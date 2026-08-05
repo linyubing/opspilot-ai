@@ -16,7 +16,7 @@ public class ChatController {
         this.service = service;
     }
 
-    @PostMapping
+    @PostMapping(produces = "application/json;charset=UTF-8")
     public ChatResponse chat(@Valid @RequestBody ChatRequest request){
         String content = service.chat(request.message());
         return new ChatResponse(content);

@@ -12,13 +12,14 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 
 public class ChatControllerTests {
     private MockMvc mockMvc;
 
     @BeforeEach
     void setUp(){
-        ChatGateway gateway = message -> "reply to: " +message;
+        ChatGateway gateway = message -> "回复: " +message;
         ChatService service = new ChatService(gateway);
         ChatController controller = new ChatController(service);
 
@@ -32,10 +33,11 @@ public class ChatControllerTests {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                         {
-                            "message":"hello"
+                            "message":"你好"
                         }"""))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content").value("reply to: hello"));
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(jsonPath("$.content").value("回复: 你好"));
     }
 
     @Test
