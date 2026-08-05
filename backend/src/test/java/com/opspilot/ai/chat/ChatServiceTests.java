@@ -7,11 +7,11 @@ public class ChatServiceTests {
 
     @Test
     void returnsTextGeneratedByGateway(){
-        ChatGateway gateway = message -> "reply to: "+ message;
+        ChatGateway gateway = message -> "回复: "+ message;
         ChatService service = new ChatService(gateway);
 
-        String result = service.chat("hello");
+        String result = service.chat("你好");
 
-        assertThat(result).isEqualTo("reply to: hello");
+        assertThat(result).isEqualTo("回复: 你好");
     }
 }
