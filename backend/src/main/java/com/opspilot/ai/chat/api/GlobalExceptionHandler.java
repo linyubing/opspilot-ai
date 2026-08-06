@@ -1,0 +1,25 @@
+package com.opspilot.ai.chat.api;
+
+import com.opspilot.ai.chat.UpstreamAiException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(UpstreamAiException.class)
+    public ResponseEntity<ApiError> handleUpstreamAiException(
+            UpstreamAiException exception
+    ){
+        ApiError error = new ApiError(
+                "AI_SERVICE_UNAVAILABLE",
+                exception.getMessage()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_GATEWAY)
+                .body(error);
+    }
+}

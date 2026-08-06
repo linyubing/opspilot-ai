@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ExtendWith(OutputCaptureExtension.class)
 public class SpringAiChatGatewayTests {
@@ -57,5 +58,24 @@ public class SpringAiChatGatewayTests {
                 .contains("耗时=")
                 .doesNotContain("你好")
                 .doesNotContain("模型回复");
+    }
+
+    @Test
+    void convertsModelFailureToSafeUpstreamException(){
+        ChatModel model = prompt -> {
+            throw new IllegalStateException("上游返回的原始敏感错误");
+        };
+
+        SpringAiChatGateway gateway =
+                new SpringAiChatGateway(ChatClient.builder(model));
+        assertThatThrownBy(()-> gateway.generate("敏感问题"))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("AI 服务暂时不可用，请稍后重试")
+                .hasCauseInstanceOf(IllegalStateException.class)
+                .satisfies(error->
+                        assertThat(error.getClass().getSimpleName())
+                                .isEqualTo("UpstreamAiException")
+                );
+
     }
 }
