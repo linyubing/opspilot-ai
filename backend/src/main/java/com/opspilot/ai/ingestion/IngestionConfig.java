@@ -1,5 +1,8 @@
 package com.opspilot.ai.ingestion;
 
+import org.springframework.ai.embedding.EmbeddingModel;
+import org.springframework.ai.vectorstore.SimpleVectorStore;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -11,6 +14,18 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class IngestionConfig {
+
+    /**
+     * 创建学习阶段使用的内存向量存储。
+     *
+     * EmbeddingModel 负责把文档内容转换成向量；
+     * SimpleVectorStore 负责保存向量并执行相似度检索。
+     * 此实现只适合学习和测试，后面会替换为 PGVector。
+     */
+    @Bean
+    public VectorStore vectorStore(EmbeddingModel embeddingModel) {
+        return SimpleVectorStore.builder(embeddingModel).build();
+    }
 
     /**
      * 创建真实文件类型校验器。
@@ -40,22 +55,11 @@ public class IngestionConfig {
     }
 
     /**
-     * 创建临时内存文档库。
-     *
-     * Spring Bean 默认是单例，因此所有上传请求
-     * 会共享同一个内存文档库实例。
-     */
-    @Bean
-    public InMemoryDocumentStore documentStore(){
-        return new InMemoryDocumentStore();
-    }
-
-    /**
      * 创建通用文档摄取服务。
      */
     @Bean
     public DocumentIngestionService ingestionService(DocumentChunker chunker,
-                                                     InMemoryDocumentStore store){
+                                                     VectorStore store){
         return new DocumentIngestionService(chunker,store);
     }
 

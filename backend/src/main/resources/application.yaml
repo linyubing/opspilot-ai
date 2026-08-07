@@ -17,6 +17,11 @@ spring:
         completions-path: /chat/completions
         options:
           model: glm-4.7
+      embedding:
+        #指定智谱向量模型，避免使用Spring AI 默认的OpenAI模型
+        options:
+          model: embedding-3
+        embeddings-path: /embeddings
 
     retry:
       max-attempts: 3

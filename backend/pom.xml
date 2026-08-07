@@ -72,6 +72,12 @@
 			<artifactId>spring-ai-tika-document-reader</artifactId>
 		</dependency>
 
+		<!-- 提供 VectorStore 接口和用于学习演示的 SimpleVectorStore -->
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-vector-store</artifactId>
+		</dependency>
+
 	</dependencies>
 
 	<build>
