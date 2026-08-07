@@ -1,6 +1,7 @@
 package com.opspilot.ai;
 
 import com.opspilot.ai.chat.ChatGateway;
+import com.opspilot.ai.retrieval.KnowledgeSearchService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,12 +17,21 @@ class OpsPilotApplicationTests {
 	@MockitoBean
 	private ChatGateway chatGateway;
 
+	// required=false：Bean 不存在时先让容器启动，再由测试给出清晰的失败结果
+	@Autowired(required = false)
+	private KnowledgeSearchService knowledgeSearchService;
+
 	@Autowired
 	private Environment environment;
 
 	// 没有 VectorStore Bean 时允许启动测试，随后通过断言明确失败原因
 	@Autowired(required = false)
 	private VectorStore vectorStore;
+
+	@Test
+	void createsKnowledgeSearchService(){
+		assertThat(knowledgeSearchService).isNotNull();
+	}
 
 	@Test
 	void usesZhipuEmbeddingPath(){
