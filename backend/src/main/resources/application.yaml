@@ -1,6 +1,13 @@
 spring:
   application:
     name: opspilot-backend
+  servlet:
+    multipart:
+      # 单个上传文件最大为 10 MB
+      max-file-size: 10MB
+      # 整个 multipart 请求还包含文件名、请求头和分隔符，因此略大于文件限制
+      max-request-size: 11MB
+
 
   ai:
     openai:

@@ -9,6 +9,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
@@ -36,6 +37,25 @@ public class DocumentControllerTests {
         DocumentController controller = new DocumentController(uploadService,new FileTypeValidator());
 
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
+    }
+
+    @Test
+// rejectsOversizedFile：超过 10 MB 的文件应在进入 Tika 解析前被拒绝
+    void rejectsOversizedFile() throws Exception{
+        byte[] content = new byte[10*1024*1024+1];
+        // 全 0 字节会被 Tika 判断为二进制文件，无法真正测试“文件大小超限”。
+        Arrays.fill(content, (byte) ' ');
+        content[0] = 'A';
+
+        MockMultipartFile oversizedFile = new MockMultipartFile(
+                "file",
+                "大型文档.txt",
+                "text/plain",
+                content
+        );
+
+        mockMvc.perform(multipart("/api/documents").file(oversizedFile))
+                .andExpect(status().isBadRequest());
     }
 
     @Test

@@ -27,6 +27,12 @@ import java.util.Set;
 @RequestMapping("/api/documents")
 public class DocumentController {
 
+    /**
+     * 单个文档最大允许 10 MB。
+     * 使用 long，避免以后扩大限制时发生整数溢出。
+     */
+    private static final long MAX_FILE_SIZE = 10L * 1024 * 1024;
+
     private final DocumentUploadService uploadService;
     private final FileTypeValidator typeValidator;
 
@@ -52,15 +58,6 @@ public class DocumentController {
     )
     public IngestionResult upload(
             @RequestParam("file") MultipartFile file) throws IOException {
-        /*
-         * 读取文件真实字节类型，并与扩展名进行匹配。
-         * 不能相信客户端提交的 Content-Type。
-         */
-        boolean allowed = typeValidator.isAllowed(file.getResource(), file.getOriginalFilename());
-
-        if(!allowed){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"文件扩展名与真实内容类型不匹配");
-        }
 
         /*
          * 空文件属于客户端请求错误，
@@ -72,6 +69,26 @@ public class DocumentController {
                     "上传文件不能为空"
             );
         }
+        /*
+         * 必须在 Tika 读取文件内容前拦截。
+         * 否则虽然最终拒绝了文件，但解析过程已经消耗了内存和 CPU。
+         */
+        if(file.getSize()> MAX_FILE_SIZE){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"上传文件不能超过 10 MB");
+        }
+
+
+        /*
+         * 读取文件真实字节类型，并与扩展名进行匹配。
+         * 不能相信客户端提交的 Content-Type。
+         */
+        boolean allowed = typeValidator.isAllowed(file.getResource(), file.getOriginalFilename());
+
+        if(!allowed){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"文件扩展名与真实内容类型不匹配");
+        }
+
+
 
         /*
          * getFilenameExtension：获取文件名最后一个点号后的扩展名。
