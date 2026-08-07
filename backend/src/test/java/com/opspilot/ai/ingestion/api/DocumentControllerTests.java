@@ -1,9 +1,6 @@
 package com.opspilot.ai.ingestion.api;
 
-import com.opspilot.ai.ingestion.DocumentChunker;
-import com.opspilot.ai.ingestion.DocumentIngestionService;
-import com.opspilot.ai.ingestion.DocumentUploadService;
-import com.opspilot.ai.ingestion.TikaReaderFactory;
+import com.opspilot.ai.ingestion.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.document.DocumentWriter;
@@ -36,9 +33,33 @@ public class DocumentControllerTests {
         DocumentUploadService uploadService=
                 new DocumentUploadService(new TikaReaderFactory(),ingestionService);
 
-        DocumentController controller = new DocumentController(uploadService);
+        DocumentController controller = new DocumentController(uploadService,new FileTypeValidator());
 
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
+    }
+
+    @Test
+// rejectsDisguisedFileContent：扩展名伪装不能绕过真实类型校验
+    void rejectsDisguisedFileContent() throws Exception{
+        byte[] executableContent = """
+            MZThis program cannot be run in DOS mode
+            """.getBytes(StandardCharsets.US_ASCII);
+
+        MockMultipartFile disguisedFile =
+                new MockMultipartFile(
+                        "file",
+                        // 文件名故意伪装成 PDF
+                        "伪装文档.pdf",
+                        // 客户端声明的类型也故意伪造成 PDF
+                        "application/pdf",
+                        executableContent
+                );
+
+        mockMvc.perform(
+                        multipart("/api/documents")
+                                .file(disguisedFile)
+                )
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -70,5 +91,21 @@ public class DocumentControllerTests {
         mockMvc.perform(multipart("/api/documents").file(emptyFile))
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    // rejectsUnsupportedFileType：不支持的文件类型应返回 400
+    void rejectsUnsupportedFileType() throws Exception{
+        MockMultipartFile executableFile =
+                new MockMultipartFile(  "file",
+                        "恶意程序.exe",
+                        "application/octet-stream",
+                        "这不是真正的文档"
+                                .getBytes(StandardCharsets.UTF_8));
+
+        mockMvc.perform(multipart("/api/documents").file(executableFile))
+                .andExpect(status().isBadRequest());
+    }
+
+
 
 }

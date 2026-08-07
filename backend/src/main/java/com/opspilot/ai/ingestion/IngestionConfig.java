@@ -13,6 +13,14 @@ import org.springframework.context.annotation.Configuration;
 public class IngestionConfig {
 
     /**
+     * 创建真实文件类型校验器。
+     */
+    @Bean
+    public FileTypeValidator fileTypeValidator(){
+        return new FileTypeValidator();
+    }
+
+    /**
      * 创建 Tika 文档读取器工厂。
      */
     @Bean
