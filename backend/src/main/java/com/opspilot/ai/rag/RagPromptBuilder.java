@@ -1,6 +1,7 @@
 package com.opspilot.ai.rag;
 
 import org.springframework.ai.document.Document;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -11,6 +12,7 @@ import java.util.stream.Collectors;
  * 负责把向量检索得到的文档块和用户问题
  * 组合成发送给大模型的最终提示词。
  */
+@Service
 public class RagPromptBuilder {
 
     public String build(String question, List<Document> documents){

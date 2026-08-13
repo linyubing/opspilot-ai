@@ -3,6 +3,7 @@ package com.opspilot.ai.rag;
 import com.opspilot.ai.chat.ChatGateway;
 import com.opspilot.ai.retrieval.KnowledgeSearchService;
 import org.springframework.ai.document.Document;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
@@ -14,6 +15,7 @@ import java.util.List;
  * 2. 将文档和问题组装成提示词；
  * 3. 调用大模型生成最终回答。
  */
+@Service
 public class RagService {
     private final KnowledgeSearchService searchService;
     private final RagPromptBuilder promptBuilder;

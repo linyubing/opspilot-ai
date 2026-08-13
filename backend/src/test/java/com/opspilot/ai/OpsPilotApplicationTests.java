@@ -1,6 +1,7 @@
 package com.opspilot.ai;
 
 import com.opspilot.ai.chat.ChatGateway;
+import com.opspilot.ai.rag.RagService;
 import com.opspilot.ai.retrieval.KnowledgeSearchService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,15 @@ class OpsPilotApplicationTests {
 	// 没有 VectorStore Bean 时允许启动测试，随后通过断言明确失败原因
 	@Autowired(required = false)
 	private VectorStore vectorStore;
+
+	@Autowired
+	private RagService ragService;
+
+	@Test
+	void loadsRagService(){
+		//验证Spring 容器能够完成RAG整条依赖链的装配
+		assertThat(ragService).isNotNull();
+	}
 
 	@Test
 	void createsKnowledgeSearchService(){
