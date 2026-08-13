@@ -10,6 +10,12 @@ spring:
 
 
   ai:
+    model:
+      # ChatModel 继续选择智谱使用的 OpenAI 兼容实现。
+      chat: openai
+
+      # EmbeddingModel 改为本地 Ollama 实现。
+      embedding: ollama
     openai:
       base-url: https://open.bigmodel.cn/api/paas/v4
       api-key: ${ZHIPU_API_KEY}
@@ -17,11 +23,19 @@ spring:
         completions-path: /chat/completions
         options:
           model: glm-4.7
+    ollama:
+      # Ollama 默认监听本机 11434 端口。
+      base-url: http://localhost:11434
+
       embedding:
-        #指定智谱向量模型，避免使用Spring AI 默认的OpenAI模型
-        options:
-          model: embedding-3
-        embeddings-path: /embeddings
+        # 使用已经下载到 D 盘的本地向量模型。
+        model: nomic-embed-text
+
+      init:
+        # 模型已提前下载，应用启动时不再自动拉取。
+        pull-model-strategy: never
+
+
 
     retry:
       max-attempts: 3
