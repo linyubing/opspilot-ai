@@ -52,11 +52,16 @@ spring:
         # HNSW 查询性能较好，并且不需要先训练索引。
         index-type: HNSW
         table-name: vector_store
-
-
     retry:
       max-attempts: 3
       backoff:
         initial-interval: 1s
         multiplier: 2
         max-interval: 5s
+
+  flyway:
+    # public schema 已存在 vector_store，让 Flyway 接管现有非空数据库。
+    baseline-on-migrate: true
+
+    # 从 0 号基线开始，保证接下来创建的 V1 脚本仍会执行。
+    baseline-version: 0
