@@ -7,7 +7,11 @@ spring:
       max-file-size: 10MB
       # 整个 multipart 请求还包含文件名、请求头和分隔符，因此略大于文件限制
       max-request-size: 11MB
-
+  datasource:
+    url: jdbc:postgresql://localhost:5432/opspilot_ai
+    username: postgres
+    # 数据库密码从环境变量读取，不能提交到 Git。
+    password: ${OPSPILOT_DB_PASSWORD}
 
   ai:
     model:
@@ -34,7 +38,20 @@ spring:
       init:
         # 模型已提前下载，应用启动时不再自动拉取。
         pull-model-strategy: never
+    vectorstore:
+      pgvector:
+        # 首次启动时创建 vector_store 表及向量索引。
+        initialize-schema: true
 
+        # nomic-embed-text 返回的向量维度是 768。
+        dimensions: 768
+
+        # 使用余弦距离比较文本语义的相似程度。
+        distance-type: COSINE_DISTANCE
+
+        # HNSW 查询性能较好，并且不需要先训练索引。
+        index-type: HNSW
+        table-name: vector_store
 
 
     retry:

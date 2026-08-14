@@ -6,6 +6,7 @@ import com.opspilot.ai.retrieval.KnowledgeSearchService;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.ollama.OllamaEmbeddingModel;
+import org.springframework.ai.vectorstore.pgvector.PgVectorStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.env.Environment;
@@ -36,6 +37,12 @@ class OpsPilotApplicationTests {
 
 	@Autowired
 	private EmbeddingModel embeddingModel;
+
+	@Test
+	void createsPgVectorStore() {
+		// 验证 VectorStore 已经从内存实现切换为 PostgreSQL 持久化实现。
+		assertThat(vectorStore).isInstanceOf(PgVectorStore.class);
+	}
 
 	@Test
 	void createsOllamaEmbeddingModel() {
@@ -77,12 +84,6 @@ class OpsPilotApplicationTests {
 		assertThat(knowledgeSearchService).isNotNull();
 	}
 
-
-	@Test
-	void createsVectorStore(){
-		//验证摄取模块已经接入真正的向量存储抽象
-		assertThat(vectorStore).isNotNull();
-	}
 
 	@Test
 	void contextLoads() {
