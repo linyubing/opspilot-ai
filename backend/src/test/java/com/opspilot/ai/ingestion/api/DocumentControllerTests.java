@@ -3,7 +3,6 @@ package com.opspilot.ai.ingestion.api;
 import com.opspilot.ai.ingestion.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.ai.document.DocumentWriter;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -11,6 +10,9 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -20,21 +22,19 @@ public class DocumentControllerTests {
     private MockMvc mockMvc;
 
     @BeforeEach
-    void setUp(){
+    void setUp() {
         /*
-         * 当前还没有接入向量数据库。
-         * 这里的 Writer 接收文档块但不持久化，
-         * Controller 测试只关注 HTTP 上传协议。
+         * Controller 测试只关注 HTTP 协议和参数校验，
+         * 上传生命周期由 DocumentUploadServiceTests 单独验证。
          */
-        DocumentWriter writer = documents -> {};
+        DocumentUploadService uploadService = mock(DocumentUploadService.class);
+        when(uploadService.upload(any()))
+                .thenReturn(new IngestionResult(1, 1));
 
-        DocumentIngestionService ingestionService =
-                new DocumentIngestionService(new DocumentChunker(100),writer);
-
-        DocumentUploadService uploadService=
-                new DocumentUploadService(new TikaReaderFactory(),ingestionService);
-
-        DocumentController controller = new DocumentController(uploadService,new FileTypeValidator());
+        DocumentController controller = new DocumentController(
+                uploadService,
+                new FileTypeValidator()
+        );
 
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }

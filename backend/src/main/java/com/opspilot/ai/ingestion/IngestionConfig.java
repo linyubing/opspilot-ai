@@ -1,5 +1,7 @@
 package com.opspilot.ai.ingestion;
 
+import com.opspilot.ai.document.ContentHashCalculator;
+import com.opspilot.ai.document.DocumentRepository;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -50,15 +52,29 @@ public class IngestionConfig {
         return new DocumentIngestionService(chunker,store);
     }
 
+    @Bean
+    public ContentHashCalculator contentHashCalculator() {
+        return new ContentHashCalculator();
+    }
+
     /**
      * 创建文档上传用例服务。
      */
     @Bean
     public DocumentUploadService uploadService(
             TikaReaderFactory readerFactory,
-            DocumentIngestionService ingestionService
+            DocumentIngestionService ingestionService,
+            ContentHashCalculator hashCalculator,
+            DocumentRepository repository,
+            VectorStore vectorStore
     ){
-        return new DocumentUploadService(readerFactory,ingestionService);
+        return new DocumentUploadService(
+                readerFactory,
+                ingestionService,
+                hashCalculator,
+                repository,
+                vectorStore
+        );
 
     }
 }
