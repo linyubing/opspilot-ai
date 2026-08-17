@@ -11,3 +11,6 @@
 
 # 忽略 Maven 编译产物
 /backend/target/
+
+# 忽略 Git 的本地独立工作区，避免把整份临时项目误提交。
+/.worktrees/
