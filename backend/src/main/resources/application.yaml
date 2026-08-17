@@ -65,3 +65,12 @@ spring:
 
     # 从 0 号基线开始，保证接下来创建的 V1 脚本仍会执行。
     baseline-version: 0
+
+opspilot:
+  market-data:
+    alpha-vantage:
+      base-url: https://www.alphavantage.co
+      # 黄金行情 Key 只从环境变量读取，禁止写入配置文件和 Git。
+      api-key: ${ALPHA_VANTAGE_API_KEY:}
+      connect-timeout: 5s
+      read-timeout: 20s
