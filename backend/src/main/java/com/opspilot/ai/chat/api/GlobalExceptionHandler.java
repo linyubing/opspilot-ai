@@ -1,6 +1,7 @@
 package com.opspilot.ai.chat.api;
 
 import com.opspilot.ai.chat.UpstreamAiException;
+import com.opspilot.ai.marketdata.InvalidMarketDataRequestException;
 import com.opspilot.ai.marketdata.MarketDataUnavailableException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,9 +39,9 @@ public class GlobalExceptionHandler {
                 .body(error);
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
+    @ExceptionHandler(InvalidMarketDataRequestException.class)
     public ResponseEntity<ApiError> handleInvalidMarketDataRequest(
-            IllegalArgumentException exception
+            InvalidMarketDataRequestException exception
     ) {
         ApiError error = new ApiError(
                 "INVALID_MARKET_DATA_REQUEST",

@@ -2,6 +2,7 @@ package com.opspilot.ai.marketdata.api;
 
 import com.opspilot.ai.marketdata.GoldPriceSyncResult;
 import com.opspilot.ai.marketdata.GoldPriceSyncService;
+import com.opspilot.ai.marketdata.InvalidMarketDataRequestException;
 import com.opspilot.ai.marketdata.MarketPriceRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -48,7 +49,7 @@ public class GoldPriceController {
             @RequestParam(defaultValue = "60") int limit
     ) {
         if (limit < 1 || limit > 500) {
-            throw new IllegalArgumentException(
+            throw new InvalidMarketDataRequestException(
                     "limit 必须在 1 到 500 之间"
             );
         }

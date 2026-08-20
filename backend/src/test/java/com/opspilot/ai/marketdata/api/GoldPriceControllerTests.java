@@ -12,6 +12,8 @@ import com.opspilot.ai.chat.api.GlobalExceptionHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -25,6 +27,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -33,10 +36,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class GoldPriceControllerTests {
 
     private MockMvc mockMvc;
+    private InMemoryRepository repository;
 
     @BeforeEach
     void setUp() {
-        InMemoryRepository repository = new InMemoryRepository();
+        repository = new InMemoryRepository();
         GoldPriceProvider provider = () -> List.of(
                 price("2026-08-14", "3333.25"),
                 price("2026-08-15", "3340.10")
@@ -103,14 +107,39 @@ class GoldPriceControllerTests {
                         .value("2026-08-14"));
     }
 
-    @Test
-    @DisplayName("limit 超出范围时返回 400")
-    void rejectsInvalidLimit() throws Exception {
+    @ParameterizedTest
+    @ValueSource(ints = {-1, 0, 501})
+    @DisplayName("limit 超出 1 到 500 时返回 400")
+    void rejectsInvalidLimit(int limit) throws Exception {
         mockMvc.perform(get("/api/market-data/gold/daily")
-                        .param("limit", "0"))
+                        .param("limit", String.valueOf(limit)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code")
                         .value("INVALID_MARKET_DATA_REQUEST"));
+    }
+
+    @Test
+    @DisplayName("limit 等于 500 时允许查询")
+    void acceptsMaximumLimit() throws Exception {
+        mockMvc.perform(get("/api/market-data/gold/daily")
+                        .param("limit", "500"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("未传 limit 时默认查询 60 条")
+    void usesDefaultLimit() throws Exception {
+        mockMvc.perform(get("/api/market-data/gold/daily"))
+                .andExpect(status().isOk());
+
+        assertThat(repository.lastLimit).isEqualTo(60);
+    }
+
+    @Test
+    @DisplayName("没有黄金价格时最新价接口返回 404")
+    void returns404WhenLatestPriceDoesNotExist() throws Exception {
+        mockMvc.perform(get("/api/market-data/gold/daily/latest"))
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -165,6 +194,7 @@ class GoldPriceControllerTests {
             implements MarketPriceRepository {
 
         private final List<MarketPrice> prices = new ArrayList<>();
+        private int lastLimit;
 
         @Override
         public void saveAll(List<MarketPrice> values) {
@@ -180,6 +210,7 @@ class GoldPriceControllerTests {
 
         @Override
         public List<MarketPrice> findRecent(String symbol, int limit) {
+            lastLimit = limit;
             return prices.stream()
                     .filter(price -> price.symbol().equals(symbol))
                     .sorted(Comparator.comparing(MarketPrice::priceDate)

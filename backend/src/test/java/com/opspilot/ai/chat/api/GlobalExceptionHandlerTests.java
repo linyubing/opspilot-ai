@@ -1,11 +1,15 @@
 package com.opspilot.ai.chat.api;
 
 import com.opspilot.ai.chat.UpstreamAiException;
+import com.opspilot.ai.marketdata.InvalidMarketDataRequestException;
 import com.opspilot.ai.marketdata.MarketDataUnavailableException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+
+import java.util.Arrays;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -61,7 +65,7 @@ public class GlobalExceptionHandlerTests {
 
         ResponseEntity<ApiError> response =
                 handler.handleInvalidMarketDataRequest(
-                        new IllegalArgumentException(
+                        new InvalidMarketDataRequestException(
                                 "limit 必须在 1 到 500 之间"
                         )
                 );
@@ -73,5 +77,19 @@ public class GlobalExceptionHandlerTests {
                         "INVALID_MARKET_DATA_REQUEST",
                         "limit 必须在 1 到 500 之间"
                 ));
+    }
+
+    @Test
+    @DisplayName("不会把所有普通参数异常标记成行情请求错误")
+    void doesNotHandleEveryIllegalArgumentException() {
+        boolean handlesIllegalArgumentException = Arrays.stream(
+                        GlobalExceptionHandler.class.getDeclaredMethods()
+                )
+                .map(method -> method.getAnnotation(ExceptionHandler.class))
+                .filter(annotation -> annotation != null)
+                .flatMap(annotation -> Arrays.stream(annotation.value()))
+                .anyMatch(IllegalArgumentException.class::equals);
+
+        assertThat(handlesIllegalArgumentException).isFalse();
     }
 }
