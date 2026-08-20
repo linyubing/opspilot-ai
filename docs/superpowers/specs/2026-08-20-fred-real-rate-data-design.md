@@ -251,4 +251,3 @@ opspilot.macro-data.fred.api-key=${FRED_API_KEY:}
 - 三个 HTTP API 的正常和错误合同均有自动化测试；
 - API Key 不出现在代码、Git 差异、测试报告和日志中；
 - 全量 Maven 测试、差异检查和敏感信息扫描通过。
-
