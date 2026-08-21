@@ -74,3 +74,12 @@ opspilot:
       api-key: ${ALPHA_VANTAGE_API_KEY:}
       connect-timeout: 5s
       read-timeout: 20s
+
+  macro-data:
+    fred:
+      base-url: https://api.stlouisfed.org
+      # FRED Key 只从环境变量读取，禁止写进配置文件和 Git。
+      api-key: ${FRED_API_KEY:}
+      series-id: DFII10
+      connect-timeout: 5s
+      read-timeout: 20s

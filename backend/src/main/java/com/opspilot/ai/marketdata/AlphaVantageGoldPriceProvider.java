@@ -2,6 +2,7 @@ package com.opspilot.ai.marketdata;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -30,7 +31,7 @@ public class AlphaVantageGoldPriceProvider implements GoldPriceProvider {
     private final Clock clock;
 
     public AlphaVantageGoldPriceProvider(
-            RestClient restClient,
+            @Qualifier("alphaVantageRestClient") RestClient restClient,
             MarketDataProperties properties,
             Clock clock
     ) {
