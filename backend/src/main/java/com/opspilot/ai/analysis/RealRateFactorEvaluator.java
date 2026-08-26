@@ -5,6 +5,9 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.util.Objects;
 
+/**
+ * 根据实际利率的短期和中期变化评估单因子状态。
+ */
 @Component
 public class RealRateFactorEvaluator {
 

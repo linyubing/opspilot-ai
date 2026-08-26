@@ -15,6 +15,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 负责对齐黄金与实际利率数据并计算确定性研究快照。
+ * 本类不调用大模型，也不生成交易信号。
+ */
 @Service
 public class GoldResearchSnapshotService {
 

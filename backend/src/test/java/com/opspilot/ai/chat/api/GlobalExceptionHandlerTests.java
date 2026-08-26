@@ -1,5 +1,7 @@
 package com.opspilot.ai.chat.api;
 
+import com.opspilot.ai.analysis.InsufficientResearchDataException;
+import com.opspilot.ai.analysis.InvalidResearchDataException;
 import com.opspilot.ai.chat.UpstreamAiException;
 import com.opspilot.ai.macrodata.InvalidMacroDataRequestException;
 import com.opspilot.ai.macrodata.MacroDataUnavailableException;
@@ -132,6 +134,46 @@ public class GlobalExceptionHandlerTests {
         assertThat(response.getBody()).isEqualTo(new ApiError(
                 "INVALID_MACRO_DATA_REQUEST",
                 "limit 必须在 1 到 500 之间"
+        ));
+    }
+
+    @Test
+    @DisplayName("研究数据不足时返回 422")
+    void returnsUnprocessableEntityForInsufficientResearchData() {
+        GlobalExceptionHandler handler = new GlobalExceptionHandler();
+
+        ResponseEntity<ApiError> response =
+                handler.handleInsufficientResearchData(
+                        new InsufficientResearchDataException(
+                                "共同观测日期不足"
+                        )
+                );
+
+        assertThat(response.getStatusCode())
+                .isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);
+        assertThat(response.getBody()).isEqualTo(new ApiError(
+                "INSUFFICIENT_RESEARCH_DATA",
+                "共同观测日期不足"
+        ));
+    }
+
+    @Test
+    @DisplayName("研究数据非法时返回 422")
+    void returnsUnprocessableEntityForInvalidResearchData() {
+        GlobalExceptionHandler handler = new GlobalExceptionHandler();
+
+        ResponseEntity<ApiError> response =
+                handler.handleInvalidResearchData(
+                        new InvalidResearchDataException(
+                                "黄金价格必须大于 0"
+                        )
+                );
+
+        assertThat(response.getStatusCode())
+                .isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);
+        assertThat(response.getBody()).isEqualTo(new ApiError(
+                "INVALID_RESEARCH_DATA",
+                "黄金价格必须大于 0"
         ));
     }
 }
