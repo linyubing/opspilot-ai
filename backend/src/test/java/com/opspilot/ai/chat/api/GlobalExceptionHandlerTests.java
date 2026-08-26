@@ -1,6 +1,8 @@
 package com.opspilot.ai.chat.api;
 
 import com.opspilot.ai.chat.UpstreamAiException;
+import com.opspilot.ai.macrodata.InvalidMacroDataRequestException;
+import com.opspilot.ai.macrodata.MacroDataUnavailableException;
 import com.opspilot.ai.marketdata.InvalidMarketDataRequestException;
 import com.opspilot.ai.marketdata.MarketDataUnavailableException;
 import org.junit.jupiter.api.Test;
@@ -91,5 +93,45 @@ public class GlobalExceptionHandlerTests {
                 .anyMatch(IllegalArgumentException.class::equals);
 
         assertThat(handlesIllegalArgumentException).isFalse();
+    }
+
+    @Test
+    @DisplayName("宏观数据来源不可用时返回 503")
+    void returnsServiceUnavailableForMacroDataFailure() {
+        GlobalExceptionHandler handler = new GlobalExceptionHandler();
+
+        ResponseEntity<ApiError> response =
+                handler.handleMacroDataUnavailable(
+                        new MacroDataUnavailableException(
+                                "FRED 实际利率服务暂时不可用"
+                        )
+                );
+
+        assertThat(response.getStatusCode())
+                .isEqualTo(HttpStatus.SERVICE_UNAVAILABLE);
+        assertThat(response.getBody()).isEqualTo(new ApiError(
+                "MACRO_DATA_UNAVAILABLE",
+                "FRED 实际利率服务暂时不可用"
+        ));
+    }
+
+    @Test
+    @DisplayName("宏观查询参数无效时返回 400")
+    void returnsBadRequestForInvalidMacroDataRequest() {
+        GlobalExceptionHandler handler = new GlobalExceptionHandler();
+
+        ResponseEntity<ApiError> response =
+                handler.handleInvalidMacroDataRequest(
+                        new InvalidMacroDataRequestException(
+                                "limit 必须在 1 到 500 之间"
+                        )
+                );
+
+        assertThat(response.getStatusCode())
+                .isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isEqualTo(new ApiError(
+                "INVALID_MACRO_DATA_REQUEST",
+                "limit 必须在 1 到 500 之间"
+        ));
     }
 }
