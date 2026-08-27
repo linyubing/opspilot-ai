@@ -11,11 +11,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.env.Environment;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest(properties = "spring.ai.openai.api-key=test-key")
+@SpringBootTest(properties = {
+		"spring.ai.openai.api-key=test-key",
+		"opspilot.forecast.gold.settlement-schedule.enabled=false"
+})
 class OpsPilotApplicationTests {
 
 	@MockitoBean
@@ -27,6 +31,9 @@ class OpsPilotApplicationTests {
 
 	@Autowired
 	private Environment environment;
+
+	@Autowired
+	private ApplicationContext applicationContext;
 
 	// 没有 VectorStore Bean 时允许启动测试，随后通过断言明确失败原因
 	@Autowired(required = false)
@@ -109,6 +116,13 @@ class OpsPilotApplicationTests {
 		assertThat(environment.getProperty(
 				"opspilot.forecast.gold.model-name"
 		)).isEqualTo("glm-4.7");
+	}
+
+	@Test
+	void doesNotRegisterGoldSettlementSchedulerWhenDisabled() {
+		// 测试必须显式关闭任务，不能受开发机环境变量影响而访问真实接口。
+		assertThat(applicationContext.containsBean("goldSettlementScheduler"))
+				.isFalse();
 	}
 
 }

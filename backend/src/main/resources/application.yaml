@@ -71,6 +71,12 @@ opspilot:
     gold:
       # 保存实际调用的模型名称，用于预测版本审计和幂等判断。
       model-name: glm-4.7
+      settlement-schedule:
+        # 默认关闭，防止本地开发启动时意外请求外部行情接口。
+        enabled: ${GOLD_SETTLEMENT_SCHEDULE_ENABLED:false}
+        # 北京时间工作日上午 8:30，同步上一交易日已经发布的行情。
+        cron: "${GOLD_SETTLEMENT_SCHEDULE_CRON:0 30 8 * * MON-FRI}"
+        zone: "${GOLD_SETTLEMENT_SCHEDULE_ZONE:Asia/Shanghai}"
   research:
     narrative:
       # 正式解读记录会保存模型名称，用于审计和幂等判断。
