@@ -2,6 +2,7 @@ package com.opspilot.ai.chat.api;
 
 import com.opspilot.ai.analysis.InsufficientResearchDataException;
 import com.opspilot.ai.analysis.InvalidResearchDataException;
+import com.opspilot.ai.analysis.history.InvalidResearchHistoryRequestException;
 import com.opspilot.ai.chat.UpstreamAiException;
 import com.opspilot.ai.macrodata.InvalidMacroDataRequestException;
 import com.opspilot.ai.macrodata.MacroDataUnavailableException;
@@ -17,6 +18,20 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(InvalidResearchHistoryRequestException.class)
+    public ResponseEntity<ApiError> handleInvalidResearchHistoryRequest(
+            InvalidResearchHistoryRequestException exception
+    ) {
+        ApiError error = new ApiError(
+                "INVALID_RESEARCH_REQUEST",
+                exception.getMessage()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(error);
+    }
 
     @ExceptionHandler(UpstreamAiException.class)
     public ResponseEntity<ApiError> handleUpstreamAiException(
