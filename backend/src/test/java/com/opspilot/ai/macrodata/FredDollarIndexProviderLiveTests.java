@@ -11,11 +11,11 @@ import java.time.Duration;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @EnabledIfEnvironmentVariable(named = "FRED_API_KEY", matches = ".+")
-class FredRealRateProviderLiveTests {
+class FredDollarIndexProviderLiveTests {
 
     @Test
-    @DisplayName("从 FRED 获取真实 DFII10 日度实际利率")
-    void fetchesRealDfii10Observations() {
+    @DisplayName("从 FRED 获取真实 DTWEXBGS 广义美元指数")
+    void fetchesRealBroadDollarIndexObservations() {
         FredProperties properties = new FredProperties(
                 URI.create("https://api.stlouisfed.org"),
                 System.getenv("FRED_API_KEY"),
@@ -27,26 +27,22 @@ class FredRealRateProviderLiveTests {
         RestClient restClient = RestClient.builder()
                 .baseUrl(properties.baseUrl().toString())
                 .build();
-        RealRateProvider provider = new FredRealRateProvider(
+        DollarIndexProvider provider = new FredDollarIndexProvider(
                 new FredSeriesClient(restClient, properties),
                 properties
         );
 
-        RealRateBatch batch = provider.fetchDailyObservations();
+        DollarIndexBatch batch = provider.fetchDailyObservations();
 
-        /*
-         * 真实利率会变化，因此只验证来源合同，
-         * 不断言某个固定日期或固定数值。
-         */
+        // 真实数据会持续变化，因此这里只验证来源合同，不固定日期和数值。
         assertThat(batch.receivedCount()).isPositive();
         assertThat(batch.observations()).isNotEmpty();
-        assertThat(batch.observations())
-                .allSatisfy(observation -> {
-                    assertThat(observation.seriesId()).isEqualTo("DFII10");
-                    assertThat(observation.observationDate()).isNotNull();
-                    assertThat(observation.value()).isNotNull();
-                    assertThat(observation.unit()).isEqualTo("percent");
-                    assertThat(observation.provider()).isEqualTo("fred");
-                });
+        assertThat(batch.observations()).allSatisfy(observation -> {
+            assertThat(observation.seriesId()).isEqualTo("DTWEXBGS");
+            assertThat(observation.observationDate()).isNotNull();
+            assertThat(observation.value()).isNotNull();
+            assertThat(observation.unit()).isEqualTo("index_2006_100");
+            assertThat(observation.provider()).isEqualTo("fred");
+        });
     }
 }

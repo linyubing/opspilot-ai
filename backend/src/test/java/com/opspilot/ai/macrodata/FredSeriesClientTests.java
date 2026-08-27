@@ -84,6 +84,7 @@ class FredSeriesClientTests {
                 baseUrl,
                 apiKey,
                 "DFII10",
+                "DTWEXBGS",
                 Duration.ofSeconds(2),
                 Duration.ofSeconds(2)
         );

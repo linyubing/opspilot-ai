@@ -81,5 +81,6 @@ opspilot:
       # FRED Key 只从环境变量读取，禁止写进配置文件和 Git。
       api-key: ${FRED_API_KEY:}
       series-id: DFII10
+      dollar-index-series-id: DTWEXBGS
       connect-timeout: 5s
       read-timeout: 20s
