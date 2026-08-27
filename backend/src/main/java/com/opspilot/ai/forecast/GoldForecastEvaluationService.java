@@ -150,7 +150,7 @@ public class GoldForecastEvaluationService {
         List<StoredGoldDirectionForecast> directionForecasts = resolvedForecasts.stream()
                 .filter(forecast ->
                 forecast.predictedDirection() == direction).toList();
-        
+
         return new DirectionEvaluation(
                 direction,
                 directionForecasts.size(),
