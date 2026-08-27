@@ -42,7 +42,7 @@ public class RealRateFactorEvaluator {
                 BigDecimal.ZERO
         ) > 0) {
             return assessment(
-                    RealRateFactorStatus.PRESSURING,
+                    GoldFactorStatus.PRESSURING,
                     "实际利率中期明显上升且短期继续上升，"
                             + "对黄金构成单因子压力。"
             );
@@ -59,21 +59,21 @@ public class RealRateFactorEvaluator {
                 BigDecimal.ZERO
         ) < 0) {
             return assessment(
-                    RealRateFactorStatus.SUPPORTIVE,
+                    GoldFactorStatus.SUPPORTIVE,
                     "实际利率中期明显下降且短期继续下降，"
                             + "对黄金构成单因子支撑。"
             );
         }
 
         return assessment(
-                RealRateFactorStatus.NEUTRAL,
+                GoldFactorStatus.NEUTRAL,
                 "实际利率变化有限或长短周期方向不一致，"
                         + "单因子状态为中性。"
         );
     }
 
     private ResearchFactorAssessment assessment(
-            RealRateFactorStatus status,
+            GoldFactorStatus status,
             String explanation
     ) {
         return new ResearchFactorAssessment(

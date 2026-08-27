@@ -3,7 +3,7 @@ package com.opspilot.ai.analysis.history;
 import com.opspilot.ai.analysis.GoldResearchSnapshot;
 import com.opspilot.ai.analysis.GoldReturnMetrics;
 import com.opspilot.ai.analysis.RealRateChangeMetrics;
-import com.opspilot.ai.analysis.RealRateFactorStatus;
+import com.opspilot.ai.analysis.GoldFactorStatus;
 import com.opspilot.ai.analysis.ResearchFactorAssessment;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -97,7 +97,7 @@ public class JdbcGoldResearchSnapshotRepository
                                 )
                         ),
                         new ResearchFactorAssessment(
-                                RealRateFactorStatus.valueOf(
+                                GoldFactorStatus.valueOf(
                                         resultSet.getString(
                                                 "assessment_status"
                                         ).toUpperCase(Locale.ROOT)

@@ -6,7 +6,7 @@ import com.opspilot.ai.analysis.GoldReturnMetrics;
 import com.opspilot.ai.analysis.InsufficientResearchDataException;
 import com.opspilot.ai.analysis.InvalidResearchDataException;
 import com.opspilot.ai.analysis.RealRateChangeMetrics;
-import com.opspilot.ai.analysis.RealRateFactorStatus;
+import com.opspilot.ai.analysis.GoldFactorStatus;
 import com.opspilot.ai.analysis.ResearchFactorAssessment;
 import com.opspilot.ai.chat.api.GlobalExceptionHandler;
 import org.junit.jupiter.api.BeforeEach;
@@ -123,7 +123,7 @@ class GoldResearchControllerTests {
                         collectedAt
                 ),
                 new ResearchFactorAssessment(
-                        RealRateFactorStatus.PRESSURING,
+                        GoldFactorStatus.PRESSURING,
                         "gold-real-rate-v1",
                         "实际利率构成单因子压力。"
                 ),

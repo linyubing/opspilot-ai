@@ -3,7 +3,7 @@ package com.opspilot.ai.analysis.api;
 import com.opspilot.ai.analysis.GoldResearchSnapshot;
 import com.opspilot.ai.analysis.GoldReturnMetrics;
 import com.opspilot.ai.analysis.RealRateChangeMetrics;
-import com.opspilot.ai.analysis.RealRateFactorStatus;
+import com.opspilot.ai.analysis.GoldFactorStatus;
 import com.opspilot.ai.analysis.ResearchFactorAssessment;
 import com.opspilot.ai.analysis.history.GoldResearchSnapshotRecordingService;
 import com.opspilot.ai.analysis.history.GoldResearchSnapshotRepository;
@@ -117,7 +117,7 @@ class GoldResearchSnapshotHistoryControllerTests {
                         time
                 ),
                 new ResearchFactorAssessment(
-                        RealRateFactorStatus.NEUTRAL,
+                        GoldFactorStatus.NEUTRAL,
                         "gold-real-rate-v1",
                         "实际利率变化有限，单因子状态为中性。"
                 ),

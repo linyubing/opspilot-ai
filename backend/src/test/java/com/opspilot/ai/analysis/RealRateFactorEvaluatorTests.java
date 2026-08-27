@@ -21,7 +21,7 @@ class RealRateFactorEvaluatorTests {
         );
 
         assertThat(assessment.status())
-                .isEqualTo(RealRateFactorStatus.PRESSURING);
+                .isEqualTo(GoldFactorStatus.PRESSURING);
         assertCommonContract(assessment);
     }
 
@@ -34,7 +34,7 @@ class RealRateFactorEvaluatorTests {
         );
 
         assertThat(assessment.status())
-                .isEqualTo(RealRateFactorStatus.SUPPORTIVE);
+                .isEqualTo(GoldFactorStatus.SUPPORTIVE);
         assertCommonContract(assessment);
     }
 
@@ -47,7 +47,7 @@ class RealRateFactorEvaluatorTests {
         );
 
         assertThat(assessment.status())
-                .isEqualTo(RealRateFactorStatus.NEUTRAL);
+                .isEqualTo(GoldFactorStatus.NEUTRAL);
         assertCommonContract(assessment);
     }
 
@@ -60,7 +60,7 @@ class RealRateFactorEvaluatorTests {
         );
 
         assertThat(assessment.status())
-                .isEqualTo(RealRateFactorStatus.NEUTRAL);
+                .isEqualTo(GoldFactorStatus.NEUTRAL);
         assertCommonContract(assessment);
     }
 
@@ -73,7 +73,7 @@ class RealRateFactorEvaluatorTests {
         );
 
         assertThat(assessment.status())
-                .isEqualTo(RealRateFactorStatus.NEUTRAL);
+                .isEqualTo(GoldFactorStatus.NEUTRAL);
         assertCommonContract(assessment);
     }
 

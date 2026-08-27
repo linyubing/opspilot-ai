@@ -106,7 +106,7 @@ class GoldResearchSnapshotServiceTests {
         assertThat(snapshot.realRate().collectedAt())
                 .isEqualTo(RATE_COLLECTED_AT);
         assertThat(snapshot.assessment().status())
-                .isEqualTo(RealRateFactorStatus.PRESSURING);
+                .isEqualTo(GoldFactorStatus.PRESSURING);
         assertThat(snapshot.disclaimer())
                 .contains("不构成黄金方向预测或投资建议");
 
