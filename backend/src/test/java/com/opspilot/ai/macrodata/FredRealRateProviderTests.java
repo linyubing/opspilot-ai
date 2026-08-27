@@ -189,12 +189,11 @@ class FredRealRateProviderTests {
                 Duration.ofSeconds(2)
         );
 
-        return new FredRealRateProvider(
-                RestClient.builder()
-                        .baseUrl(baseUrl.toString())
-                        .build(),
+        FredSeriesClient seriesClient = new FredSeriesClient(
+                RestClient.builder().baseUrl(baseUrl.toString()).build(),
                 properties
         );
+        return new FredRealRateProvider(seriesClient, properties);
     }
 
     private String responseWith(String date, String value) {

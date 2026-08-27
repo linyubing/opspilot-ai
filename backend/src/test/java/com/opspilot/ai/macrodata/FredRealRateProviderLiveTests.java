@@ -27,7 +27,7 @@ class FredRealRateProviderLiveTests {
                 .baseUrl(properties.baseUrl().toString())
                 .build();
         RealRateProvider provider = new FredRealRateProvider(
-                restClient,
+                new FredSeriesClient(restClient, properties),
                 properties
         );
 
