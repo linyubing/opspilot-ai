@@ -35,9 +35,35 @@ class GoldResearchSnapshotSchemaTests {
                 from pg_indexes
                 where schemaname = 'public'
                   and tablename = 'gold_research_snapshot'
-                  and indexdef like '%(analysis_date, rule_version)%'
+                  and indexdef like '%(analysis_date, research_version)%'
                 """, Long.class);
 
         assertThat(count).isEqualTo(1L);
+    }
+
+    @Test
+    @DisplayName("双因子快照包含研究版本和完整美元指数列")
+    void addsDollarIndexSnapshotColumns() {
+        Long count = jdbcTemplate.queryForObject("""
+                select count(*)
+                from information_schema.columns
+                where table_schema = 'public'
+                  and table_name = 'gold_research_snapshot'
+                  and column_name in (
+                      'research_version',
+                      'real_rate_rule_version',
+                      'latest_dollar_index_date',
+                      'dollar_index',
+                      'dollar_index_return_1',
+                      'dollar_index_return_5',
+                      'dollar_index_return_20',
+                      'dollar_index_collected_at',
+                      'dollar_index_status',
+                      'dollar_index_rule_version',
+                      'dollar_index_explanation'
+                  )
+                """, Long.class);
+
+        assertThat(count).isEqualTo(11L);
     }
 }

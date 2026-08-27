@@ -1,5 +1,6 @@
 package com.opspilot.ai.analysis.history;
 
+import com.opspilot.ai.analysis.DollarIndexChangeMetrics;
 import com.opspilot.ai.analysis.GoldResearchSnapshot;
 import com.opspilot.ai.analysis.GoldReturnMetrics;
 import com.opspilot.ai.analysis.RealRateChangeMetrics;
@@ -29,6 +30,7 @@ public class JdbcGoldResearchSnapshotRepository
             analysis_date,
             latest_gold_date,
             latest_real_rate_date,
+            latest_dollar_index_date,
             gold_price,
             gold_return_1,
             gold_return_5,
@@ -39,9 +41,18 @@ public class JdbcGoldResearchSnapshotRepository
             real_rate_change_5,
             real_rate_change_20,
             real_rate_collected_at,
-            assessment_status,
-            rule_version,
-            explanation,
+            real_rate_status,
+            real_rate_rule_version,
+            real_rate_explanation,
+            dollar_index,
+            dollar_index_return_1,
+            dollar_index_return_5,
+            dollar_index_return_20,
+            dollar_index_collected_at,
+            dollar_index_status,
+            dollar_index_rule_version,
+            dollar_index_explanation,
+            research_version,
             disclaimer,
             created_at
             """;
@@ -59,6 +70,32 @@ public class JdbcGoldResearchSnapshotRepository
                         resultSet.getBigDecimal("real_rate_change_5");
                 BigDecimal change20 =
                         resultSet.getBigDecimal("real_rate_change_20");
+                LocalDate latestDollarIndexDate = resultSet.getObject(
+                        "latest_dollar_index_date",
+                        LocalDate.class
+                );
+
+                DollarIndexChangeMetrics dollarIndex = null;
+                ResearchFactorAssessment dollarIndexAssessment = null;
+                if (latestDollarIndexDate != null) {
+                    dollarIndex = new DollarIndexChangeMetrics(
+                            resultSet.getBigDecimal("dollar_index"),
+                            resultSet.getBigDecimal("dollar_index_return_1"),
+                            resultSet.getBigDecimal("dollar_index_return_5"),
+                            resultSet.getBigDecimal("dollar_index_return_20"),
+                            resultSet.getObject(
+                                    "dollar_index_collected_at",
+                                    OffsetDateTime.class
+                            )
+                    );
+                    dollarIndexAssessment = new ResearchFactorAssessment(
+                            toFactorStatus(resultSet.getString(
+                                    "dollar_index_status"
+                            )),
+                            resultSet.getString("dollar_index_rule_version"),
+                            resultSet.getString("dollar_index_explanation")
+                    );
+                }
 
                 GoldResearchSnapshot snapshot = new GoldResearchSnapshot(
                         resultSet.getObject(
@@ -73,6 +110,7 @@ public class JdbcGoldResearchSnapshotRepository
                                 "latest_real_rate_date",
                                 LocalDate.class
                         ),
+                        latestDollarIndexDate,
                         new GoldReturnMetrics(
                                 resultSet.getBigDecimal("gold_price"),
                                 resultSet.getBigDecimal("gold_return_1"),
@@ -96,15 +134,18 @@ public class JdbcGoldResearchSnapshotRepository
                                         OffsetDateTime.class
                                 )
                         ),
+                        dollarIndex,
                         new ResearchFactorAssessment(
-                                GoldFactorStatus.valueOf(
-                                        resultSet.getString(
-                                                "assessment_status"
-                                        ).toUpperCase(Locale.ROOT)
+                                toFactorStatus(resultSet.getString(
+                                        "real_rate_status"
+                                )),
+                                resultSet.getString(
+                                        "real_rate_rule_version"
                                 ),
-                                resultSet.getString("rule_version"),
-                                resultSet.getString("explanation")
+                                resultSet.getString("real_rate_explanation")
                         ),
+                        dollarIndexAssessment,
+                        resultSet.getString("research_version"),
                         resultSet.getString("disclaimer")
                 );
 
@@ -130,6 +171,9 @@ public class JdbcGoldResearchSnapshotRepository
             OffsetDateTime createdAt
     ) {
         UUID id = UUID.randomUUID();
+        DollarIndexChangeMetrics dollarIndex = snapshot.dollarIndex();
+        ResearchFactorAssessment dollarAssessment =
+                snapshot.dollarIndexAssessment();
 
         String sql = """
                 insert into gold_research_snapshot (
@@ -137,6 +181,7 @@ public class JdbcGoldResearchSnapshotRepository
                     analysis_date,
                     latest_gold_date,
                     latest_real_rate_date,
+                    latest_dollar_index_date,
                     gold_price,
                     gold_return_1,
                     gold_return_5,
@@ -147,14 +192,27 @@ public class JdbcGoldResearchSnapshotRepository
                     real_rate_change_5,
                     real_rate_change_20,
                     real_rate_collected_at,
-                    assessment_status,
-                    rule_version,
-                    explanation,
+                    real_rate_status,
+                    real_rate_rule_version,
+                    real_rate_explanation,
+                    dollar_index,
+                    dollar_index_return_1,
+                    dollar_index_return_5,
+                    dollar_index_return_20,
+                    dollar_index_collected_at,
+                    dollar_index_status,
+                    dollar_index_rule_version,
+                    dollar_index_explanation,
+                    research_version,
                     disclaimer,
                     created_at
                 )
-                values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                on conflict (analysis_date, rule_version)
+                values (
+                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                    ?, ?, ?, ?, ?, ?, ?, ?, ?
+                )
+                on conflict (analysis_date, research_version)
                 do nothing
                 """;
 
@@ -164,6 +222,7 @@ public class JdbcGoldResearchSnapshotRepository
                 snapshot.analysisDate(),
                 snapshot.latestGoldDate(),
                 snapshot.latestRealRateDate(),
+                snapshot.latestDollarIndexDate(),
                 snapshot.gold().currentPrice(),
                 snapshot.gold().return1(),
                 snapshot.gold().return5(),
@@ -174,11 +233,28 @@ public class JdbcGoldResearchSnapshotRepository
                 snapshot.realRate().percentagePointChange5(),
                 snapshot.realRate().percentagePointChange20(),
                 snapshot.realRate().collectedAt(),
-                snapshot.assessment().status()
+                snapshot.realRateAssessment().status()
                         .name()
                         .toLowerCase(Locale.ROOT),
-                snapshot.assessment().ruleVersion(),
-                snapshot.assessment().explanation(),
+                snapshot.realRateAssessment().ruleVersion(),
+                snapshot.realRateAssessment().explanation(),
+                dollarIndex == null ? null : dollarIndex.currentIndex(),
+                dollarIndex == null ? null : dollarIndex.return1(),
+                dollarIndex == null ? null : dollarIndex.return5(),
+                dollarIndex == null ? null : dollarIndex.return20(),
+                dollarIndex == null ? null : dollarIndex.collectedAt(),
+                dollarAssessment == null
+                        ? null
+                        : dollarAssessment.status()
+                                .name()
+                                .toLowerCase(Locale.ROOT),
+                dollarAssessment == null
+                        ? null
+                        : dollarAssessment.ruleVersion(),
+                dollarAssessment == null
+                        ? null
+                        : dollarAssessment.explanation(),
+                snapshot.researchVersion(),
                 snapshot.disclaimer(),
                 createdAt
         );
@@ -187,7 +263,7 @@ public class JdbcGoldResearchSnapshotRepository
 
         StoredGoldResearchSnapshot record = findByKey(
                 snapshot.analysisDate(),
-                snapshot.assessment().ruleVersion()
+                snapshot.researchVersion()
         ).orElseThrow(() -> new IllegalStateException(
                 "黄金研究快照保存后未能读取"
         ));
@@ -222,17 +298,17 @@ public class JdbcGoldResearchSnapshotRepository
      */
     private Optional<StoredGoldResearchSnapshot> findByKey(
             LocalDate analysisDate,
-            String ruleVersion
+            String researchVersion
     ) {
         List<StoredGoldResearchSnapshot> records = jdbcTemplate.query(
                 "select " + COLUMNS + """
                         from gold_research_snapshot
                         where analysis_date = ?
-                          and rule_version = ?
+                          and research_version = ?
                         """,
                 rowMapper,
                 analysisDate,
-                ruleVersion
+                researchVersion
         );
 
         return records.stream().findFirst();
@@ -242,5 +318,11 @@ public class JdbcGoldResearchSnapshotRepository
             BigDecimal percentagePoints
     ) {
         return percentagePoints.multiply(new BigDecimal("100"));
+    }
+
+    private static GoldFactorStatus toFactorStatus(String databaseValue) {
+        return GoldFactorStatus.valueOf(
+                databaseValue.toUpperCase(Locale.ROOT)
+        );
     }
 }
