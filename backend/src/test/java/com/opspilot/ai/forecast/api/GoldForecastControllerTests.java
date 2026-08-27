@@ -1,7 +1,9 @@
 package com.opspilot.ai.forecast.api;
 
 import com.opspilot.ai.forecast.*;
+import com.opspilot.ai.marketdata.GoldPriceSyncResult;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -29,13 +31,15 @@ class GoldForecastControllerTests {
     @Mock private GoldForecastGenerationService generationService;
     @Mock private GoldForecastResolutionService resolutionService;
     @Mock private GoldForecastEvaluationService evaluationService;
+    @Mock private GoldSettlementService settlementService;
     @Mock private GoldForecastRepository repository;
     private MockMvc mockMvc;
 
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(new GoldForecastController(
-                generationService, resolutionService, evaluationService, repository
+                generationService, resolutionService, evaluationService,
+                settlementService, repository
         )).build();
     }
 
@@ -77,6 +81,20 @@ class GoldForecastControllerTests {
                 .andExpect(jsonPath("$.scannedCount").value(2))
                 .andExpect(jsonPath("$.resolvedCount").value(1));
         verifyNoInteractions(generationService);
+    }
+
+    @Test
+    @DisplayName("每日结算接口返回行情同步和预测结算结果")
+    void returnsDailySettlementResult() throws Exception {
+        when(settlementService.settleDaily()).thenReturn(new GoldSettlementResult(
+                new GoldPriceSyncResult(3, 2, 1, LocalDate.parse("2026-08-27")),
+                new ResolveGoldForecastsResult(2, 1, 1)
+        ));
+
+        mockMvc.perform(post("/api/research/gold/forecasts/daily-settlement"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.priceSync.savedCount").value(2))
+                .andExpect(jsonPath("$.forecastResolution.resolvedCount").value(1));
     }
 
     @Test

@@ -4,6 +4,7 @@ import com.opspilot.ai.forecast.GoldForecastEvaluationService;
 import com.opspilot.ai.forecast.GoldForecastGenerationService;
 import com.opspilot.ai.forecast.GoldForecastRepository;
 import com.opspilot.ai.forecast.GoldForecastResolutionService;
+import com.opspilot.ai.forecast.GoldSettlementService;
 import com.opspilot.ai.forecast.SaveGoldForecastResult;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,24 +18,27 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.UUID;
 
-/** 提供黄金方向预测生成、历史、解析和评测 HTTP 接口。 */
+/** 提供黄金方向预测生成、历史、结算和评测 HTTP 接口。 */
 @RestController
 @RequestMapping("/api/research/gold")
 public class GoldForecastController {
     private final GoldForecastGenerationService generationService;
     private final GoldForecastResolutionService resolutionService;
     private final GoldForecastEvaluationService evaluationService;
+    private final GoldSettlementService settlementService;
     private final GoldForecastRepository repository;
 
     public GoldForecastController(
             GoldForecastGenerationService generationService,
             GoldForecastResolutionService resolutionService,
             GoldForecastEvaluationService evaluationService,
+            GoldSettlementService settlementService,
             GoldForecastRepository repository
     ) {
         this.generationService = generationService;
         this.resolutionService = resolutionService;
         this.evaluationService = evaluationService;
+        this.settlementService = settlementService;
         this.repository = repository;
     }
 
@@ -55,6 +59,11 @@ public class GoldForecastController {
     @PostMapping("/forecasts/resolve")
     public ResolveGoldForecastsResponse resolve(@RequestParam(defaultValue = "100") int limit) {
         return ResolveGoldForecastsResponse.from(resolutionService.resolvePending(limit));
+    }
+
+    @PostMapping("/forecasts/daily-settlement")
+    public GoldSettlementResponse settleDaily() {
+        return GoldSettlementResponse.from(settlementService.settleDaily());
     }
 
     @GetMapping("/forecasts/evaluation")
