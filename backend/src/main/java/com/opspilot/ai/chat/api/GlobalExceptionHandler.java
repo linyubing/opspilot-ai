@@ -5,6 +5,7 @@ import com.opspilot.ai.analysis.InvalidResearchDataException;
 import com.opspilot.ai.analysis.history.InvalidResearchHistoryRequestException;
 import com.opspilot.ai.chat.UpstreamAiException;
 import com.opspilot.ai.macrodata.InvalidMacroDataRequestException;
+import com.opspilot.ai.macrodata.DollarIndexNotFoundException;
 import com.opspilot.ai.macrodata.MacroDataUnavailableException;
 import com.opspilot.ai.marketdata.InvalidMarketDataRequestException;
 import com.opspilot.ai.marketdata.MarketDataUnavailableException;
@@ -18,6 +19,17 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(DollarIndexNotFoundException.class)
+    public ResponseEntity<ApiError> handleDollarIndexNotFound(
+            DollarIndexNotFoundException exception
+    ) {
+        ApiError error = new ApiError(
+                "DOLLAR_INDEX_NOT_FOUND",
+                exception.getMessage()
+        );
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
 
     @ExceptionHandler(InvalidResearchHistoryRequestException.class)
     public ResponseEntity<ApiError> handleInvalidResearchHistoryRequest(
