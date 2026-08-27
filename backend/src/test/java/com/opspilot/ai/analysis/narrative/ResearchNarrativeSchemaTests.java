@@ -59,4 +59,18 @@ class ResearchNarrativeSchemaTests {
         assertThat(jsonColumns).isEqualTo(2L);
         assertThat(foreignKeys).isEqualTo(1L);
     }
+
+    @Test
+    void validatesPromptHashFormatInDatabase() {
+        Long count = jdbcTemplate.queryForObject("""
+                select count(*)
+                from information_schema.table_constraints
+                where constraint_schema = 'public'
+                  and table_name = 'gold_research_narrative'
+                  and constraint_name = 'ck_gold_research_narrative_prompt_hash'
+                  and constraint_type = 'CHECK'
+                """, Long.class);
+
+        assertThat(count).isEqualTo(1L);
+    }
 }
