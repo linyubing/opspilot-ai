@@ -44,8 +44,11 @@ class GoldResearchSnapshotServiceTests {
         service = new GoldResearchSnapshotService(
                 marketPriceRepository,
                 macroObservationRepository,
-                new RealRateFactorEvaluator()
+                new RealRateFactorEvaluator(),
+                new DollarIndexFactorEvaluator()
         );
+        when(macroObservationRepository.findRecent("DTWEXBGS", 120))
+                .thenReturn(dollarIndexes(21));
     }
 
     @Test
@@ -66,10 +69,19 @@ class GoldResearchSnapshotServiceTests {
         ));
         Collections.reverse(realRates);
 
+        List<MacroObservation> dollarIndexes = dollarIndexes(21);
+        dollarIndexes.add(dollarIndex(
+                LocalDate.parse("2026-08-25"),
+                "121.00"
+        ));
+        Collections.rotate(dollarIndexes, 3);
+
         when(marketPriceRepository.findRecent("XAUUSD", 120))
                 .thenReturn(goldPrices);
         when(macroObservationRepository.findRecent("DFII10", 120))
                 .thenReturn(realRates);
+        when(macroObservationRepository.findRecent("DTWEXBGS", 120))
+                .thenReturn(dollarIndexes);
 
         GoldResearchSnapshot snapshot = service.createSnapshot();
 
@@ -78,6 +90,8 @@ class GoldResearchSnapshotServiceTests {
                 .isEqualTo(LocalDate.parse("2026-08-25"));
         assertThat(snapshot.latestRealRateDate())
                 .isEqualTo(LocalDate.parse("2026-08-26"));
+        assertThat(snapshot.latestDollarIndexDate())
+                .isEqualTo(LocalDate.parse("2026-08-25"));
         assertThat(snapshot.gold().currentPrice())
                 .isEqualByComparingTo("2200");
         assertThat(snapshot.gold().return1())
@@ -105,13 +119,26 @@ class GoldResearchSnapshotServiceTests {
                 .isEqualByComparingTo("28.00");
         assertThat(snapshot.realRate().collectedAt())
                 .isEqualTo(RATE_COLLECTED_AT);
-        assertThat(snapshot.assessment().status())
+        assertThat(snapshot.realRateAssessment().status())
                 .isEqualTo(GoldFactorStatus.PRESSURING);
+        assertThat(snapshot.dollarIndex().currentIndex())
+                .isEqualByComparingTo("120.00");
+        assertThat(snapshot.dollarIndex().return1())
+                .isEqualByComparingTo("2.5641");
+        assertThat(snapshot.dollarIndex().return5())
+                .isEqualByComparingTo("2.5641");
+        assertThat(snapshot.dollarIndex().return20())
+                .isEqualByComparingTo("2.5641");
+        assertThat(snapshot.dollarIndexAssessment().status())
+                .isEqualTo(GoldFactorStatus.PRESSURING);
+        assertThat(snapshot.researchVersion())
+                .isEqualTo("gold-multifactor-v2");
         assertThat(snapshot.disclaimer())
                 .contains("不构成黄金方向预测或投资建议");
 
         verify(marketPriceRepository).findRecent("XAUUSD", 120);
         verify(macroObservationRepository).findRecent("DFII10", 120);
+        verify(macroObservationRepository).findRecent("DTWEXBGS", 120);
     }
 
     @Test
@@ -157,6 +184,76 @@ class GoldResearchSnapshotServiceTests {
         assertThatThrownBy(service::createSnapshot)
                 .isInstanceOf(InsufficientResearchDataException.class)
                 .hasMessageContaining("黄金价格");
+    }
+
+    @Test
+    @DisplayName("没有广义美元指数时拒绝生成部分研究快照")
+    void rejectsMissingDollarIndexData() {
+        when(marketPriceRepository.findRecent("XAUUSD", 120))
+                .thenReturn(goldPrices(21));
+        when(macroObservationRepository.findRecent("DFII10", 120))
+                .thenReturn(realRates(21));
+        when(macroObservationRepository.findRecent("DTWEXBGS", 120))
+                .thenReturn(List.of());
+
+        assertThatThrownBy(service::createSnapshot)
+                .isInstanceOf(InsufficientResearchDataException.class)
+                .hasMessageContaining("美元指数");
+    }
+
+    @Test
+    @DisplayName("三方共同日期只有20个时报告数据不足")
+    void rejectsInsufficientThreeWayCommonDates() {
+        when(marketPriceRepository.findRecent("XAUUSD", 120))
+                .thenReturn(goldPrices(21));
+        when(macroObservationRepository.findRecent("DFII10", 120))
+                .thenReturn(realRates(21));
+        when(macroObservationRepository.findRecent("DTWEXBGS", 120))
+                .thenReturn(dollarIndexes(20));
+
+        assertThatThrownBy(service::createSnapshot)
+                .isInstanceOf(InsufficientResearchDataException.class)
+                .hasMessageContaining("实际=20")
+                .hasMessageContaining("最低要求=21");
+    }
+
+    @Test
+    @DisplayName("广义美元指数重复日期不会被静默覆盖")
+    void rejectsDuplicateDollarIndexDates() {
+        List<MacroObservation> indexes = dollarIndexes(21);
+        indexes.add(dollarIndex(ANALYSIS_DATE, "119.00"));
+        when(marketPriceRepository.findRecent("XAUUSD", 120))
+                .thenReturn(goldPrices(21));
+        when(macroObservationRepository.findRecent("DFII10", 120))
+                .thenReturn(realRates(21));
+        when(macroObservationRepository.findRecent("DTWEXBGS", 120))
+                .thenReturn(indexes);
+
+        assertThatThrownBy(service::createSnapshot)
+                .isInstanceOf(InvalidResearchDataException.class)
+                .hasMessageContaining("美元指数")
+                .hasMessageContaining("重复");
+    }
+
+    @Test
+    @DisplayName("参与计算的广义美元指数必须大于零")
+    void rejectsNonPositiveDollarIndex() {
+        List<MacroObservation> indexes = dollarIndexes(21);
+        indexes.set(5, dollarIndex(
+                ANALYSIS_DATE.minusDays(5),
+                "0"
+        ));
+        when(marketPriceRepository.findRecent("XAUUSD", 120))
+                .thenReturn(goldPrices(21));
+        when(macroObservationRepository.findRecent("DFII10", 120))
+                .thenReturn(realRates(21));
+        when(macroObservationRepository.findRecent("DTWEXBGS", 120))
+                .thenReturn(indexes);
+
+        assertThatThrownBy(service::createSnapshot)
+                .isInstanceOf(InvalidResearchDataException.class)
+                .hasMessageContaining("美元指数")
+                .hasMessageContaining("大于 0");
     }
 
     @Test
@@ -220,6 +317,17 @@ class GoldResearchSnapshotServiceTests {
         return observations;
     }
 
+    private List<MacroObservation> dollarIndexes(int count) {
+        List<MacroObservation> observations = new ArrayList<>();
+        for (int index = 0; index < count; index++) {
+            observations.add(dollarIndex(
+                    ANALYSIS_DATE.minusDays(index),
+                    index == 0 ? "120.00" : "117.00"
+            ));
+        }
+        return observations;
+    }
+
     private String goldValue(int index) {
         return switch (index) {
             case 0 -> "2200";
@@ -259,6 +367,19 @@ class GoldResearchSnapshotServiceTests {
                 date,
                 new BigDecimal(value),
                 "percent",
+                "fred",
+                RATE_COLLECTED_AT,
+                null
+        );
+    }
+
+    private MacroObservation dollarIndex(LocalDate date, String value) {
+        return new MacroObservation(
+                UUID.randomUUID(),
+                "DTWEXBGS",
+                date,
+                new BigDecimal(value),
+                "index_2006_100",
                 "fred",
                 RATE_COLLECTED_AT,
                 null

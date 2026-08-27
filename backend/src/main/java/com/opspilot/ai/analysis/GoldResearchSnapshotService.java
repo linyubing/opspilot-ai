@@ -24,6 +24,8 @@ public class GoldResearchSnapshotService {
 
     private static final String GOLD_SYMBOL = "XAUUSD";
     private static final String REAL_RATE_SERIES_ID = "DFII10";
+    private static final String DOLLAR_INDEX_SERIES_ID = "DTWEXBGS";
+    private static final String RESEARCH_VERSION = "gold-multifactor-v2";
     private static final int QUERY_LIMIT = 120;
     private static final int REQUIRED_COMMON_DATE_COUNT = 21;
 
@@ -37,15 +39,18 @@ public class GoldResearchSnapshotService {
     private final MarketPriceRepository marketPriceRepository;
     private final MacroObservationRepository macroObservationRepository;
     private final RealRateFactorEvaluator evaluator;
+    private final DollarIndexFactorEvaluator dollarIndexEvaluator;
 
     public GoldResearchSnapshotService(
             MarketPriceRepository marketPriceRepository,
             MacroObservationRepository macroObservationRepository,
-            RealRateFactorEvaluator evaluator
+            RealRateFactorEvaluator evaluator,
+            DollarIndexFactorEvaluator dollarIndexEvaluator
     ) {
         this.marketPriceRepository = marketPriceRepository;
         this.macroObservationRepository = macroObservationRepository;
         this.evaluator = evaluator;
+        this.dollarIndexEvaluator = dollarIndexEvaluator;
     }
 
     public GoldResearchSnapshot createSnapshot() {
@@ -61,7 +66,13 @@ public class GoldResearchSnapshotService {
                         QUERY_LIMIT
                 );
 
-        validateSourceData(goldPrices, realRates);
+        List<MacroObservation> dollarIndexes =
+                macroObservationRepository.findRecent(
+                        DOLLAR_INDEX_SERIES_ID,
+                        QUERY_LIMIT
+                );
+
+        validateSourceData(goldPrices, realRates, dollarIndexes);
 
         LocalDate latestGoldDate = goldPrices.stream()
                 .map(MarketPrice::priceDate)
@@ -73,11 +84,19 @@ public class GoldResearchSnapshotService {
                 .max(LocalDate::compareTo)
                 .orElseThrow();
 
+        LocalDate latestDollarIndexDate = dollarIndexes.stream()
+                .map(MacroObservation::observationDate)
+                .max(LocalDate::compareTo)
+                .orElseThrow();
+
         Map<LocalDate, MarketPrice> goldByDate =
                 indexGoldPrices(goldPrices);
 
         Map<LocalDate, MacroObservation> realRateByDate =
                 indexRealRates(realRates);
+
+        Map<LocalDate, MacroObservation> dollarIndexByDate =
+                indexDollarIndexes(dollarIndexes);
 
         /*
          * 只保留两个数据源都有记录的日期。
@@ -86,6 +105,7 @@ public class GoldResearchSnapshotService {
         List<LocalDate> commonDates = goldByDate.keySet()
                 .stream()
                 .filter(realRateByDate::containsKey)
+                .filter(dollarIndexByDate::containsKey)
                 .sorted(Comparator.reverseOrder())
                 .toList();
 
@@ -116,6 +136,15 @@ public class GoldResearchSnapshotService {
         MacroObservation realRate20 =
                 realRateByDate.get(commonDates.get(20));
 
+        MacroObservation currentDollarIndex =
+                dollarIndexByDate.get(commonDates.get(0));
+        MacroObservation dollarIndex1 =
+                dollarIndexByDate.get(commonDates.get(1));
+        MacroObservation dollarIndex5 =
+                dollarIndexByDate.get(commonDates.get(5));
+        MacroObservation dollarIndex20 =
+                dollarIndexByDate.get(commonDates.get(20));
+
         validateGoldPrice(currentGold);
         validateGoldPrice(gold1);
         validateGoldPrice(gold5);
@@ -125,6 +154,11 @@ public class GoldResearchSnapshotService {
         validateRealRate(realRate1);
         validateRealRate(realRate5);
         validateRealRate(realRate20);
+
+        validateDollarIndex(currentDollarIndex);
+        validateDollarIndex(dollarIndex1);
+        validateDollarIndex(dollarIndex5);
+        validateDollarIndex(dollarIndex20);
 
         GoldReturnMetrics goldMetrics = new GoldReturnMetrics(
                 currentGold.referencePrice(),
@@ -168,26 +202,55 @@ public class GoldResearchSnapshotService {
                         currentRealRate.collectedAt()
                 );
 
-        ResearchFactorAssessment assessment =
+        DollarIndexChangeMetrics dollarIndexMetrics =
+                new DollarIndexChangeMetrics(
+                        currentDollarIndex.value(),
+                        calculateReturn(
+                                currentDollarIndex.value(),
+                                dollarIndex1.value()
+                        ),
+                        calculateReturn(
+                                currentDollarIndex.value(),
+                                dollarIndex5.value()
+                        ),
+                        calculateReturn(
+                                currentDollarIndex.value(),
+                                dollarIndex20.value()
+                        ),
+                        currentDollarIndex.collectedAt()
+                );
+
+        ResearchFactorAssessment realRateAssessment =
                 evaluator.evaluate(
                         realRateMetrics.basisPointChange5(),
                         realRateMetrics.basisPointChange20()
+                );
+
+        ResearchFactorAssessment dollarIndexAssessment =
+                dollarIndexEvaluator.evaluate(
+                        dollarIndexMetrics.return5(),
+                        dollarIndexMetrics.return20()
                 );
 
         return new GoldResearchSnapshot(
                 commonDates.get(0),
                 latestGoldDate,
                 latestRealRateDate,
+                latestDollarIndexDate,
                 goldMetrics,
                 realRateMetrics,
-                assessment,
+                dollarIndexMetrics,
+                realRateAssessment,
+                dollarIndexAssessment,
+                RESEARCH_VERSION,
                 DISCLAIMER
         );
     }
 
     private void validateSourceData(
             List<MarketPrice> goldPrices,
-            List<MacroObservation> realRates
+            List<MacroObservation> realRates,
+            List<MacroObservation> dollarIndexes
     ) {
         if (goldPrices == null || goldPrices.isEmpty()) {
             throw new InsufficientResearchDataException(
@@ -198,6 +261,12 @@ public class GoldResearchSnapshotService {
         if (realRates == null || realRates.isEmpty()) {
             throw new InsufficientResearchDataException(
                     "没有可用于研究的实际利率"
+            );
+        }
+
+        if (dollarIndexes == null || dollarIndexes.isEmpty()) {
+            throw new InsufficientResearchDataException(
+                    "没有可用于研究的广义美元指数"
             );
         }
 
@@ -218,6 +287,16 @@ public class GoldResearchSnapshotService {
                     || observation.observationDate() == null) {
                 throw new InvalidResearchDataException(
                         "实际利率观测日期不能为空"
+                );
+            }
+        }
+
+
+        for (MacroObservation observation : dollarIndexes) {
+            if (observation == null
+                    || observation.observationDate() == null) {
+                throw new InvalidResearchDataException(
+                        "广义美元指数观测日期不能为空"
                 );
             }
         }
@@ -267,6 +346,26 @@ public class GoldResearchSnapshotService {
         return result;
     }
 
+    private Map<LocalDate, MacroObservation> indexDollarIndexes(
+            List<MacroObservation> dollarIndexes
+    ) {
+        Map<LocalDate, MacroObservation> result = new HashMap<>();
+
+        for (MacroObservation observation : dollarIndexes) {
+            MacroObservation previous = result.putIfAbsent(
+                    observation.observationDate(),
+                    observation
+            );
+            if (previous != null) {
+                throw new InvalidResearchDataException(
+                        "广义美元指数存在重复观测日期："
+                                + observation.observationDate()
+                );
+            }
+        }
+        return result;
+    }
+
     private void validateGoldPrice(MarketPrice price) {
         if (price.referencePrice() == null
                 || price.referencePrice().compareTo(
@@ -283,6 +382,16 @@ public class GoldResearchSnapshotService {
         if (observation.value() == null) {
             throw new InvalidResearchDataException(
                     "实际利率不能为空，日期："
+                            + observation.observationDate()
+            );
+        }
+    }
+
+    private void validateDollarIndex(MacroObservation observation) {
+        if (observation.value() == null
+                || observation.value().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new InvalidResearchDataException(
+                    "广义美元指数必须大于 0，日期："
                             + observation.observationDate()
             );
         }
