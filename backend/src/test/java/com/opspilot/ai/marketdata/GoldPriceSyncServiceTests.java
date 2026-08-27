@@ -143,6 +143,15 @@ class GoldPriceSyncServiceTests {
             return List.of();
         }
 
+        @Override
+        public List<MarketPrice> findAfter(
+                String symbol,
+                LocalDate baseDate,
+                int limit
+        ) {
+            throw new AssertionError("同步服务测试不应查询后续价格");
+        }
+
         List<MarketPrice> savedPrices() {
             return savedPrices;
         }

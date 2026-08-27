@@ -2,6 +2,7 @@ package com.opspilot.ai.marketdata;
 
 import java.util.List;
 import java.util.Optional;
+import java.time.LocalDate;
 
 public interface MarketPriceRepository {
 
@@ -10,4 +11,6 @@ public interface MarketPriceRepository {
     Optional<MarketPrice> findLatest(String symbol);
 
     List<MarketPrice> findRecent(String symbol, int limit);
+
+    List<MarketPrice> findAfter(String symbol, LocalDate baseDate, int limit);
 }

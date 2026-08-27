@@ -218,5 +218,14 @@ class GoldPriceControllerTests {
                     .limit(limit)
                     .toList();
         }
+
+        @Override
+        public List<MarketPrice> findAfter(
+                String symbol,
+                LocalDate baseDate,
+                int limit
+        ) {
+            throw new AssertionError("行情查询接口测试不应查询后续价格");
+        }
     }
 }

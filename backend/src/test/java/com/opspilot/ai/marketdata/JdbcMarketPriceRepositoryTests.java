@@ -95,6 +95,47 @@ class JdbcMarketPriceRepositoryTests {
                 .withMessage("limit 必须大于 0");
     }
 
+    @Test
+    @DisplayName("基准日之后的价格按照日期升序返回并限制数量")
+    void findsPricesAfterBaseDate() {
+        repository.saveAll(List.of(
+                price("2026-08-14", "100.00000000"),
+                price("2026-08-15", "101.00000000"),
+                price("2026-08-16", "102.00000000"),
+                price("2026-08-17", "103.00000000")
+        ));
+
+        assertThat(repository.findAfter(
+                TEST_SYMBOL,
+                LocalDate.of(2026, 8, 14),
+                2
+        )).extracting(MarketPrice::priceDate)
+                .containsExactly(
+                        LocalDate.of(2026, 8, 15),
+                        LocalDate.of(2026, 8, 16)
+                );
+    }
+
+    @Test
+    @DisplayName("基准日之后查询的数量必须在一到一百之间")
+    void rejectsOutOfRangeAfterLimit() {
+        assertThatIllegalArgumentException()
+                .isThrownBy(() -> repository.findAfter(
+                        TEST_SYMBOL,
+                        LocalDate.of(2026, 8, 14),
+                        101
+                ))
+                .withMessage("limit 必须在 1 到 100 之间");
+
+        assertThatIllegalArgumentException()
+                .isThrownBy(() -> repository.findAfter(
+                        TEST_SYMBOL,
+                        LocalDate.of(2026, 8, 14),
+                        0
+                ))
+                .withMessage("limit 必须在 1 到 100 之间");
+    }
+
     /**
      * 固定数字只验证 JDBC 存取契约，不代表真实黄金行情。
      */
