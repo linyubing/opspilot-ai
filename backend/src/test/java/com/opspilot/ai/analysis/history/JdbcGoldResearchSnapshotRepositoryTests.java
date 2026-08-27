@@ -18,6 +18,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
@@ -79,6 +80,26 @@ class JdbcGoldResearchSnapshotRepositoryTests {
         assertThat(result.record().snapshot().researchVersion())
                 .isEqualTo(RESEARCH_VERSION);
         assertThat(result.record().createdAt()).isEqualTo(CREATED_AT);
+    }
+
+    @Test
+    @DisplayName("按照编号读取已经保存的正式快照")
+    void findsSnapshotById() {
+        SaveGoldResearchSnapshotResult saved = repository.saveIfAbsent(
+                snapshot("2026-08-24", "2500.00"),
+                CREATED_AT
+        );
+
+        assertThat(repository.findById(saved.record().id()))
+                .contains(saved.record());
+    }
+
+    @Test
+    @DisplayName("编号不存在时返回空结果")
+    void returnsEmptyWhenSnapshotIdDoesNotExist() {
+        assertThat(repository.findById(UUID.fromString(
+                "99999999-9999-9999-9999-999999999999"
+        ))).isEmpty();
     }
 
     @Test

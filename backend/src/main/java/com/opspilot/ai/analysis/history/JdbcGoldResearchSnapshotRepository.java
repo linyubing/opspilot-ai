@@ -15,6 +15,7 @@ import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -291,6 +292,22 @@ public class JdbcGoldResearchSnapshotRepository
                 rowMapper,
                 limit
         );
+    }
+
+    @Override
+    public Optional<StoredGoldResearchSnapshot> findById(UUID id) {
+        Objects.requireNonNull(id, "id 不能为空");
+
+        List<StoredGoldResearchSnapshot> records = jdbcTemplate.query(
+                "select " + COLUMNS + """
+                        from gold_research_snapshot
+                        where id = ?
+                        """,
+                rowMapper,
+                id
+        );
+
+        return records.stream().findFirst();
     }
 
     /**
