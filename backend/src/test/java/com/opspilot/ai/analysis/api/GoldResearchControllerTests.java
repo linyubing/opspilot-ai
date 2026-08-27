@@ -1,5 +1,6 @@
 package com.opspilot.ai.analysis.api;
 
+import com.opspilot.ai.analysis.DollarIndexChangeMetrics;
 import com.opspilot.ai.analysis.GoldResearchSnapshot;
 import com.opspilot.ai.analysis.GoldResearchSnapshotService;
 import com.opspilot.ai.analysis.GoldReturnMetrics;
@@ -57,14 +58,23 @@ class GoldResearchControllerTests {
                         .value("2026-08-25"))
                 .andExpect(jsonPath("$.latestRealRateDate")
                         .value("2026-08-24"))
+                .andExpect(jsonPath("$.latestDollarIndexDate")
+                        .value("2026-08-24"))
                 .andExpect(jsonPath("$.gold.return20")
                         .value(2.3456))
                 .andExpect(jsonPath("$.realRate.basisPointChange20")
                         .value(18.00))
-                .andExpect(jsonPath("$.assessment.status")
+                .andExpect(jsonPath("$.dollarIndex.currentIndex")
+                        .value(118.0628))
+                .andExpect(jsonPath("$.realRateAssessment.status")
                         .value("PRESSURING"))
-                .andExpect(jsonPath("$.assessment.ruleVersion")
+                .andExpect(jsonPath("$.realRateAssessment.ruleVersion")
                         .value("gold-real-rate-v1"))
+                .andExpect(jsonPath("$.dollarIndexAssessment.status")
+                        .value("SUPPORTIVE"))
+                .andExpect(jsonPath("$.researchVersion")
+                        .value("gold-multifactor-v2"))
+                .andExpect(jsonPath("$.assessment").doesNotExist())
                 .andExpect(jsonPath("$.disclaimer")
                         .value(DISCLAIMER));
     }
@@ -105,6 +115,7 @@ class GoldResearchControllerTests {
                 LocalDate.parse("2026-08-24"),
                 LocalDate.parse("2026-08-25"),
                 LocalDate.parse("2026-08-24"),
+                LocalDate.parse("2026-08-24"),
                 new GoldReturnMetrics(
                         new BigDecimal("2500.00"),
                         new BigDecimal("0.1000"),
@@ -122,11 +133,24 @@ class GoldResearchControllerTests {
                         new BigDecimal("18.00"),
                         collectedAt
                 ),
+                new DollarIndexChangeMetrics(
+                        new BigDecimal("118.0628"),
+                        new BigDecimal("-0.1000"),
+                        new BigDecimal("-0.6000"),
+                        new BigDecimal("-1.2000"),
+                        collectedAt
+                ),
                 new ResearchFactorAssessment(
                         GoldFactorStatus.PRESSURING,
                         "gold-real-rate-v1",
                         "实际利率构成单因子压力。"
                 ),
+                new ResearchFactorAssessment(
+                        GoldFactorStatus.SUPPORTIVE,
+                        "gold-dollar-index-v1",
+                        "广义美元指数构成单因子支撑。"
+                ),
+                "gold-multifactor-v2",
                 DISCLAIMER
         );
     }

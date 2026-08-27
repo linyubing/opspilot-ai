@@ -1,6 +1,7 @@
 package com.opspilot.ai.analysis.api;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.opspilot.ai.analysis.DollarIndexChangeMetrics;
 import com.opspilot.ai.analysis.GoldResearchSnapshot;
 import com.opspilot.ai.analysis.GoldReturnMetrics;
 import com.opspilot.ai.analysis.RealRateChangeMetrics;
@@ -18,9 +19,14 @@ public record GoldResearchSnapshotResponse(
         LocalDate latestGoldDate,
         @JsonFormat(pattern = "yyyy-MM-dd")
         LocalDate latestRealRateDate,
+        @JsonFormat(pattern = "yyyy-MM-dd")
+        LocalDate latestDollarIndexDate,
         GoldReturnMetrics gold,
         RealRateChangeMetrics realRate,
-        ResearchFactorAssessment assessment,
+        DollarIndexChangeMetrics dollarIndex,
+        ResearchFactorAssessment realRateAssessment,
+        ResearchFactorAssessment dollarIndexAssessment,
+        String researchVersion,
         String disclaimer
 ) {
 
@@ -31,9 +37,13 @@ public record GoldResearchSnapshotResponse(
                 snapshot.analysisDate(),
                 snapshot.latestGoldDate(),
                 snapshot.latestRealRateDate(),
+                snapshot.latestDollarIndexDate(),
                 snapshot.gold(),
                 snapshot.realRate(),
-                snapshot.assessment(),
+                snapshot.dollarIndex(),
+                snapshot.realRateAssessment(),
+                snapshot.dollarIndexAssessment(),
+                snapshot.researchVersion(),
                 snapshot.disclaimer()
         );
     }
