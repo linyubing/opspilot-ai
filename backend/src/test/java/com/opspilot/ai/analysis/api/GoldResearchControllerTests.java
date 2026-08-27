@@ -1,6 +1,8 @@
 package com.opspilot.ai.analysis.api;
 
 import com.opspilot.ai.analysis.DollarIndexChangeMetrics;
+import com.opspilot.ai.analysis.GoldDailyResearchReportResult;
+import com.opspilot.ai.analysis.GoldDailyResearchReportService;
 import com.opspilot.ai.analysis.GoldResearchSnapshot;
 import com.opspilot.ai.analysis.GoldResearchPreparationResult;
 import com.opspilot.ai.analysis.GoldResearchPreparationService;
@@ -13,6 +15,9 @@ import com.opspilot.ai.analysis.GoldFactorStatus;
 import com.opspilot.ai.analysis.ResearchFactorAssessment;
 import com.opspilot.ai.analysis.history.SaveGoldResearchSnapshotResult;
 import com.opspilot.ai.analysis.history.StoredGoldResearchSnapshot;
+import com.opspilot.ai.analysis.narrative.ResearchNarrativeContent;
+import com.opspilot.ai.analysis.narrative.SaveResearchNarrativeResult;
+import com.opspilot.ai.analysis.narrative.StoredResearchNarrative;
 import com.opspilot.ai.macrodata.DollarIndexSyncResult;
 import com.opspilot.ai.macrodata.RealRateSyncResult;
 import com.opspilot.ai.marketdata.GoldPriceSyncResult;
@@ -25,6 +30,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.Mockito.doThrow;
@@ -44,15 +50,18 @@ class GoldResearchControllerTests {
 
     private GoldResearchSnapshotService snapshotService;
     private GoldResearchPreparationService preparationService;
+    private GoldDailyResearchReportService dailyReportService;
     private MockMvc mockMvc;
 
     @BeforeEach
     void setUp() {
         snapshotService = mock(GoldResearchSnapshotService.class);
         preparationService = mock(GoldResearchPreparationService.class);
+        dailyReportService = mock(GoldDailyResearchReportService.class);
         mockMvc = standaloneSetup(new GoldResearchController(
                 snapshotService,
-                preparationService
+                preparationService,
+                dailyReportService
         ))
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
@@ -114,6 +123,21 @@ class GoldResearchControllerTests {
         mockMvc.perform(post("/api/research/gold/daily-preparation"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.snapshot.created").value(false));
+    }
+
+    @Test
+    @DisplayName("每日报告接口返回真实数据准备结果和大模型研究解读")
+    void returnsDailyResearchReport() throws Exception {
+        when(dailyReportService.generateDailyReport())
+                .thenReturn(dailyReportResult());
+
+        mockMvc.perform(post("/api/research/gold/daily-report"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.preparation.snapshot.record.id")
+                        .value("11111111-1111-1111-1111-111111111111"))
+                .andExpect(jsonPath("$.narrative.record.snapshotId")
+                        .value("11111111-1111-1111-1111-111111111111"))
+                .andExpect(jsonPath("$.narrative.created").value(true));
     }
 
     @Test
@@ -208,6 +232,34 @@ class GoldResearchControllerTests {
                 new RealRateSyncResult(5, 1, 3, 0, 1, collectedAt),
                 new DollarIndexSyncResult(6, 1, 4, 0, 1, collectedAt),
                 new SaveGoldResearchSnapshotResult(record, created)
+        );
+    }
+
+    private GoldDailyResearchReportResult dailyReportResult() {
+        UUID snapshotId = UUID.fromString(
+                "11111111-1111-1111-1111-111111111111"
+        );
+        StoredResearchNarrative narrative = new StoredResearchNarrative(
+                UUID.fromString("22222222-2222-2222-2222-222222222222"),
+                snapshotId,
+                new ResearchNarrativeContent(
+                        "黄金研究摘要",
+                        "实际利率因素解读",
+                        "美元指数因素解读",
+                        List.of("真实数据可能修订"),
+                        List.of("关注实际利率变化"),
+                        "不构成价格预测、交易或投资建议。"
+                ),
+                "glm-4.7",
+                "gold-research-narrative-v1",
+                "prompt-hash",
+                "raw-response",
+                OffsetDateTime.parse("2026-08-27T01:05:00Z")
+        );
+
+        return new GoldDailyResearchReportResult(
+                preparationResult(true),
+                new SaveResearchNarrativeResult(narrative, true)
         );
     }
 }
