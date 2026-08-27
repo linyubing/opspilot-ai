@@ -143,6 +143,7 @@ snapshot_id + model_name + prompt_version + forecast_rule_version
 | `prompt_version` | `varchar(64)` | 提示词版本 |
 | `prompt_hash` | `char(64)` | 提示词 SHA-256 |
 | `forecast_rule_version` | `varchar(64)` | 分类和目标规则版本 |
+| `raw_response` | `text` | 模型原始响应，仅用于内部审计 |
 | `status` | `varchar(16)` | 预测状态 |
 | `target_date` | `date` | 实际目标工作日，待验证时为空 |
 | `target_price` | `numeric(20,8)` | 真实目标价格，待验证时为空 |
