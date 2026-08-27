@@ -67,6 +67,10 @@ spring:
     baseline-version: 0
 
 opspilot:
+  forecast:
+    gold:
+      # 保存实际调用的模型名称，用于预测版本审计和幂等判断。
+      model-name: glm-4.7
   research:
     narrative:
       # 正式解读记录会保存模型名称，用于审计和幂等判断。

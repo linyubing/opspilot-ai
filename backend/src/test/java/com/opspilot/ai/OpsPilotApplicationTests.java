@@ -103,4 +103,12 @@ class OpsPilotApplicationTests {
 		)).isEqualTo("glm-4.7");
 	}
 
+	@Test
+	void usesDedicatedGoldForecastModel() {
+		// 预测记录按专用配置留痕实际模型，不能依赖供应商默认值。
+		assertThat(environment.getProperty(
+				"opspilot.forecast.gold.model-name"
+		)).isEqualTo("glm-4.7");
+	}
+
 }
