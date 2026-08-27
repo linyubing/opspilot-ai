@@ -18,6 +18,10 @@ import com.opspilot.ai.analysis.history.StoredGoldResearchSnapshot;
 import com.opspilot.ai.analysis.narrative.ResearchNarrativeContent;
 import com.opspilot.ai.analysis.narrative.SaveResearchNarrativeResult;
 import com.opspilot.ai.analysis.narrative.StoredResearchNarrative;
+import com.opspilot.ai.forecast.ForecastDirection;
+import com.opspilot.ai.forecast.ForecastStatus;
+import com.opspilot.ai.forecast.SaveGoldForecastResult;
+import com.opspilot.ai.forecast.StoredGoldDirectionForecast;
 import com.opspilot.ai.macrodata.DollarIndexSyncResult;
 import com.opspilot.ai.macrodata.RealRateSyncResult;
 import com.opspilot.ai.marketdata.GoldPriceSyncResult;
@@ -137,7 +141,12 @@ class GoldResearchControllerTests {
                         .value("11111111-1111-1111-1111-111111111111"))
                 .andExpect(jsonPath("$.narrative.record.snapshotId")
                         .value("11111111-1111-1111-1111-111111111111"))
-                .andExpect(jsonPath("$.narrative.created").value(true));
+                .andExpect(jsonPath("$.narrative.created").value(true))
+                .andExpect(jsonPath("$.forecast.record.predictedDirection")
+                        .value("BULLISH"))
+                .andExpect(jsonPath("$.forecast.record.reasoning")
+                        .value("美元指数走弱对黄金构成支撑。"))
+                .andExpect(jsonPath("$.forecast.created").value(true));
     }
 
     @Test
@@ -256,10 +265,36 @@ class GoldResearchControllerTests {
                 "raw-response",
                 OffsetDateTime.parse("2026-08-27T01:05:00Z")
         );
+        StoredGoldDirectionForecast forecast =
+                new StoredGoldDirectionForecast(
+                        UUID.fromString(
+                                "33333333-3333-3333-3333-333333333333"
+                        ),
+                        snapshotId,
+                        LocalDate.parse("2026-08-26"),
+                        new BigDecimal("2500.00"),
+                        ForecastDirection.BULLISH,
+                        "美元指数走弱对黄金构成支撑。",
+                        List.of("美元指数重新转强"),
+                        "glm-4.7",
+                        "gold-direction-v1",
+                        "forecast-prompt-hash",
+                        "gold-direction-rule-v1",
+                        "raw-forecast-response",
+                        ForecastStatus.PENDING,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        OffsetDateTime.parse("2026-08-27T01:06:00Z")
+                );
 
         return new GoldDailyResearchReportResult(
                 preparationResult(true),
-                new SaveResearchNarrativeResult(narrative, true)
+                new SaveResearchNarrativeResult(narrative, true),
+                new SaveGoldForecastResult(forecast, true)
         );
     }
 }

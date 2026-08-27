@@ -2,23 +2,28 @@ package com.opspilot.ai.analysis;
 
 import com.opspilot.ai.analysis.narrative.GoldResearchNarrativeService;
 import com.opspilot.ai.analysis.narrative.SaveResearchNarrativeResult;
+import com.opspilot.ai.forecast.GoldForecastGenerationService;
+import com.opspilot.ai.forecast.SaveGoldForecastResult;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
-/** 编排真实研究数据准备和黄金研究解读生成。 */
+/** 编排真实研究数据准备、黄金研究解读和方向预测生成。 */
 @Service
 public class GoldDailyResearchReportService {
 
     private final GoldResearchPreparationService preparationService;
     private final GoldResearchNarrativeService narrativeService;
+    private final GoldForecastGenerationService forecastService;
 
     public GoldDailyResearchReportService(
             GoldResearchPreparationService preparationService,
-            GoldResearchNarrativeService narrativeService
+            GoldResearchNarrativeService narrativeService,
+            GoldForecastGenerationService forecastService
     ) {
         this.preparationService = preparationService;
         this.narrativeService = narrativeService;
+        this.forecastService = forecastService;
     }
 
     public GoldDailyResearchReportResult generateDailyReport() {
@@ -30,7 +35,13 @@ public class GoldDailyResearchReportService {
         UUID snapshotId = preparation.snapshot().record().id();
         SaveResearchNarrativeResult narrative =
                 narrativeService.generate(snapshotId);
+        SaveGoldForecastResult forecast =
+                forecastService.generate(snapshotId);
 
-        return new GoldDailyResearchReportResult(preparation, narrative);
+        return new GoldDailyResearchReportResult(
+                preparation,
+                narrative,
+                forecast
+        );
     }
 }

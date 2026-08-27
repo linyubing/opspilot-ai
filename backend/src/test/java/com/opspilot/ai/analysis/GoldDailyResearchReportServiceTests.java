@@ -4,6 +4,8 @@ import com.opspilot.ai.analysis.history.SaveGoldResearchSnapshotResult;
 import com.opspilot.ai.analysis.history.StoredGoldResearchSnapshot;
 import com.opspilot.ai.analysis.narrative.GoldResearchNarrativeService;
 import com.opspilot.ai.analysis.narrative.SaveResearchNarrativeResult;
+import com.opspilot.ai.forecast.GoldForecastGenerationService;
+import com.opspilot.ai.forecast.SaveGoldForecastResult;
 import com.opspilot.ai.macrodata.DollarIndexSyncResult;
 import com.opspilot.ai.macrodata.MacroDataUnavailableException;
 import com.opspilot.ai.macrodata.RealRateSyncResult;
@@ -39,13 +41,17 @@ class GoldDailyResearchReportServiceTests {
     @Mock
     private GoldResearchNarrativeService narrativeService;
 
+    @Mock
+    private GoldForecastGenerationService forecastService;
+
     private GoldDailyResearchReportService service;
 
     @BeforeEach
     void setUp() {
         service = new GoldDailyResearchReportService(
                 preparationService,
-                narrativeService
+                narrativeService,
+                forecastService
         );
     }
 
@@ -55,16 +61,25 @@ class GoldDailyResearchReportServiceTests {
         GoldResearchPreparationResult preparation = preparationResult();
         SaveResearchNarrativeResult narrative =
                 mock(SaveResearchNarrativeResult.class);
+        SaveGoldForecastResult forecast =
+                mock(SaveGoldForecastResult.class);
         when(preparationService.prepareDaily()).thenReturn(preparation);
         when(narrativeService.generate(SNAPSHOT_ID)).thenReturn(narrative);
+        when(forecastService.generate(SNAPSHOT_ID)).thenReturn(forecast);
 
         GoldDailyResearchReportResult result = service.generateDailyReport();
 
         assertThat(result.preparation()).isSameAs(preparation);
         assertThat(result.narrative()).isSameAs(narrative);
-        InOrder order = inOrder(preparationService, narrativeService);
+        assertThat(result.forecast()).isSameAs(forecast);
+        InOrder order = inOrder(
+                preparationService,
+                narrativeService,
+                forecastService
+        );
         order.verify(preparationService).prepareDaily();
         order.verify(narrativeService).generate(SNAPSHOT_ID);
+        order.verify(forecastService).generate(SNAPSHOT_ID);
     }
 
     @Test
@@ -75,7 +90,19 @@ class GoldDailyResearchReportServiceTests {
         when(preparationService.prepareDaily()).thenThrow(failure);
 
         assertThatThrownBy(service::generateDailyReport).isSameAs(failure);
-        verifyNoInteractions(narrativeService);
+        verifyNoInteractions(narrativeService, forecastService);
+    }
+
+    @Test
+    @DisplayName("研究解读生成失败时不生成方向预测")
+    void skipsForecastWhenNarrativeFails() {
+        GoldResearchPreparationResult preparation = preparationResult();
+        RuntimeException failure = new RuntimeException("大模型解读失败");
+        when(preparationService.prepareDaily()).thenReturn(preparation);
+        when(narrativeService.generate(SNAPSHOT_ID)).thenThrow(failure);
+
+        assertThatThrownBy(service::generateDailyReport).isSameAs(failure);
+        verifyNoInteractions(forecastService);
     }
 
     private GoldResearchPreparationResult preparationResult() {
