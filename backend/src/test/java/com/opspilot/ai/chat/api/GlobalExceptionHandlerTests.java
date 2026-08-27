@@ -2,6 +2,10 @@ package com.opspilot.ai.chat.api;
 
 import com.opspilot.ai.analysis.InsufficientResearchDataException;
 import com.opspilot.ai.analysis.InvalidResearchDataException;
+import com.opspilot.ai.analysis.narrative.GoldResearchSnapshotNotFoundException;
+import com.opspilot.ai.analysis.narrative.InvalidResearchAiResponseException;
+import com.opspilot.ai.analysis.narrative.ResearchAiUnavailableException;
+import com.opspilot.ai.analysis.narrative.UnsafeResearchNarrativeException;
 import com.opspilot.ai.chat.UpstreamAiException;
 import com.opspilot.ai.macrodata.InvalidMacroDataRequestException;
 import com.opspilot.ai.macrodata.MacroDataUnavailableException;
@@ -14,10 +18,67 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.util.Arrays;
+import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 public class GlobalExceptionHandlerTests {
+
+    @Test
+    void returnsNotFoundForMissingResearchSnapshot() {
+        GlobalExceptionHandler handler = new GlobalExceptionHandler();
+        ResponseEntity<ApiError> response = handler.handleGoldResearchSnapshotNotFound(
+                new GoldResearchSnapshotNotFoundException(UUID.randomUUID())
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(response.getBody().code())
+                .isEqualTo("GOLD_RESEARCH_SNAPSHOT_NOT_FOUND");
+    }
+
+    @Test
+    void returnsServiceUnavailableForResearchAiFailure() {
+        GlobalExceptionHandler handler = new GlobalExceptionHandler();
+        ResponseEntity<ApiError> response = handler.handleResearchAiUnavailable(
+                new ResearchAiUnavailableException(
+                        "黄金研究大模型暂时不可用，请稍后重试",
+                        new IllegalStateException()
+                )
+        );
+
+        assertThat(response.getStatusCode())
+                .isEqualTo(HttpStatus.SERVICE_UNAVAILABLE);
+        assertThat(response.getBody().code())
+                .isEqualTo("RESEARCH_AI_UNAVAILABLE");
+    }
+
+    @Test
+    void returnsBadGatewayForInvalidResearchAiResponse() {
+        GlobalExceptionHandler handler = new GlobalExceptionHandler();
+        ResponseEntity<ApiError> response = handler.handleInvalidResearchAiResponse(
+                new InvalidResearchAiResponseException(
+                        "大模型未返回合法的结构化研究解读",
+                        new IllegalArgumentException()
+                )
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_GATEWAY);
+        assertThat(response.getBody().code())
+                .isEqualTo("INVALID_RESEARCH_AI_RESPONSE");
+    }
+
+    @Test
+    void returnsUnprocessableEntityForUnsafeNarrative() {
+        GlobalExceptionHandler handler = new GlobalExceptionHandler();
+        ResponseEntity<ApiError> response = handler.handleUnsafeResearchNarrative(
+                new UnsafeResearchNarrativeException("研究解读包含禁止内容")
+        );
+
+        assertThat(response.getStatusCode())
+                .isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);
+        assertThat(response.getBody().code())
+                .isEqualTo("UNSAFE_RESEARCH_NARRATIVE");
+    }
 
     @Test
     void returnsBadGatewayForUpstreamAiFailure(){

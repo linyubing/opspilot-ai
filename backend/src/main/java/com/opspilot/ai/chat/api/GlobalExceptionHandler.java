@@ -2,6 +2,10 @@ package com.opspilot.ai.chat.api;
 
 import com.opspilot.ai.analysis.InsufficientResearchDataException;
 import com.opspilot.ai.analysis.InvalidResearchDataException;
+import com.opspilot.ai.analysis.narrative.GoldResearchSnapshotNotFoundException;
+import com.opspilot.ai.analysis.narrative.InvalidResearchAiResponseException;
+import com.opspilot.ai.analysis.narrative.ResearchAiUnavailableException;
+import com.opspilot.ai.analysis.narrative.UnsafeResearchNarrativeException;
 import com.opspilot.ai.analysis.history.InvalidResearchHistoryRequestException;
 import com.opspilot.ai.chat.UpstreamAiException;
 import com.opspilot.ai.macrodata.InvalidMacroDataRequestException;
@@ -19,6 +23,54 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(GoldResearchSnapshotNotFoundException.class)
+    public ResponseEntity<ApiError> handleGoldResearchSnapshotNotFound(
+            GoldResearchSnapshotNotFoundException exception
+    ) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                new ApiError(
+                        "GOLD_RESEARCH_SNAPSHOT_NOT_FOUND",
+                        exception.getMessage()
+                )
+        );
+    }
+
+    @ExceptionHandler(ResearchAiUnavailableException.class)
+    public ResponseEntity<ApiError> handleResearchAiUnavailable(
+            ResearchAiUnavailableException exception
+    ) {
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(
+                new ApiError(
+                        "RESEARCH_AI_UNAVAILABLE",
+                        exception.getMessage()
+                )
+        );
+    }
+
+    @ExceptionHandler(InvalidResearchAiResponseException.class)
+    public ResponseEntity<ApiError> handleInvalidResearchAiResponse(
+            InvalidResearchAiResponseException exception
+    ) {
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(
+                new ApiError(
+                        "INVALID_RESEARCH_AI_RESPONSE",
+                        exception.getMessage()
+                )
+        );
+    }
+
+    @ExceptionHandler(UnsafeResearchNarrativeException.class)
+    public ResponseEntity<ApiError> handleUnsafeResearchNarrative(
+            UnsafeResearchNarrativeException exception
+    ) {
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(
+                new ApiError(
+                        "UNSAFE_RESEARCH_NARRATIVE",
+                        exception.getMessage()
+                )
+        );
+    }
 
     @ExceptionHandler(DollarIndexNotFoundException.class)
     public ResponseEntity<ApiError> handleDollarIndexNotFound(
