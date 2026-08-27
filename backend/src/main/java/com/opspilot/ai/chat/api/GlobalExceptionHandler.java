@@ -8,6 +8,10 @@ import com.opspilot.ai.analysis.narrative.ResearchAiUnavailableException;
 import com.opspilot.ai.analysis.narrative.UnsafeResearchNarrativeException;
 import com.opspilot.ai.analysis.history.InvalidResearchHistoryRequestException;
 import com.opspilot.ai.chat.UpstreamAiException;
+import com.opspilot.ai.forecast.GoldForecastAiUnavailableException;
+import com.opspilot.ai.forecast.InvalidGoldForecastAiResponseException;
+import com.opspilot.ai.forecast.InvalidGoldForecastSnapshotException;
+import com.opspilot.ai.forecast.UnsafeGoldForecastException;
 import com.opspilot.ai.macrodata.InvalidMacroDataRequestException;
 import com.opspilot.ai.macrodata.DollarIndexNotFoundException;
 import com.opspilot.ai.macrodata.MacroDataUnavailableException;
@@ -23,6 +27,42 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(InvalidGoldForecastSnapshotException.class)
+    public ResponseEntity<ApiError> handleInvalidGoldForecastSnapshot(
+            InvalidGoldForecastSnapshotException exception
+    ) {
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(
+                new ApiError("INVALID_GOLD_FORECAST_SNAPSHOT", exception.getMessage())
+        );
+    }
+
+    @ExceptionHandler(GoldForecastAiUnavailableException.class)
+    public ResponseEntity<ApiError> handleGoldForecastAiUnavailable(
+            GoldForecastAiUnavailableException exception
+    ) {
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(
+                new ApiError("GOLD_FORECAST_AI_UNAVAILABLE", exception.getMessage())
+        );
+    }
+
+    @ExceptionHandler(InvalidGoldForecastAiResponseException.class)
+    public ResponseEntity<ApiError> handleInvalidGoldForecastAiResponse(
+            InvalidGoldForecastAiResponseException exception
+    ) {
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(
+                new ApiError("INVALID_GOLD_FORECAST_AI_RESPONSE", exception.getMessage())
+        );
+    }
+
+    @ExceptionHandler(UnsafeGoldForecastException.class)
+    public ResponseEntity<ApiError> handleUnsafeGoldForecast(
+            UnsafeGoldForecastException exception
+    ) {
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(
+                new ApiError("UNSAFE_GOLD_FORECAST", exception.getMessage())
+        );
+    }
 
     @ExceptionHandler(GoldResearchSnapshotNotFoundException.class)
     public ResponseEntity<ApiError> handleGoldResearchSnapshotNotFound(

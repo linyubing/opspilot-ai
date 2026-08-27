@@ -7,6 +7,10 @@ import com.opspilot.ai.analysis.narrative.InvalidResearchAiResponseException;
 import com.opspilot.ai.analysis.narrative.ResearchAiUnavailableException;
 import com.opspilot.ai.analysis.narrative.UnsafeResearchNarrativeException;
 import com.opspilot.ai.chat.UpstreamAiException;
+import com.opspilot.ai.forecast.GoldForecastAiUnavailableException;
+import com.opspilot.ai.forecast.InvalidGoldForecastAiResponseException;
+import com.opspilot.ai.forecast.InvalidGoldForecastSnapshotException;
+import com.opspilot.ai.forecast.UnsafeGoldForecastException;
 import com.opspilot.ai.macrodata.InvalidMacroDataRequestException;
 import com.opspilot.ai.macrodata.MacroDataUnavailableException;
 import com.opspilot.ai.marketdata.InvalidMarketDataRequestException;
@@ -23,6 +27,38 @@ import java.util.UUID;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 public class GlobalExceptionHandlerTests {
+
+    @Test
+    void returnsUnprocessableEntityForInvalidForecastSnapshot() {
+        ResponseEntity<ApiError> response = new GlobalExceptionHandler()
+                .handleInvalidGoldForecastSnapshot(new InvalidGoldForecastSnapshotException("old-v1"));
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);
+        assertThat(response.getBody().code()).isEqualTo("INVALID_GOLD_FORECAST_SNAPSHOT");
+    }
+
+    @Test
+    void returnsServiceUnavailableForForecastAiFailure() {
+        ResponseEntity<ApiError> response = new GlobalExceptionHandler()
+                .handleGoldForecastAiUnavailable(new GoldForecastAiUnavailableException("不可用", new RuntimeException()));
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE);
+        assertThat(response.getBody().code()).isEqualTo("GOLD_FORECAST_AI_UNAVAILABLE");
+    }
+
+    @Test
+    void returnsBadGatewayForInvalidForecastAiResponse() {
+        ResponseEntity<ApiError> response = new GlobalExceptionHandler()
+                .handleInvalidGoldForecastAiResponse(new InvalidGoldForecastAiResponseException("非法", new RuntimeException()));
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_GATEWAY);
+        assertThat(response.getBody().code()).isEqualTo("INVALID_GOLD_FORECAST_AI_RESPONSE");
+    }
+
+    @Test
+    void returnsUnprocessableEntityForUnsafeForecast() {
+        ResponseEntity<ApiError> response = new GlobalExceptionHandler()
+                .handleUnsafeGoldForecast(new UnsafeGoldForecastException("越界"));
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);
+        assertThat(response.getBody().code()).isEqualTo("UNSAFE_GOLD_FORECAST");
+    }
 
     @Test
     void returnsNotFoundForMissingResearchSnapshot() {
