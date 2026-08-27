@@ -95,4 +95,12 @@ class OpsPilotApplicationTests {
 				.isEqualTo("/chat/completions");
 	}
 
+	@Test
+	void usesDedicatedGoldResearchNarrativeModel() {
+		// 解读记录必须明确留痕实际使用的模型名称。
+		assertThat(environment.getProperty(
+				"opspilot.research.narrative.model-name"
+		)).isEqualTo("glm-4.7");
+	}
+
 }
