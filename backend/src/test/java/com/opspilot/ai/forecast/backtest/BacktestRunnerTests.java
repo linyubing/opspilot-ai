@@ -33,6 +33,8 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.contains;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -64,9 +66,8 @@ class BacktestRunnerTests {
                 new GoldForecastRule(), Clock.fixed(NOW, ZoneOffset.UTC)
         );
         when(repo.findTask(TASK_ID)).thenReturn(Optional.of(task()));
+        when(repo.findSampleDates(TASK_ID)).thenReturn(List.of(DATE));
         when(repo.findDoneDates(TASK_ID)).thenReturn(Set.of());
-        when(priceRepo.findRecent("XAUUSD", DATE, 1))
-                .thenReturn(List.of(price(DATE, "2500")));
         when(priceRepo.findAfter("XAUUSD", DATE, 100))
                 .thenReturn(List.of(
                         price(LocalDate.parse("2026-08-22"), "2510"),
@@ -117,6 +118,17 @@ class BacktestRunnerTests {
                 TASK_ID,
                 OffsetDateTime.ofInstant(NOW, ZoneOffset.UTC)
         );
+    }
+
+    @Test
+    void failsWhenFrozenSamplePlanIsIncomplete() {
+        when(repo.findSampleDates(TASK_ID)).thenReturn(List.of());
+
+        runner.run(TASK_ID);
+
+        verify(repo).fail(eq(TASK_ID), contains("冻结样本计划不完整"));
+        verify(gateway, never()).generate(any());
+        verify(repo, never()).complete(any(), any());
     }
 
     private BacktestTask task() {

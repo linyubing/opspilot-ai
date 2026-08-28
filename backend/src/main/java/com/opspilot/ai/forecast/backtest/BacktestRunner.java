@@ -20,7 +20,6 @@ import java.time.Clock;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -67,19 +66,15 @@ public class BacktestRunner {
         BacktestTask task = repo.findTask(id).orElseThrow(() ->
                 new BacktestNotFoundException("回测任务不存在，编号=" + id)
         );
+        List<LocalDate> dates = repo.findSampleDates(id);
+        if (dates.size() != task.sampleCount()) {
+            repo.fail(id, "冻结样本计划不完整，期望=" + task.sampleCount()
+                    + "，实际=" + dates.size());
+            return;
+        }
         Set<LocalDate> done = repo.findDoneDates(id);
-        List<MarketPrice> prices = priceRepo.findRecent(
-                SYMBOL,
-                task.endDate(),
-                task.sampleCount()
-        );
 
-        for (MarketPrice price : prices.stream()
-                .filter(item -> !item.priceDate().isBefore(task.startDate()))
-                .filter(item -> !item.priceDate().isAfter(task.endDate()))
-                .sorted(Comparator.comparing(MarketPrice::priceDate))
-                .toList()) {
-            LocalDate date = price.priceDate();
+        for (LocalDate date : dates) {
             if (done.contains(date)) {
                 continue;
             }
