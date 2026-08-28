@@ -63,7 +63,7 @@ public class BacktestService {
                 null,
                 null
         );
-        return repo.create(task);
+        return repo.create(task, dates);
     }
 
     public BacktestTask get(UUID id) {

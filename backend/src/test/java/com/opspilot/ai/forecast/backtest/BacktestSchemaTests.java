@@ -16,7 +16,7 @@ class BacktestSchemaTests {
     private JdbcTemplate jdbc;
 
     @Test
-    @DisplayName("创建独立的回测任务表和明细表")
+    @DisplayName("创建回测任务、冻结样本和明细表")
     void createsBacktestTables() {
         Long count = jdbc.queryForObject("""
                 select count(*)
@@ -24,11 +24,12 @@ class BacktestSchemaTests {
                 where table_schema = 'public'
                   and table_name in (
                       'gold_forecast_backtest',
+                      'gold_forecast_backtest_sample',
                       'gold_forecast_backtest_case'
                   )
                 """, Long.class);
 
-        assertThat(count).isEqualTo(2L);
+        assertThat(count).isEqualTo(3L);
     }
 
     @Test
@@ -51,5 +52,19 @@ class BacktestSchemaTests {
 
         assertThat(jsonColumns).isEqualTo(2L);
         assertThat(uniqueIndexes).isEqualTo(1L);
+    }
+
+    @Test
+    @DisplayName("冻结样本按任务日期和执行位置保证唯一")
+    void createsSampleConstraints() {
+        Long uniqueConstraints = jdbc.queryForObject("""
+                select count(*)
+                from information_schema.table_constraints
+                where table_schema = 'public'
+                  and table_name = 'gold_forecast_backtest_sample'
+                  and constraint_type in ('PRIMARY KEY', 'UNIQUE')
+                """, Long.class);
+
+        assertThat(uniqueConstraints).isEqualTo(2L);
     }
 }

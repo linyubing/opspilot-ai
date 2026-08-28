@@ -11,6 +11,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.math.BigDecimal;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /** 验证黄金回测任务、明细、进度和恢复状态的数据库往返。 */
 @SpringBootTest(properties = "spring.ai.openai.api-key=test-key")
@@ -51,7 +53,11 @@ class JdbcBacktestRepositoryTests {
         BacktestTask task = task();
         taskId = task.id();
 
-        BacktestTask created = repo.create(task);
+        List<LocalDate> dates = List.of(
+                LocalDate.parse("2026-08-19"),
+                LocalDate.parse("2026-08-20")
+        );
+        BacktestTask created = repo.create(task, dates);
         boolean started = repo.start(taskId, NOW.plusMinutes(1));
         boolean first = repo.saveCase(item(taskId));
         boolean repeated = repo.saveCase(item(taskId));
@@ -66,6 +72,7 @@ class JdbcBacktestRepositoryTests {
         assertThat(running.hitCount()).isEqualTo(1);
         assertThat(repo.findDoneDates(taskId))
                 .containsExactly(LocalDate.parse("2026-08-20"));
+        assertThat(repo.findSampleDates(taskId)).containsExactlyElementsOf(dates);
         assertThat(repo.findCases(taskId, 10))
                 .singleElement()
                 .satisfies(saved -> {
@@ -81,7 +88,10 @@ class JdbcBacktestRepositoryTests {
     void startsOnlyOnceAndUpdatesFinalStatus() {
         BacktestTask task = task();
         taskId = task.id();
-        repo.create(task);
+        repo.create(task, List.of(
+                LocalDate.parse("2026-08-19"),
+                LocalDate.parse("2026-08-20")
+        ));
 
         assertThat(repo.start(taskId, NOW.plusMinutes(1))).isTrue();
         assertThat(repo.start(taskId, NOW.plusMinutes(2))).isFalse();
@@ -103,12 +113,24 @@ class JdbcBacktestRepositoryTests {
         assertThat(completed.lastError()).isNull();
     }
 
+    @Test
+    void rollsBackTaskWhenSampleDateIsRepeated() {
+        BacktestTask task = task();
+        taskId = task.id();
+        LocalDate date = LocalDate.parse("2026-08-20");
+
+        assertThatThrownBy(() -> repo.create(task, List.of(date, date)))
+                .isInstanceOf(DataIntegrityViolationException.class);
+
+        assertThat(repo.findTask(taskId)).isEmpty();
+    }
+
     private BacktestTask task() {
         return new BacktestTask(
                 UUID.randomUUID(),
                 LocalDate.parse("2026-07-01"),
                 LocalDate.parse("2026-08-20"),
-                60,
+                2,
                 "glm-4.7",
                 "gold-backtest-prompt-v1",
                 "gold-direction-rule-v1",

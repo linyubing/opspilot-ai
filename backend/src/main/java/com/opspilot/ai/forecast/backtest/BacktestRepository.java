@@ -10,7 +10,9 @@ import java.util.UUID;
 /** 定义黄金回测任务和明细的持久化边界。 */
 public interface BacktestRepository {
 
-    BacktestTask create(BacktestTask task);
+    BacktestTask create(BacktestTask task, List<LocalDate> dates);
+
+    List<LocalDate> findSampleDates(UUID id);
 
     Optional<BacktestTask> findTask(UUID id);
 

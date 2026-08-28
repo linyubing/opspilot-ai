@@ -21,6 +21,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -44,7 +45,8 @@ class BacktestServiceTests {
                 new GoldForecastProperties("glm-4.7"),
                 Clock.fixed(NOW, ZoneOffset.UTC)
         );
-        when(repo.create(any())).thenAnswer(call -> call.getArgument(0));
+        when(repo.create(any(), anyList()))
+                .thenAnswer(call -> call.getArgument(0));
     }
 
     @Test
@@ -61,7 +63,7 @@ class BacktestServiceTests {
         assertThat(task.ruleVersion()).isEqualTo(GoldForecastRule.RULE_VERSION);
         assertThat(task.status()).isEqualTo(BacktestStatus.CREATED);
         assertThat(task.createdAt()).isEqualTo(OffsetDateTime.ofInstant(NOW, ZoneOffset.UTC));
-        verify(repo).create(task);
+        verify(repo).create(any(BacktestTask.class), anyList());
     }
 
     @Test

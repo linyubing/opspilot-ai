@@ -19,6 +19,7 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.IntStream;
 
 /** 使用 PostgreSQL 保存可恢复的黄金回测任务和明细。 */
 @Repository
@@ -96,7 +97,8 @@ public class JdbcBacktestRepository implements BacktestRepository {
     }
 
     @Override
-    public BacktestTask create(BacktestTask task) {
+    @Transactional
+    public BacktestTask create(BacktestTask task, List<LocalDate> dates) {
         jdbc.update("""
                 insert into gold_forecast_backtest (
                     id, start_date, end_date, sample_count, model_name,
@@ -112,7 +114,30 @@ public class JdbcBacktestRepository implements BacktestRepository {
                 task.lastError(), task.createdAt(), task.startedAt(),
                 task.completedAt()
         );
+
+        List<Integer> indexes = IntStream.range(0, dates.size())
+                .boxed()
+                .toList();
+        jdbc.batchUpdate("""
+                insert into gold_forecast_backtest_sample (
+                    backtest_id, position, as_of_date
+                ) values (?, ?, ?)
+                """, indexes, indexes.size(), (statement, index) -> {
+            statement.setObject(1, task.id());
+            statement.setInt(2, index + 1);
+            statement.setObject(3, dates.get(index));
+        });
         return findTask(task.id()).orElseThrow();
+    }
+
+    @Override
+    public List<LocalDate> findSampleDates(UUID id) {
+        return jdbc.queryForList("""
+                select as_of_date
+                from gold_forecast_backtest_sample
+                where backtest_id = ?
+                order by position
+                """, LocalDate.class, id);
     }
 
     @Override
