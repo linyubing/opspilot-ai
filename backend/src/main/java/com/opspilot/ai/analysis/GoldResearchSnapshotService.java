@@ -14,6 +14,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * 负责对齐黄金与实际利率数据并计算确定性研究快照。
@@ -71,6 +72,40 @@ public class GoldResearchSnapshotService {
                         DOLLAR_INDEX_SERIES_ID,
                         QUERY_LIMIT
                 );
+
+        return calculate(goldPrices, realRates, dollarIndexes);
+    }
+
+    /**
+     * 按指定历史日期重建快照，避免回测读取未来数据。
+     */
+    public GoldResearchSnapshot createSnapshot(LocalDate asOf) {
+        Objects.requireNonNull(asOf, "回测日期不能为空");
+
+        return calculate(
+                marketPriceRepository.findRecent(
+                        GOLD_SYMBOL,
+                        asOf,
+                        QUERY_LIMIT
+                ),
+                macroObservationRepository.findRecent(
+                        REAL_RATE_SERIES_ID,
+                        asOf,
+                        QUERY_LIMIT
+                ),
+                macroObservationRepository.findRecent(
+                        DOLLAR_INDEX_SERIES_ID,
+                        asOf,
+                        QUERY_LIMIT
+                )
+        );
+    }
+
+    private GoldResearchSnapshot calculate(
+            List<MarketPrice> goldPrices,
+            List<MacroObservation> realRates,
+            List<MacroObservation> dollarIndexes
+    ) {
 
         validateSourceData(goldPrices, realRates, dollarIndexes);
 

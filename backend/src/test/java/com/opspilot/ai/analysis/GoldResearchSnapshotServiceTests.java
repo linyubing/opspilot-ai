@@ -142,6 +142,42 @@ class GoldResearchSnapshotServiceTests {
     }
 
     @Test
+    @DisplayName("历史快照只使用截止日期及之前的数据")
+    void createsHistoricalSnapshotWithoutFutureData() {
+        LocalDate asOf = ANALYSIS_DATE;
+        List<MarketPrice> liveGold = goldPrices(21);
+        liveGold.add(goldPrice(LocalDate.parse("2026-08-25"), "9999"));
+        List<MacroObservation> liveRates = realRates(21);
+        liveRates.add(realRate(LocalDate.parse("2026-08-25"), "9.99"));
+        List<MacroObservation> liveDollars = dollarIndexes(21);
+        liveDollars.add(dollarIndex(LocalDate.parse("2026-08-25"), "999"));
+
+        when(marketPriceRepository.findRecent("XAUUSD", 120))
+                .thenReturn(liveGold);
+        when(macroObservationRepository.findRecent("DFII10", 120))
+                .thenReturn(liveRates);
+        when(macroObservationRepository.findRecent("DTWEXBGS", 120))
+                .thenReturn(liveDollars);
+        when(marketPriceRepository.findRecent("XAUUSD", asOf, 120))
+                .thenReturn(goldPrices(21));
+        when(macroObservationRepository.findRecent("DFII10", asOf, 120))
+                .thenReturn(realRates(21));
+        when(macroObservationRepository.findRecent("DTWEXBGS", asOf, 120))
+                .thenReturn(dollarIndexes(21));
+
+        GoldResearchSnapshot snapshot = service.createSnapshot(asOf);
+
+        assertThat(snapshot.latestGoldDate()).isBeforeOrEqualTo(asOf);
+        assertThat(snapshot.latestRealRateDate()).isBeforeOrEqualTo(asOf);
+        assertThat(snapshot.latestDollarIndexDate()).isBeforeOrEqualTo(asOf);
+        assertThat(snapshot.gold().currentPrice())
+                .isNotEqualByComparingTo("9999");
+        verify(marketPriceRepository).findRecent("XAUUSD", asOf, 120);
+        verify(macroObservationRepository).findRecent("DFII10", asOf, 120);
+        verify(macroObservationRepository).findRecent("DTWEXBGS", asOf, 120);
+    }
+
+    @Test
     @DisplayName("只有 20 个共同日期时明确报告数据不足")
     void rejectsInsufficientCommonDates() {
         when(marketPriceRepository.findRecent("XAUUSD", 120))
