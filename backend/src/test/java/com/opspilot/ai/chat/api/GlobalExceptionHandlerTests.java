@@ -11,6 +11,9 @@ import com.opspilot.ai.forecast.GoldForecastAiUnavailableException;
 import com.opspilot.ai.forecast.InvalidGoldForecastAiResponseException;
 import com.opspilot.ai.forecast.InvalidGoldForecastSnapshotException;
 import com.opspilot.ai.forecast.UnsafeGoldForecastException;
+import com.opspilot.ai.forecast.backtest.BacktestDataInsufficientException;
+import com.opspilot.ai.forecast.backtest.BacktestNotFoundException;
+import com.opspilot.ai.forecast.backtest.InvalidBacktestRequestException;
 import com.opspilot.ai.forecast.review.GoldForecastReviewAiUnavailableException;
 import com.opspilot.ai.forecast.review.InsufficientForecastReviewSamplesException;
 import com.opspilot.ai.forecast.review.InvalidGoldForecastReviewAiResponseException;
@@ -30,6 +33,32 @@ import java.util.UUID;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 public class GlobalExceptionHandlerTests {
+
+    @Test
+    void mapsBacktestErrorsToStableCodes() {
+        GlobalExceptionHandler handler = new GlobalExceptionHandler();
+
+        assertThat(handler.handleBacktestNotFound(
+                new BacktestNotFoundException("不存在")
+        ).getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(handler.handleBacktestNotFound(
+                new BacktestNotFoundException("不存在")
+        ).getBody().code()).isEqualTo("BACKTEST_NOT_FOUND");
+
+        assertThat(handler.handleInvalidBacktestRequest(
+                new InvalidBacktestRequestException("参数错误")
+        ).getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(handler.handleInvalidBacktestRequest(
+                new InvalidBacktestRequestException("参数错误")
+        ).getBody().code()).isEqualTo("INVALID_BACKTEST_REQUEST");
+
+        assertThat(handler.handleBacktestDataInsufficient(
+                new BacktestDataInsufficientException("数据不足")
+        ).getStatusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);
+        assertThat(handler.handleBacktestDataInsufficient(
+                new BacktestDataInsufficientException("数据不足")
+        ).getBody().code()).isEqualTo("BACKTEST_DATA_INSUFFICIENT");
+    }
 
     @Test
     void returnsUnprocessableEntityForSmallReviewSample() {

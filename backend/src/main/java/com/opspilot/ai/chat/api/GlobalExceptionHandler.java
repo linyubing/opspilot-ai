@@ -14,6 +14,9 @@ import com.opspilot.ai.forecast.InvalidGoldForecastAiResponseException;
 import com.opspilot.ai.forecast.InvalidGoldForecastSnapshotException;
 import com.opspilot.ai.forecast.StaleGoldForecastDataException;
 import com.opspilot.ai.forecast.UnsafeGoldForecastException;
+import com.opspilot.ai.forecast.backtest.BacktestDataInsufficientException;
+import com.opspilot.ai.forecast.backtest.BacktestNotFoundException;
+import com.opspilot.ai.forecast.backtest.InvalidBacktestRequestException;
 import com.opspilot.ai.forecast.review.GoldForecastReviewAiUnavailableException;
 import com.opspilot.ai.forecast.review.InsufficientForecastReviewSamplesException;
 import com.opspilot.ai.forecast.review.InvalidGoldForecastReviewAiResponseException;
@@ -32,6 +35,33 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(BacktestNotFoundException.class)
+    public ResponseEntity<ApiError> handleBacktestNotFound(
+            BacktestNotFoundException exception
+    ) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                new ApiError("BACKTEST_NOT_FOUND", exception.getMessage())
+        );
+    }
+
+    @ExceptionHandler(InvalidBacktestRequestException.class)
+    public ResponseEntity<ApiError> handleInvalidBacktestRequest(
+            InvalidBacktestRequestException exception
+    ) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                new ApiError("INVALID_BACKTEST_REQUEST", exception.getMessage())
+        );
+    }
+
+    @ExceptionHandler(BacktestDataInsufficientException.class)
+    public ResponseEntity<ApiError> handleBacktestDataInsufficient(
+            BacktestDataInsufficientException exception
+    ) {
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(
+                new ApiError("BACKTEST_DATA_INSUFFICIENT", exception.getMessage())
+        );
+    }
 
     @ExceptionHandler(InsufficientForecastReviewSamplesException.class)
     public ResponseEntity<ApiError> handleReviewSamples(
