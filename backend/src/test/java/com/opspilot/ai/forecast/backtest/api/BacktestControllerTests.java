@@ -141,7 +141,11 @@ class BacktestControllerTests {
                 .andExpect(jsonPath("$.balancedAccuracy").value(0.5238))
                 .andExpect(jsonPath("$.confusionMatrix.actualBullish.bullish").value(4))
                 .andExpect(jsonPath("$.confusionMatrix.actualNeutral.neutral").value(3))
-                .andExpect(jsonPath("$.confusionMatrix.actualBearish.bearish").value(4));
+                .andExpect(jsonPath("$.confusionMatrix.actualBearish.bearish").value(4))
+                .andExpect(jsonPath("$.conclusion.level").value("INSUFFICIENT"))
+                .andExpect(jsonPath("$.conclusion.summary").value(
+                        "有效样本不足 30 条，当前结果只能用于观察。"
+                ));
     }
 
     private BacktestTask task(BacktestStatus status) {

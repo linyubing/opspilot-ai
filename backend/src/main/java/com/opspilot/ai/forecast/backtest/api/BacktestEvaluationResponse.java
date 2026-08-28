@@ -1,6 +1,7 @@
 package com.opspilot.ai.forecast.backtest.api;
 
 import com.opspilot.ai.forecast.DirectionEvaluation;
+import com.opspilot.ai.forecast.backtest.BacktestConclusion;
 import com.opspilot.ai.forecast.backtest.BacktestEvaluation;
 import com.opspilot.ai.forecast.backtest.ConfusionMatrix;
 
@@ -17,6 +18,7 @@ public record BacktestEvaluationResponse(
         BigDecimal accuracyLift,
         BigDecimal balancedAccuracy,
         ConfusionMatrix confusionMatrix,
+        BacktestConclusion conclusion,
         DirectionEvaluation bullish,
         DirectionEvaluation neutral,
         DirectionEvaluation bearish
@@ -27,6 +29,7 @@ public record BacktestEvaluationResponse(
                 value.rolling20Accuracy(), value.neutralBaselineAccuracy(),
                 value.majorityBaselineAccuracy(), value.accuracyLift(),
                 value.balancedAccuracy(), value.confusionMatrix(),
+                BacktestConclusion.from(value),
                 value.bullish(), value.neutral(), value.bearish()
         );
     }
