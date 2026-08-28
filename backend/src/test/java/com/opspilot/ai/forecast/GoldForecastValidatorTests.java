@@ -57,6 +57,18 @@ class GoldForecastValidatorTests {
         ));
     }
 
+    @Test
+    @DisplayName("允许描述真实涨跌幅和方向判定阈值")
+    void acceptsPriceChangePercentages() {
+        assertThatCode(() -> validator.validate(
+                new GoldDirectionForecastContent(
+                        ForecastDirection.BULLISH,
+                        "黄金20期上涨11.7766%，美元指数走弱形成支撑。",
+                        List.of("若下一有效交易日上涨不超过0.5%，方向判断失效")
+                )
+        )).doesNotThrowAnyException();
+    }
+
     private GoldDirectionForecastContent valid() {
         return new GoldDirectionForecastContent(
                 ForecastDirection.NEUTRAL,

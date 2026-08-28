@@ -10,7 +10,9 @@ import org.springframework.stereotype.Component;
 public class GoldForecastValidator {
 
     private static final Pattern NUMERIC_PROBABILITY = Pattern.compile(
-            "(?:上涨|下跌|涨|跌).{0,8}\\d+(?:\\.\\d+)?%"
+            "(?:(?:上涨|下跌|涨|跌).{0,8}(?:概率|可能性|胜率).{0,8}"
+                    + "\\d+(?:\\.\\d+)?%|\\d+(?:\\.\\d+)?%.{0,8}"
+                    + "(?:概率|可能性|胜率).{0,8}(?:上涨|下跌|涨|跌))"
     );
     private static final List<String> FORBIDDEN_PHRASES = List.of(
             "建议买入", "建议卖出", "目标价", "止损位", "仓位"
