@@ -203,9 +203,23 @@ $task | Format-List
 $id = $task.id
 ```
 
-`samples` 允许范围为 `1` 到 `120`。正式跑 60 条前，建议先用 5 条验证完整流程和模型额度。
+`samples` 允许范围为 `1` 到 `120`。创建时会从完整真实黄金历史中等距选择日期，并把日期永久冻结；之后新增行情或重启应用都不会改变该任务的样本。
 
-### 2. 启动后台回测
+### 2. 查看冻结样本日期
+
+查看样本只查询数据库，不会调用大模型，也不会消耗 GLM 额度：
+
+```powershell
+$samples = Invoke-RestMethod `
+    -Method Get `
+    -Uri "http://localhost:8080/api/research/gold/backtests/$id/samples"
+
+$samples | Format-Table position, asOfDate
+```
+
+日期应覆盖较长历史区间，而不是集中在最近几天。最早 20 个交易日只用于计算历史指标，最新 1 个交易日只用于结算，因此不会被选为预测日期。
+
+### 3. 启动后台回测
 
 下面的接口会针对每个尚未完成的历史日期调用一次 GLM，可能消耗 API 额度：
 
@@ -219,7 +233,7 @@ $running | Format-List
 
 相同任务重复启动不会重复提交；失败后再次启动时，已经保存的日期不会重复调用模型。
 
-### 3. 查询任务进度
+### 4. 查询任务进度
 
 ```powershell
 $status = Invoke-RestMethod `
@@ -231,7 +245,7 @@ $status | Format-List
 
 重点查看 `status`、`completedCount`、`hitCount`、`failedCount` 和 `lastError`。
 
-### 4. 查看逐日涨跌结果
+### 5. 查看逐日涨跌结果
 
 ```powershell
 $results = Invoke-RestMethod `
@@ -244,7 +258,7 @@ $results | Format-Table `
 
 接口不会返回完整提示词或模型原始响应。
 
-### 5. 查看准确率评估
+### 6. 查看准确率评估
 
 ```powershell
 $evaluation = Invoke-RestMethod `
