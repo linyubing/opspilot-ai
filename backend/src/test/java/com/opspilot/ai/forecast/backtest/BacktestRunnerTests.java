@@ -11,6 +11,7 @@ import com.opspilot.ai.forecast.ForecastDirection;
 import com.opspilot.ai.forecast.GeneratedGoldForecast;
 import com.opspilot.ai.forecast.GoldDirectionForecastContent;
 import com.opspilot.ai.forecast.GoldForecastGateway;
+import com.opspilot.ai.forecast.GoldForecastAiUnavailableException;
 import com.opspilot.ai.forecast.GoldForecastRule;
 import com.opspilot.ai.forecast.GoldForecastValidator;
 import com.opspilot.ai.forecast.NextValidMarketPriceSelector;
@@ -128,6 +129,25 @@ class BacktestRunnerTests {
 
         verify(repo).fail(eq(TASK_ID), contains("冻结样本计划不完整"));
         verify(gateway, never()).generate(any());
+        verify(repo, never()).complete(any(), any());
+    }
+
+    @Test
+    void failsTaskWhenModelCallTimesOut() {
+        when(gateway.generate(any())).thenThrow(
+                new GoldForecastAiUnavailableException(
+                        "黄金方向预测模型暂时不可用，请稍后重试",
+                        new java.net.SocketTimeoutException("Read timed out")
+                )
+        );
+
+        runner.run(TASK_ID);
+
+        verify(repo).fail(
+                eq(TASK_ID),
+                contains("黄金方向预测模型暂时不可用")
+        );
+        verify(repo, never()).recordFailure(any(), any());
         verify(repo, never()).complete(any(), any());
     }
 

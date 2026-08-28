@@ -53,7 +53,8 @@ spring:
         index-type: HNSW
         table-name: vector_store
     retry:
-      max-attempts: 3
+      # 付费模型调用不自动重发，失败后由可恢复任务按日期断点续跑。
+      max-attempts: 1
       backoff:
         initial-interval: 1s
         multiplier: 2
@@ -67,6 +68,12 @@ spring:
     baseline-version: 0
 
 opspilot:
+  ai:
+    http:
+      # 建立到大模型服务的连接最多等待 5 秒。
+      connect-timeout: 5s
+      # 正常调用曾达到 195 秒，保留余量但避免无限等待。
+      read-timeout: 4m
   forecast:
     gold:
       # 保存实际调用的模型名称，用于预测版本审计和幂等判断。
