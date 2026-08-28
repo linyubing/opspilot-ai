@@ -14,6 +14,9 @@ import com.opspilot.ai.forecast.InvalidGoldForecastAiResponseException;
 import com.opspilot.ai.forecast.InvalidGoldForecastSnapshotException;
 import com.opspilot.ai.forecast.StaleGoldForecastDataException;
 import com.opspilot.ai.forecast.UnsafeGoldForecastException;
+import com.opspilot.ai.forecast.review.GoldForecastReviewAiUnavailableException;
+import com.opspilot.ai.forecast.review.InsufficientForecastReviewSamplesException;
+import com.opspilot.ai.forecast.review.InvalidGoldForecastReviewAiResponseException;
 import com.opspilot.ai.macrodata.InvalidMacroDataRequestException;
 import com.opspilot.ai.macrodata.DollarIndexNotFoundException;
 import com.opspilot.ai.macrodata.MacroDataUnavailableException;
@@ -29,6 +32,42 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(InsufficientForecastReviewSamplesException.class)
+    public ResponseEntity<ApiError> handleReviewSamples(
+            InsufficientForecastReviewSamplesException exception
+    ) {
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(
+                new ApiError(
+                        "INSUFFICIENT_FORECAST_REVIEW_SAMPLES",
+                        exception.getMessage()
+                )
+        );
+    }
+
+    @ExceptionHandler(GoldForecastReviewAiUnavailableException.class)
+    public ResponseEntity<ApiError> handleReviewAiUnavailable(
+            GoldForecastReviewAiUnavailableException exception
+    ) {
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(
+                new ApiError(
+                        "FORECAST_REVIEW_AI_UNAVAILABLE",
+                        exception.getMessage()
+                )
+        );
+    }
+
+    @ExceptionHandler(InvalidGoldForecastReviewAiResponseException.class)
+    public ResponseEntity<ApiError> handleInvalidReviewResponse(
+            InvalidGoldForecastReviewAiResponseException exception
+    ) {
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(
+                new ApiError(
+                        "INVALID_FORECAST_REVIEW_AI_RESPONSE",
+                        exception.getMessage()
+                )
+        );
+    }
 
     @ExceptionHandler(GoldDailyResearchReportNotFoundException.class)
     public ResponseEntity<ApiError> handleGoldDailyResearchReportNotFound(

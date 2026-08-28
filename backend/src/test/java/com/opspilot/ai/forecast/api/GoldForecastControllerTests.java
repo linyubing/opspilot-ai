@@ -2,6 +2,9 @@ package com.opspilot.ai.forecast.api;
 
 import com.opspilot.ai.forecast.*;
 import com.opspilot.ai.marketdata.GoldPriceSyncResult;
+import com.opspilot.ai.forecast.review.GeneratedGoldForecastReview;
+import com.opspilot.ai.forecast.review.GoldForecastReviewContent;
+import com.opspilot.ai.forecast.review.GoldForecastReviewService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,13 +36,14 @@ class GoldForecastControllerTests {
     @Mock private GoldForecastEvaluationService evaluationService;
     @Mock private GoldSettlementService settlementService;
     @Mock private GoldForecastRepository repository;
+    @Mock private GoldForecastReviewService reviewService;
     private MockMvc mockMvc;
 
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(new GoldForecastController(
                 generationService, resolutionService, evaluationService,
-                settlementService, repository
+                settlementService, repository, reviewService
         )).build();
     }
 
@@ -109,6 +113,32 @@ class GoldForecastControllerTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.resolvedCount").value(0))
                 .andExpect(jsonPath("$.overallAccuracy").value(org.hamcrest.Matchers.nullValue()));
+    }
+
+    @Test
+    @DisplayName("黄金预测复盘接口返回结构化结果")
+    void returnsForecastReview() throws Exception {
+        when(reviewService.review()).thenReturn(
+                new GeneratedGoldForecastReview(
+                        "glm-4.7",
+                        "敏感原始响应",
+                        new GoldForecastReviewContent(
+                                "历史预测整体优于中性基线",
+                                List.of(),
+                                "近期表现保持稳定",
+                                List.of(),
+                                List.of(),
+                                List.of("样本仍然有限"),
+                                "不构成投资建议"
+                        )
+                )
+        );
+
+        mockMvc.perform(post("/api/research/gold/forecasts/review"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.summary")
+                        .value("历史预测整体优于中性基线"))
+                .andExpect(jsonPath("$.rawResponse").doesNotExist());
     }
 
     private StoredGoldDirectionForecast record() {

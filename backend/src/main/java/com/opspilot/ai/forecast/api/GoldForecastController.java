@@ -6,6 +6,7 @@ import com.opspilot.ai.forecast.GoldForecastRepository;
 import com.opspilot.ai.forecast.GoldForecastResolutionService;
 import com.opspilot.ai.forecast.GoldSettlementService;
 import com.opspilot.ai.forecast.SaveGoldForecastResult;
+import com.opspilot.ai.forecast.review.GoldForecastReviewService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,19 +28,22 @@ public class GoldForecastController {
     private final GoldForecastEvaluationService evaluationService;
     private final GoldSettlementService settlementService;
     private final GoldForecastRepository repository;
+    private final GoldForecastReviewService reviewService;
 
     public GoldForecastController(
             GoldForecastGenerationService generationService,
             GoldForecastResolutionService resolutionService,
             GoldForecastEvaluationService evaluationService,
             GoldSettlementService settlementService,
-            GoldForecastRepository repository
+            GoldForecastRepository repository,
+            GoldForecastReviewService reviewService
     ) {
         this.generationService = generationService;
         this.resolutionService = resolutionService;
         this.evaluationService = evaluationService;
         this.settlementService = settlementService;
         this.repository = repository;
+        this.reviewService = reviewService;
     }
 
     @PostMapping("/snapshots/{snapshotId}/forecasts")
@@ -69,5 +73,10 @@ public class GoldForecastController {
     @GetMapping("/forecasts/evaluation")
     public GoldForecastEvaluationResponse evaluation() {
         return GoldForecastEvaluationResponse.from(evaluationService.evaluate());
+    }
+
+    @PostMapping("/forecasts/review")
+    public GoldForecastReviewResponse review() {
+        return GoldForecastReviewResponse.from(reviewService.review());
     }
 }

@@ -11,6 +11,9 @@ import com.opspilot.ai.forecast.GoldForecastAiUnavailableException;
 import com.opspilot.ai.forecast.InvalidGoldForecastAiResponseException;
 import com.opspilot.ai.forecast.InvalidGoldForecastSnapshotException;
 import com.opspilot.ai.forecast.UnsafeGoldForecastException;
+import com.opspilot.ai.forecast.review.GoldForecastReviewAiUnavailableException;
+import com.opspilot.ai.forecast.review.InsufficientForecastReviewSamplesException;
+import com.opspilot.ai.forecast.review.InvalidGoldForecastReviewAiResponseException;
 import com.opspilot.ai.macrodata.InvalidMacroDataRequestException;
 import com.opspilot.ai.macrodata.MacroDataUnavailableException;
 import com.opspilot.ai.marketdata.InvalidMarketDataRequestException;
@@ -27,6 +30,51 @@ import java.util.UUID;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 public class GlobalExceptionHandlerTests {
+
+    @Test
+    void returnsUnprocessableEntityForSmallReviewSample() {
+        ResponseEntity<ApiError> response = new GlobalExceptionHandler()
+                .handleReviewSamples(
+                        new InsufficientForecastReviewSamplesException(30, 8)
+                );
+
+        assertThat(response.getStatusCode())
+                .isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);
+        assertThat(response.getBody().code())
+                .isEqualTo("INSUFFICIENT_FORECAST_REVIEW_SAMPLES");
+    }
+
+    @Test
+    void returnsServiceUnavailableForReviewAiFailure() {
+        ResponseEntity<ApiError> response = new GlobalExceptionHandler()
+                .handleReviewAiUnavailable(
+                        new GoldForecastReviewAiUnavailableException(
+                                "不可用",
+                                new RuntimeException()
+                        )
+                );
+
+        assertThat(response.getStatusCode())
+                .isEqualTo(HttpStatus.SERVICE_UNAVAILABLE);
+        assertThat(response.getBody().code())
+                .isEqualTo("FORECAST_REVIEW_AI_UNAVAILABLE");
+    }
+
+    @Test
+    void returnsBadGatewayForInvalidReviewResponse() {
+        ResponseEntity<ApiError> response = new GlobalExceptionHandler()
+                .handleInvalidReviewResponse(
+                        new InvalidGoldForecastReviewAiResponseException(
+                                "非法响应",
+                                new RuntimeException()
+                        )
+                );
+
+        assertThat(response.getStatusCode())
+                .isEqualTo(HttpStatus.BAD_GATEWAY);
+        assertThat(response.getBody().code())
+                .isEqualTo("INVALID_FORECAST_REVIEW_AI_RESPONSE");
+    }
 
     @Test
     void returnsUnprocessableEntityForInvalidForecastSnapshot() {
