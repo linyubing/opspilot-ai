@@ -12,5 +12,13 @@ public interface MarketPriceRepository {
 
     List<MarketPrice> findRecent(String symbol, int limit);
 
+    default List<MarketPrice> findRecent(
+            String symbol,
+            LocalDate endDate,
+            int limit
+    ) {
+        return findRecent(symbol, limit);
+    }
+
     List<MarketPrice> findAfter(String symbol, LocalDate baseDate, int limit);
 }

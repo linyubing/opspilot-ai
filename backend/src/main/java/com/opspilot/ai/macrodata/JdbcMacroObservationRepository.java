@@ -264,6 +264,35 @@ public class JdbcMacroObservationRepository
     }
 
     @Override
+    public List<MacroObservation> findRecent(
+            String seriesId,
+            LocalDate endDate,
+            int limit
+    ) {
+        if (limit <= 0) {
+            throw new IllegalArgumentException(
+                    "limit 必须大于 0"
+            );
+        }
+
+        return jdbcTemplate.query(
+                "select " + COLUMNS + """
+                        from macro_observation
+                        where series_id = ?
+                          and observation_date <= ?
+                          and superseded_at is null
+                        order by observation_date desc,
+                                 collected_at desc
+                        limit ?
+                        """,
+                rowMapper,
+                seriesId,
+                endDate,
+                limit
+        );
+    }
+
+    @Override
     public Optional<MacroObservation> findLatestAsOf(
             String seriesId,
             OffsetDateTime researchTime

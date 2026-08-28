@@ -117,6 +117,26 @@ class JdbcMarketPriceRepositoryTests {
     }
 
     @Test
+    @DisplayName("历史查询不返回截止日期之后的价格")
+    void excludesFuturePrices() {
+        repository.saveAll(List.of(
+                price("2026-08-19", "99.00000000"),
+                price("2026-08-20", "100.00000000"),
+                price("2026-08-21", "999.00000000")
+        ));
+
+        assertThat(repository.findRecent(
+                TEST_SYMBOL,
+                LocalDate.parse("2026-08-20"),
+                10
+        )).extracting(MarketPrice::priceDate)
+                .containsExactly(
+                        LocalDate.parse("2026-08-20"),
+                        LocalDate.parse("2026-08-19")
+                );
+    }
+
+    @Test
     @DisplayName("基准日之后查询的数量必须在一到一百之间")
     void rejectsOutOfRangeAfterLimit() {
         assertThatIllegalArgumentException()

@@ -135,6 +135,33 @@ class JdbcMacroObservationRepositoryTests {
     }
 
     @Test
+    @DisplayName("历史查询不返回截止日期之后的宏观观测")
+    void excludesFutureObservations() {
+        repository.save(
+                observation("2026-08-19", "1.900000"),
+                FIRST_COLLECTED_AT
+        );
+        repository.save(
+                observation("2026-08-20", "1.850000"),
+                FIRST_COLLECTED_AT
+        );
+        repository.save(
+                observation("2026-08-21", "9.990000"),
+                FIRST_COLLECTED_AT
+        );
+
+        assertThat(repository.findRecent(
+                SERIES_ID,
+                LocalDate.parse("2026-08-20"),
+                10
+        )).extracting(MacroObservation::observationDate)
+                .containsExactly(
+                        LocalDate.parse("2026-08-20"),
+                        LocalDate.parse("2026-08-19")
+                );
+    }
+
+    @Test
     @DisplayName("研究时间位于修订前后时返回各自当时可见的版本")
     void findsLatestVersionAsOfResearchTime() {
         repository.save(

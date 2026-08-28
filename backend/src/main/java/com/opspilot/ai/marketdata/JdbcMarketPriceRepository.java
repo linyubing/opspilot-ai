@@ -129,6 +129,31 @@ public class JdbcMarketPriceRepository implements MarketPriceRepository {
     }
 
     @Override
+    public List<MarketPrice> findRecent(
+            String symbol,
+            LocalDate endDate,
+            int limit
+    ) {
+        if (limit <= 0) {
+            throw new IllegalArgumentException("limit 必须大于 0");
+        }
+
+        return jdbcTemplate.query(
+                "select " + COLUMNS + """
+                        from market_price
+                        where symbol = ?
+                          and price_date <= ?
+                        order by price_date desc
+                        limit ?
+                        """,
+                rowMapper,
+                symbol,
+                endDate,
+                limit
+        );
+    }
+
+    @Override
     public List<MarketPrice> findAfter(String symbol, LocalDate baseDate, int limit) {
         if (limit < 1 || limit > 100) {
             throw new IllegalArgumentException("limit 必须在 1 到 100 之间");
