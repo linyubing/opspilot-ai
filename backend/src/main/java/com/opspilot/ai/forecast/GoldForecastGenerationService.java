@@ -24,6 +24,7 @@ public class GoldForecastGenerationService {
     private final GoldForecastPromptBuilder promptBuilder;
     private final GoldForecastGateway gateway;
     private final GoldForecastValidator validator;
+    private final GoldForecastDataFreshnessPolicy freshnessPolicy;
     private final String modelName;
     private final Clock clock;
 
@@ -33,6 +34,7 @@ public class GoldForecastGenerationService {
             GoldForecastPromptBuilder promptBuilder,
             GoldForecastGateway gateway,
             GoldForecastValidator validator,
+            GoldForecastDataFreshnessPolicy freshnessPolicy,
             GoldForecastProperties properties,
             Clock clock
     ) {
@@ -41,6 +43,7 @@ public class GoldForecastGenerationService {
         this.promptBuilder = promptBuilder;
         this.gateway = gateway;
         this.validator = validator;
+        this.freshnessPolicy = freshnessPolicy;
         this.modelName = properties.modelName();
         this.clock = clock;
     }
@@ -70,6 +73,9 @@ public class GoldForecastGenerationService {
      * 只有不存在相同版本的预测时，才调用模型并保存结果。
      */
     private SaveGoldForecastResult generateAndSave(StoredGoldResearchSnapshot snapshot) {
+        // 新鲜度只约束新预测，已经保存的历史预测仍可按幂等键读取。
+        freshnessPolicy.validate(snapshot.snapshot());
+
         GoldForecastPrompt prompt = promptBuilder.build(snapshot);
         GeneratedGoldForecast generated = gateway.generate(prompt);
 

@@ -15,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
@@ -58,6 +59,9 @@ class GoldForecastGenerationServiceTests {
                 promptBuilder,
                 gateway,
                 validator,
+                new GoldForecastDataFreshnessPolicy(
+                        Clock.fixed(NOW, ZoneOffset.UTC)
+                ),
                 new GoldForecastProperties(MODEL_NAME),
                 Clock.fixed(NOW, ZoneOffset.UTC)
         );
@@ -84,6 +88,52 @@ class GoldForecastGenerationServiceTests {
                 .hasMessageContaining("gold-real-rate-v1");
 
         verifyNoInteractions(forecastRepository, promptBuilder, gateway, validator);
+    }
+
+    @Test
+    void rejectsStaleGoldPriceBeforeModelCall() {
+        StoredGoldResearchSnapshot snapshot = snapshotWithDates(
+                "2026-08-23",
+                "2026-08-25",
+                "2026-08-21"
+        );
+        when(snapshotRepository.findById(snapshot.id()))
+                .thenReturn(Optional.of(snapshot));
+        when(forecastRepository.findByKey(
+                snapshot.id(), MODEL_NAME,
+                GoldForecastPromptBuilder.PROMPT_VERSION,
+                GoldForecastRule.RULE_VERSION
+        )).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.generate(snapshot.id()))
+                .hasMessageContaining("黄金价格")
+                .hasMessageContaining("过期");
+
+        verifyNoInteractions(promptBuilder, gateway, validator);
+    }
+
+    @Test
+    void returnsExistingForecastEvenWhenSnapshotDataIsNowStale() {
+        StoredGoldResearchSnapshot snapshot = snapshotWithDates(
+                "2026-08-23",
+                "2026-08-19",
+                "2026-08-19"
+        );
+        StoredGoldDirectionForecast existing = existingForecast(snapshot);
+        when(snapshotRepository.findById(snapshot.id()))
+                .thenReturn(Optional.of(snapshot));
+        when(forecastRepository.findByKey(
+                snapshot.id(), MODEL_NAME,
+                GoldForecastPromptBuilder.PROMPT_VERSION,
+                GoldForecastRule.RULE_VERSION
+        )).thenReturn(Optional.of(existing));
+
+        SaveGoldForecastResult result = service.generate(snapshot.id());
+
+        assertThat(result).isEqualTo(
+                new SaveGoldForecastResult(existing, false)
+        );
+        verifyNoInteractions(promptBuilder, gateway, validator);
     }
 
     @Test
@@ -242,6 +292,31 @@ class GoldForecastGenerationServiceTests {
                         value.gold(), value.realRate(), value.dollarIndex(),
                         value.realRateAssessment(), value.dollarIndexAssessment(),
                         version, value.disclaimer()
+                ),
+                source.createdAt()
+        );
+    }
+
+    private StoredGoldResearchSnapshot snapshotWithDates(
+            String goldDate,
+            String realRateDate,
+            String dollarIndexDate
+    ) {
+        StoredGoldResearchSnapshot source =
+                GoldForecastTestFixtures.snapshot("2515.75");
+        GoldResearchSnapshot value = source.snapshot();
+
+        return new StoredGoldResearchSnapshot(
+                source.id(),
+                new GoldResearchSnapshot(
+                        value.analysisDate(),
+                        LocalDate.parse(goldDate),
+                        LocalDate.parse(realRateDate),
+                        LocalDate.parse(dollarIndexDate),
+                        value.gold(), value.realRate(), value.dollarIndex(),
+                        value.realRateAssessment(),
+                        value.dollarIndexAssessment(),
+                        value.researchVersion(), value.disclaimer()
                 ),
                 source.createdAt()
         );

@@ -21,6 +21,7 @@ import com.opspilot.ai.analysis.narrative.StoredResearchNarrative;
 import com.opspilot.ai.forecast.ForecastDirection;
 import com.opspilot.ai.forecast.ForecastStatus;
 import com.opspilot.ai.forecast.SaveGoldForecastResult;
+import com.opspilot.ai.forecast.StaleGoldForecastDataException;
 import com.opspilot.ai.forecast.StoredGoldDirectionForecast;
 import com.opspilot.ai.macrodata.DollarIndexSyncResult;
 import com.opspilot.ai.macrodata.RealRateSyncResult;
@@ -147,6 +148,18 @@ class GoldResearchControllerTests {
                 .andExpect(jsonPath("$.forecast.record.reasoning")
                         .value("美元指数走弱对黄金构成支撑。"))
                 .andExpect(jsonPath("$.forecast.created").value(true));
+    }
+
+    @Test
+    @DisplayName("预测输入数据过期时返回 422 和明确错误码")
+    void returnsUnprocessableEntityForStaleForecastData() throws Exception {
+        doThrow(new StaleGoldForecastDataException("美元指数已过期"))
+                .when(dailyReportService).generateDailyReport();
+
+        mockMvc.perform(post("/api/research/gold/daily-report"))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(jsonPath("$.code")
+                        .value("FORECAST_DATA_STALE"));
     }
 
     @Test

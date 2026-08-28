@@ -11,6 +11,7 @@ import com.opspilot.ai.chat.UpstreamAiException;
 import com.opspilot.ai.forecast.GoldForecastAiUnavailableException;
 import com.opspilot.ai.forecast.InvalidGoldForecastAiResponseException;
 import com.opspilot.ai.forecast.InvalidGoldForecastSnapshotException;
+import com.opspilot.ai.forecast.StaleGoldForecastDataException;
 import com.opspilot.ai.forecast.UnsafeGoldForecastException;
 import com.opspilot.ai.macrodata.InvalidMacroDataRequestException;
 import com.opspilot.ai.macrodata.DollarIndexNotFoundException;
@@ -27,6 +28,15 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(StaleGoldForecastDataException.class)
+    public ResponseEntity<ApiError> handleStaleGoldForecastData(
+            StaleGoldForecastDataException exception
+    ) {
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(
+                new ApiError("FORECAST_DATA_STALE", exception.getMessage())
+        );
+    }
 
     @ExceptionHandler(InvalidGoldForecastSnapshotException.class)
     public ResponseEntity<ApiError> handleInvalidGoldForecastSnapshot(
