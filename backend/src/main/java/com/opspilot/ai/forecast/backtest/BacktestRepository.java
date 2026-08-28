@@ -22,6 +22,8 @@ public interface BacktestRepository {
 
     boolean saveCase(BacktestCase item);
 
+    void recordFailure(UUID id, String error);
+
     void fail(UUID id, String error);
 
     void complete(UUID id, OffsetDateTime time);

@@ -86,6 +86,11 @@ class JdbcBacktestRepositoryTests {
         assertThat(repo.start(taskId, NOW.plusMinutes(1))).isTrue();
         assertThat(repo.start(taskId, NOW.plusMinutes(2))).isFalse();
 
+        repo.recordFailure(taskId, "单日模型响应不合法");
+        BacktestTask withFailure = repo.findTask(taskId).orElseThrow();
+        assertThat(withFailure.failedCount()).isEqualTo(1);
+        assertThat(withFailure.lastError()).isEqualTo("单日模型响应不合法");
+
         repo.fail(taskId, "模型暂时不可用");
         assertThat(repo.findTask(taskId).orElseThrow().status())
                 .isEqualTo(BacktestStatus.FAILED);

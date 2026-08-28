@@ -207,6 +207,16 @@ public class JdbcBacktestRepository implements BacktestRepository {
     }
 
     @Override
+    public void recordFailure(UUID id, String error) {
+        jdbc.update("""
+                update gold_forecast_backtest
+                set failed_count = failed_count + 1,
+                    last_error = ?
+                where id = ?
+                """, error, id);
+    }
+
+    @Override
     public void fail(UUID id, String error) {
         jdbc.update("""
                 update gold_forecast_backtest
