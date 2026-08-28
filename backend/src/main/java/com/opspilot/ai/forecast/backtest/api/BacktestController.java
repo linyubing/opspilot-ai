@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.IntStream;
 
 /** 提供黄金历史回测的创建、运行、进度、明细和评估接口。 */
 @RestController
@@ -62,6 +63,19 @@ public class BacktestController {
     ) {
         return service.results(id, limit).stream()
                 .map(BacktestCaseResponse::from)
+                .toList();
+    }
+
+    @GetMapping("/{id}/samples")
+    public List<BacktestSampleResponse> samples(
+            @PathVariable("id") UUID id
+    ) {
+        List<java.time.LocalDate> dates = service.samples(id);
+        return IntStream.range(0, dates.size())
+                .mapToObj(index -> new BacktestSampleResponse(
+                        index + 1,
+                        dates.get(index)
+                ))
                 .toList();
     }
 

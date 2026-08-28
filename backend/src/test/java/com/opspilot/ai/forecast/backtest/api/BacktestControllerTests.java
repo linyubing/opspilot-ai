@@ -28,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/** 验证黄金回测五个 HTTP 接口及敏感字段隔离。 */
+/** 验证黄金回测 HTTP 接口及敏感字段隔离。 */
 class BacktestControllerTests {
 
     private static final UUID ID =
@@ -91,6 +91,22 @@ class BacktestControllerTests {
                 .andExpect(content().string(org.hamcrest.Matchers.not(
                         org.hamcrest.Matchers.containsString("rawResponse")
                 )));
+    }
+
+    @Test
+    void getsFrozenSampleDates() throws Exception {
+        when(service.samples(ID)).thenReturn(List.of(
+                LocalDate.parse("2012-01-03"),
+                LocalDate.parse("2020-06-15"),
+                LocalDate.parse("2026-08-19")
+        ));
+
+        mvc.perform(get("/api/research/gold/backtests/{id}/samples", ID))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].position").value(1))
+                .andExpect(jsonPath("$[0].asOfDate").value("2012-01-03"))
+                .andExpect(jsonPath("$[2].position").value(3))
+                .andExpect(jsonPath("$[2].asOfDate").value("2026-08-19"));
     }
 
     @Test
