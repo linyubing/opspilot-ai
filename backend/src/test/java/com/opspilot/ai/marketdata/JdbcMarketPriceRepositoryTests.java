@@ -117,6 +117,24 @@ class JdbcMarketPriceRepositoryTests {
     }
 
     @Test
+    @DisplayName("完整历史价格按照日期升序返回")
+    void findsAllPricesInDateOrder() {
+        repository.saveAll(List.of(
+                price("2026-08-20", "100.00000000"),
+                price("2026-08-18", "98.00000000"),
+                price("2026-08-19", "99.00000000")
+        ));
+
+        assertThat(repository.findAll(TEST_SYMBOL))
+                .extracting(MarketPrice::priceDate)
+                .containsExactly(
+                        LocalDate.parse("2026-08-18"),
+                        LocalDate.parse("2026-08-19"),
+                        LocalDate.parse("2026-08-20")
+                );
+    }
+
+    @Test
     @DisplayName("历史查询不返回截止日期之后的价格")
     void excludesFuturePrices() {
         repository.saveAll(List.of(

@@ -129,6 +129,19 @@ public class JdbcMarketPriceRepository implements MarketPriceRepository {
     }
 
     @Override
+    public List<MarketPrice> findAll(String symbol) {
+        return jdbcTemplate.query(
+                "select " + COLUMNS + """
+                        from market_price
+                        where symbol = ?
+                        order by price_date
+                        """,
+                rowMapper,
+                symbol
+        );
+    }
+
+    @Override
     public List<MarketPrice> findRecent(
             String symbol,
             LocalDate endDate,

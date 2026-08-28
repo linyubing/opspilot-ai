@@ -220,6 +220,14 @@ class GoldPriceControllerTests {
         }
 
         @Override
+        public List<MarketPrice> findAll(String symbol) {
+            return prices.stream()
+                    .filter(price -> price.symbol().equals(symbol))
+                    .sorted(Comparator.comparing(MarketPrice::priceDate))
+                    .toList();
+        }
+
+        @Override
         public List<MarketPrice> findAfter(
                 String symbol,
                 LocalDate baseDate,
