@@ -78,6 +78,13 @@ opspilot:
         cron: "${GOLD_SETTLEMENT_SCHEDULE_CRON:0 30 8 * * MON-FRI}"
         zone: "${GOLD_SETTLEMENT_SCHEDULE_ZONE:Asia/Shanghai}"
   research:
+    gold:
+      daily-report-schedule:
+        # 默认关闭，防止本地启动时意外调用真实数据源和大模型。
+        enabled: ${GOLD_DAILY_REPORT_SCHEDULE_ENABLED:false}
+        # 北京时间周二到周六上午 9 点，处理上一美国交易日数据。
+        cron: "${GOLD_DAILY_REPORT_SCHEDULE_CRON:0 0 9 * * TUE-SAT}"
+        zone: "${GOLD_DAILY_REPORT_SCHEDULE_ZONE:Asia/Shanghai}"
     narrative:
       # 正式解读记录会保存模型名称，用于审计和幂等判断。
       model-name: glm-4.7
