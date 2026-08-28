@@ -77,15 +77,46 @@ class JdbcGoldForecastRepositoryTests {
                 .contains(saved.id());
     }
 
+    @Test
+    @DisplayName("按快照查询时返回创建时间最新的预测")
+    void findsLatestForecastForSnapshot() {
+        repository.saveIfAbsent(candidate(
+                "较早预测",
+                "prompt-v1",
+                OffsetDateTime.parse("2026-08-27T08:00:00Z")
+        ));
+        StoredGoldDirectionForecast latest = candidate(
+                "最新预测",
+                "prompt-v2",
+                OffsetDateTime.parse("2026-08-27T09:00:00Z")
+        );
+        repository.saveIfAbsent(latest);
+
+        assertThat(repository.findLatestBySnapshotId(snapshotId))
+                .contains(latest);
+    }
+
     private StoredGoldDirectionForecast candidate(String reasoning) {
+        return candidate(
+                reasoning,
+                "gold-direction-forecast-prompt-v1",
+                OffsetDateTime.parse("2026-08-27T08:00:00Z")
+        );
+    }
+
+    private StoredGoldDirectionForecast candidate(
+            String reasoning,
+            String promptVersion,
+            OffsetDateTime createdAt
+    ) {
         return new StoredGoldDirectionForecast(
                 UUID.randomUUID(), snapshotId, LocalDate.parse("2026-08-26"),
                 new BigDecimal("4520.00894962"), ForecastDirection.NEUTRAL,
                 reasoning, List.of("条件一", "条件二"), "glm-4.7",
-                "gold-direction-forecast-prompt-v1", "a".repeat(64),
+                promptVersion, "a".repeat(64),
                 GoldForecastRule.RULE_VERSION, "原始 JSON", ForecastStatus.PENDING,
                 null, null, null, null, null, null,
-                OffsetDateTime.parse("2026-08-27T08:00:00Z")
+                createdAt
         );
     }
 }

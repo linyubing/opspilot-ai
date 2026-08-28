@@ -110,6 +110,20 @@ class JdbcResearchNarrativeRepositoryTests {
     }
 
     @Test
+    void findsLatestNarrativeForSnapshot() {
+        repository.saveIfAbsent(candidate("glm-4.7", "prompt-v1", CREATED_AT));
+        StoredResearchNarrative latest = candidate(
+                "glm-4.7",
+                "prompt-v2",
+                CREATED_AT.plusHours(1)
+        );
+        repository.saveIfAbsent(latest);
+
+        assertThat(repository.findLatestBySnapshotId(snapshotId))
+                .contains(latest);
+    }
+
+    @Test
     void returnsEmptyForMissingIdempotencyKey() {
         assertThat(repository.findByKey(snapshotId, "glm-4.7", "missing"))
                 .isEmpty();

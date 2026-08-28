@@ -12,5 +12,6 @@ public interface GoldForecastRepository {
     List<StoredGoldDirectionForecast> findPending(int limit);
     List<StoredGoldDirectionForecast> findRecent(int limit);
     List<StoredGoldDirectionForecast> findAllForEvaluation();
+    Optional<StoredGoldDirectionForecast> findLatestBySnapshotId(UUID snapshotId);
     StoredGoldDirectionForecast resolve(UUID id, ForecastResolution resolution);
 }

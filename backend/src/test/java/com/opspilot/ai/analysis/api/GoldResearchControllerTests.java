@@ -3,6 +3,9 @@ package com.opspilot.ai.analysis.api;
 import com.opspilot.ai.analysis.DollarIndexChangeMetrics;
 import com.opspilot.ai.analysis.GoldDailyResearchReportResult;
 import com.opspilot.ai.analysis.GoldDailyResearchReportService;
+import com.opspilot.ai.analysis.GoldDailyResearchReportQueryService;
+import com.opspilot.ai.analysis.GoldDailyResearchReportNotFoundException;
+import com.opspilot.ai.analysis.StoredGoldDailyResearchReport;
 import com.opspilot.ai.analysis.GoldResearchSnapshot;
 import com.opspilot.ai.analysis.GoldResearchPreparationResult;
 import com.opspilot.ai.analysis.GoldResearchPreparationService;
@@ -56,6 +59,7 @@ class GoldResearchControllerTests {
     private GoldResearchSnapshotService snapshotService;
     private GoldResearchPreparationService preparationService;
     private GoldDailyResearchReportService dailyReportService;
+    private GoldDailyResearchReportQueryService dailyReportQueryService;
     private MockMvc mockMvc;
 
     @BeforeEach
@@ -63,10 +67,12 @@ class GoldResearchControllerTests {
         snapshotService = mock(GoldResearchSnapshotService.class);
         preparationService = mock(GoldResearchPreparationService.class);
         dailyReportService = mock(GoldDailyResearchReportService.class);
+        dailyReportQueryService = mock(GoldDailyResearchReportQueryService.class);
         mockMvc = standaloneSetup(new GoldResearchController(
                 snapshotService,
                 preparationService,
-                dailyReportService
+                dailyReportService,
+                dailyReportQueryService
         ))
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
@@ -148,6 +154,37 @@ class GoldResearchControllerTests {
                 .andExpect(jsonPath("$.forecast.record.reasoning")
                         .value("美元指数走弱对黄金构成支撑。"))
                 .andExpect(jsonPath("$.forecast.created").value(true));
+    }
+
+    @Test
+    @DisplayName("最新完整报告接口返回同一快照的研究解读和方向预测")
+    void returnsLatestCompleteDailyReport() throws Exception {
+        when(dailyReportQueryService.findLatestCompleteReport())
+                .thenReturn(storedDailyReport());
+
+        mockMvc.perform(get("/api/research/gold/daily-report/latest"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.snapshot.id")
+                        .value("11111111-1111-1111-1111-111111111111"))
+                .andExpect(jsonPath("$.narrative.snapshotId")
+                        .value("11111111-1111-1111-1111-111111111111"))
+                .andExpect(jsonPath("$.forecast.snapshotId")
+                        .value("11111111-1111-1111-1111-111111111111"))
+                .andExpect(jsonPath("$.forecast.predictedDirection")
+                        .value("BULLISH"));
+    }
+
+    @Test
+    @DisplayName("最新黄金日报不完整时返回 404 和稳定错误码")
+    void returnsNotFoundForIncompleteDailyReport() throws Exception {
+        doThrow(new GoldDailyResearchReportNotFoundException("方向预测"))
+                .when(dailyReportQueryService)
+                .findLatestCompleteReport();
+
+        mockMvc.perform(get("/api/research/gold/daily-report/latest"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code")
+                        .value("GOLD_DAILY_REPORT_NOT_FOUND"));
     }
 
     @Test
@@ -308,6 +345,15 @@ class GoldResearchControllerTests {
                 preparationResult(true),
                 new SaveResearchNarrativeResult(narrative, true),
                 new SaveGoldForecastResult(forecast, true)
+        );
+    }
+
+    private StoredGoldDailyResearchReport storedDailyReport() {
+        GoldDailyResearchReportResult generated = dailyReportResult();
+        return new StoredGoldDailyResearchReport(
+                generated.preparation().snapshot().record(),
+                generated.narrative().record(),
+                generated.forecast().record()
         );
     }
 }

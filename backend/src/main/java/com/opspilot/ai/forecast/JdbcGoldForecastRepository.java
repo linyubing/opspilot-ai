@@ -105,6 +105,19 @@ public class JdbcGoldForecastRepository implements GoldForecastRepository {
     }
 
     @Override
+    public Optional<StoredGoldDirectionForecast> findLatestBySnapshotId(
+            UUID snapshotId
+    ) {
+        Objects.requireNonNull(snapshotId, "快照编号不能为空");
+        return jdbcTemplate.query("select " + COLUMNS + """
+                from gold_direction_forecast
+                where snapshot_id = ?
+                order by created_at desc, id desc
+                limit 1
+                """, rowMapper, snapshotId).stream().findFirst();
+    }
+
+    @Override
     public StoredGoldDirectionForecast resolve(UUID id, ForecastResolution r) {
         jdbcTemplate.update("""
                 update gold_direction_forecast set

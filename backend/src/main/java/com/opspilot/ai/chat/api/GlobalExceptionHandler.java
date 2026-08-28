@@ -1,6 +1,7 @@
 package com.opspilot.ai.chat.api;
 
 import com.opspilot.ai.analysis.InsufficientResearchDataException;
+import com.opspilot.ai.analysis.GoldDailyResearchReportNotFoundException;
 import com.opspilot.ai.analysis.InvalidResearchDataException;
 import com.opspilot.ai.analysis.narrative.GoldResearchSnapshotNotFoundException;
 import com.opspilot.ai.analysis.narrative.InvalidResearchAiResponseException;
@@ -28,6 +29,18 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(GoldDailyResearchReportNotFoundException.class)
+    public ResponseEntity<ApiError> handleGoldDailyResearchReportNotFound(
+            GoldDailyResearchReportNotFoundException exception
+    ) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                new ApiError(
+                        "GOLD_DAILY_REPORT_NOT_FOUND",
+                        exception.getMessage()
+                )
+        );
+    }
 
     @ExceptionHandler(StaleGoldForecastDataException.class)
     public ResponseEntity<ApiError> handleStaleGoldForecastData(

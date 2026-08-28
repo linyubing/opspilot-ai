@@ -1,6 +1,7 @@
 package com.opspilot.ai.analysis.api;
 
 import com.opspilot.ai.analysis.GoldDailyResearchReportService;
+import com.opspilot.ai.analysis.GoldDailyResearchReportQueryService;
 import com.opspilot.ai.analysis.GoldResearchPreparationService;
 import com.opspilot.ai.analysis.GoldResearchSnapshot;
 import com.opspilot.ai.analysis.GoldResearchSnapshotService;
@@ -19,15 +20,18 @@ public class GoldResearchController {
     private final GoldResearchSnapshotService snapshotService;
     private final GoldResearchPreparationService preparationService;
     private final GoldDailyResearchReportService dailyReportService;
+    private final GoldDailyResearchReportQueryService dailyReportQueryService;
 
     public GoldResearchController(
             GoldResearchSnapshotService snapshotService,
             GoldResearchPreparationService preparationService,
-            GoldDailyResearchReportService dailyReportService
+            GoldDailyResearchReportService dailyReportService,
+            GoldDailyResearchReportQueryService dailyReportQueryService
     ) {
         this.snapshotService = snapshotService;
         this.preparationService = preparationService;
         this.dailyReportService = dailyReportService;
+        this.dailyReportQueryService = dailyReportQueryService;
     }
 
     @GetMapping("/snapshot")
@@ -49,6 +53,13 @@ public class GoldResearchController {
     public GoldDailyResearchReportResponse generateDailyReport() {
         return GoldDailyResearchReportResponse.from(
                 dailyReportService.generateDailyReport()
+        );
+    }
+
+    @GetMapping("/daily-report/latest")
+    public StoredGoldDailyResearchReportResponse latestDailyReport() {
+        return StoredGoldDailyResearchReportResponse.from(
+                dailyReportQueryService.findLatestCompleteReport()
         );
     }
 }

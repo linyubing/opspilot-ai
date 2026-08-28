@@ -18,4 +18,6 @@ public interface ResearchNarrativeRepository {
     );
 
     List<StoredResearchNarrative> findBySnapshotId(UUID snapshotId);
+
+    Optional<StoredResearchNarrative> findLatestBySnapshotId(UUID snapshotId);
 }

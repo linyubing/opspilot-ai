@@ -166,6 +166,24 @@ public class JdbcResearchNarrativeRepository
         );
     }
 
+    @Override
+    public Optional<StoredResearchNarrative> findLatestBySnapshotId(
+            UUID snapshotId
+    ) {
+        Objects.requireNonNull(snapshotId, "快照编号不能为空");
+
+        return jdbcTemplate.query(
+                "select " + COLUMNS + """
+                        from gold_research_narrative
+                        where snapshot_id = ?
+                        order by created_at desc, id desc
+                        limit 1
+                        """,
+                rowMapper,
+                snapshotId
+        ).stream().findFirst();
+    }
+
     /** JSONB 列只保存字符串列表，解析失败意味着正式历史数据已损坏。 */
     private List<String> readList(String json) throws SQLException {
         try {
