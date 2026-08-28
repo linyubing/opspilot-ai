@@ -186,6 +186,76 @@ AI 对话调用失败，问题长度=4，耗时=20毫秒，异常类型=IllegalS
 
 日志不会打印 API Key、完整问题或完整模型回答。
 
+## 黄金历史方向回测
+
+历史回测使用数据库中的真实黄金价格、实际利率和美元指数，按历史截止日重建研究快照。回测数据与实时预测表完全隔离。
+
+### 1. 创建回测任务
+
+下面先创建 5 条样本，创建过程不会调用大模型：
+
+```powershell
+$task = Invoke-RestMethod `
+    -Method Post `
+    -Uri "http://localhost:8080/api/research/gold/backtests?samples=5"
+
+$task | Format-List
+$id = $task.id
+```
+
+`samples` 允许范围为 `1` 到 `120`。正式跑 60 条前，建议先用 5 条验证完整流程和模型额度。
+
+### 2. 启动后台回测
+
+下面的接口会针对每个尚未完成的历史日期调用一次 GLM，可能消耗 API 额度：
+
+```powershell
+$running = Invoke-RestMethod `
+    -Method Post `
+    -Uri "http://localhost:8080/api/research/gold/backtests/$id/run"
+
+$running | Format-List
+```
+
+相同任务重复启动不会重复提交；失败后再次启动时，已经保存的日期不会重复调用模型。
+
+### 3. 查询任务进度
+
+```powershell
+$status = Invoke-RestMethod `
+    -Method Get `
+    -Uri "http://localhost:8080/api/research/gold/backtests/$id"
+
+$status | Format-List
+```
+
+重点查看 `status`、`completedCount`、`hitCount`、`failedCount` 和 `lastError`。
+
+### 4. 查看逐日涨跌结果
+
+```powershell
+$results = Invoke-RestMethod `
+    -Method Get `
+    -Uri "http://localhost:8080/api/research/gold/backtests/$id/results?limit=60"
+
+$results | Format-Table `
+    asOfDate, predictedDirection, targetDate, actualDirection, hit
+```
+
+接口不会返回完整提示词或模型原始响应。
+
+### 5. 查看准确率评估
+
+```powershell
+$evaluation = Invoke-RestMethod `
+    -Method Get `
+    -Uri "http://localhost:8080/api/research/gold/backtests/$id/evaluation"
+
+$evaluation | Format-List
+```
+
+`accuracy` 是总体准确率，`rolling20Accuracy` 是最近 20 条准确率，`neutralBaselineAccuracy` 是全部猜中性时的基线准确率。只有明显高于简单基线，模型预测才具有进一步研究价值。
+
 ## GitHub
 
 项目地址：
