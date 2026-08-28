@@ -9,9 +9,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.List;
 
 /**
- * 提供黄金研究快照查询、每日数据准备和大模型研究报告接口。
+ * 提供黄金研究快照、每日报告生成及已保存报告查询接口。
  */
 @RestController
 @RequestMapping("/api/research/gold")
@@ -61,5 +64,15 @@ public class GoldResearchController {
         return StoredGoldDailyResearchReportResponse.from(
                 dailyReportQueryService.findLatestCompleteReport()
         );
+    }
+
+    @GetMapping("/daily-report/history")
+    public List<StoredGoldDailyResearchReportResponse> dailyReportHistory(
+            @RequestParam(defaultValue = "20") int limit
+    ) {
+        return dailyReportQueryService.findRecentCompleteReports(limit)
+                .stream()
+                .map(StoredGoldDailyResearchReportResponse::from)
+                .toList();
     }
 }

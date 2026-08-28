@@ -17,6 +17,7 @@ import com.opspilot.ai.analysis.RealRateChangeMetrics;
 import com.opspilot.ai.analysis.GoldFactorStatus;
 import com.opspilot.ai.analysis.ResearchFactorAssessment;
 import com.opspilot.ai.analysis.history.SaveGoldResearchSnapshotResult;
+import com.opspilot.ai.analysis.history.InvalidResearchHistoryRequestException;
 import com.opspilot.ai.analysis.history.StoredGoldResearchSnapshot;
 import com.opspilot.ai.analysis.narrative.ResearchNarrativeContent;
 import com.opspilot.ai.analysis.narrative.SaveResearchNarrativeResult;
@@ -185,6 +186,38 @@ class GoldResearchControllerTests {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code")
                         .value("GOLD_DAILY_REPORT_NOT_FOUND"));
+    }
+
+    @Test
+    @DisplayName("黄金日报历史接口返回列表")
+    void returnsDailyReportHistory() throws Exception {
+        when(dailyReportQueryService.findRecentCompleteReports(2))
+                .thenReturn(List.of(storedDailyReport()));
+
+        mockMvc.perform(get("/api/research/gold/daily-report/history")
+                        .param("limit", "2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].snapshot.id")
+                        .value("11111111-1111-1111-1111-111111111111"))
+                .andExpect(jsonPath("$[0].narrative.snapshotId")
+                        .value("11111111-1111-1111-1111-111111111111"))
+                .andExpect(jsonPath("$[0].forecast.snapshotId")
+                        .value("11111111-1111-1111-1111-111111111111"));
+    }
+
+    @Test
+    @DisplayName("黄金日报历史数量非法时返回 400")
+    void rejectsInvalidDailyReportHistoryLimit() throws Exception {
+        doThrow(new InvalidResearchHistoryRequestException(
+                "limit 必须在 1 到 100 之间"
+        )).when(dailyReportQueryService).findRecentCompleteReports(0);
+
+        mockMvc.perform(get("/api/research/gold/daily-report/history")
+                        .param("limit", "0"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code")
+                        .value("INVALID_RESEARCH_REQUEST"));
     }
 
     @Test

@@ -1,6 +1,7 @@
 package com.opspilot.ai.analysis;
 
 import com.opspilot.ai.analysis.history.GoldResearchSnapshotRepository;
+import com.opspilot.ai.analysis.history.InvalidResearchHistoryRequestException;
 import com.opspilot.ai.analysis.history.StoredGoldResearchSnapshot;
 import com.opspilot.ai.analysis.narrative.ResearchNarrativeRepository;
 import com.opspilot.ai.analysis.narrative.StoredResearchNarrative;
@@ -101,9 +102,54 @@ class GoldDailyResearchReportQueryServiceTests {
                 .hasMessageContaining("方向预测");
     }
 
+    @Test
+    @DisplayName("历史查询保持快照倒序并跳过不完整日报")
+    void returnsOnlyCompleteReportsInSnapshotOrder() {
+        UUID incompleteId = UUID.fromString(
+                "22222222-2222-2222-2222-222222222222"
+        );
+        StoredGoldResearchSnapshot incomplete = snapshot(incompleteId);
+        StoredGoldResearchSnapshot complete = snapshot(SNAPSHOT_ID);
+        StoredResearchNarrative narrative = mock(StoredResearchNarrative.class);
+        StoredGoldDirectionForecast forecast =
+                mock(StoredGoldDirectionForecast.class);
+        when(snapshotRepository.findRecent(2))
+                .thenReturn(List.of(incomplete, complete));
+        when(narrativeRepository.findLatestBySnapshotId(incompleteId))
+                .thenReturn(Optional.empty());
+        when(narrativeRepository.findLatestBySnapshotId(SNAPSHOT_ID))
+                .thenReturn(Optional.of(narrative));
+        when(forecastRepository.findLatestBySnapshotId(SNAPSHOT_ID))
+                .thenReturn(Optional.of(forecast));
+
+        List<StoredGoldDailyResearchReport> reports =
+                service.findRecentCompleteReports(2);
+
+        assertThat(reports).singleElement().satisfies(report -> {
+            assertThat(report.snapshot()).isSameAs(complete);
+            assertThat(report.narrative()).isSameAs(narrative);
+            assertThat(report.forecast()).isSameAs(forecast);
+        });
+    }
+
+    @Test
+    @DisplayName("历史查询数量必须在一到一百之间")
+    void rejectsInvalidHistoryLimit() {
+        assertThatThrownBy(() -> service.findRecentCompleteReports(0))
+                .isInstanceOf(InvalidResearchHistoryRequestException.class)
+                .hasMessage("limit 必须在 1 到 100 之间");
+        assertThatThrownBy(() -> service.findRecentCompleteReports(101))
+                .isInstanceOf(InvalidResearchHistoryRequestException.class)
+                .hasMessage("limit 必须在 1 到 100 之间");
+    }
+
     private StoredGoldResearchSnapshot snapshot() {
+        return snapshot(SNAPSHOT_ID);
+    }
+
+    private StoredGoldResearchSnapshot snapshot(UUID id) {
         return new StoredGoldResearchSnapshot(
-                SNAPSHOT_ID,
+                id,
                 mock(GoldResearchSnapshot.class),
                 OffsetDateTime.parse("2026-08-27T01:00:00Z")
         );
