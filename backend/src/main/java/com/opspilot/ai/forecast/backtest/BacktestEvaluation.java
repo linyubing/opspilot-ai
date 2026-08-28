@@ -11,6 +11,10 @@ public record BacktestEvaluation(
         BigDecimal accuracy,
         BigDecimal rolling20Accuracy,
         BigDecimal neutralBaselineAccuracy,
+        BigDecimal majorityBaselineAccuracy,
+        BigDecimal accuracyLift,
+        BigDecimal balancedAccuracy,
+        ConfusionMatrix confusionMatrix,
         DirectionEvaluation bullish,
         DirectionEvaluation neutral,
         DirectionEvaluation bearish

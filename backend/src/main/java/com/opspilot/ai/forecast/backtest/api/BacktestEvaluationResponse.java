@@ -2,6 +2,7 @@ package com.opspilot.ai.forecast.backtest.api;
 
 import com.opspilot.ai.forecast.DirectionEvaluation;
 import com.opspilot.ai.forecast.backtest.BacktestEvaluation;
+import com.opspilot.ai.forecast.backtest.ConfusionMatrix;
 
 import java.math.BigDecimal;
 
@@ -12,6 +13,10 @@ public record BacktestEvaluationResponse(
         BigDecimal accuracy,
         BigDecimal rolling20Accuracy,
         BigDecimal neutralBaselineAccuracy,
+        BigDecimal majorityBaselineAccuracy,
+        BigDecimal accuracyLift,
+        BigDecimal balancedAccuracy,
+        ConfusionMatrix confusionMatrix,
         DirectionEvaluation bullish,
         DirectionEvaluation neutral,
         DirectionEvaluation bearish
@@ -20,6 +25,8 @@ public record BacktestEvaluationResponse(
         return new BacktestEvaluationResponse(
                 value.source(), value.sampleCount(), value.accuracy(),
                 value.rolling20Accuracy(), value.neutralBaselineAccuracy(),
+                value.majorityBaselineAccuracy(), value.accuracyLift(),
+                value.balancedAccuracy(), value.confusionMatrix(),
                 value.bullish(), value.neutral(), value.bearish()
         );
     }

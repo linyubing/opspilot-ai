@@ -32,6 +32,15 @@ class BacktestEvaluationServiceTests {
         assertThat(result.rolling20Accuracy()).isEqualByComparingTo("0.5000");
         assertThat(result.neutralBaselineAccuracy())
                 .isEqualByComparingTo("0.2857");
+        assertThat(result.majorityBaselineAccuracy())
+                .isEqualByComparingTo("0.3810");
+        assertThat(result.accuracyLift()).isEqualByComparingTo("0.1428");
+        assertThat(result.balancedAccuracy()).isEqualByComparingTo("0.5238");
+        assertThat(result.confusionMatrix()).isEqualTo(new ConfusionMatrix(
+                new DirectionCounts(4, 0, 3),
+                new DirectionCounts(3, 3, 0),
+                new DirectionCounts(0, 4, 4)
+        ));
         assertThat(result.bullish().sampleCount()).isEqualTo(7);
         assertThat(result.bullish().accuracy()).isEqualByComparingTo("0.5714");
         assertThat(result.neutral().accuracy()).isEqualByComparingTo("0.4286");
