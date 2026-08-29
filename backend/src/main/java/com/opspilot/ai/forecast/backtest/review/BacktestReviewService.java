@@ -1,14 +1,17 @@
 package com.opspilot.ai.forecast.backtest.review;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.Ticker;
 import com.opspilot.ai.forecast.backtest.BacktestService;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.UUID;
 
 /** 编排回测结果查询、复盘提示词构建和大模型调用。 */
@@ -21,14 +24,25 @@ public class BacktestReviewService {
     private final Counter calls;
     private final Counter hits;
     private final Counter failures;
-    private final ConcurrentMap<ReviewKey, CompletableFuture<GeneratedBacktestReview>>
-            cache = new ConcurrentHashMap<>();
+    private final Cache<ReviewKey, CompletableFuture<GeneratedBacktestReview>>
+            cache;
 
+    @Autowired
     public BacktestReviewService(
             BacktestService backtests,
             BacktestReviewPromptBuilder builder,
             BacktestReviewGateway gateway,
             MeterRegistry registry
+    ) {
+        this(backtests, builder, gateway, registry, Ticker.systemTicker());
+    }
+
+    BacktestReviewService(
+            BacktestService backtests,
+            BacktestReviewPromptBuilder builder,
+            BacktestReviewGateway gateway,
+            MeterRegistry registry,
+            Ticker ticker
     ) {
         this.backtests = backtests;
         this.builder = builder;
@@ -36,6 +50,11 @@ public class BacktestReviewService {
         this.calls = registry.counter("opspilot.backtest.review.calls");
         this.hits = registry.counter("opspilot.backtest.review.cache.hits");
         this.failures = registry.counter("opspilot.backtest.review.failures");
+        this.cache = Caffeine.newBuilder()
+                .maximumSize(100)
+                .expireAfterAccess(Duration.ofHours(6))
+                .ticker(ticker)
+                .build();
     }
 
     public BacktestReviewResult review(UUID id) {
@@ -43,7 +62,7 @@ public class BacktestReviewService {
         BacktestReviewPrompt prompt = builder.build(cases);
         ReviewKey key = new ReviewKey(id, prompt.version(), prompt.content());
         var current = new CompletableFuture<GeneratedBacktestReview>();
-        var existing = cache.putIfAbsent(key, current);
+        var existing = cache.asMap().putIfAbsent(key, current);
 
         // 已有请求时共同等待同一个结果，避免并发重复调用模型。
         if (existing != null) {
@@ -59,7 +78,7 @@ public class BacktestReviewService {
         } catch (RuntimeException exception) {
             failures.increment();
             current.completeExceptionally(exception);
-            cache.remove(key, current);
+            cache.asMap().remove(key, current);
             throw exception;
         }
     }

@@ -2,6 +2,7 @@ package com.opspilot.ai.forecast.backtest.review;
 
 import com.opspilot.ai.forecast.backtest.BacktestCase;
 import com.opspilot.ai.forecast.backtest.BacktestService;
+import com.github.benmanes.caffeine.cache.Ticker;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,6 +12,7 @@ import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -136,7 +138,24 @@ class BacktestReviewServiceTests {
                 .counter().count()).isEqualTo(1);
     }
 
+    @Test
+    @DisplayName("缓存超过六小时未访问后重新调用模型")
+    void expiresIdleCache() {
+        AtomicLong nanos = new AtomicLong();
+        Fixture fixture = fixture(nanos::get);
+
+        fixture.service.review(fixture.id);
+        nanos.addAndGet(java.time.Duration.ofHours(6).plusNanos(1).toNanos());
+        fixture.service.review(fixture.id);
+
+        verify(fixture.gateway, times(2)).generate(fixture.prompt);
+    }
+
     private Fixture fixture() {
+        return fixture(Ticker.systemTicker());
+    }
+
+    private Fixture fixture(Ticker ticker) {
         UUID id = UUID.randomUUID();
         BacktestService backtests = mock(BacktestService.class);
         BacktestReviewPromptBuilder builder =
@@ -159,7 +178,9 @@ class BacktestReviewServiceTests {
                 expected,
                 gateway,
                 registry,
-                new BacktestReviewService(backtests, builder, gateway, registry)
+                new BacktestReviewService(
+                        backtests, builder, gateway, registry, ticker
+                )
         );
     }
 
