@@ -307,6 +307,55 @@ button, input { font: inherit; }
 .case-reason p { margin: 8px 0 0; color: var(--muted); overflow-wrap: anywhere; }
 .empty-state { margin: 18px 0 4px; color: var(--muted); text-align: center; }
 
+.review-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+.review-heading button { flex: 0 0 auto; }
+.review-status { margin: 18px 0 0; color: var(--muted); }
+.review-result { display: grid; gap: 18px; margin-top: 20px; }
+
+.review-summary, .pattern-card, .review-risks {
+    padding: 18px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--surface-soft);
+}
+
+.review-summary p, .pattern-card p, .review-risks p {
+    margin: 10px 0 0;
+    line-height: 1.7;
+}
+
+.review-evidence { color: var(--muted); font-size: 0.9rem; }
+
+.model-tag {
+    display: inline-flex;
+    padding: 4px 9px;
+    border-radius: 999px;
+    color: var(--gold-strong);
+    background: var(--gold-soft);
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.pattern-list { display: grid; gap: 12px; }
+.pattern-card h3, .review-risks h3 { margin: 0; font-size: 1rem; }
+.pattern-card dl { display: grid; gap: 10px; margin: 14px 0 0; }
+
+.pattern-card dl div {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    gap: 12px;
+}
+
+.pattern-card dt { color: var(--muted); }
+.pattern-card dd { margin: 0; line-height: 1.6; }
+.review-risks ul { margin: 12px 0 0; padding-left: 20px; line-height: 1.7; }
+
 [hidden] { display: none !important; }
 
 @media (max-width: 1180px) {
@@ -353,6 +402,9 @@ button, input { font: inherit; }
     .case-date::before { content: "分析日期："; color: var(--muted); font-weight: 400; }
     .case-return::before { content: "实际涨跌："; color: var(--muted); font-weight: 400; }
     .hit-tag { justify-self: start; }
+    .review-heading { display: grid; }
+    .review-heading button { width: 100%; }
+    .pattern-card dl div { grid-template-columns: 1fr; gap: 3px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

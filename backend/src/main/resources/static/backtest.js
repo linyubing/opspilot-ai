@@ -21,7 +21,15 @@ const missOnly = document.getElementById("missOnly");
 const caseList = document.getElementById("caseList");
 const caseEmpty = document.getElementById("caseEmpty");
 const caseSummary = document.getElementById("caseSummary");
+const reviewButton = document.getElementById("reviewButton");
+const reviewStatus = document.getElementById("reviewStatus");
+const reviewError = document.getElementById("reviewError");
+const reviewResult = document.getElementById("reviewResult");
+const patternList = document.getElementById("patternList");
+const riskList = document.getElementById("riskList");
 let cases = [];
+let activeId = null;
+let reviewRequest = null;
 
 const directionNames = {
     BULLISH: "上涨",
@@ -200,6 +208,94 @@ function renderCases() {
     caseSummary.textContent = `共 ${cases.length} 条，错误 ${missCount} 条`;
 }
 
+function reviewRow(label, value) {
+    const wrapper = document.createElement("div");
+    const term = document.createElement("dt");
+    const detail = document.createElement("dd");
+    term.textContent = label;
+    detail.textContent = value || "暂无数据";
+    wrapper.append(term, detail);
+    return wrapper;
+}
+
+function patternCard(item) {
+    const card = document.createElement("article");
+    card.className = "pattern-card";
+    const title = document.createElement("h3");
+    title.textContent = item.category || "未分类错误";
+    const list = document.createElement("dl");
+    list.append(
+        reviewRow("观察结果", item.observation),
+        reviewRow("证据编号", (item.evidence || []).join("、")),
+        reviewRow("改进假设", item.improvement),
+        reviewRow("验证方法", item.validationMethod)
+    );
+    card.append(title, list);
+    return card;
+}
+
+function renderReview(data) {
+    setText("reviewModel", `模型：${data.modelName || "未知"}`);
+    setText("reviewSummary", data.summary || "暂无复盘摘要。");
+    setText(
+        "reviewSummaryEvidence",
+        `摘要证据：${(data.summaryEvidence || []).join("、")}`
+    );
+    setText("reviewDisclaimer", data.disclaimer || "不构成投资建议");
+    const patterns = Array.isArray(data.patterns) ? data.patterns : [];
+    patternList.replaceChildren(...patterns.map(patternCard));
+    const risks = Array.isArray(data.risks) ? data.risks : [];
+    riskList.replaceChildren(...risks.map(item => {
+        const li = document.createElement("li");
+        const evidence = (item.evidence || []).join("、");
+        li.textContent = `${item.description || "暂无说明"}（证据：${evidence}）`;
+        return li;
+    }));
+    reviewResult.hidden = false;
+}
+
+async function loadReview() {
+    if (!activeId) return;
+    const reviewId = activeId;
+    reviewRequest?.abort();
+    const request = new AbortController();
+    reviewRequest = request;
+    reviewButton.disabled = true;
+    reviewButton.textContent = "正在复盘…";
+    reviewStatus.textContent = "大模型正在分析真实错误样本，请稍候…";
+    reviewError.hidden = true;
+    reviewResult.hidden = true;
+    try {
+        const response = await fetch(
+            `/api/research/gold/backtests/${encodeURIComponent(reviewId)}/review`,
+            {
+                method: "POST",
+                headers: {Accept: "application/json"},
+                signal: request.signal
+            }
+        );
+        if (!response.ok) {
+            throw new Error(await readError(response));
+        }
+        const data = await response.json();
+        if (activeId !== reviewId || reviewRequest !== request) return;
+        renderReview(data);
+        reviewStatus.textContent = "AI 复盘已生成，可结合逐日错误样本人工核验。";
+    } catch (error) {
+        if (error.name === "AbortError") return;
+        if (activeId !== reviewId || reviewRequest !== request) return;
+        reviewError.textContent = error.message || "生成 AI 复盘失败。";
+        reviewError.hidden = false;
+        reviewStatus.textContent = "AI 复盘生成失败。";
+    } finally {
+        if (reviewRequest === request) {
+            reviewRequest = null;
+            reviewButton.disabled = false;
+            reviewButton.textContent = "重新生成 AI 复盘";
+        }
+    }
+}
+
 function render(data, id) {
     renderConclusion(data.conclusion);
     renderMetrics(data);
@@ -224,6 +320,11 @@ async function loadEvaluation(id) {
     }
 
     clearError();
+    reviewRequest?.abort();
+    reviewRequest = null;
+    activeId = null;
+    reviewButton.disabled = true;
+    reviewStatus.textContent = "正在切换回测任务…";
     setLoading(true);
     try {
         const base = `/api/research/gold/backtests/${encodeURIComponent(id)}`;
@@ -242,6 +343,12 @@ async function loadEvaluation(id) {
             casesResponse.json()
         ]);
         cases = Array.isArray(loadedCases) ? loadedCases : [];
+        activeId = id;
+        reviewButton.disabled = false;
+        reviewButton.textContent = "生成 AI 复盘";
+        reviewStatus.textContent = "已加载真实回测数据，可手动生成 AI 复盘。";
+        reviewError.hidden = true;
+        reviewResult.hidden = true;
         missOnly.checked = false;
         render(evaluation, id);
         renderCases();
@@ -262,6 +369,7 @@ form.addEventListener("submit", event => {
 });
 
 missOnly.addEventListener("change", renderCases);
+reviewButton.addEventListener("click", loadReview);
 
 const initialId = new URLSearchParams(location.search).get("id");
 if (initialId) {

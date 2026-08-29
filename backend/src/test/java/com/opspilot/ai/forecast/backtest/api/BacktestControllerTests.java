@@ -10,6 +10,11 @@ import com.opspilot.ai.forecast.backtest.BacktestStatus;
 import com.opspilot.ai.forecast.backtest.BacktestTask;
 import com.opspilot.ai.forecast.backtest.ConfusionMatrix;
 import com.opspilot.ai.forecast.backtest.DirectionCounts;
+import com.opspilot.ai.forecast.backtest.review.BacktestErrorPattern;
+import com.opspilot.ai.forecast.backtest.review.BacktestReviewContent;
+import com.opspilot.ai.forecast.backtest.review.BacktestReviewService;
+import com.opspilot.ai.forecast.backtest.review.BacktestReviewRisk;
+import com.opspilot.ai.forecast.backtest.review.GeneratedBacktestReview;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
@@ -39,6 +44,7 @@ class BacktestControllerTests {
     private BacktestService service;
     private BacktestJobService jobs;
     private BacktestEvaluationService evaluation;
+    private BacktestReviewService review;
     private MockMvc mvc;
 
     @BeforeEach
@@ -46,8 +52,9 @@ class BacktestControllerTests {
         service = mock(BacktestService.class);
         jobs = mock(BacktestJobService.class);
         evaluation = mock(BacktestEvaluationService.class);
+        review = mock(BacktestReviewService.class);
         mvc = MockMvcBuilders.standaloneSetup(
-                new BacktestController(service, jobs, evaluation)
+                new BacktestController(service, jobs, evaluation, review)
         ).build();
     }
 
@@ -146,6 +153,43 @@ class BacktestControllerTests {
                 .andExpect(jsonPath("$.conclusion.summary").value(
                         "有效样本不足 30 条，当前结果只能用于观察。"
                 ));
+    }
+
+    @Test
+    void generatesReviewWithoutRawResponse() throws Exception {
+        when(review.review(ID)).thenReturn(new GeneratedBacktestReview(
+                "glm-4.7",
+                "敏感原始模型响应",
+                new BacktestReviewContent(
+                        "错误集中在趋势反转日",
+                        List.of("case-1"),
+                        List.of(new BacktestErrorPattern(
+                                "趋势延续误判",
+                                "趋势反转后仍然看涨",
+                                List.of("case-1"),
+                                "增加趋势衰减条件",
+                                "使用下一批历史样本验证"
+                        )),
+                        List.of(new BacktestReviewRisk(
+                                "样本有限", List.of("case-1")
+                        )),
+                        "不构成投资建议"
+                )
+        ));
+
+        mvc.perform(post("/api/research/gold/backtests/{id}/review", ID))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.modelName").value("glm-4.7"))
+                .andExpect(jsonPath("$.summary").value("错误集中在趋势反转日"))
+                .andExpect(jsonPath("$.summaryEvidence[0]").value("case-1"))
+                .andExpect(jsonPath("$.patterns[0].category")
+                        .value("趋势延续误判"))
+                .andExpect(content().string(org.hamcrest.Matchers.not(
+                        org.hamcrest.Matchers.containsString("rawResponse")
+                )))
+                .andExpect(content().string(org.hamcrest.Matchers.not(
+                        org.hamcrest.Matchers.containsString("敏感原始模型响应")
+                )));
     }
 
     private BacktestTask task(BacktestStatus status) {

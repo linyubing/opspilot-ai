@@ -14,6 +14,9 @@ import com.opspilot.ai.forecast.UnsafeGoldForecastException;
 import com.opspilot.ai.forecast.backtest.BacktestDataInsufficientException;
 import com.opspilot.ai.forecast.backtest.BacktestNotFoundException;
 import com.opspilot.ai.forecast.backtest.InvalidBacktestRequestException;
+import com.opspilot.ai.forecast.backtest.review.BacktestReviewAiUnavailableException;
+import com.opspilot.ai.forecast.backtest.review.InvalidBacktestReviewAiResponseException;
+import com.opspilot.ai.forecast.backtest.review.NoBacktestErrorsException;
 import com.opspilot.ai.forecast.review.GoldForecastReviewAiUnavailableException;
 import com.opspilot.ai.forecast.review.InsufficientForecastReviewSamplesException;
 import com.opspilot.ai.forecast.review.InvalidGoldForecastReviewAiResponseException;
@@ -33,6 +36,30 @@ import java.util.UUID;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 public class GlobalExceptionHandlerTests {
+
+    @Test
+    void mapsBacktestReviewErrors() {
+        GlobalExceptionHandler handler = new GlobalExceptionHandler();
+
+        assertThat(handler.handleNoBacktestErrors(
+                new NoBacktestErrorsException("没有错误样本")
+        ).getStatusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);
+        assertThat(handler.handleNoBacktestErrors(
+                new NoBacktestErrorsException("没有错误样本")
+        ).getBody().code()).isEqualTo("NO_BACKTEST_ERRORS");
+
+        assertThat(handler.handleBacktestReviewAiUnavailable(
+                new BacktestReviewAiUnavailableException(
+                        "模型不可用", new RuntimeException()
+                )
+        ).getStatusCode()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE);
+
+        assertThat(handler.handleInvalidBacktestReviewResponse(
+                new InvalidBacktestReviewAiResponseException(
+                        "非法响应", new RuntimeException()
+                )
+        ).getStatusCode()).isEqualTo(HttpStatus.BAD_GATEWAY);
+    }
 
     @Test
     void mapsBacktestErrorsToStableCodes() {

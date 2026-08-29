@@ -17,6 +17,9 @@ import com.opspilot.ai.forecast.UnsafeGoldForecastException;
 import com.opspilot.ai.forecast.backtest.BacktestDataInsufficientException;
 import com.opspilot.ai.forecast.backtest.BacktestNotFoundException;
 import com.opspilot.ai.forecast.backtest.InvalidBacktestRequestException;
+import com.opspilot.ai.forecast.backtest.review.BacktestReviewAiUnavailableException;
+import com.opspilot.ai.forecast.backtest.review.InvalidBacktestReviewAiResponseException;
+import com.opspilot.ai.forecast.backtest.review.NoBacktestErrorsException;
 import com.opspilot.ai.forecast.review.GoldForecastReviewAiUnavailableException;
 import com.opspilot.ai.forecast.review.InsufficientForecastReviewSamplesException;
 import com.opspilot.ai.forecast.review.InvalidGoldForecastReviewAiResponseException;
@@ -35,6 +38,39 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(NoBacktestErrorsException.class)
+    public ResponseEntity<ApiError> handleNoBacktestErrors(
+            NoBacktestErrorsException exception
+    ) {
+        return ResponseEntity.unprocessableEntity().body(
+                new ApiError("NO_BACKTEST_ERRORS", exception.getMessage())
+        );
+    }
+
+    @ExceptionHandler(BacktestReviewAiUnavailableException.class)
+    public ResponseEntity<ApiError> handleBacktestReviewAiUnavailable(
+            BacktestReviewAiUnavailableException exception
+    ) {
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(
+                new ApiError(
+                        "BACKTEST_REVIEW_AI_UNAVAILABLE",
+                        exception.getMessage()
+                )
+        );
+    }
+
+    @ExceptionHandler(InvalidBacktestReviewAiResponseException.class)
+    public ResponseEntity<ApiError> handleInvalidBacktestReviewResponse(
+            InvalidBacktestReviewAiResponseException exception
+    ) {
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(
+                new ApiError(
+                        "INVALID_BACKTEST_REVIEW_AI_RESPONSE",
+                        exception.getMessage()
+                )
+        );
+    }
 
     @ExceptionHandler(BacktestNotFoundException.class)
     public ResponseEntity<ApiError> handleBacktestNotFound(

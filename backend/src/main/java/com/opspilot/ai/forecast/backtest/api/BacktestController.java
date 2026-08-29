@@ -3,6 +3,7 @@ package com.opspilot.ai.forecast.backtest.api;
 import com.opspilot.ai.forecast.backtest.BacktestEvaluationService;
 import com.opspilot.ai.forecast.backtest.BacktestJobService;
 import com.opspilot.ai.forecast.backtest.BacktestService;
+import com.opspilot.ai.forecast.backtest.review.BacktestReviewService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,15 +25,18 @@ public class BacktestController {
     private final BacktestService service;
     private final BacktestJobService jobs;
     private final BacktestEvaluationService evaluation;
+    private final BacktestReviewService review;
 
     public BacktestController(
             BacktestService service,
             BacktestJobService jobs,
-            BacktestEvaluationService evaluation
+            BacktestEvaluationService evaluation,
+            BacktestReviewService review
     ) {
         this.service = service;
         this.jobs = jobs;
         this.evaluation = evaluation;
+        this.review = review;
     }
 
     @PostMapping
@@ -84,5 +88,10 @@ public class BacktestController {
             @PathVariable("id") UUID id
     ) {
         return BacktestEvaluationResponse.from(evaluation.evaluate(id));
+    }
+
+    @PostMapping("/{id}/review")
+    public BacktestReviewResponse review(@PathVariable("id") UUID id) {
+        return BacktestReviewResponse.from(review.review(id));
     }
 }

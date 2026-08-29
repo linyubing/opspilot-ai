@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="查看黄金方向预测的历史回测指标和中文评估结论">
     <title>黄金回测评估</title>
-    <link rel="stylesheet" href="/backtest.css?v=3">
+    <link rel="stylesheet" href="/backtest.css?v=4">
 </head>
 <body>
 <main class="page-shell">
@@ -133,6 +133,33 @@
             </div>
         </section>
 
+        <section id="reviewPanel" class="data-panel review-panel">
+            <div class="review-heading">
+                <div class="section-heading">
+                    <h2>AI 错误复盘</h2>
+                    <p>只分析当前任务中的真实错误样本，不自动修改预测规则。</p>
+                </div>
+                <button id="reviewButton" type="button" disabled>生成 AI 复盘</button>
+            </div>
+            <p id="reviewStatus" class="review-status" aria-live="polite">
+                加载回测任务后可手动生成。
+            </p>
+            <div id="reviewError" class="message error" role="alert" hidden></div>
+            <div id="reviewResult" class="review-result" hidden>
+                <div class="review-summary">
+                    <span id="reviewModel" class="model-tag"></span>
+                    <p id="reviewSummary"></p>
+                    <p id="reviewSummaryEvidence" class="review-evidence"></p>
+                </div>
+                <div id="patternList" class="pattern-list"></div>
+                <div class="review-risks">
+                    <h3>可信边界</h3>
+                    <ul id="riskList"></ul>
+                    <p id="reviewDisclaimer"></p>
+                </div>
+            </div>
+        </section>
+
         <section class="data-panel case-panel">
             <div class="case-heading">
                 <div class="section-heading">
@@ -149,6 +176,6 @@
         </section>
     </section>
 </main>
-<script src="/backtest.js?v=3" defer></script>
+<script src="/backtest.js?v=4" defer></script>
 </body>
 </html>

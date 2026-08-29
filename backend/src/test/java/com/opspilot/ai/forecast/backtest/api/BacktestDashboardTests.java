@@ -28,6 +28,9 @@ class BacktestDashboardTests {
                 ))
                 .andExpect(content().string(
                         org.hamcrest.Matchers.containsString("id=\"caseList\"")
+                ))
+                .andExpect(content().string(
+                        org.hamcrest.Matchers.containsString("id=\"reviewPanel\"")
                 ));
     }
 
