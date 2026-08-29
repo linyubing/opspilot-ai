@@ -410,3 +410,48 @@ button, input { font: inherit; }
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { transition-duration: 0.01ms !important; }
 }
+.compare-form {
+    display: grid;
+    grid-template-columns: auto minmax(240px, 1fr) auto;
+    gap: 12px;
+    align-items: center;
+    margin-top: 18px;
+}
+
+.compare-form input {
+    min-width: 0;
+    padding: 11px 13px;
+    border: 1px solid #d2d9e5;
+    border-radius: 8px;
+    font: inherit;
+}
+
+.compare-result {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.compare-result article {
+    padding: 16px;
+    border-radius: 10px;
+    background: #f4f7fb;
+}
+
+.compare-result span,
+.compare-result strong {
+    display: block;
+}
+
+.compare-result strong {
+    margin-top: 8px;
+    font-size: 1.35rem;
+}
+
+@media (max-width: 720px) {
+    .compare-form,
+    .compare-result {
+        grid-template-columns: 1fr;
+    }
+}

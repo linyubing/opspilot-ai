@@ -27,6 +27,11 @@ const reviewError = document.getElementById("reviewError");
 const reviewResult = document.getElementById("reviewResult");
 const patternList = document.getElementById("patternList");
 const riskList = document.getElementById("riskList");
+const candidateInput = document.getElementById("candidateId");
+const compareButton = document.getElementById("compareButton");
+const compareStatus = document.getElementById("compareStatus");
+const compareError = document.getElementById("compareError");
+const compareResult = document.getElementById("compareResult");
 let cases = [];
 let activeId = null;
 let reviewRequest = null;
@@ -297,6 +302,48 @@ async function loadReview() {
     }
 }
 
+function renderComparison(data) {
+    setText("baseAccuracy", formatPercent(data.baselineAccuracy));
+    setText("candidateAccuracy", formatPercent(data.candidateAccuracy));
+    setText("accuracyChange", formatSignedPercent(data.accuracyChange));
+    setText("balancedChange", formatSignedPercent(data.balancedAccuracyChange));
+    compareResult.hidden = false;
+    compareStatus.textContent = `已比较 ${data.sampleCount} 个相同历史样本。`;
+}
+
+async function loadComparison() {
+    const candidateId = candidateInput.value.trim();
+    if (!activeId || !uuidPattern.test(candidateId)) {
+        compareError.textContent = "请先加载基准任务，再输入正确的候选任务 ID。";
+        compareError.hidden = false;
+        return;
+    }
+
+    compareButton.disabled = true;
+    compareButton.textContent = "正在比较…";
+    compareError.hidden = true;
+    compareResult.hidden = true;
+    try {
+        const query = new URLSearchParams({
+            baselineId: activeId,
+            candidateId
+        });
+        const response = await fetch(
+            `/api/research/gold/backtests/compare?${query}`,
+            {headers: {Accept: "application/json"}}
+        );
+        if (!response.ok) throw new Error(await readError(response));
+        renderComparison(await response.json());
+    } catch (error) {
+        compareError.textContent = error.message || "对比回测失败。";
+        compareError.hidden = false;
+        compareStatus.textContent = "无法比较这两个回测任务。";
+    } finally {
+        compareButton.disabled = false;
+        compareButton.textContent = "比较结果";
+    }
+}
+
 function render(data, id) {
     renderConclusion(data.conclusion);
     renderMetrics(data);
@@ -345,6 +392,9 @@ async function loadEvaluation(id) {
         ]);
         cases = Array.isArray(loadedCases) ? loadedCases : [];
         activeId = id;
+        compareResult.hidden = true;
+        compareError.hidden = true;
+        compareStatus.textContent = "请输入使用 v2 候选提示词的回测任务 ID。";
         reviewButton.disabled = false;
         reviewButton.textContent = "生成 AI 复盘";
         reviewStatus.textContent = "已加载真实回测数据，可手动生成 AI 复盘。";
@@ -371,6 +421,7 @@ form.addEventListener("submit", event => {
 
 missOnly.addEventListener("change", renderCases);
 reviewButton.addEventListener("click", loadReview);
+compareButton.addEventListener("click", loadComparison);
 
 const initialId = new URLSearchParams(location.search).get("id");
 if (initialId) {
