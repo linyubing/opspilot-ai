@@ -33,7 +33,8 @@ public class BacktestRunner {
     private final BacktestRepository repo;
     private final MarketPriceRepository priceRepo;
     private final GoldResearchSnapshotService snapshotService;
-    private final BacktestPromptBuilder promptBuilder;
+    private final BacktestPromptBuilder baseBuilder;
+    private final CandidateBacktestPromptBuilder candidateBuilder;
     private final GoldForecastGateway gateway;
     private final GoldForecastValidator validator;
     private final NextValidMarketPriceSelector priceSelector;
@@ -44,7 +45,8 @@ public class BacktestRunner {
             BacktestRepository repo,
             MarketPriceRepository priceRepo,
             GoldResearchSnapshotService snapshotService,
-            BacktestPromptBuilder promptBuilder,
+            BacktestPromptBuilder baseBuilder,
+            CandidateBacktestPromptBuilder candidateBuilder,
             GoldForecastGateway gateway,
             GoldForecastValidator validator,
             NextValidMarketPriceSelector priceSelector,
@@ -54,7 +56,8 @@ public class BacktestRunner {
         this.repo = repo;
         this.priceRepo = priceRepo;
         this.snapshotService = snapshotService;
-        this.promptBuilder = promptBuilder;
+        this.baseBuilder = baseBuilder;
+        this.candidateBuilder = candidateBuilder;
         this.gateway = gateway;
         this.validator = validator;
         this.priceSelector = priceSelector;
@@ -95,7 +98,7 @@ public class BacktestRunner {
     private BacktestCase runOne(BacktestTask task, LocalDate date) {
         UUID caseId = UUID.randomUUID();
         GoldResearchSnapshot snapshot = snapshotService.createSnapshot(date);
-        GoldForecastPrompt prompt = promptBuilder.build(caseId, snapshot);
+        GoldForecastPrompt prompt = buildPrompt(task, caseId, snapshot);
         GeneratedGoldForecast generated = gateway.generate(prompt);
         validator.validate(generated.content());
 
@@ -134,6 +137,23 @@ public class BacktestRunner {
                 task.ruleVersion(),
                 generated.rawResponse(),
                 now()
+        );
+    }
+
+    /** 按任务冻结的版本选择提示词，避免运行期间发生版本漂移。 */
+    private GoldForecastPrompt buildPrompt(
+            BacktestTask task,
+            UUID caseId,
+            GoldResearchSnapshot snapshot
+    ) {
+        if (CandidateBacktestPromptBuilder.VERSION.equals(task.promptVersion())) {
+            return candidateBuilder.build(caseId, snapshot);
+        }
+        if (BacktestPromptBuilder.VERSION.equals(task.promptVersion())) {
+            return baseBuilder.build(caseId, snapshot);
+        }
+        throw new InvalidBacktestRequestException(
+                "不支持的回测提示词版本=" + task.promptVersion()
         );
     }
 

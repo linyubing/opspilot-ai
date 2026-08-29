@@ -3,8 +3,11 @@ package com.opspilot.ai.forecast.backtest.api;
 import com.opspilot.ai.forecast.DirectionEvaluation;
 import com.opspilot.ai.forecast.ForecastDirection;
 import com.opspilot.ai.forecast.backtest.BacktestEvaluation;
+import com.opspilot.ai.forecast.backtest.BacktestComparison;
+import com.opspilot.ai.forecast.backtest.BacktestComparisonService;
 import com.opspilot.ai.forecast.backtest.BacktestEvaluationService;
 import com.opspilot.ai.forecast.backtest.BacktestJobService;
+import com.opspilot.ai.forecast.backtest.BacktestPromptVersion;
 import com.opspilot.ai.forecast.backtest.BacktestService;
 import com.opspilot.ai.forecast.backtest.BacktestStatus;
 import com.opspilot.ai.forecast.backtest.BacktestTask;
@@ -46,6 +49,7 @@ class BacktestControllerTests {
     private BacktestJobService jobs;
     private BacktestEvaluationService evaluation;
     private BacktestReviewService review;
+    private BacktestComparisonService comparison;
     private MockMvc mvc;
 
     @BeforeEach
@@ -54,14 +58,18 @@ class BacktestControllerTests {
         jobs = mock(BacktestJobService.class);
         evaluation = mock(BacktestEvaluationService.class);
         review = mock(BacktestReviewService.class);
+        comparison = mock(BacktestComparisonService.class);
         mvc = MockMvcBuilders.standaloneSetup(
-                new BacktestController(service, jobs, evaluation, review)
+                new BacktestController(
+                        service, jobs, evaluation, review, comparison
+                )
         ).build();
     }
 
     @Test
     void createsTask() throws Exception {
-        when(service.create(60)).thenReturn(task(BacktestStatus.CREATED));
+        when(service.create(60, BacktestPromptVersion.BASELINE))
+                .thenReturn(task(BacktestStatus.CREATED));
 
         mvc.perform(post("/api/research/gold/backtests")
                         .param("samples", "60"))
@@ -70,6 +78,17 @@ class BacktestControllerTests {
                 .andExpect(jsonPath("$.id").value(ID.toString()))
                 .andExpect(jsonPath("$.sampleCount").value(60))
                 .andExpect(jsonPath("$.status").value("CREATED"));
+    }
+
+    @Test
+    void createsCandidateTask() throws Exception {
+        when(service.create(60, BacktestPromptVersion.CANDIDATE))
+                .thenReturn(task(BacktestStatus.CREATED));
+
+        mvc.perform(post("/api/research/gold/backtests")
+                        .param("samples", "60")
+                        .param("version", "CANDIDATE"))
+                .andExpect(status().isCreated());
     }
 
     @Test
@@ -194,6 +213,43 @@ class BacktestControllerTests {
                 .andExpect(content().string(org.hamcrest.Matchers.not(
                         org.hamcrest.Matchers.containsString("敏感原始模型响应")
                 )));
+    }
+
+    @Test
+    void comparesPromptVersions() throws Exception {
+        UUID candidateId = UUID.randomUUID();
+        BacktestEvaluation baseline = evaluation("0.4000", "0.4500");
+        BacktestEvaluation candidate = evaluation("0.5500", "0.5200");
+        when(comparison.compare(ID, candidateId)).thenReturn(
+                new BacktestComparison(
+                        ID, candidateId, 60, baseline, candidate,
+                        new BigDecimal("0.1500"), new BigDecimal("0.0700")
+                )
+        );
+
+        mvc.perform(get("/api/research/gold/backtests/compare")
+                        .param("baselineId", ID.toString())
+                        .param("candidateId", candidateId.toString()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.sampleCount").value(60))
+                .andExpect(jsonPath("$.accuracyChange").value(0.1500))
+                .andExpect(jsonPath("$.balancedAccuracyChange").value(0.0700));
+    }
+
+    private BacktestEvaluation evaluation(String accuracy, String balanced) {
+        DirectionEvaluation empty = new DirectionEvaluation(
+                ForecastDirection.BULLISH, 0, 0, null
+        );
+        return new BacktestEvaluation(
+                "BACKTEST", 60, new BigDecimal(accuracy), null,
+                null, null, null, new BigDecimal(balanced),
+                new ConfusionMatrix(
+                        new DirectionCounts(0, 0, 0),
+                        new DirectionCounts(0, 0, 0),
+                        new DirectionCounts(0, 0, 0)
+                ),
+                empty, empty, empty
+        );
     }
 
     private BacktestTask task(BacktestStatus status) {

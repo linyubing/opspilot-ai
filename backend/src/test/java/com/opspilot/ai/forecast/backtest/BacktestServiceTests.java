@@ -83,6 +83,23 @@ class BacktestServiceTests {
     }
 
     @Test
+    void createsCandidateTask() {
+        List<MarketPrice> history = prices(101);
+        List<LocalDate> selected = List.of(LocalDate.parse("2026-08-19"));
+        when(priceRepo.findAll("XAUUSD")).thenReturn(history);
+        when(selector.select(history, 1)).thenReturn(selected);
+
+        BacktestTask task = service.create(
+                1,
+                BacktestPromptVersion.CANDIDATE
+        );
+
+        assertThat(task.promptVersion()).isEqualTo(
+                CandidateBacktestPromptBuilder.VERSION
+        );
+    }
+
+    @Test
     void rejectsInvalidSampleCount() {
         assertThatThrownBy(() -> service.create(0))
                 .isInstanceOf(InvalidBacktestRequestException.class)

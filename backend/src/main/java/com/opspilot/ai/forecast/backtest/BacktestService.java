@@ -18,7 +18,6 @@ import java.util.UUID;
 public class BacktestService {
 
     private static final String SYMBOL = "XAUUSD";
-    private static final String PROMPT_VERSION = "gold-backtest-prompt-v1";
     private static final int MAX_SAMPLES = 120;
 
     private final MarketPriceRepository priceRepo;
@@ -42,7 +41,15 @@ public class BacktestService {
     }
 
     public BacktestTask create(int samples) {
+        return create(samples, BacktestPromptVersion.BASELINE);
+    }
+
+    /** 创建指定提示词版本的回测任务。 */
+    public BacktestTask create(int samples, BacktestPromptVersion version) {
         checkRange(samples, "samples");
+        if (version == null) {
+            throw new InvalidBacktestRequestException("提示词版本不能为空");
+        }
         List<MarketPrice> prices = priceRepo.findAll(SYMBOL);
         List<LocalDate> dates = selector.select(prices, samples);
 
@@ -52,7 +59,7 @@ public class BacktestService {
                 dates.get(dates.size() - 1),
                 samples,
                 properties.modelName(),
-                PROMPT_VERSION,
+                version.version(),
                 GoldForecastRule.RULE_VERSION,
                 BacktestStatus.CREATED,
                 0,

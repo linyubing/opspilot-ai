@@ -1,7 +1,9 @@
 package com.opspilot.ai.forecast.backtest.api;
 
 import com.opspilot.ai.forecast.backtest.BacktestEvaluationService;
+import com.opspilot.ai.forecast.backtest.BacktestComparisonService;
 import com.opspilot.ai.forecast.backtest.BacktestJobService;
+import com.opspilot.ai.forecast.backtest.BacktestPromptVersion;
 import com.opspilot.ai.forecast.backtest.BacktestService;
 import com.opspilot.ai.forecast.backtest.review.BacktestReviewService;
 import org.springframework.http.HttpStatus;
@@ -26,25 +28,32 @@ public class BacktestController {
     private final BacktestJobService jobs;
     private final BacktestEvaluationService evaluation;
     private final BacktestReviewService review;
+    private final BacktestComparisonService comparison;
 
     public BacktestController(
             BacktestService service,
             BacktestJobService jobs,
             BacktestEvaluationService evaluation,
-            BacktestReviewService review
+            BacktestReviewService review,
+            BacktestComparisonService comparison
     ) {
         this.service = service;
         this.jobs = jobs;
         this.evaluation = evaluation;
         this.review = review;
+        this.comparison = comparison;
     }
 
     @PostMapping
     public ResponseEntity<BacktestTaskResponse> create(
-            @RequestParam(name = "samples", defaultValue = "60") int samples
+            @RequestParam(name = "samples", defaultValue = "60") int samples,
+            @RequestParam(
+                    name = "version",
+                    defaultValue = "BASELINE"
+            ) BacktestPromptVersion version
     ) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(BacktestTaskResponse.from(service.create(samples)));
+                .body(BacktestTaskResponse.from(service.create(samples, version)));
     }
 
     @PostMapping("/{id}/run")
@@ -93,5 +102,15 @@ public class BacktestController {
     @PostMapping("/{id}/review")
     public BacktestReviewResponse review(@PathVariable("id") UUID id) {
         return BacktestReviewResponse.from(review.review(id));
+    }
+
+    @GetMapping("/compare")
+    public BacktestComparisonResponse compare(
+            @RequestParam("baselineId") UUID baselineId,
+            @RequestParam("candidateId") UUID candidateId
+    ) {
+        return BacktestComparisonResponse.from(
+                comparison.compare(baselineId, candidateId)
+        );
     }
 }

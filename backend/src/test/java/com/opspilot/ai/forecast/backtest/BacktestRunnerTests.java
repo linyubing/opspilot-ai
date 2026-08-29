@@ -62,7 +62,8 @@ class BacktestRunnerTests {
         snapshots = mock(GoldResearchSnapshotService.class);
         gateway = mock(GoldForecastGateway.class);
         runner = new BacktestRunner(
-                repo, priceRepo, snapshots, new BacktestPromptBuilder(), gateway,
+                repo, priceRepo, snapshots, new BacktestPromptBuilder(),
+                new CandidateBacktestPromptBuilder(), gateway,
                 new GoldForecastValidator(), new NextValidMarketPriceSelector(),
                 new GoldForecastRule(), Clock.fixed(NOW, ZoneOffset.UTC)
         );
@@ -105,6 +106,25 @@ class BacktestRunnerTests {
                 TASK_ID,
                 OffsetDateTime.ofInstant(NOW, ZoneOffset.UTC)
         );
+    }
+
+    @Test
+    void usesCandidatePromptVersion() {
+        when(repo.findTask(TASK_ID)).thenReturn(Optional.of(task(
+                CandidateBacktestPromptBuilder.VERSION
+        )));
+
+        runner.run(TASK_ID);
+
+        ArgumentCaptor<com.opspilot.ai.forecast.GoldForecastPrompt> captor =
+                ArgumentCaptor.forClass(
+                        com.opspilot.ai.forecast.GoldForecastPrompt.class
+                );
+        verify(gateway).generate(captor.capture());
+        assertThat(captor.getValue().version()).isEqualTo(
+                CandidateBacktestPromptBuilder.VERSION
+        );
+        assertThat(captor.getValue().content()).contains("因子发生冲突时");
     }
 
     @Test
@@ -152,10 +172,14 @@ class BacktestRunnerTests {
     }
 
     private BacktestTask task() {
+        return task(BacktestPromptBuilder.VERSION);
+    }
+
+    private BacktestTask task(String promptVersion) {
         OffsetDateTime now = OffsetDateTime.ofInstant(NOW, ZoneOffset.UTC);
         return new BacktestTask(
                 TASK_ID, DATE, DATE, 1, "glm-4.7",
-                BacktestPromptBuilder.VERSION, GoldForecastRule.RULE_VERSION,
+                promptVersion, GoldForecastRule.RULE_VERSION,
                 BacktestStatus.RUNNING, 0, 0, 0,
                 null, now, now, null
         );
