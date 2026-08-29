@@ -24,7 +24,7 @@ public class BacktestComparisonService {
         BacktestTask baselineTask = service.get(baselineId);
         BacktestTask candidateTask = service.get(candidateId);
         checkTask(baselineTask, BacktestPromptVersion.BASELINE);
-        checkTask(candidateTask, BacktestPromptVersion.CANDIDATE);
+        checkCandidate(candidateTask);
 
         var baselineDates = service.samples(baselineId);
         var candidateDates = service.samples(candidateId);
@@ -50,18 +50,35 @@ public class BacktestComparisonService {
         );
     }
 
+    private void checkCandidate(BacktestTask task) {
+        checkCompleted(task);
+        boolean supported = BacktestPromptVersion.CANDIDATE.version()
+                .equals(task.promptVersion())
+                || BacktestPromptVersion.IMPROVED.version()
+                .equals(task.promptVersion());
+        if (!supported) {
+            throw new InvalidBacktestRequestException(
+                    "回测任务不是候选提示词版本，编号=" + task.id()
+            );
+        }
+    }
+
     private void checkTask(
             BacktestTask task,
             BacktestPromptVersion expected
     ) {
-        if (task.status() != BacktestStatus.COMPLETED) {
-            throw new InvalidBacktestRequestException(
-                    "回测任务尚未完成，编号=" + task.id()
-            );
-        }
+        checkCompleted(task);
         if (!expected.version().equals(task.promptVersion())) {
             throw new InvalidBacktestRequestException(
                     "回测任务提示词版本不符合比较要求，编号=" + task.id()
+            );
+        }
+    }
+
+    private void checkCompleted(BacktestTask task) {
+        if (task.status() != BacktestStatus.COMPLETED) {
+            throw new InvalidBacktestRequestException(
+                    "回测任务尚未完成，编号=" + task.id()
             );
         }
     }

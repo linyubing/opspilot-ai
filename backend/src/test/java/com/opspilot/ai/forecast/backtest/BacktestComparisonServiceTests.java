@@ -68,6 +68,17 @@ class BacktestComparisonServiceTests {
                 .hasMessageContaining("样本日期不一致");
     }
 
+    @Test
+    void comparesImprovedVersion() {
+        when(backtests.get(candidateId)).thenReturn(task(
+                candidateId,
+                ImprovedBacktestPromptBuilder.VERSION
+        ));
+
+        assertThat(service.compare(baselineId, candidateId).candidateId())
+                .isEqualTo(candidateId);
+    }
+
     private BacktestTask task(UUID id, String version) {
         var now = OffsetDateTime.parse("2026-08-30T00:00:00Z");
         return new BacktestTask(

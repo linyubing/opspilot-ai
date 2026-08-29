@@ -100,6 +100,23 @@ class BacktestServiceTests {
     }
 
     @Test
+    void createsTaskFromHoldoutSamples() {
+        List<MarketPrice> history = prices(101);
+        List<LocalDate> selected = List.of(LocalDate.parse("2026-08-18"));
+        when(priceRepo.findAll("XAUUSD")).thenReturn(history);
+        when(selector.select(history, 1, BacktestSampleSet.HOLDOUT))
+                .thenReturn(selected);
+
+        BacktestTask task = service.create(
+                1,
+                BacktestPromptVersion.BASELINE,
+                BacktestSampleSet.HOLDOUT
+        );
+
+        assertThat(task.startDate()).isEqualTo(selected.getFirst());
+    }
+
+    @Test
     void rejectsInvalidSampleCount() {
         assertThatThrownBy(() -> service.create(0))
                 .isInstanceOf(InvalidBacktestRequestException.class)

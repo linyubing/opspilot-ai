@@ -36,6 +36,20 @@ class BacktestDateSelectorTests {
     }
 
     @Test
+    void selectsHoldoutWithoutDevelopmentDates() {
+        List<MarketPrice> prices = prices(101);
+        List<LocalDate> development = selector.select(prices, 5);
+        List<LocalDate> holdout = selector.select(
+                prices,
+                5,
+                BacktestSampleSet.HOLDOUT
+        );
+
+        assertThat(holdout).hasSize(5);
+        assertThat(holdout).doesNotContainAnyElementsOf(development);
+    }
+
+    @Test
     void sortsAndRemovesRepeatedDatesBeforeSelecting() {
         List<MarketPrice> input = new ArrayList<>(prices(26));
         input.add(price(dateAt(10)));

@@ -63,7 +63,8 @@ class BacktestRunnerTests {
         gateway = mock(GoldForecastGateway.class);
         runner = new BacktestRunner(
                 repo, priceRepo, snapshots, new BacktestPromptBuilder(),
-                new CandidateBacktestPromptBuilder(), gateway,
+                new CandidateBacktestPromptBuilder(),
+                new ImprovedBacktestPromptBuilder(), gateway,
                 new GoldForecastValidator(), new NextValidMarketPriceSelector(),
                 new GoldForecastRule(), Clock.fixed(NOW, ZoneOffset.UTC)
         );
@@ -125,6 +126,25 @@ class BacktestRunnerTests {
                 CandidateBacktestPromptBuilder.VERSION
         );
         assertThat(captor.getValue().content()).contains("因子发生冲突时");
+    }
+
+    @Test
+    void usesImprovedPromptVersion() {
+        when(repo.findTask(TASK_ID)).thenReturn(Optional.of(task(
+                ImprovedBacktestPromptBuilder.VERSION
+        )));
+
+        runner.run(TASK_ID);
+
+        ArgumentCaptor<com.opspilot.ai.forecast.GoldForecastPrompt> captor =
+                ArgumentCaptor.forClass(
+                        com.opspilot.ai.forecast.GoldForecastPrompt.class
+                );
+        verify(gateway).generate(captor.capture());
+        assertThat(captor.getValue().version()).isEqualTo(
+                ImprovedBacktestPromptBuilder.VERSION
+        );
+        assertThat(captor.getValue().content()).contains("中性只能用于");
     }
 
     @Test

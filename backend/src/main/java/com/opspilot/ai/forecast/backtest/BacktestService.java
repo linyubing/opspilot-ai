@@ -46,12 +46,33 @@ public class BacktestService {
 
     /** 创建指定提示词版本的回测任务。 */
     public BacktestTask create(int samples, BacktestPromptVersion version) {
-        checkRange(samples, "samples");
-        if (version == null) {
-            throw new InvalidBacktestRequestException("提示词版本不能为空");
-        }
+        checkCreate(samples, version);
         List<MarketPrice> prices = priceRepo.findAll(SYMBOL);
-        List<LocalDate> dates = selector.select(prices, samples);
+        return saveTask(
+                samples,
+                version,
+                selector.select(prices, samples)
+        );
+    }
+
+    /** 创建指定提示词版本和样本集合的回测任务。 */
+    public BacktestTask create(
+            int samples,
+            BacktestPromptVersion version,
+            BacktestSampleSet sampleSet
+    ) {
+        checkCreate(samples, version);
+        List<MarketPrice> prices = priceRepo.findAll(SYMBOL);
+        List<LocalDate> dates = selector.select(prices, samples, sampleSet);
+
+        return saveTask(samples, version, dates);
+    }
+
+    private BacktestTask saveTask(
+            int samples,
+            BacktestPromptVersion version,
+            List<LocalDate> dates
+    ) {
 
         BacktestTask task = new BacktestTask(
                 UUID.randomUUID(),
@@ -71,6 +92,13 @@ public class BacktestService {
                 null
         );
         return repo.create(task, dates);
+    }
+
+    private void checkCreate(int samples, BacktestPromptVersion version) {
+        checkRange(samples, "samples");
+        if (version == null) {
+            throw new InvalidBacktestRequestException("提示词版本不能为空");
+        }
     }
 
     public BacktestTask get(UUID id) {

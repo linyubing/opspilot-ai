@@ -4,6 +4,7 @@ import com.opspilot.ai.forecast.backtest.BacktestEvaluationService;
 import com.opspilot.ai.forecast.backtest.BacktestComparisonService;
 import com.opspilot.ai.forecast.backtest.BacktestJobService;
 import com.opspilot.ai.forecast.backtest.BacktestPromptVersion;
+import com.opspilot.ai.forecast.backtest.BacktestSampleSet;
 import com.opspilot.ai.forecast.backtest.BacktestService;
 import com.opspilot.ai.forecast.backtest.review.BacktestReviewService;
 import org.springframework.http.HttpStatus;
@@ -50,10 +51,16 @@ public class BacktestController {
             @RequestParam(
                     name = "version",
                     defaultValue = "BASELINE"
-            ) BacktestPromptVersion version
+            ) BacktestPromptVersion version,
+            @RequestParam(
+                    name = "sampleSet",
+                    defaultValue = "DEFAULT"
+            ) BacktestSampleSet sampleSet
     ) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(BacktestTaskResponse.from(service.create(samples, version)));
+                .body(BacktestTaskResponse.from(
+                        service.create(samples, version, sampleSet)
+                ));
     }
 
     @PostMapping("/{id}/run")

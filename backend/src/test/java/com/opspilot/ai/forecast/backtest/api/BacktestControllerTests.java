@@ -8,6 +8,7 @@ import com.opspilot.ai.forecast.backtest.BacktestComparisonService;
 import com.opspilot.ai.forecast.backtest.BacktestEvaluationService;
 import com.opspilot.ai.forecast.backtest.BacktestJobService;
 import com.opspilot.ai.forecast.backtest.BacktestPromptVersion;
+import com.opspilot.ai.forecast.backtest.BacktestSampleSet;
 import com.opspilot.ai.forecast.backtest.BacktestService;
 import com.opspilot.ai.forecast.backtest.BacktestStatus;
 import com.opspilot.ai.forecast.backtest.BacktestTask;
@@ -68,7 +69,11 @@ class BacktestControllerTests {
 
     @Test
     void createsTask() throws Exception {
-        when(service.create(60, BacktestPromptVersion.BASELINE))
+        when(service.create(
+                60,
+                BacktestPromptVersion.BASELINE,
+                BacktestSampleSet.DEFAULT
+        ))
                 .thenReturn(task(BacktestStatus.CREATED));
 
         mvc.perform(post("/api/research/gold/backtests")
@@ -82,12 +87,31 @@ class BacktestControllerTests {
 
     @Test
     void createsCandidateTask() throws Exception {
-        when(service.create(60, BacktestPromptVersion.CANDIDATE))
+        when(service.create(
+                60,
+                BacktestPromptVersion.CANDIDATE,
+                BacktestSampleSet.DEFAULT
+        ))
                 .thenReturn(task(BacktestStatus.CREATED));
 
         mvc.perform(post("/api/research/gold/backtests")
                         .param("samples", "60")
                         .param("version", "CANDIDATE"))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    void createsHoldoutTask() throws Exception {
+        when(service.create(
+                20,
+                BacktestPromptVersion.BASELINE,
+                BacktestSampleSet.HOLDOUT
+        )).thenReturn(task(BacktestStatus.CREATED));
+
+        mvc.perform(post("/api/research/gold/backtests")
+                        .param("samples", "20")
+                        .param("version", "BASELINE")
+                        .param("sampleSet", "HOLDOUT"))
                 .andExpect(status().isCreated());
     }
 
