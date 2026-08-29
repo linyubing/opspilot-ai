@@ -17,6 +17,17 @@ const statusText = document.getElementById("status");
 const errorBox = document.getElementById("error");
 const resultBox = document.getElementById("result");
 const conclusionCard = document.getElementById("conclusion");
+const missOnly = document.getElementById("missOnly");
+const caseList = document.getElementById("caseList");
+const caseEmpty = document.getElementById("caseEmpty");
+const caseSummary = document.getElementById("caseSummary");
+let cases = [];
+
+const directionNames = {
+    BULLISH: "上涨",
+    NEUTRAL: "中性",
+    BEARISH: "下跌"
+};
 
 function formatPercent(value) {
     if (value === null || value === undefined || Number.isNaN(Number(value))) {
@@ -126,6 +137,69 @@ function renderDirection(prefix, data) {
     setText(`${prefix}Accuracy`, formatPercent(data?.accuracy));
 }
 
+function formatReturn(value) {
+    if (value === null || value === undefined || Number.isNaN(Number(value))) {
+        return "暂无数据";
+    }
+    const number = Number(value);
+    const sign = number > 0 ? "+" : "";
+    return `${sign}${number.toFixed(2)}%`;
+}
+
+function tag(direction, label) {
+    const span = document.createElement("span");
+    span.className = `direction-tag ${String(direction || "").toLowerCase()}`;
+    span.textContent = directionNames[direction] || "未知";
+    span.setAttribute("aria-label", `${label}：${span.textContent}`);
+    return span;
+}
+
+function caseRow(item) {
+    const row = document.createElement("article");
+    row.className = `case-row${item.hit ? "" : " miss"}`;
+
+    const date = document.createElement("time");
+    date.className = "case-date";
+    date.dateTime = item.asOfDate;
+    date.textContent = item.asOfDate || "暂无日期";
+
+    const arrow = document.createElement("span");
+    arrow.className = "case-arrow";
+    arrow.textContent = "→";
+    arrow.setAttribute("aria-hidden", "true");
+
+    const value = document.createElement("span");
+    value.className = "case-return";
+    const number = Number(item.actualReturn);
+    if (number > 0) value.classList.add("positive");
+    if (number < 0) value.classList.add("negative");
+    value.textContent = formatReturn(item.actualReturn);
+
+    const hit = document.createElement("span");
+    hit.className = "hit-tag";
+    hit.textContent = item.hit ? "命中" : "错误";
+
+    const details = document.createElement("details");
+    details.className = "case-reason";
+    const summary = document.createElement("summary");
+    summary.textContent = "查看模型依据";
+    const reason = document.createElement("p");
+    reason.textContent = item.reasoning || "暂无模型依据。";
+    details.append(summary, reason);
+
+    row.append(date, tag(item.predictedDirection, "预测方向"), arrow,
+            tag(item.actualDirection, "实际方向"), value, hit, details);
+    return row;
+}
+
+function renderCases() {
+    const visible = missOnly.checked ? cases.filter(item => !item.hit) : cases;
+    caseList.replaceChildren(...visible.map(caseRow));
+    caseEmpty.hidden = visible.length > 0;
+    const missCount = cases.filter(item => !item.hit).length;
+    caseSummary.textContent = `共 ${cases.length} 条，错误 ${missCount} 条`;
+}
+
 function render(data, id) {
     renderConclusion(data.conclusion);
     renderMetrics(data);
@@ -152,14 +226,25 @@ async function loadEvaluation(id) {
     clearError();
     setLoading(true);
     try {
-        const response = await fetch(
-            `/api/research/gold/backtests/${encodeURIComponent(id)}/evaluation`,
-            {headers: {Accept: "application/json"}}
-        );
-        if (!response.ok) {
-            throw new Error(await readError(response));
+        const base = `/api/research/gold/backtests/${encodeURIComponent(id)}`;
+        const [evaluationResponse, casesResponse] = await Promise.all([
+            fetch(`${base}/evaluation`, {headers: {Accept: "application/json"}}),
+            fetch(`${base}/results?limit=120`, {headers: {Accept: "application/json"}})
+        ]);
+        if (!evaluationResponse.ok) {
+            throw new Error(await readError(evaluationResponse));
         }
-        render(await response.json(), id);
+        if (!casesResponse.ok) {
+            throw new Error(await readError(casesResponse));
+        }
+        const [evaluation, loadedCases] = await Promise.all([
+            evaluationResponse.json(),
+            casesResponse.json()
+        ]);
+        cases = Array.isArray(loadedCases) ? loadedCases : [];
+        missOnly.checked = false;
+        render(evaluation, id);
+        renderCases();
         history.replaceState(null, "", `?id=${encodeURIComponent(id)}`);
     } catch (error) {
         const message = error instanceof TypeError
@@ -175,6 +260,8 @@ form.addEventListener("submit", event => {
     event.preventDefault();
     loadEvaluation(taskInput.value.trim());
 });
+
+missOnly.addEventListener("change", renderCases);
 
 const initialId = new URLSearchParams(location.search).get("id");
 if (initialId) {

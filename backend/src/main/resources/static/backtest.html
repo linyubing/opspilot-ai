@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="查看黄金方向预测的历史回测指标和中文评估结论">
     <title>黄金回测评估</title>
-    <link rel="stylesheet" href="/backtest.css">
+    <link rel="stylesheet" href="/backtest.css?v=3">
 </head>
 <body>
 <main class="page-shell">
@@ -132,8 +132,23 @@
                 </article>
             </div>
         </section>
+
+        <section class="data-panel case-panel">
+            <div class="case-heading">
+                <div class="section-heading">
+                    <h2>逐日回测明细</h2>
+                    <p id="caseSummary">查看每个历史日期的预测与真实结果</p>
+                </div>
+                <label class="miss-filter">
+                    <input id="missOnly" type="checkbox">
+                    只看错误
+                </label>
+            </div>
+            <div id="caseList" class="case-list"></div>
+            <p id="caseEmpty" class="empty-state" hidden>当前筛选条件下没有回测明细。</p>
+        </section>
     </section>
 </main>
-<script src="/backtest.js" defer></script>
+<script src="/backtest.js?v=3" defer></script>
 </body>
 </html>

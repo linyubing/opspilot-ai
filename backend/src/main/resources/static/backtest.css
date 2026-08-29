@@ -245,6 +245,68 @@ button, input { font: inherit; }
 .direction-card.neutral { color: var(--flat); }
 .direction-card.bearish { color: var(--down); }
 
+.case-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.miss-filter {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-width: max-content;
+    padding: 8px 13px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: #fafafa;
+    cursor: pointer;
+}
+
+.miss-filter input { width: 17px; height: 17px; accent-color: var(--gold); }
+
+.case-list { display: grid; gap: 12px; }
+
+.case-row {
+    display: grid;
+    grid-template-columns: 110px 110px 28px 110px 110px 82px minmax(220px, 1fr);
+    align-items: center;
+    gap: 14px;
+    padding: 15px 16px;
+    border: 1px solid var(--border);
+    border-left: 5px solid var(--up);
+    border-radius: 10px;
+    background: #fff;
+}
+
+.case-row.miss { border-left-color: var(--down); background: #fffafa; }
+.case-date { font-variant-numeric: tabular-nums; font-weight: 700; }
+.case-arrow { color: var(--muted); text-align: center; }
+.case-return { font-variant-numeric: tabular-nums; font-weight: 700; }
+.case-return.positive { color: var(--up); }
+.case-return.negative { color: var(--down); }
+
+.direction-tag, .hit-tag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 32px;
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: #f0f1f1;
+    font-weight: 700;
+}
+
+.direction-tag.bullish { background: #edf8f2; color: var(--up); }
+.direction-tag.bearish { background: #fff0ee; color: var(--down); }
+.hit-tag { background: #edf8f2; color: var(--up); }
+.case-row.miss .hit-tag { background: #fff0ee; color: var(--down); }
+
+.case-reason summary { color: var(--gold-strong); cursor: pointer; font-weight: 700; }
+.case-reason p { margin: 8px 0 0; color: var(--muted); overflow-wrap: anywhere; }
+.empty-state { margin: 18px 0 4px; color: var(--muted); text-align: center; }
+
 [hidden] { display: none !important; }
 
 @media (max-width: 1180px) {
@@ -280,6 +342,17 @@ button, input { font: inherit; }
         padding: 8px 3px;
         font-size: 12px;
     }
+    .case-heading { align-items: flex-start; }
+    .case-heading .section-heading { margin-bottom: 12px; }
+    .case-row {
+        grid-template-columns: 1fr 28px 1fr;
+        gap: 10px;
+        padding: 14px;
+    }
+    .case-date, .case-return, .hit-tag, .case-reason { grid-column: 1 / -1; }
+    .case-date::before { content: "分析日期："; color: var(--muted); font-weight: 400; }
+    .case-return::before { content: "实际涨跌："; color: var(--muted); font-weight: 400; }
+    .hit-tag { justify-self: start; }
 }
 
 @media (prefers-reduced-motion: reduce) {

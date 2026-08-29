@@ -25,6 +25,9 @@ class BacktestDashboardTests {
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(
                         MediaType.TEXT_HTML
+                ))
+                .andExpect(content().string(
+                        org.hamcrest.Matchers.containsString("id=\"caseList\"")
                 ));
     }
 
