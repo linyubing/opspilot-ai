@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="查看黄金方向预测的历史回测指标和中文评估结论">
+    <title>黄金回测评估</title>
+    <link rel="stylesheet" href="/backtest.css">
+</head>
+<body>
+<main class="page-shell">
+    <header class="page-header">
+        <h1>黄金回测评估</h1>
+    </header>
+
+    <form id="queryForm" class="query-panel" novalidate>
+        <label for="taskId">回测任务 ID</label>
+        <div class="query-row">
+            <input id="taskId" name="taskId" type="text" autocomplete="off"
+                   spellcheck="false"
+                   placeholder="例如：171b3874-54f9-477d-a3d9-5aff4bfbffcb"
+                   aria-describedby="status">
+            <button id="loadButton" type="submit">加载评估</button>
+        </div>
+        <p id="status" class="status" aria-live="polite">
+            请输入已经完成的回测任务 ID。
+        </p>
+    </form>
+
+    <section id="error" class="message error" role="alert" hidden></section>
+
+    <section id="result" class="result" aria-busy="false" hidden>
+        <article id="conclusion" class="conclusion-card">
+            <span class="conclusion-icon" aria-hidden="true">!</span>
+            <strong id="conclusionLevel" class="conclusion-level">暂无结论</strong>
+            <span class="conclusion-divider" aria-hidden="true"></span>
+            <h2 id="conclusionSummary">暂无评估结论。</h2>
+        </article>
+
+        <section class="metric-grid" aria-label="核心评估指标">
+            <article class="metric-card">
+                <h2>有效样本</h2>
+                <strong id="sampleCount">暂无数据</strong>
+            </article>
+            <article class="metric-card accent">
+                <h2>总体准确率</h2>
+                <strong id="accuracy">暂无数据</strong>
+            </article>
+            <article class="metric-card accent">
+                <h2>最近 20 条</h2>
+                <strong id="rollingAccuracy">暂无数据</strong>
+            </article>
+            <article class="metric-card">
+                <h2>多数类基线</h2>
+                <strong id="majorityBaseline">暂无数据</strong>
+            </article>
+            <article class="metric-card lift">
+                <h2>相对基线提升</h2>
+                <strong id="accuracyLift">暂无数据</strong>
+            </article>
+            <article class="metric-card accent">
+                <h2>平衡准确率</h2>
+                <strong id="balancedAccuracy">暂无数据</strong>
+            </article>
+        </section>
+
+        <section class="data-panel">
+            <div class="section-heading">
+                <h2>混淆矩阵</h2>
+                <p>行表示真实方向，列表示预测方向</p>
+            </div>
+            <div class="table-wrap">
+                <table class="matrix-table">
+                    <thead>
+                    <tr>
+                        <th scope="col">真实 / 预测</th>
+                        <th scope="col">预测上涨</th>
+                        <th scope="col">预测中性</th>
+                        <th scope="col">预测下跌</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <th scope="row">真实上涨</th>
+                        <td class="diagonal" id="matrixBullishBullish">0</td>
+                        <td id="matrixBullishNeutral">0</td>
+                        <td id="matrixBullishBearish">0</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">真实中性</th>
+                        <td id="matrixNeutralBullish">0</td>
+                        <td class="diagonal" id="matrixNeutralNeutral">0</td>
+                        <td id="matrixNeutralBearish">0</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">真实下跌</th>
+                        <td id="matrixBearishBullish">0</td>
+                        <td id="matrixBearishNeutral">0</td>
+                        <td class="diagonal" id="matrixBearishBearish">0</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="data-panel direction-panel">
+            <div class="section-heading"><h2>分方向表现</h2></div>
+            <div class="direction-grid">
+                <article class="direction-card bullish">
+                    <h3><span aria-hidden="true">↑</span>预测上涨</h3>
+                    <dl>
+                        <div><dt>样本数</dt><dd id="bullishSamples">0</dd></div>
+                        <div><dt>命中数</dt><dd id="bullishHits">0</dd></div>
+                        <div><dt>准确率</dt><dd id="bullishAccuracy">暂无数据</dd></div>
+                    </dl>
+                </article>
+                <article class="direction-card neutral">
+                    <h3><span aria-hidden="true">−</span>预测中性</h3>
+                    <dl>
+                        <div><dt>样本数</dt><dd id="neutralSamples">0</dd></div>
+                        <div><dt>命中数</dt><dd id="neutralHits">0</dd></div>
+                        <div><dt>准确率</dt><dd id="neutralAccuracy">暂无数据</dd></div>
+                    </dl>
+                </article>
+                <article class="direction-card bearish">
+                    <h3><span aria-hidden="true">↓</span>预测下跌</h3>
+                    <dl>
+                        <div><dt>样本数</dt><dd id="bearishSamples">0</dd></div>
+                        <div><dt>命中数</dt><dd id="bearishHits">0</dd></div>
+                        <div><dt>准确率</dt><dd id="bearishAccuracy">暂无数据</dd></div>
+                    </dl>
+                </article>
+            </div>
+        </section>
+    </section>
+</main>
+<script src="/backtest.js" defer></script>
+</body>
+</html>
