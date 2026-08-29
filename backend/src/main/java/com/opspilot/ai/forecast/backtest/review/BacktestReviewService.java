@@ -9,7 +9,6 @@ import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.UUID;
@@ -32,16 +31,26 @@ public class BacktestReviewService {
             BacktestService backtests,
             BacktestReviewPromptBuilder builder,
             BacktestReviewGateway gateway,
-            MeterRegistry registry
+            MeterRegistry registry,
+            BacktestReviewCacheProperties properties
     ) {
-        this(backtests, builder, gateway, registry, Ticker.systemTicker());
+        this(
+                backtests,
+                builder,
+                gateway,
+                registry,
+                properties,
+                Ticker.systemTicker()
+        );
     }
 
+    /** 允许测试注入虚拟时间，生产环境使用上面的 Spring 构造器。 */
     BacktestReviewService(
             BacktestService backtests,
             BacktestReviewPromptBuilder builder,
             BacktestReviewGateway gateway,
             MeterRegistry registry,
+            BacktestReviewCacheProperties properties,
             Ticker ticker
     ) {
         this.backtests = backtests;
@@ -51,8 +60,8 @@ public class BacktestReviewService {
         this.hits = registry.counter("opspilot.backtest.review.cache.hits");
         this.failures = registry.counter("opspilot.backtest.review.failures");
         this.cache = Caffeine.newBuilder()
-                .maximumSize(100)
-                .expireAfterAccess(Duration.ofHours(6))
+                .maximumSize(properties.maxSize())
+                .expireAfterAccess(properties.ttl())
                 .ticker(ticker)
                 .build();
     }
@@ -74,6 +83,8 @@ public class BacktestReviewService {
             calls.increment();
             GeneratedBacktestReview result = gateway.generate(prompt);
             current.complete(result);
+            // 主动执行维护，让个人服务的容量上限在写入后立即生效。
+            cache.cleanUp();
             return new BacktestReviewResult(result, false);
         } catch (RuntimeException exception) {
             failures.increment();

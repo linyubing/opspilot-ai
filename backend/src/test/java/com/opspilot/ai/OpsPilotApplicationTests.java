@@ -1,6 +1,7 @@
 package com.opspilot.ai;
 
 import com.opspilot.ai.chat.ChatGateway;
+import com.opspilot.ai.forecast.backtest.review.BacktestReviewCacheProperties;
 import com.opspilot.ai.rag.RagService;
 import com.opspilot.ai.retrieval.KnowledgeSearchService;
 import org.junit.jupiter.api.Test;
@@ -34,6 +35,9 @@ class OpsPilotApplicationTests {
 
 	@Autowired
 	private ApplicationContext applicationContext;
+
+	@Autowired
+	private BacktestReviewCacheProperties reviewCacheProperties;
 
 	// 没有 VectorStore Bean 时允许启动测试，随后通过断言明确失败原因
 	@Autowired(required = false)
@@ -116,6 +120,13 @@ class OpsPilotApplicationTests {
 		assertThat(environment.getProperty(
 				"opspilot.forecast.gold.model-name"
 		)).isEqualTo("glm-4.7");
+	}
+
+	@Test
+	void loadsBacktestReviewCacheLimits() {
+		assertThat(reviewCacheProperties.maxSize()).isEqualTo(100);
+		assertThat(reviewCacheProperties.ttl())
+				.isEqualTo(java.time.Duration.ofHours(6));
 	}
 
 	@Test

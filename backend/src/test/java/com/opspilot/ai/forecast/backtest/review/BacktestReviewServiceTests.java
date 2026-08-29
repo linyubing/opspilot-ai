@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.UUID;
+import java.time.Duration;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -17,6 +18,8 @@ import java.util.concurrent.atomic.AtomicLong;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -45,7 +48,8 @@ class BacktestReviewServiceTests {
                 backtests,
                 builder,
                 gateway,
-                new SimpleMeterRegistry()
+                new SimpleMeterRegistry(),
+                properties()
         ).review(id);
 
         assertThat(actual.review()).isEqualTo(expected);
@@ -69,7 +73,8 @@ class BacktestReviewServiceTests {
                 backtests,
                 builder,
                 gateway,
-                new SimpleMeterRegistry()
+                new SimpleMeterRegistry(),
+                properties()
         );
 
         assertThatThrownBy(() -> service.review(id))
@@ -139,23 +144,51 @@ class BacktestReviewServiceTests {
     }
 
     @Test
-    @DisplayName("缓存超过六小时未访问后重新调用模型")
+    @DisplayName("缓存超过配置时间未访问后重新调用模型")
     void expiresIdleCache() {
         AtomicLong nanos = new AtomicLong();
-        Fixture fixture = fixture(nanos::get);
+        Fixture fixture = fixture(
+                new BacktestReviewCacheProperties(10, Duration.ofHours(2)),
+                nanos::get
+        );
 
         fixture.service.review(fixture.id);
-        nanos.addAndGet(java.time.Duration.ofHours(6).plusNanos(1).toNanos());
+        nanos.addAndGet(Duration.ofHours(2).plusNanos(1).toNanos());
         fixture.service.review(fixture.id);
 
         verify(fixture.gateway, times(2)).generate(fixture.prompt);
     }
 
-    private Fixture fixture() {
-        return fixture(Ticker.systemTicker());
+    @Test
+    @DisplayName("缓存超过配置容量后淘汰较早结果")
+    void limitsCacheSize() {
+        Fixture fixture = fixture(
+                new BacktestReviewCacheProperties(1, Duration.ofHours(6)),
+                Ticker.systemTicker()
+        );
+
+        fixture.service.review(fixture.id);
+        fixture.service.review(UUID.randomUUID());
+        fixture.service.review(fixture.id);
+
+        verify(fixture.gateway, times(3)).generate(fixture.prompt);
     }
 
-    private Fixture fixture(Ticker ticker) {
+    private Fixture fixture() {
+        return fixture(
+                properties(),
+                Ticker.systemTicker()
+        );
+    }
+
+    private BacktestReviewCacheProperties properties() {
+        return new BacktestReviewCacheProperties(100, Duration.ofHours(6));
+    }
+
+    private Fixture fixture(
+            BacktestReviewCacheProperties properties,
+            Ticker ticker
+    ) {
         UUID id = UUID.randomUUID();
         BacktestService backtests = mock(BacktestService.class);
         BacktestReviewPromptBuilder builder =
@@ -169,7 +202,7 @@ class BacktestReviewServiceTests {
         );
         GeneratedBacktestReview expected = review();
         SimpleMeterRegistry registry = new SimpleMeterRegistry();
-        when(backtests.results(id, 120)).thenReturn(cases);
+        when(backtests.results(any(UUID.class), eq(120))).thenReturn(cases);
         when(builder.build(cases)).thenReturn(prompt);
         when(gateway.generate(prompt)).thenReturn(expected);
         return new Fixture(
@@ -179,7 +212,7 @@ class BacktestReviewServiceTests {
                 gateway,
                 registry,
                 new BacktestReviewService(
-                        backtests, builder, gateway, registry, ticker
+                        backtests, builder, gateway, registry, properties, ticker
                 )
         );
     }
