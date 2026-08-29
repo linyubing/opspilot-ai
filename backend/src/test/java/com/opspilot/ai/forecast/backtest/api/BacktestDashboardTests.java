@@ -36,7 +36,10 @@ class BacktestDashboardTests {
                         org.hamcrest.Matchers.containsString("id=\"comparePanel\"")
                 ))
                 .andExpect(content().string(
-                        org.hamcrest.Matchers.containsString("/backtest.js?v=6")
+                        org.hamcrest.Matchers.containsString("id=\"factorPanel\"")
+                ))
+                .andExpect(content().string(
+                        org.hamcrest.Matchers.containsString("/backtest.js?v=7")
                 ));
     }
 
@@ -59,6 +62,9 @@ class BacktestDashboardTests {
                 ))
                 .andExpect(content().string(
                         org.hamcrest.Matchers.containsString("accuracyChange")
+                ))
+                .andExpect(content().string(
+                        org.hamcrest.Matchers.containsString("directionalAccuracy")
                 ));
     }
 }

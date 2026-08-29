@@ -14,6 +14,9 @@ import com.opspilot.ai.forecast.backtest.BacktestStatus;
 import com.opspilot.ai.forecast.backtest.BacktestTask;
 import com.opspilot.ai.forecast.backtest.ConfusionMatrix;
 import com.opspilot.ai.forecast.backtest.DirectionCounts;
+import com.opspilot.ai.forecast.backtest.FactorDiagnostic;
+import com.opspilot.ai.forecast.backtest.FactorDiagnosticReport;
+import com.opspilot.ai.forecast.backtest.FactorDiagnosticService;
 import com.opspilot.ai.forecast.backtest.review.BacktestErrorPattern;
 import com.opspilot.ai.forecast.backtest.review.BacktestReviewContent;
 import com.opspilot.ai.forecast.backtest.review.BacktestReviewService;
@@ -51,6 +54,7 @@ class BacktestControllerTests {
     private BacktestEvaluationService evaluation;
     private BacktestReviewService review;
     private BacktestComparisonService comparison;
+    private FactorDiagnosticService diagnostics;
     private MockMvc mvc;
 
     @BeforeEach
@@ -60,9 +64,11 @@ class BacktestControllerTests {
         evaluation = mock(BacktestEvaluationService.class);
         review = mock(BacktestReviewService.class);
         comparison = mock(BacktestComparisonService.class);
+        diagnostics = mock(FactorDiagnosticService.class);
         mvc = MockMvcBuilders.standaloneSetup(
                 new BacktestController(
-                        service, jobs, evaluation, review, comparison
+                        service, jobs, evaluation, review, comparison,
+                        diagnostics
                 )
         ).build();
     }
@@ -258,6 +264,28 @@ class BacktestControllerTests {
                 .andExpect(jsonPath("$.sampleCount").value(60))
                 .andExpect(jsonPath("$.accuracyChange").value(0.1500))
                 .andExpect(jsonPath("$.balancedAccuracyChange").value(0.0700));
+    }
+
+    @Test
+    void getsFactorDiagnostics() throws Exception {
+        when(diagnostics.diagnose(ID)).thenReturn(new FactorDiagnosticReport(
+                ID,
+                20,
+                List.of(new FactorDiagnostic(
+                        "REAL_RATE", 20, 12, new BigDecimal("0.6000"),
+                        8, new BigDecimal("0.4000"), 6,
+                        new BigDecimal("0.5000"),
+                        new DirectionCounts(5, 8, 7)
+                ))
+        ));
+
+        mvc.perform(get("/api/research/gold/backtests/{id}/factors", ID))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.sampleCount").value(20))
+                .andExpect(jsonPath("$.factors[0].factor").value("REAL_RATE"))
+                .andExpect(jsonPath("$.factors[0].coverage").value(0.6000))
+                .andExpect(jsonPath("$.factors[0].directionalAccuracy")
+                        .value(0.5000));
     }
 
     private BacktestEvaluation evaluation(String accuracy, String balanced) {

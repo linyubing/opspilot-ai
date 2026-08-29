@@ -32,6 +32,7 @@ const compareButton = document.getElementById("compareButton");
 const compareStatus = document.getElementById("compareStatus");
 const compareError = document.getElementById("compareError");
 const compareResult = document.getElementById("compareResult");
+const factorList = document.getElementById("factorList");
 let cases = [];
 let activeId = null;
 let reviewRequest = null;
@@ -148,6 +149,36 @@ function renderDirection(prefix, data) {
     setText(`${prefix}Samples`, formatCount(data?.sampleCount));
     setText(`${prefix}Hits`, formatCount(data?.hitCount));
     setText(`${prefix}Accuracy`, formatPercent(data?.accuracy));
+}
+
+const factorNames = {
+    GOLD_MOMENTUM_20: "黄金 20 期动量",
+    REAL_RATE: "实际利率",
+    DOLLAR_INDEX: "美元指数"
+};
+
+function factorCard(item) {
+    const card = document.createElement("article");
+    card.className = "factor-card";
+    const title = document.createElement("h3");
+    title.textContent = factorNames[item.factor] || item.factor;
+    const list = document.createElement("dl");
+    list.append(
+        reviewRow("总体准确率", formatPercent(item.accuracy)),
+        reviewRow("方向覆盖率", formatPercent(item.coverage)),
+        reviewRow("方向信号准确率", formatPercent(item.directionalAccuracy)),
+        reviewRow(
+            "信号分布",
+            `涨 ${item.signals?.bullish || 0} / 中性 ${item.signals?.neutral || 0} / 跌 ${item.signals?.bearish || 0}`
+        )
+    );
+    card.append(title, list);
+    return card;
+}
+
+function renderFactors(data) {
+    const factors = Array.isArray(data?.factors) ? data.factors : [];
+    factorList.replaceChildren(...factors.map(factorCard));
 }
 
 function formatReturn(value) {
@@ -376,9 +407,10 @@ async function loadEvaluation(id) {
     setLoading(true);
     try {
         const base = `/api/research/gold/backtests/${encodeURIComponent(id)}`;
-        const [evaluationResponse, casesResponse] = await Promise.all([
+        const [evaluationResponse, casesResponse, factorResponse] = await Promise.all([
             fetch(`${base}/evaluation`, {headers: {Accept: "application/json"}}),
-            fetch(`${base}/results?limit=120`, {headers: {Accept: "application/json"}})
+            fetch(`${base}/results?limit=120`, {headers: {Accept: "application/json"}}),
+            fetch(`${base}/factors`, {headers: {Accept: "application/json"}})
         ]);
         if (!evaluationResponse.ok) {
             throw new Error(await readError(evaluationResponse));
@@ -386,9 +418,13 @@ async function loadEvaluation(id) {
         if (!casesResponse.ok) {
             throw new Error(await readError(casesResponse));
         }
-        const [evaluation, loadedCases] = await Promise.all([
+        if (!factorResponse.ok) {
+            throw new Error(await readError(factorResponse));
+        }
+        const [evaluation, loadedCases, factors] = await Promise.all([
             evaluationResponse.json(),
-            casesResponse.json()
+            casesResponse.json(),
+            factorResponse.json()
         ]);
         cases = Array.isArray(loadedCases) ? loadedCases : [];
         activeId = id;
@@ -403,6 +439,7 @@ async function loadEvaluation(id) {
         missOnly.checked = false;
         render(evaluation, id);
         renderCases();
+        renderFactors(factors);
         history.replaceState(null, "", `?id=${encodeURIComponent(id)}`);
     } catch (error) {
         const message = error instanceof TypeError

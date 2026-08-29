@@ -455,3 +455,43 @@ button, input { font: inherit; }
         grid-template-columns: 1fr;
     }
 }
+.factor-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    margin-top: 18px;
+}
+
+.factor-card {
+    padding: 18px;
+    border: 1px solid #dce3ed;
+    border-radius: 12px;
+    background: #f8fafc;
+}
+
+.factor-card h3 {
+    margin: 0 0 14px;
+}
+
+.factor-card dl div {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 9px;
+}
+
+.factor-card dt {
+    color: #64748b;
+}
+
+.factor-card dd {
+    margin: 0;
+    text-align: right;
+    font-weight: 600;
+}
+
+@media (max-width: 720px) {
+    .factor-grid {
+        grid-template-columns: 1fr;
+    }
+}

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="查看黄金方向预测的历史回测指标和中文评估结论">
     <title>黄金回测评估</title>
-    <link rel="stylesheet" href="/backtest.css?v=6">
+    <link rel="stylesheet" href="/backtest.css?v=7">
 </head>
 <body>
 <main class="page-shell">
@@ -133,6 +133,14 @@
             </div>
         </section>
 
+        <section id="factorPanel" class="data-panel factor-panel">
+            <div class="section-heading">
+                <h2>因子有效性诊断</h2>
+                <p>单独检查每个输入因子对下一交易日方向是否具有历史解释力。</p>
+            </div>
+            <div id="factorList" class="factor-grid"></div>
+        </section>
+
         <section id="comparePanel" class="data-panel compare-panel">
             <div class="section-heading">
                 <h2>候选提示词对比</h2>
@@ -199,6 +207,6 @@
         </section>
     </section>
 </main>
-<script src="/backtest.js?v=6" defer></script>
+<script src="/backtest.js?v=7" defer></script>
 </body>
 </html>

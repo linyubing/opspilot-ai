@@ -5,6 +5,7 @@ import com.opspilot.ai.forecast.backtest.BacktestComparisonService;
 import com.opspilot.ai.forecast.backtest.BacktestJobService;
 import com.opspilot.ai.forecast.backtest.BacktestPromptVersion;
 import com.opspilot.ai.forecast.backtest.BacktestSampleSet;
+import com.opspilot.ai.forecast.backtest.FactorDiagnosticService;
 import com.opspilot.ai.forecast.backtest.BacktestService;
 import com.opspilot.ai.forecast.backtest.review.BacktestReviewService;
 import org.springframework.http.HttpStatus;
@@ -30,19 +31,22 @@ public class BacktestController {
     private final BacktestEvaluationService evaluation;
     private final BacktestReviewService review;
     private final BacktestComparisonService comparison;
+    private final FactorDiagnosticService diagnostics;
 
     public BacktestController(
             BacktestService service,
             BacktestJobService jobs,
             BacktestEvaluationService evaluation,
             BacktestReviewService review,
-            BacktestComparisonService comparison
+            BacktestComparisonService comparison,
+            FactorDiagnosticService diagnostics
     ) {
         this.service = service;
         this.jobs = jobs;
         this.evaluation = evaluation;
         this.review = review;
         this.comparison = comparison;
+        this.diagnostics = diagnostics;
     }
 
     @PostMapping
@@ -119,5 +123,10 @@ public class BacktestController {
         return BacktestComparisonResponse.from(
                 comparison.compare(baselineId, candidateId)
         );
+    }
+
+    @GetMapping("/{id}/factors")
+    public FactorDiagnosticResponse factors(@PathVariable("id") UUID id) {
+        return FactorDiagnosticResponse.from(diagnostics.diagnose(id));
     }
 }
