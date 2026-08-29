@@ -24,17 +24,35 @@ public class FactorDiagnosticService {
 
     public FactorDiagnosticReport diagnose(UUID id) {
         List<BacktestCase> cases = backtests.results(id, 120);
+        return diagnose(id, cases, BacktestCase::actualDirection);
+    }
+
+    /** 允许周期诊断使用不同持有期的真实方向复用同一套因子统计。 */
+    FactorDiagnosticReport diagnose(
+            UUID id,
+            List<BacktestCase> cases,
+            Function<BacktestCase, ForecastDirection> actual
+    ) {
         return new FactorDiagnosticReport(
                 id,
                 cases.size(),
                 List.of(
-                        diagnose("GOLD_MOMENTUM_20", cases, this::momentum),
-                        diagnose("REAL_RATE", cases, item -> status(
-                                item.snapshot().realRateAssessment().status()
-                        )),
-                        diagnose("DOLLAR_INDEX", cases, item -> status(
-                                item.snapshot().dollarIndexAssessment().status()
-                        ))
+                        diagnose(
+                                "GOLD_MOMENTUM_20", cases,
+                                this::momentum, actual
+                        ),
+                        diagnose(
+                                "REAL_RATE", cases,
+                                item -> status(item.snapshot()
+                                        .realRateAssessment().status()),
+                                actual
+                        ),
+                        diagnose(
+                                "DOLLAR_INDEX", cases,
+                                item -> status(item.snapshot()
+                                        .dollarIndexAssessment().status()),
+                                actual
+                        )
                 )
         );
     }
@@ -42,7 +60,8 @@ public class FactorDiagnosticService {
     private FactorDiagnostic diagnose(
             String factor,
             List<BacktestCase> cases,
-            Function<BacktestCase, ForecastDirection> signal
+            Function<BacktestCase, ForecastDirection> signal,
+            Function<BacktestCase, ForecastDirection> actual
     ) {
         List<ForecastDirection> signals = cases.stream().map(signal).toList();
         int directional = (int) signals.stream()
@@ -52,7 +71,7 @@ public class FactorDiagnosticService {
         int directionalHits = 0;
         for (int index = 0; index < cases.size(); index++) {
             ForecastDirection value = signals.get(index);
-            if (value == cases.get(index).actualDirection()) {
+            if (value == actual.apply(cases.get(index))) {
                 hits++;
                 if (value != ForecastDirection.NEUTRAL) {
                     directionalHits++;

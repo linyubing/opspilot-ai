@@ -39,7 +39,10 @@ class BacktestDashboardTests {
                         org.hamcrest.Matchers.containsString("id=\"factorPanel\"")
                 ))
                 .andExpect(content().string(
-                        org.hamcrest.Matchers.containsString("/backtest.js?v=7")
+                        org.hamcrest.Matchers.containsString("id=\"horizonPanel\"")
+                ))
+                .andExpect(content().string(
+                        org.hamcrest.Matchers.containsString("/backtest.js?v=8")
                 ));
     }
 

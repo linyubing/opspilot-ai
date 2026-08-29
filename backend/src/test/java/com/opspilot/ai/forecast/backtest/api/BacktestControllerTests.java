@@ -17,6 +17,9 @@ import com.opspilot.ai.forecast.backtest.DirectionCounts;
 import com.opspilot.ai.forecast.backtest.FactorDiagnostic;
 import com.opspilot.ai.forecast.backtest.FactorDiagnosticReport;
 import com.opspilot.ai.forecast.backtest.FactorDiagnosticService;
+import com.opspilot.ai.forecast.backtest.HorizonDiagnostic;
+import com.opspilot.ai.forecast.backtest.HorizonDiagnosticReport;
+import com.opspilot.ai.forecast.backtest.HorizonDiagnosticService;
 import com.opspilot.ai.forecast.backtest.review.BacktestErrorPattern;
 import com.opspilot.ai.forecast.backtest.review.BacktestReviewContent;
 import com.opspilot.ai.forecast.backtest.review.BacktestReviewService;
@@ -55,6 +58,7 @@ class BacktestControllerTests {
     private BacktestReviewService review;
     private BacktestComparisonService comparison;
     private FactorDiagnosticService diagnostics;
+    private HorizonDiagnosticService horizons;
     private MockMvc mvc;
 
     @BeforeEach
@@ -65,10 +69,11 @@ class BacktestControllerTests {
         review = mock(BacktestReviewService.class);
         comparison = mock(BacktestComparisonService.class);
         diagnostics = mock(FactorDiagnosticService.class);
+        horizons = mock(HorizonDiagnosticService.class);
         mvc = MockMvcBuilders.standaloneSetup(
                 new BacktestController(
                         service, jobs, evaluation, review, comparison,
-                        diagnostics
+                        diagnostics, horizons
                 )
         ).build();
     }
@@ -286,6 +291,32 @@ class BacktestControllerTests {
                 .andExpect(jsonPath("$.factors[0].coverage").value(0.6000))
                 .andExpect(jsonPath("$.factors[0].directionalAccuracy")
                         .value(0.5000));
+    }
+
+    @Test
+    void getsHorizonDiagnostics() throws Exception {
+        when(horizons.diagnose(ID)).thenReturn(new HorizonDiagnosticReport(
+                ID,
+                List.of(new HorizonDiagnostic(
+                        5,
+                        20,
+                        List.of(new FactorDiagnostic(
+                                "REAL_RATE", 20, 12,
+                                new BigDecimal("0.6000"), 10,
+                                new BigDecimal("0.5000"), 7,
+                                new BigDecimal("0.5833"),
+                                new DirectionCounts(5, 8, 7)
+                        ))
+                ))
+        ));
+
+        mvc.perform(get("/api/research/gold/backtests/{id}/horizons", ID))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.horizons[0].sessions").value(5))
+                .andExpect(jsonPath("$.horizons[0].sampleCount").value(20))
+                .andExpect(jsonPath(
+                        "$.horizons[0].factors[0].directionalAccuracy"
+                ).value(0.5833));
     }
 
     private BacktestEvaluation evaluation(String accuracy, String balanced) {

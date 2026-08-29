@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="查看黄金方向预测的历史回测指标和中文评估结论">
     <title>黄金回测评估</title>
-    <link rel="stylesheet" href="/backtest.css?v=7">
+    <link rel="stylesheet" href="/backtest.css?v=8">
 </head>
 <body>
 <main class="page-shell">
@@ -141,6 +141,27 @@
             <div id="factorList" class="factor-grid"></div>
         </section>
 
+        <section id="horizonPanel" class="data-panel horizon-panel">
+            <div class="section-heading">
+                <h2>预测周期诊断</h2>
+                <p>比较各因子预测未来 1、5、20 个有效交易日方向的表现。</p>
+            </div>
+            <div class="table-wrap">
+                <table class="matrix-table horizon-table">
+                    <thead>
+                    <tr>
+                        <th scope="col">未来周期</th>
+                        <th scope="col">可用样本</th>
+                        <th scope="col">黄金动量</th>
+                        <th scope="col">实际利率</th>
+                        <th scope="col">美元指数</th>
+                    </tr>
+                    </thead>
+                    <tbody id="horizonRows"></tbody>
+                </table>
+            </div>
+        </section>
+
         <section id="comparePanel" class="data-panel compare-panel">
             <div class="section-heading">
                 <h2>候选提示词对比</h2>
@@ -207,6 +228,6 @@
         </section>
     </section>
 </main>
-<script src="/backtest.js?v=7" defer></script>
+<script src="/backtest.js?v=8" defer></script>
 </body>
 </html>

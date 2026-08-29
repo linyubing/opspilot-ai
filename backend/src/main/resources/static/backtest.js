@@ -33,6 +33,7 @@ const compareStatus = document.getElementById("compareStatus");
 const compareError = document.getElementById("compareError");
 const compareResult = document.getElementById("compareResult");
 const factorList = document.getElementById("factorList");
+const horizonRows = document.getElementById("horizonRows");
 let cases = [];
 let activeId = null;
 let reviewRequest = null;
@@ -179,6 +180,28 @@ function factorCard(item) {
 function renderFactors(data) {
     const factors = Array.isArray(data?.factors) ? data.factors : [];
     factorList.replaceChildren(...factors.map(factorCard));
+}
+
+function renderHorizons(data) {
+    const rows = (data?.horizons || []).map(horizon => {
+        const row = document.createElement("tr");
+        const values = Object.fromEntries(
+            (horizon.factors || []).map(item => [item.factor, item])
+        );
+        const period = document.createElement("th");
+        period.scope = "row";
+        period.textContent = `${horizon.sessions} 个交易日`;
+        const count = document.createElement("td");
+        count.textContent = formatCount(horizon.sampleCount);
+        row.append(period, count);
+        ["GOLD_MOMENTUM_20", "REAL_RATE", "DOLLAR_INDEX"].forEach(name => {
+            const cell = document.createElement("td");
+            cell.textContent = formatPercent(values[name]?.directionalAccuracy);
+            row.append(cell);
+        });
+        return row;
+    });
+    horizonRows.replaceChildren(...rows);
 }
 
 function formatReturn(value) {
@@ -407,10 +430,11 @@ async function loadEvaluation(id) {
     setLoading(true);
     try {
         const base = `/api/research/gold/backtests/${encodeURIComponent(id)}`;
-        const [evaluationResponse, casesResponse, factorResponse] = await Promise.all([
+        const [evaluationResponse, casesResponse, factorResponse, horizonResponse] = await Promise.all([
             fetch(`${base}/evaluation`, {headers: {Accept: "application/json"}}),
             fetch(`${base}/results?limit=120`, {headers: {Accept: "application/json"}}),
-            fetch(`${base}/factors`, {headers: {Accept: "application/json"}})
+            fetch(`${base}/factors`, {headers: {Accept: "application/json"}}),
+            fetch(`${base}/horizons`, {headers: {Accept: "application/json"}})
         ]);
         if (!evaluationResponse.ok) {
             throw new Error(await readError(evaluationResponse));
@@ -421,10 +445,14 @@ async function loadEvaluation(id) {
         if (!factorResponse.ok) {
             throw new Error(await readError(factorResponse));
         }
-        const [evaluation, loadedCases, factors] = await Promise.all([
+        if (!horizonResponse.ok) {
+            throw new Error(await readError(horizonResponse));
+        }
+        const [evaluation, loadedCases, factors, horizons] = await Promise.all([
             evaluationResponse.json(),
             casesResponse.json(),
-            factorResponse.json()
+            factorResponse.json(),
+            horizonResponse.json()
         ]);
         cases = Array.isArray(loadedCases) ? loadedCases : [];
         activeId = id;
@@ -440,6 +468,7 @@ async function loadEvaluation(id) {
         render(evaluation, id);
         renderCases();
         renderFactors(factors);
+        renderHorizons(horizons);
         history.replaceState(null, "", `?id=${encodeURIComponent(id)}`);
     } catch (error) {
         const message = error instanceof TypeError

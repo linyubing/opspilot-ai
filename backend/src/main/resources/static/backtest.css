@@ -495,3 +495,7 @@ button, input { font: inherit; }
         grid-template-columns: 1fr;
     }
 }
+.horizon-table td {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+}
