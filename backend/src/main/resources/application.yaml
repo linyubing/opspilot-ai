@@ -67,6 +67,13 @@ spring:
     # 从 0 号基线开始，保证接下来创建的 V1 脚本仍会执行。
     baseline-version: 0
 
+management:
+  endpoints:
+    web:
+      exposure:
+        # 只开放健康检查和指标，不暴露环境变量或配置内容。
+        include: health,metrics
+
 opspilot:
   ai:
     http:

@@ -31,6 +31,9 @@ class BacktestDashboardTests {
                 ))
                 .andExpect(content().string(
                         org.hamcrest.Matchers.containsString("id=\"reviewPanel\"")
+                ))
+                .andExpect(content().string(
+                        org.hamcrest.Matchers.containsString("/backtest.js?v=5")
                 ));
     }
 
@@ -47,6 +50,9 @@ class BacktestDashboardTests {
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(
                         "text/javascript"
+                ))
+                .andExpect(content().string(
+                        org.hamcrest.Matchers.containsString("data.cached")
                 ));
     }
 }

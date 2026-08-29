@@ -2,6 +2,7 @@ package com.opspilot.ai.forecast.backtest.review;
 
 import com.opspilot.ai.forecast.backtest.BacktestCase;
 import com.opspilot.ai.forecast.backtest.BacktestService;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -38,13 +39,15 @@ class BacktestReviewServiceTests {
         when(builder.build(cases)).thenReturn(prompt);
         when(gateway.generate(prompt)).thenReturn(expected);
 
-        GeneratedBacktestReview actual = new BacktestReviewService(
+        BacktestReviewResult actual = new BacktestReviewService(
                 backtests,
                 builder,
-                gateway
+                gateway,
+                new SimpleMeterRegistry()
         ).review(id);
 
-        assertThat(actual).isEqualTo(expected);
+        assertThat(actual.review()).isEqualTo(expected);
+        assertThat(actual.cached()).isFalse();
     }
 
     @Test
@@ -63,7 +66,8 @@ class BacktestReviewServiceTests {
         BacktestReviewService service = new BacktestReviewService(
                 backtests,
                 builder,
-                gateway
+                gateway,
+                new SimpleMeterRegistry()
         );
 
         assertThatThrownBy(() -> service.review(id))
@@ -76,10 +80,12 @@ class BacktestReviewServiceTests {
     void cachesSuccess() {
         Fixture fixture = fixture();
 
-        GeneratedBacktestReview first = fixture.service.review(fixture.id);
-        GeneratedBacktestReview second = fixture.service.review(fixture.id);
+        BacktestReviewResult first = fixture.service.review(fixture.id);
+        BacktestReviewResult second = fixture.service.review(fixture.id);
 
-        assertThat(second).isSameAs(first);
+        assertThat(first.cached()).isFalse();
+        assertThat(second.cached()).isTrue();
+        assertThat(second.review()).isSameAs(first.review());
         verify(fixture.gateway, times(1)).generate(fixture.prompt);
     }
 
@@ -101,10 +107,9 @@ class BacktestReviewServiceTests {
             var second = executor.submit(() -> fixture.service.review(fixture.id));
             release.countDown();
 
-            assertThat(first.get(2, TimeUnit.SECONDS))
-                    .isSameAs(fixture.expected);
-            assertThat(second.get(2, TimeUnit.SECONDS))
-                    .isSameAs(fixture.expected);
+            assertThat(first.get(2, TimeUnit.SECONDS).cached()).isFalse();
+            assertThat(second.get(2, TimeUnit.SECONDS).cached()).isTrue();
+            assertThat(second.get().review()).isSameAs(fixture.expected);
         }
         verify(fixture.gateway, times(1)).generate(fixture.prompt);
     }
@@ -122,9 +127,13 @@ class BacktestReviewServiceTests {
 
         assertThatThrownBy(() -> fixture.service.review(fixture.id))
                 .isInstanceOf(BacktestReviewAiUnavailableException.class);
-        assertThat(fixture.service.review(fixture.id))
+        assertThat(fixture.service.review(fixture.id).review())
                 .isSameAs(fixture.expected);
         verify(fixture.gateway, times(2)).generate(fixture.prompt);
+        assertThat(fixture.registry.get("opspilot.backtest.review.calls")
+                .counter().count()).isEqualTo(2);
+        assertThat(fixture.registry.get("opspilot.backtest.review.failures")
+                .counter().count()).isEqualTo(1);
     }
 
     private Fixture fixture() {
@@ -140,6 +149,7 @@ class BacktestReviewServiceTests {
                 java.util.Set.of("case-1")
         );
         GeneratedBacktestReview expected = review();
+        SimpleMeterRegistry registry = new SimpleMeterRegistry();
         when(backtests.results(id, 120)).thenReturn(cases);
         when(builder.build(cases)).thenReturn(prompt);
         when(gateway.generate(prompt)).thenReturn(expected);
@@ -148,7 +158,8 @@ class BacktestReviewServiceTests {
                 prompt,
                 expected,
                 gateway,
-                new BacktestReviewService(backtests, builder, gateway)
+                registry,
+                new BacktestReviewService(backtests, builder, gateway, registry)
         );
     }
 
@@ -157,6 +168,7 @@ class BacktestReviewServiceTests {
             BacktestReviewPrompt prompt,
             GeneratedBacktestReview expected,
             BacktestReviewGateway gateway,
+            SimpleMeterRegistry registry,
             BacktestReviewService service
     ) {
     }

@@ -1,6 +1,8 @@
 package com.opspilot.ai.forecast.backtest.review;
 
 import com.opspilot.ai.forecast.backtest.BacktestService;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.CompletableFuture;
@@ -16,20 +18,27 @@ public class BacktestReviewService {
     private final BacktestService backtests;
     private final BacktestReviewPromptBuilder builder;
     private final BacktestReviewGateway gateway;
+    private final Counter calls;
+    private final Counter hits;
+    private final Counter failures;
     private final ConcurrentMap<ReviewKey, CompletableFuture<GeneratedBacktestReview>>
             cache = new ConcurrentHashMap<>();
 
     public BacktestReviewService(
             BacktestService backtests,
             BacktestReviewPromptBuilder builder,
-            BacktestReviewGateway gateway
+            BacktestReviewGateway gateway,
+            MeterRegistry registry
     ) {
         this.backtests = backtests;
         this.builder = builder;
         this.gateway = gateway;
+        this.calls = registry.counter("opspilot.backtest.review.calls");
+        this.hits = registry.counter("opspilot.backtest.review.cache.hits");
+        this.failures = registry.counter("opspilot.backtest.review.failures");
     }
 
-    public GeneratedBacktestReview review(UUID id) {
+    public BacktestReviewResult review(UUID id) {
         var cases = backtests.results(id, 120);
         BacktestReviewPrompt prompt = builder.build(cases);
         ReviewKey key = new ReviewKey(id, prompt.version(), prompt.content());
@@ -38,14 +47,17 @@ public class BacktestReviewService {
 
         // 已有请求时共同等待同一个结果，避免并发重复调用模型。
         if (existing != null) {
-            return await(existing);
+            hits.increment();
+            return new BacktestReviewResult(await(existing), true);
         }
 
         try {
+            calls.increment();
             GeneratedBacktestReview result = gateway.generate(prompt);
             current.complete(result);
-            return result;
+            return new BacktestReviewResult(result, false);
         } catch (RuntimeException exception) {
+            failures.increment();
             current.completeExceptionally(exception);
             cache.remove(key, current);
             throw exception;

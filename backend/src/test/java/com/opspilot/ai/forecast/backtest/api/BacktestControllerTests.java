@@ -14,6 +14,7 @@ import com.opspilot.ai.forecast.backtest.review.BacktestErrorPattern;
 import com.opspilot.ai.forecast.backtest.review.BacktestReviewContent;
 import com.opspilot.ai.forecast.backtest.review.BacktestReviewService;
 import com.opspilot.ai.forecast.backtest.review.BacktestReviewRisk;
+import com.opspilot.ai.forecast.backtest.review.BacktestReviewResult;
 import com.opspilot.ai.forecast.backtest.review.GeneratedBacktestReview;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -157,7 +158,8 @@ class BacktestControllerTests {
 
     @Test
     void generatesReviewWithoutRawResponse() throws Exception {
-        when(review.review(ID)).thenReturn(new GeneratedBacktestReview(
+        when(review.review(ID)).thenReturn(new BacktestReviewResult(
+                new GeneratedBacktestReview(
                 "glm-4.7",
                 "敏感原始模型响应",
                 new BacktestReviewContent(
@@ -174,12 +176,14 @@ class BacktestControllerTests {
                                 "样本有限", List.of("case-1")
                         )),
                         "不构成投资建议"
-                )
+                )),
+                true
         ));
 
         mvc.perform(post("/api/research/gold/backtests/{id}/review", ID))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.modelName").value("glm-4.7"))
+                .andExpect(jsonPath("$.cached").value(true))
                 .andExpect(jsonPath("$.summary").value("错误集中在趋势反转日"))
                 .andExpect(jsonPath("$.summaryEvidence[0]").value("case-1"))
                 .andExpect(jsonPath("$.patterns[0].category")

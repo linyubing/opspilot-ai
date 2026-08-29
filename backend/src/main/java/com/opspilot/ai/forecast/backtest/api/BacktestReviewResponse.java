@@ -3,6 +3,7 @@ package com.opspilot.ai.forecast.backtest.api;
 import com.opspilot.ai.forecast.backtest.review.BacktestErrorPattern;
 import com.opspilot.ai.forecast.backtest.review.GeneratedBacktestReview;
 import com.opspilot.ai.forecast.backtest.review.BacktestReviewRisk;
+import com.opspilot.ai.forecast.backtest.review.BacktestReviewResult;
 
 import java.util.List;
 
@@ -13,16 +14,19 @@ public record BacktestReviewResponse(
         List<String> summaryEvidence,
         List<BacktestErrorPattern> patterns,
         List<BacktestReviewRisk> risks,
-        String disclaimer
+        String disclaimer,
+        boolean cached
 ) {
-    public static BacktestReviewResponse from(GeneratedBacktestReview value) {
+    public static BacktestReviewResponse from(BacktestReviewResult result) {
+        GeneratedBacktestReview value = result.review();
         return new BacktestReviewResponse(
                 value.modelName(),
                 value.content().summary(),
                 value.content().summaryEvidence(),
                 value.content().patterns(),
                 value.content().risks(),
-                value.content().disclaimer()
+                value.content().disclaimer(),
+                result.cached()
         );
     }
 }

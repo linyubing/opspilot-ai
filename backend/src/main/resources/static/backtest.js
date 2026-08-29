@@ -235,7 +235,8 @@ function patternCard(item) {
 }
 
 function renderReview(data) {
-    setText("reviewModel", `模型：${data.modelName || "未知"}`);
+    const source = data.cached ? "内存缓存" : "本次调用模型";
+    setText("reviewModel", `模型：${data.modelName || "未知"}｜来源：${source}`);
     setText("reviewSummary", data.summary || "暂无复盘摘要。");
     setText(
         "reviewSummaryEvidence",
