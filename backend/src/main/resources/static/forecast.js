@@ -4,6 +4,8 @@ const statusText = byId("status");
 const errorBox = byId("errorBox");
 const emptyBox = byId("emptyBox");
 const reportBox = byId("report");
+let latestForecast = null;
+let latestBar = null;
 
 const directions = {BULLISH: "上涨", NEUTRAL: "中性", BEARISH: "下跌"};
 const statuses = {PENDING: "等待验证", RESOLVED: "已验证", DATA_MISSING: "缺少结算数据", VOIDED: "已作废"};
@@ -27,6 +29,38 @@ function percent(value) {
     return value == null ? "暂无" : `${(Number(value) * 100).toFixed(1)}%`;
 }
 
+function money(value) {
+    return value == null ? "—" : `$${Number(value).toFixed(2)}`;
+}
+
+async function loadGoldBar() {
+    const bar = await request("/api/market-data/gold/daily-bars/latest");
+    latestBar = bar;
+    text("barDate", bar.priceDate);
+    text("barOpen", money(bar.open));
+    text("barHigh", money(bar.high));
+    text("barLow", money(bar.low));
+    text("barClose", money(bar.close));
+    text("barProvider", bar.provider === "twelve_data"
+        ? "Twelve Data"
+        : bar.provider);
+    renderPriceBasis();
+}
+
+function renderPriceBasis() {
+    if (!latestForecast || !latestBar
+            || latestForecast.baseDate !== latestBar.priceDate) {
+        text("basePriceLabel", "预测基准价");
+        return;
+    }
+    const matchesClose = Math.abs(
+        Number(latestForecast.basePrice) - Number(latestBar.close)
+    ) < 0.005;
+    text("basePriceLabel", matchesClose
+        ? "基准日收盘价"
+        : "历史预测基准价（旧口径）");
+}
+
 function lag(baseDate, sourceDate) {
     if (!baseDate || !sourceDate) return "";
     const days = Math.round((new Date(`${baseDate}T00:00:00Z`) - new Date(`${sourceDate}T00:00:00Z`)) / 86400000);
@@ -34,6 +68,7 @@ function lag(baseDate, sourceDate) {
 }
 
 function renderForecast(forecast) {
+    latestForecast = forecast;
     const direction = forecast.predictedDirection;
 
     reportBox.hidden = false;
@@ -43,11 +78,12 @@ function renderForecast(forecast) {
     text("direction", directions[direction] || direction);
     text("baseDate", forecast.baseDate);
     text("targetSession", forecast.targetDate || `基准日 ${forecast.baseDate} 后的下一有效黄金交易日`);
-    text("basePrice", forecast.basePrice == null ? "—" : `$${Number(forecast.basePrice).toFixed(2)}`);
+    text("basePrice", money(forecast.basePrice));
     text("forecastStatus", statuses[forecast.status] || forecast.status);
     text("createdAt", forecast.createdAt ? new Date(forecast.createdAt).toLocaleString("zh-CN") : "—");
     text("modelName", forecast.modelName);
     text("reasoning", forecast.reasoning);
+    renderPriceBasis();
 
     const conditions = byId("conditions");
     conditions.replaceChildren(...(forecast.invalidationConditions || []).map(item => {
@@ -148,7 +184,7 @@ async function generate() {
     statusText.textContent = "正在同步真实数据并调用大模型，可能需要几十秒……";
     try {
         await request("/api/research/gold/daily-report", {method: "POST"});
-        await Promise.all([loadLatest(), loadAccuracy()]);
+        await Promise.all([loadLatest(), loadAccuracy(), loadGoldBar()]);
         statusText.textContent = "预测已保存，等待下一有效交易日真实价格验证。";
     } catch (error) {
         showError(error);
@@ -158,4 +194,4 @@ async function generate() {
 }
 
 generateButton.addEventListener("click", generate);
-Promise.all([loadLatest(), loadAccuracy()]);
+Promise.all([loadLatest(), loadAccuracy(), loadGoldBar()]).catch(showError);

@@ -45,7 +45,10 @@ class BacktestDashboardTests {
                         org.hamcrest.Matchers.containsString("id=\"historyHorizonButton\"")
                 ))
                 .andExpect(content().string(
-                        org.hamcrest.Matchers.containsString("/backtest.js?v=9")
+                        org.hamcrest.Matchers.containsString("id=\"priceBasis\"")
+                ))
+                .andExpect(content().string(
+                        org.hamcrest.Matchers.containsString("/backtest.js?v=10")
                 ));
     }
 
@@ -71,6 +74,9 @@ class BacktestDashboardTests {
                 ))
                 .andExpect(content().string(
                         org.hamcrest.Matchers.containsString("directionalAccuracy")
+                ))
+                .andExpect(content().string(
+                        org.hamcrest.Matchers.containsString("priceBasisNames")
                 ));
     }
 }

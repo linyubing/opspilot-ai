@@ -48,6 +48,11 @@ const directionNames = {
     BEARISH: "下跌"
 };
 
+const priceBasisNames = {
+    OHLC_CLOSE: "真实 XAU/USD OHLC 日线收盘价（Twelve Data）",
+    LEGACY_REFERENCE: "旧版参考价（仅用于识别历史任务，不与新回测混算）"
+};
+
 function formatPercent(value) {
     if (value === null || value === undefined || Number.isNaN(Number(value))) {
         return "暂无数据";
@@ -423,13 +428,16 @@ async function loadComparison() {
     }
 }
 
-function render(data, id) {
+function render(data, task, id) {
     renderConclusion(data.conclusion);
     renderMetrics(data);
     renderMatrix(data.confusionMatrix);
     renderDirection("bullish", data.bullish);
     renderDirection("neutral", data.neutral);
     renderDirection("bearish", data.bearish);
+    setText("priceBasis", priceBasisNames[task.priceBasis]
+        || task.priceBasis
+        || "价格口径未知");
 
     clearError();
     resultBox.hidden = false;
@@ -455,12 +463,16 @@ async function loadEvaluation(id) {
     setLoading(true);
     try {
         const base = `/api/research/gold/backtests/${encodeURIComponent(id)}`;
-        const [evaluationResponse, casesResponse, factorResponse, horizonResponse] = await Promise.all([
+        const [taskResponse, evaluationResponse, casesResponse, factorResponse, horizonResponse] = await Promise.all([
+            fetch(base, {headers: {Accept: "application/json"}}),
             fetch(`${base}/evaluation`, {headers: {Accept: "application/json"}}),
             fetch(`${base}/results?limit=120`, {headers: {Accept: "application/json"}}),
             fetch(`${base}/factors`, {headers: {Accept: "application/json"}}),
             fetch(`${base}/horizons`, {headers: {Accept: "application/json"}})
         ]);
+        if (!taskResponse.ok) {
+            throw new Error(await readError(taskResponse));
+        }
         if (!evaluationResponse.ok) {
             throw new Error(await readError(evaluationResponse));
         }
@@ -473,7 +485,8 @@ async function loadEvaluation(id) {
         if (!horizonResponse.ok) {
             throw new Error(await readError(horizonResponse));
         }
-        const [evaluation, loadedCases, factors, horizons] = await Promise.all([
+        const [task, evaluation, loadedCases, factors, horizons] = await Promise.all([
+            taskResponse.json(),
             evaluationResponse.json(),
             casesResponse.json(),
             factorResponse.json(),
@@ -491,7 +504,7 @@ async function loadEvaluation(id) {
         reviewError.hidden = true;
         reviewResult.hidden = true;
         missOnly.checked = false;
-        render(evaluation, id);
+        render(evaluation, task, id);
         renderCases();
         renderFactors(factors);
         renderHorizons(horizons);

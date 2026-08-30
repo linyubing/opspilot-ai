@@ -1,6 +1,7 @@
 package com.opspilot.ai.forecast.backtest.api;
 
 import com.opspilot.ai.forecast.backtest.BacktestStatus;
+import com.opspilot.ai.forecast.backtest.BacktestPriceBasis;
 import com.opspilot.ai.forecast.backtest.BacktestTask;
 
 import java.time.LocalDate;
@@ -16,6 +17,7 @@ public record BacktestTaskResponse(
         String modelName,
         String promptVersion,
         String ruleVersion,
+        BacktestPriceBasis priceBasis,
         BacktestStatus status,
         int completedCount,
         int hitCount,
@@ -29,6 +31,7 @@ public record BacktestTaskResponse(
         return new BacktestTaskResponse(
                 task.id(), task.startDate(), task.endDate(), task.sampleCount(),
                 task.modelName(), task.promptVersion(), task.ruleVersion(),
+                task.priceBasis(),
                 task.status(), task.completedCount(), task.hitCount(),
                 task.failedCount(), task.lastError(), task.createdAt(),
                 task.startedAt(), task.completedAt()

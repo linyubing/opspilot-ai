@@ -8,6 +8,7 @@ import com.opspilot.ai.forecast.backtest.BacktestComparisonService;
 import com.opspilot.ai.forecast.backtest.BacktestEvaluationService;
 import com.opspilot.ai.forecast.backtest.BacktestJobService;
 import com.opspilot.ai.forecast.backtest.BacktestPromptVersion;
+import com.opspilot.ai.forecast.backtest.BacktestPriceBasis;
 import com.opspilot.ai.forecast.backtest.BacktestSampleSet;
 import com.opspilot.ai.forecast.backtest.BacktestService;
 import com.opspilot.ai.forecast.backtest.BacktestStatus;
@@ -97,6 +98,7 @@ class BacktestControllerTests {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(ID.toString()))
                 .andExpect(jsonPath("$.sampleCount").value(60))
+                .andExpect(jsonPath("$.priceBasis").value("OHLC_CLOSE"))
                 .andExpect(jsonPath("$.status").value("CREATED"));
     }
 
@@ -361,7 +363,8 @@ class BacktestControllerTests {
         return new BacktestTask(
                 ID, LocalDate.parse("2026-06-01"),
                 LocalDate.parse("2026-08-20"), 60,
-                "glm-4.7", "prompt-v1", "rule-v1", status,
+                "glm-4.7", "prompt-v1", "rule-v1",
+                BacktestPriceBasis.OHLC_CLOSE, status,
                 0, 0, 0, null, now, null, null
         );
     }

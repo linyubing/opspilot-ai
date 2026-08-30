@@ -35,11 +35,26 @@
             <dl>
                 <div><dt>黄金基准日</dt><dd id="baseDate">—</dd></div>
                 <div><dt>预测目标</dt><dd id="targetSession">—</dd></div>
-                <div><dt>黄金基准价</dt><dd id="basePrice">—</dd></div>
+                <div><dt id="basePriceLabel">预测基准价</dt><dd id="basePrice">—</dd></div>
                 <div><dt>验证状态</dt><dd id="forecastStatus">—</dd></div>
                 <div><dt>生成时间</dt><dd id="createdAt">—</dd></div>
             </dl>
         </article>
+
+        <section class="panel">
+            <div class="heading">
+                <h2>真实黄金日线</h2>
+                <span id="barProvider">Twelve Data</span>
+            </div>
+            <p class="bar-meta">行情日期：<strong id="barDate">—</strong>，单位：美元/金衡盎司</p>
+            <div class="bar-grid">
+                <article><span>开盘</span><strong id="barOpen">—</strong></article>
+                <article><span>最高</span><strong id="barHigh">—</strong></article>
+                <article><span>最低</span><strong id="barLow">—</strong></article>
+                <article><span>收盘</span><strong id="barClose">—</strong></article>
+            </div>
+            <p class="note">预测基准价和后续结算价统一使用真实日线收盘价，不使用开盘价代替。</p>
+        </section>
 
         <section class="panel">
             <div class="heading">
@@ -87,6 +102,6 @@
         <p class="note">历史回测衡量方法过去的表现；本次预测必须等下一条真实金价发布后才能判断准不准。</p>
     </section>
 </main>
-<script src="/forecast.js?v=2" defer></script>
+<script src="/forecast.js?v=4" defer></script>
 </body>
 </html>
