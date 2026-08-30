@@ -15,6 +15,7 @@ import java.util.UUID;
 public class BacktestEvaluationService {
 
     private static final int SCALE = 4;
+    private static final int MIN_PROMOTION_SAMPLES = 60;
 
     private final BacktestService service;
     private final BacktestRepository repo;
@@ -32,7 +33,7 @@ public class BacktestEvaluationService {
      */
     public BacktestEvaluation evaluate(UUID id) {
         // 先确认回测任务存在。
-        service.get(id);
+        BacktestTask task = service.get(id);
 
         List<BacktestCase> cases = repo.findCases(id, 120);
 
@@ -51,21 +52,52 @@ public class BacktestEvaluationService {
 
         BigDecimal overall = accuracy(cases);
         BigDecimal baseline = majorityBaseline(cases);
+        BigDecimal balanced = balancedAccuracy(cases);
+        boolean beats = beatsBaseline(cases, overall, baseline, balanced);
+        boolean ready = cases.size() >= MIN_PROMOTION_SAMPLES
+                && beats
+                && task.priceBasis() == BacktestPriceBasis.OHLC_CLOSE
+                && task.sampleSet() == BacktestSampleSet.HOLDOUT;
 
         return new BacktestEvaluation(
                 "BACKTEST",
+                task.priceBasis(),
+                task.sampleSet(),
                 cases.size(),
                 overall,
                 accuracy(latest),
                 ratio(neutralActual, cases.size()),
                 baseline,
                 lift(overall, baseline),
-                balancedAccuracy(cases),
+                balanced,
+                beats,
+                ready,
                 matrix(cases),
                 direction(cases, ForecastDirection.BULLISH),
                 direction(cases, ForecastDirection.NEUTRAL),
                 direction(cases, ForecastDirection.BEARISH)
         );
+    }
+
+    /** 判断模型是否同时超过多数类基线和平衡随机基线。 */
+    private boolean beatsBaseline(
+            List<BacktestCase> cases,
+            BigDecimal accuracy,
+            BigDecimal majority,
+            BigDecimal balanced
+    ) {
+        if (accuracy == null || majority == null || balanced == null) {
+            return false;
+        }
+        long classes = List.of(ForecastDirection.values()).stream()
+                .filter(direction -> actualCount(cases, direction) > 0)
+                .count();
+        if (classes == 0) return false;
+        BigDecimal chance = BigDecimal.ONE.divide(
+                BigDecimal.valueOf(classes), SCALE, RoundingMode.HALF_UP
+        );
+        return accuracy.compareTo(majority) > 0
+                && balanced.compareTo(chance) > 0;
     }
 
     /**

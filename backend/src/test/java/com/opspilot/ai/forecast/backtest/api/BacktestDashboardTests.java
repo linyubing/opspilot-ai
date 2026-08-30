@@ -48,7 +48,10 @@ class BacktestDashboardTests {
                         org.hamcrest.Matchers.containsString("id=\"priceBasis\"")
                 ))
                 .andExpect(content().string(
-                        org.hamcrest.Matchers.containsString("/backtest.js?v=10")
+                        org.hamcrest.Matchers.containsString("id=\"promotionStatus\"")
+                ))
+                .andExpect(content().string(
+                        org.hamcrest.Matchers.containsString("/backtest.js?v=11")
                 ));
     }
 
@@ -77,6 +80,9 @@ class BacktestDashboardTests {
                 ))
                 .andExpect(content().string(
                         org.hamcrest.Matchers.containsString("priceBasisNames")
+                ))
+                .andExpect(content().string(
+                        org.hamcrest.Matchers.containsString("promotionReady")
                 ));
     }
 }

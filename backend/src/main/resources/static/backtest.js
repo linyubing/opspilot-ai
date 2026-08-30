@@ -53,6 +53,12 @@ const priceBasisNames = {
     LEGACY_REFERENCE: "旧版参考价（仅用于识别历史任务，不与新回测混算）"
 };
 
+const sampleSetNames = {
+    DEFAULT: "开发样本",
+    HOLDOUT: "样本外验证集",
+    RECENT: "近期样本"
+};
+
 function formatPercent(value) {
     if (value === null || value === undefined || Number.isNaN(Number(value))) {
         return "暂无数据";
@@ -133,6 +139,10 @@ function renderMetrics(data) {
     setText("majorityBaseline", formatPercent(data.majorityBaselineAccuracy));
     setText("accuracyLift", formatSignedPercent(data.accuracyLift));
     setText("balancedAccuracy", formatPercent(data.balancedAccuracy));
+    setText("beatsBaseline", data.beatsBaseline ? "是" : "否");
+    setText("promotionStatus", data.promotionReady
+        ? "达到候选晋级门槛"
+        : "尚未达到晋级门槛");
 
     const lift = document.getElementById("accuracyLift");
     lift.classList.toggle("positive", Number(data.accuracyLift) > 0);
@@ -435,9 +445,13 @@ function render(data, task, id) {
     renderDirection("bullish", data.bullish);
     renderDirection("neutral", data.neutral);
     renderDirection("bearish", data.bearish);
-    setText("priceBasis", priceBasisNames[task.priceBasis]
+    const basis = priceBasisNames[task.priceBasis]
         || task.priceBasis
-        || "价格口径未知");
+        || "价格口径未知";
+    const sampleSet = sampleSetNames[task.sampleSet]
+        || task.sampleSet
+        || "样本集合未知";
+    setText("priceBasis", `${basis}｜${sampleSet}`);
 
     clearError();
     resultBox.hidden = false;

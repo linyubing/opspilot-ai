@@ -14,6 +14,7 @@ public record BacktestTask(
         String promptVersion,
         String ruleVersion,
         BacktestPriceBasis priceBasis,
+        BacktestSampleSet sampleSet,
         BacktestStatus status,
         int completedCount,
         int hitCount,
@@ -44,7 +45,36 @@ public record BacktestTask(
         this(
                 id, startDate, endDate, sampleCount, modelName,
                 promptVersion, ruleVersion,
-                BacktestPriceBasis.LEGACY_REFERENCE, status,
+                BacktestPriceBasis.LEGACY_REFERENCE,
+                BacktestSampleSet.DEFAULT, status,
+                completedCount, hitCount, failedCount, lastError,
+                createdAt, startedAt, completedAt
+        );
+    }
+
+    /** 兼容只记录价格口径、尚未记录样本集合的调用。 */
+    public BacktestTask(
+            UUID id,
+            LocalDate startDate,
+            LocalDate endDate,
+            int sampleCount,
+            String modelName,
+            String promptVersion,
+            String ruleVersion,
+            BacktestPriceBasis priceBasis,
+            BacktestStatus status,
+            int completedCount,
+            int hitCount,
+            int failedCount,
+            String lastError,
+            OffsetDateTime createdAt,
+            OffsetDateTime startedAt,
+            OffsetDateTime completedAt
+    ) {
+        this(
+                id, startDate, endDate, sampleCount, modelName,
+                promptVersion, ruleVersion, priceBasis,
+                BacktestSampleSet.DEFAULT, status,
                 completedCount, hitCount, failedCount, lastError,
                 createdAt, startedAt, completedAt
         );

@@ -99,6 +99,7 @@ class BacktestControllerTests {
                 .andExpect(jsonPath("$.id").value(ID.toString()))
                 .andExpect(jsonPath("$.sampleCount").value(60))
                 .andExpect(jsonPath("$.priceBasis").value("OHLC_CLOSE"))
+                .andExpect(jsonPath("$.sampleSet").value("HOLDOUT"))
                 .andExpect(jsonPath("$.status").value("CREATED"));
     }
 
@@ -185,10 +186,12 @@ class BacktestControllerTests {
                 ForecastDirection.BULLISH, 0, 0, null
         );
         when(evaluation.evaluate(ID)).thenReturn(new BacktestEvaluation(
-                "BACKTEST", 21, new BigDecimal("0.5238"),
+                "BACKTEST", BacktestPriceBasis.OHLC_CLOSE,
+                BacktestSampleSet.HOLDOUT, 21, new BigDecimal("0.5238"),
                 new BigDecimal("0.5000"), new BigDecimal("0.2857"),
                 new BigDecimal("0.3810"), new BigDecimal("0.1428"),
-                new BigDecimal("0.5238"), new ConfusionMatrix(
+                new BigDecimal("0.5238"), true, false,
+                new ConfusionMatrix(
                         new DirectionCounts(4, 0, 3),
                         new DirectionCounts(3, 3, 0),
                         new DirectionCounts(0, 4, 4)
@@ -207,6 +210,10 @@ class BacktestControllerTests {
                 .andExpect(jsonPath("$.majorityBaselineAccuracy").value(0.3810))
                 .andExpect(jsonPath("$.accuracyLift").value(0.1428))
                 .andExpect(jsonPath("$.balancedAccuracy").value(0.5238))
+                .andExpect(jsonPath("$.priceBasis").value("OHLC_CLOSE"))
+                .andExpect(jsonPath("$.sampleSet").value("HOLDOUT"))
+                .andExpect(jsonPath("$.beatsBaseline").value(true))
+                .andExpect(jsonPath("$.promotionReady").value(false))
                 .andExpect(jsonPath("$.confusionMatrix.actualBullish.bullish").value(4))
                 .andExpect(jsonPath("$.confusionMatrix.actualNeutral.neutral").value(3))
                 .andExpect(jsonPath("$.confusionMatrix.actualBearish.bearish").value(4))
@@ -364,7 +371,8 @@ class BacktestControllerTests {
                 ID, LocalDate.parse("2026-06-01"),
                 LocalDate.parse("2026-08-20"), 60,
                 "glm-4.7", "prompt-v1", "rule-v1",
-                BacktestPriceBasis.OHLC_CLOSE, status,
+                BacktestPriceBasis.OHLC_CLOSE, BacktestSampleSet.HOLDOUT,
+                status,
                 0, 0, 0, null, now, null, null
         );
     }

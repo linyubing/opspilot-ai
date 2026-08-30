@@ -52,6 +52,7 @@ public class BacktestService {
         return saveTask(
                 samples,
                 version,
+                BacktestSampleSet.DEFAULT,
                 selector.selectBars(
                         bars,
                         samples,
@@ -74,12 +75,13 @@ public class BacktestService {
                 sampleSet
         );
 
-        return saveTask(samples, version, dates);
+        return saveTask(samples, version, sampleSet, dates);
     }
 
     private BacktestTask saveTask(
             int samples,
             BacktestPromptVersion version,
+            BacktestSampleSet sampleSet,
             List<LocalDate> dates
     ) {
 
@@ -92,6 +94,7 @@ public class BacktestService {
                 version.version(),
                 GoldForecastRule.RULE_VERSION,
                 BacktestPriceBasis.OHLC_CLOSE,
+                sampleSet,
                 BacktestStatus.CREATED,
                 0,
                 0,

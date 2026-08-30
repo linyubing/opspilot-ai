@@ -20,6 +20,7 @@ class BacktestEvaluationServiceTests {
         UUID id = UUID.randomUUID();
         BacktestService service = mock(BacktestService.class);
         BacktestRepository repo = mock(BacktestRepository.class);
+        when(service.get(id)).thenReturn(task(id, BacktestSampleSet.HOLDOUT));
         when(repo.findCases(id, 120)).thenReturn(cases(id));
         BacktestEvaluationService evaluation =
                 new BacktestEvaluationService(service, repo);
@@ -36,6 +37,10 @@ class BacktestEvaluationServiceTests {
                 .isEqualByComparingTo("0.3810");
         assertThat(result.accuracyLift()).isEqualByComparingTo("0.1428");
         assertThat(result.balancedAccuracy()).isEqualByComparingTo("0.5238");
+        assertThat(result.priceBasis()).isEqualTo(BacktestPriceBasis.OHLC_CLOSE);
+        assertThat(result.sampleSet()).isEqualTo(BacktestSampleSet.HOLDOUT);
+        assertThat(result.beatsBaseline()).isTrue();
+        assertThat(result.promotionReady()).isFalse();
         assertThat(result.confusionMatrix()).isEqualTo(new ConfusionMatrix(
                 new DirectionCounts(4, 0, 3),
                 new DirectionCounts(3, 3, 0),
@@ -47,11 +52,30 @@ class BacktestEvaluationServiceTests {
         assertThat(result.bearish().accuracy()).isEqualByComparingTo("0.5714");
     }
 
+    @Test
+    void promotesOnlyLargeOhlcHoldout() {
+        UUID id = UUID.randomUUID();
+        BacktestService service = mock(BacktestService.class);
+        BacktestRepository repo = mock(BacktestRepository.class);
+        when(service.get(id)).thenReturn(task(id, BacktestSampleSet.HOLDOUT));
+        when(repo.findCases(id, 120)).thenReturn(cases(id, 60));
+
+        BacktestEvaluation result =
+                new BacktestEvaluationService(service, repo).evaluate(id);
+
+        assertThat(result.beatsBaseline()).isTrue();
+        assertThat(result.promotionReady()).isTrue();
+    }
+
     private List<BacktestCase> cases(UUID id) {
+        return cases(id, 21);
+    }
+
+    private List<BacktestCase> cases(UUID id, int count) {
         List<BacktestCase> result = new ArrayList<>();
         ForecastDirection[] values = ForecastDirection.values();
         OffsetDateTime start = OffsetDateTime.parse("2026-08-01T00:00:00Z");
-        for (int index = 0; index < 21; index++) {
+        for (int index = 0; index < count; index++) {
             ForecastDirection predicted = values[index % values.length];
             boolean hit = index % 2 == 0;
             ForecastDirection actual = hit
@@ -67,5 +91,16 @@ class BacktestEvaluationServiceTests {
             ));
         }
         return result;
+    }
+
+    private BacktestTask task(UUID id, BacktestSampleSet sampleSet) {
+        OffsetDateTime now = OffsetDateTime.parse("2026-08-01T00:00:00Z");
+        return new BacktestTask(
+                id, now.toLocalDate(), now.toLocalDate().plusDays(60), 60,
+                "glm-4.7", "prompt-v1", "rule-v1",
+                BacktestPriceBasis.OHLC_CLOSE, sampleSet,
+                BacktestStatus.COMPLETED, 60, 30, 0, null,
+                now, now, now.plusDays(60)
+        );
     }
 }
