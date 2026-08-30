@@ -55,6 +55,8 @@ public class BacktestComparisonService {
         boolean supported = BacktestPromptVersion.CANDIDATE.version()
                 .equals(task.promptVersion())
                 || BacktestPromptVersion.IMPROVED.version()
+                .equals(task.promptVersion())
+                || BacktestPromptVersion.CALIBRATED.version()
                 .equals(task.promptVersion());
         if (!supported) {
             throw new InvalidBacktestRequestException(
