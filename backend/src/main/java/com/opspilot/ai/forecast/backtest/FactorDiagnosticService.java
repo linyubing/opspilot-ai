@@ -69,7 +69,7 @@ public class FactorDiagnosticService {
     }
 
     /** 根据 1 日与 5 日收益率是否同向，生成未经调参的短期反转信号。 */
-    private ForecastDirection shortReversal(FactorSample item) {
+    ForecastDirection shortReversal(FactorSample item) {
         int daily = item.snapshot().gold().return1().signum();
         int weekly = item.snapshot().gold().return5().signum();
 

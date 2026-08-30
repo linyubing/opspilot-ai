@@ -19,7 +19,15 @@ public record HistoricalHorizonResponse(
                         horizon.factors().stream().map(factor -> new FactorItem(
                                 factor.factor(), factor.coverage(),
                                 factor.accuracy(), factor.directionalAccuracy()
-                        )).toList()
+                        )).toList(),
+                        horizon.volatility().stream()
+                                .map(item -> new VolatilityItem(
+                                        item.regime().name(),
+                                        item.sampleCount(),
+                                        item.signalCount(),
+                                        item.hitCount(),
+                                        item.accuracy()
+                                )).toList()
                 )).toList()
         );
     }
@@ -28,7 +36,8 @@ public record HistoricalHorizonResponse(
     public record HorizonItem(
             int sessions,
             int sampleCount,
-            List<FactorItem> factors
+            List<FactorItem> factors,
+            List<VolatilityItem> volatility
     ) {
     }
 
@@ -38,6 +47,16 @@ public record HistoricalHorizonResponse(
             BigDecimal coverage,
             BigDecimal accuracy,
             BigDecimal directionalAccuracy
+    ) {
+    }
+
+    /** 保存一个波动区间内短期反转信号的真实表现。 */
+    public record VolatilityItem(
+            String regime,
+            int sampleCount,
+            int signalCount,
+            int hitCount,
+            BigDecimal accuracy
     ) {
     }
 }

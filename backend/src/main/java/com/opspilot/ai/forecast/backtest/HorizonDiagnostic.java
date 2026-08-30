@@ -6,6 +6,15 @@ import java.util.List;
 public record HorizonDiagnostic(
         int sessions,
         int sampleCount,
-        List<FactorDiagnostic> factors
+        List<FactorDiagnostic> factors,
+        List<VolatilityDiagnostic> volatility
 ) {
+    /** 兼容不需要波动区间结果的调用方。 */
+    public HorizonDiagnostic(
+            int sessions,
+            int sampleCount,
+            List<FactorDiagnostic> factors
+    ) {
+        this(sessions, sampleCount, factors, List.of());
+    }
 }

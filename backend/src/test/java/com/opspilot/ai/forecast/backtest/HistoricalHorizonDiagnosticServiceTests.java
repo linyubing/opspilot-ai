@@ -46,6 +46,9 @@ class HistoricalHorizonDiagnosticServiceTests {
                 .containsExactly(1, 5, 20);
         assertThat(report.horizons()).extracting(HorizonDiagnostic::sampleCount)
                 .containsOnly(1);
+        assertThat(report.horizons())
+                .allSatisfy(horizon -> assertThat(horizon.volatility())
+                        .hasSize(3));
     }
 
     private GoldResearchSnapshot snapshot() {
@@ -56,6 +59,7 @@ class HistoricalHorizonDiagnosticServiceTests {
         when(gold.return1()).thenReturn(BigDecimal.ZERO);
         when(gold.return5()).thenReturn(BigDecimal.ZERO);
         when(gold.return20()).thenReturn(BigDecimal.ONE);
+        when(gold.volatility20()).thenReturn(new BigDecimal("18.0000"));
         when(snapshot.realRateAssessment()).thenReturn(new ResearchFactorAssessment(
                 GoldFactorStatus.SUPPORTIVE, "test", "test"
         ));

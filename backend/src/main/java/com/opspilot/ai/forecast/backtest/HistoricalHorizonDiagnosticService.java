@@ -31,6 +31,8 @@ public class HistoricalHorizonDiagnosticService {
     private final GoldResearchSnapshotService snapshots;
     private final GoldForecastRule rule;
     private final FactorDiagnosticService factors;
+    private final VolatilityDiagnosticService volatility =
+            new VolatilityDiagnosticService();
 
     public HistoricalHorizonDiagnosticService(
             MarketPriceRepository prices,
@@ -81,6 +83,7 @@ public class HistoricalHorizonDiagnosticService {
             int sessions
     ) {
         List<FactorSample> samples = new ArrayList<>();
+        List<VolatilitySample> volatilitySamples = new ArrayList<>();
         for (HistorySample item : selected) {
             List<MarketPrice> future = history.stream()
                     .filter(price -> price.priceDate().isAfter(item.date()))
@@ -92,8 +95,15 @@ public class HistoricalHorizonDiagnosticService {
             BigDecimal change = target.subtract(item.basePrice())
                     .divide(item.basePrice(), 8, RoundingMode.HALF_UP)
                     .multiply(new BigDecimal("100"));
-            samples.add(new FactorSample(
+            FactorSample sample = new FactorSample(
                     item.snapshot(), rule.classify(change)
+            );
+            samples.add(sample);
+            volatilitySamples.add(new VolatilitySample(
+                    item.date(),
+                    item.snapshot().gold().volatility20(),
+                    factors.shortReversal(sample),
+                    sample.actual()
             ));
         }
         UUID id = UUID.nameUUIDFromBytes(
@@ -101,7 +111,12 @@ public class HistoricalHorizonDiagnosticService {
                         .getBytes(StandardCharsets.UTF_8)
         );
         FactorDiagnosticReport report = factors.diagnose(id, samples);
-        return new HorizonDiagnostic(sessions, samples.size(), report.factors());
+        return new HorizonDiagnostic(
+                sessions,
+                samples.size(),
+                report.factors(),
+                volatility.diagnose(volatilitySamples)
+        );
     }
 
     private boolean weekday(DayOfWeek day) {
