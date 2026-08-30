@@ -1,7 +1,7 @@
 package com.opspilot.ai.forecast;
 
-import com.opspilot.ai.marketdata.MarketPrice;
-import com.opspilot.ai.marketdata.MarketPriceRepository;
+import com.opspilot.ai.marketdata.GoldDailyBar;
+import com.opspilot.ai.marketdata.GoldDailyBarRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -16,32 +16,28 @@ import java.util.Optional;
 public class GoldForecastResolutionService {
 
     private static final String GOLD_SYMBOL = "XAUUSD";
+    private static final String GOLD_PROVIDER = "twelve_data";
 
     /*
      * 单次只读取基准日期之后的前 10 条真实行情。
      * 周末行情会由 NextValidMarketPriceSelector 排除。
      */
-    private static final int PRICE_LOOKAHEAD_LIMIT = 10;
-
     private static final BigDecimal PERCENT_MULTIPLIER =
             new BigDecimal("100");
 
     private final GoldForecastRepository forecastRepository;
-    private final MarketPriceRepository marketPriceRepository;
-    private final NextValidMarketPriceSelector priceSelector;
+    private final GoldDailyBarRepository goldRepository;
     private final GoldForecastRule forecastRule;
     private final Clock clock;
 
     public GoldForecastResolutionService(
             GoldForecastRepository forecastRepository,
-            MarketPriceRepository marketPriceRepository,
-            NextValidMarketPriceSelector priceSelector,
+            GoldDailyBarRepository goldRepository,
             GoldForecastRule forecastRule,
             Clock clock
     ) {
         this.forecastRepository = forecastRepository;
-        this.marketPriceRepository = marketPriceRepository;
-        this.priceSelector = priceSelector;
+        this.goldRepository = goldRepository;
         this.forecastRule = forecastRule;
         this.clock = clock;
     }
@@ -82,20 +78,18 @@ public class GoldForecastResolutionService {
      * 尝试解析一条预测；没有后续有效工作日价格时保持待验证。
      */
     private boolean resolveOne(StoredGoldDirectionForecast forecast) {
-        List<MarketPrice> candidates = marketPriceRepository.findAfter(
+        Optional<GoldDailyBar> target = goldRepository.findNext(
                 GOLD_SYMBOL,
-                forecast.baseDate(),
-                PRICE_LOOKAHEAD_LIMIT
+                GOLD_PROVIDER,
+                forecast.baseDate()
         );
 
-        Optional<MarketPrice> targetPrice = priceSelector.select(candidates);
-
-        if (targetPrice.isEmpty()) {
+        if (target.isEmpty()) {
             return false;
         }
         ForecastResolution resolution = createResolution(
                 forecast,
-                targetPrice.get()
+                target.get()
         );
 
         StoredGoldDirectionForecast resolved = forecastRepository.resolve(
@@ -113,11 +107,11 @@ public class GoldForecastResolutionService {
      */
     private ForecastResolution createResolution(
             StoredGoldDirectionForecast forecast,
-            MarketPrice targetPrice
+            GoldDailyBar target
     ) {
         BigDecimal actualReturn = calculateReturn(
                 forecast.basePrice(),
-                targetPrice.referencePrice()
+                target.close()
         );
         // 复用统一规则，不能在解析服务中重新编写方向阈值。
         ForecastDirection actualDirection = forecastRule.classify(actualReturn);
@@ -125,8 +119,8 @@ public class GoldForecastResolutionService {
         boolean hit = forecast.predictedDirection() == actualDirection;
 
         return new ForecastResolution(
-                targetPrice.priceDate(),
-                targetPrice.referencePrice(),
+                target.priceDate(),
+                target.close(),
                 actualReturn,
                 actualDirection,
                 hit,
