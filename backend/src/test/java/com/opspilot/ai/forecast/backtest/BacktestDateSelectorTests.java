@@ -50,6 +50,17 @@ class BacktestDateSelectorTests {
     }
 
     @Test
+    void selectsRecentDates() {
+        BacktestSampleSet recent = BacktestSampleSet.valueOf("RECENT");
+
+        assertThat(selector.select(prices(101), 5, recent))
+                .containsExactly(
+                        dateAt(95), dateAt(96), dateAt(97),
+                        dateAt(98), dateAt(99)
+                );
+    }
+
+    @Test
     void sortsAndRemovesRepeatedDatesBeforeSelecting() {
         List<MarketPrice> input = new ArrayList<>(prices(26));
         input.add(price(dateAt(10)));

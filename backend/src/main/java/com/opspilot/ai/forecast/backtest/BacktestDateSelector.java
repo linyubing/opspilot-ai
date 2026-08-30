@@ -55,6 +55,12 @@ public class BacktestDateSelector {
             }
             return stratified(remaining, samples);
         }
+        if (sampleSet == BacktestSampleSet.RECENT) {
+            return List.copyOf(eligible.subList(
+                    eligible.size() - samples,
+                    eligible.size()
+            ));
+        }
 
         return stratified(eligible, samples);
     }
