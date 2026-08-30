@@ -9,9 +9,8 @@ import com.opspilot.ai.forecast.GoldForecastGateway;
 import com.opspilot.ai.forecast.GoldForecastPrompt;
 import com.opspilot.ai.forecast.GoldForecastRule;
 import com.opspilot.ai.forecast.GoldForecastValidator;
-import com.opspilot.ai.forecast.NextValidMarketPriceSelector;
-import com.opspilot.ai.marketdata.MarketPrice;
-import com.opspilot.ai.marketdata.MarketPriceRepository;
+import com.opspilot.ai.marketdata.GoldDailyBar;
+import com.opspilot.ai.marketdata.GoldDailyBarRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -29,9 +28,10 @@ import java.util.UUID;
 public class BacktestRunner {
 
     private static final String SYMBOL = "XAUUSD";
+    private static final String PROVIDER = "twelve_data";
 
     private final BacktestRepository repo;
-    private final MarketPriceRepository priceRepo;
+    private final GoldDailyBarRepository barRepo;
     private final GoldResearchSnapshotService snapshotService;
     private final BacktestPromptBuilder baseBuilder;
     private final CandidateBacktestPromptBuilder candidateBuilder;
@@ -39,13 +39,12 @@ public class BacktestRunner {
     private final CalibratedBacktestPromptBuilder calibratedBuilder;
     private final GoldForecastGateway gateway;
     private final GoldForecastValidator validator;
-    private final NextValidMarketPriceSelector priceSelector;
     private final GoldForecastRule rule;
     private final Clock clock;
 
     public BacktestRunner(
             BacktestRepository repo,
-            MarketPriceRepository priceRepo,
+            GoldDailyBarRepository barRepo,
             GoldResearchSnapshotService snapshotService,
             BacktestPromptBuilder baseBuilder,
             CandidateBacktestPromptBuilder candidateBuilder,
@@ -53,12 +52,11 @@ public class BacktestRunner {
             CalibratedBacktestPromptBuilder calibratedBuilder,
             GoldForecastGateway gateway,
             GoldForecastValidator validator,
-            NextValidMarketPriceSelector priceSelector,
             GoldForecastRule rule,
             Clock clock
     ) {
         this.repo = repo;
-        this.priceRepo = priceRepo;
+        this.barRepo = barRepo;
         this.snapshotService = snapshotService;
         this.baseBuilder = baseBuilder;
         this.candidateBuilder = candidateBuilder;
@@ -66,7 +64,6 @@ public class BacktestRunner {
         this.calibratedBuilder = calibratedBuilder;
         this.gateway = gateway;
         this.validator = validator;
-        this.priceSelector = priceSelector;
         this.rule = rule;
         this.clock = clock;
     }
@@ -108,14 +105,16 @@ public class BacktestRunner {
         GeneratedGoldForecast generated = gateway.generate(prompt);
         validator.validate(generated.content());
 
-        MarketPrice nextPrice = priceSelector.select(
-                priceRepo.findAfter(SYMBOL, date, 100)
+        GoldDailyBar nextBar = barRepo.findNext(
+                SYMBOL,
+                PROVIDER,
+                date
         ).orElseThrow(() -> new BacktestDataInsufficientException(
                 "回测日期之后没有可结算的真实价格，日期=" + date
         ));
 
         BigDecimal basePrice = snapshot.gold().currentPrice();
-        BigDecimal actualReturn = nextPrice.referencePrice()
+        BigDecimal actualReturn = nextBar.close()
                 .subtract(basePrice)
                 .divide(basePrice, 8, RoundingMode.HALF_UP)
                 .multiply(new BigDecimal("100"))
@@ -132,8 +131,8 @@ public class BacktestRunner {
                 generated.content().direction(),
                 generated.content().reasoning(),
                 generated.content().invalidationConditions(),
-                nextPrice.priceDate(),
-                nextPrice.referencePrice(),
+                nextBar.priceDate(),
+                nextBar.close(),
                 actualReturn,
                 actual,
                 hit,

@@ -14,9 +14,8 @@ import com.opspilot.ai.forecast.GoldForecastGateway;
 import com.opspilot.ai.forecast.GoldForecastAiUnavailableException;
 import com.opspilot.ai.forecast.GoldForecastRule;
 import com.opspilot.ai.forecast.GoldForecastValidator;
-import com.opspilot.ai.forecast.NextValidMarketPriceSelector;
-import com.opspilot.ai.marketdata.MarketPrice;
-import com.opspilot.ai.marketdata.MarketPriceRepository;
+import com.opspilot.ai.marketdata.GoldDailyBar;
+import com.opspilot.ai.marketdata.GoldDailyBarRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -50,7 +49,7 @@ class BacktestRunnerTests {
     private static final Instant NOW = Instant.parse("2026-08-28T08:00:00Z");
 
     private BacktestRepository repo;
-    private MarketPriceRepository priceRepo;
+    private GoldDailyBarRepository barRepo;
     private GoldResearchSnapshotService snapshots;
     private GoldForecastGateway gateway;
     private BacktestRunner runner;
@@ -58,26 +57,25 @@ class BacktestRunnerTests {
     @BeforeEach
     void setUp() {
         repo = mock(BacktestRepository.class);
-        priceRepo = mock(MarketPriceRepository.class);
+        barRepo = mock(GoldDailyBarRepository.class);
         snapshots = mock(GoldResearchSnapshotService.class);
         gateway = mock(GoldForecastGateway.class);
         runner = new BacktestRunner(
-                repo, priceRepo, snapshots, new BacktestPromptBuilder(),
+                repo, barRepo, snapshots, new BacktestPromptBuilder(),
                 new CandidateBacktestPromptBuilder(),
                 new ImprovedBacktestPromptBuilder(),
                 new CalibratedBacktestPromptBuilder(new BacktestPromptBuilder()),
-                gateway,
-                new GoldForecastValidator(), new NextValidMarketPriceSelector(),
+                gateway, new GoldForecastValidator(),
                 new GoldForecastRule(), Clock.fixed(NOW, ZoneOffset.UTC)
         );
         when(repo.findTask(TASK_ID)).thenReturn(Optional.of(task()));
         when(repo.findSampleDates(TASK_ID)).thenReturn(List.of(DATE));
         when(repo.findDoneDates(TASK_ID)).thenReturn(Set.of());
-        when(priceRepo.findAfter("XAUUSD", DATE, 100))
-                .thenReturn(List.of(
-                        price(LocalDate.parse("2026-08-22"), "2510"),
-                        price(LocalDate.parse("2026-08-24"), "2520")
-                ));
+        when(barRepo.findNext(
+                "XAUUSD", "twelve_data", DATE
+        )).thenReturn(Optional.of(
+                bar(LocalDate.parse("2026-08-24"), "2520")
+        ));
         when(snapshots.createSnapshot(DATE)).thenReturn(snapshot());
         when(gateway.generate(any())).thenReturn(new GeneratedGoldForecast(
                 "glm-4.7", "固定 JSON",
@@ -229,10 +227,13 @@ class BacktestRunnerTests {
         );
     }
 
-    private MarketPrice price(LocalDate date, String value) {
-        return new MarketPrice(
-                "XAUUSD", date, new BigDecimal(value),
-                "usd", "troy_ounce", "test",
+    private GoldDailyBar bar(LocalDate date, String close) {
+        BigDecimal value = new BigDecimal(close);
+        return new GoldDailyBar(
+                "XAUUSD", date, value,
+                value.add(BigDecimal.TEN),
+                value.subtract(BigDecimal.TEN), value,
+                "usd", "troy_ounce", "twelve_data",
                 OffsetDateTime.ofInstant(NOW, ZoneOffset.UTC)
         );
     }

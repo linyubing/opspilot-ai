@@ -1,6 +1,7 @@
 package com.opspilot.ai.forecast.backtest;
 
 import com.opspilot.ai.marketdata.MarketPrice;
+import com.opspilot.ai.marketdata.GoldDailyBar;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -24,6 +25,18 @@ class BacktestDateSelectorTests {
     @Test
     void selectsDatesAcrossTheWholeHistory() {
         assertThat(selector.select(prices(101), 5)).containsExactly(
+                dateAt(20), dateAt(40), dateAt(60),
+                dateAt(79), dateAt(99)
+        );
+    }
+
+    @Test
+    void selectsDatesFromRealGoldBars() {
+        assertThat(selector.selectBars(
+                bars(101),
+                5,
+                BacktestSampleSet.DEFAULT
+        )).containsExactly(
                 dateAt(20), dateAt(40), dateAt(60),
                 dateAt(79), dateAt(99)
         );
@@ -94,6 +107,23 @@ class BacktestDateSelectorTests {
         List<MarketPrice> result = new ArrayList<>();
         for (int index = 0; index < count; index++) {
             result.add(price(dateAt(index)));
+        }
+        return result;
+    }
+
+    private List<GoldDailyBar> bars(int count) {
+        List<GoldDailyBar> result = new ArrayList<>();
+        for (int index = 0; index < count; index++) {
+            BigDecimal close = new BigDecimal("2500");
+            result.add(new GoldDailyBar(
+                    "XAUUSD", dateAt(index), close,
+                    close.add(BigDecimal.TEN),
+                    close.subtract(BigDecimal.TEN), close,
+                    "usd", "troy_ounce", "twelve_data",
+                    OffsetDateTime.of(
+                            2026, 8, 28, 8, 0, 0, 0, ZoneOffset.UTC
+                    )
+            ));
         }
         return result;
     }

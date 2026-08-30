@@ -5,17 +5,15 @@ import com.opspilot.ai.analysis.GoldResearchSnapshotService;
 import com.opspilot.ai.analysis.InsufficientResearchDataException;
 import com.opspilot.ai.forecast.ForecastDirection;
 import com.opspilot.ai.forecast.GoldForecastRule;
-import com.opspilot.ai.marketdata.MarketPrice;
-import com.opspilot.ai.marketdata.MarketPriceRepository;
+import com.opspilot.ai.marketdata.GoldDailyBar;
+import com.opspilot.ai.marketdata.GoldDailyBarRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,9 +22,10 @@ import java.util.UUID;
 public class HistoricalHorizonDiagnosticService {
 
     private static final String SYMBOL = "XAUUSD";
+    private static final String PROVIDER = "twelve_data";
     private static final List<Integer> HORIZONS = List.of(1, 5, 20);
 
-    private final MarketPriceRepository prices;
+    private final GoldDailyBarRepository bars;
     private final BacktestDateSelector selector;
     private final GoldResearchSnapshotService snapshots;
     private final GoldForecastRule rule;
@@ -35,13 +34,13 @@ public class HistoricalHorizonDiagnosticService {
             new VolatilityDiagnosticService();
 
     public HistoricalHorizonDiagnosticService(
-            MarketPriceRepository prices,
+            GoldDailyBarRepository bars,
             BacktestDateSelector selector,
             GoldResearchSnapshotService snapshots,
             GoldForecastRule rule,
             FactorDiagnosticService factors
     ) {
-        this.prices = prices;
+        this.bars = bars;
         this.selector = selector;
         this.snapshots = snapshots;
         this.rule = rule;
@@ -49,10 +48,8 @@ public class HistoricalHorizonDiagnosticService {
     }
 
     public HistoricalHorizonReport diagnose(int samples) {
-        List<MarketPrice> history = prices.findAll(SYMBOL).stream()
-                .sorted(Comparator.comparing(MarketPrice::priceDate))
-                .toList();
-        List<LocalDate> dates = selector.select(
+        List<GoldDailyBar> history = bars.findAll(SYMBOL, PROVIDER);
+        List<LocalDate> dates = selector.selectBars(
                 history, samples, BacktestSampleSet.HOLDOUT
         );
         List<HistorySample> selected = loadSamples(dates);
@@ -78,20 +75,19 @@ public class HistoricalHorizonDiagnosticService {
     }
 
     private HorizonDiagnostic diagnose(
-            List<MarketPrice> history,
+            List<GoldDailyBar> history,
             List<HistorySample> selected,
             int sessions
     ) {
         List<FactorSample> samples = new ArrayList<>();
         List<VolatilitySample> volatilitySamples = new ArrayList<>();
         for (HistorySample item : selected) {
-            List<MarketPrice> future = history.stream()
-                    .filter(price -> price.priceDate().isAfter(item.date()))
-                    .filter(price -> weekday(price.priceDate().getDayOfWeek()))
+            List<GoldDailyBar> future = history.stream()
+                    .filter(bar -> bar.priceDate().isAfter(item.date()))
                     .limit(sessions)
                     .toList();
             if (future.size() < sessions) continue;
-            BigDecimal target = future.get(sessions - 1).referencePrice();
+            BigDecimal target = future.get(sessions - 1).close();
             BigDecimal change = target.subtract(item.basePrice())
                     .divide(item.basePrice(), 8, RoundingMode.HALF_UP)
                     .multiply(new BigDecimal("100"));
@@ -118,11 +114,6 @@ public class HistoricalHorizonDiagnosticService {
                 volatility.diagnose(volatilitySamples)
         );
     }
-
-    private boolean weekday(DayOfWeek day) {
-        return day != DayOfWeek.SATURDAY && day != DayOfWeek.SUNDAY;
-    }
-
     private record HistorySample(
             LocalDate date,
             GoldResearchSnapshot snapshot,

@@ -27,7 +27,7 @@ public class JdbcBacktestRepository implements BacktestRepository {
 
     private static final String TASK_COLUMNS = """
             id, start_date, end_date, sample_count, model_name,
-            prompt_version, rule_version, status, completed_count,
+            prompt_version, rule_version, price_basis, status, completed_count,
             hit_count, failed_count, last_error, created_at,
             started_at, completed_at
             """;
@@ -56,6 +56,9 @@ public class JdbcBacktestRepository implements BacktestRepository {
                     rs.getString("model_name"),
                     rs.getString("prompt_version"),
                     rs.getString("rule_version"),
+                    BacktestPriceBasis.valueOf(
+                            rs.getString("price_basis").toUpperCase(Locale.ROOT)
+                    ),
                     BacktestStatus.valueOf(
                             rs.getString("status").toUpperCase(Locale.ROOT)
                     ),
@@ -102,14 +105,14 @@ public class JdbcBacktestRepository implements BacktestRepository {
         jdbc.update("""
                 insert into gold_forecast_backtest (
                     id, start_date, end_date, sample_count, model_name,
-                    prompt_version, rule_version, status, completed_count,
+                    prompt_version, rule_version, price_basis, status, completed_count,
                     hit_count, failed_count, last_error, created_at,
                     started_at, completed_at
-                ) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 task.id(), task.startDate(), task.endDate(),
                 task.sampleCount(), task.modelName(), task.promptVersion(),
-                task.ruleVersion(), lower(task.status()),
+                task.ruleVersion(), lower(task.priceBasis()), lower(task.status()),
                 task.completedCount(), task.hitCount(), task.failedCount(),
                 task.lastError(), task.createdAt(), task.startedAt(),
                 task.completedAt()

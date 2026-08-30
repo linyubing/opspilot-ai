@@ -1,6 +1,7 @@
 package com.opspilot.ai.forecast.backtest;
 
 import com.opspilot.ai.marketdata.MarketPrice;
+import com.opspilot.ai.marketdata.GoldDailyBar;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -23,13 +24,34 @@ public class BacktestDateSelector {
             int samples,
             BacktestSampleSet sampleSet
     ) {
-        checkSamples(samples);
-
         List<LocalDate> dates = prices.stream()
                 .map(MarketPrice::priceDate)
                 .distinct()
                 .sorted()
                 .toList();
+        return selectDates(dates, samples, sampleSet);
+    }
+
+    /** 从真实黄金 OHLC 日线中选择回测日期。 */
+    public List<LocalDate> selectBars(
+            List<GoldDailyBar> bars,
+            int samples,
+            BacktestSampleSet sampleSet
+    ) {
+        List<LocalDate> dates = bars.stream()
+                .map(GoldDailyBar::priceDate)
+                .distinct()
+                .sorted()
+                .toList();
+        return selectDates(dates, samples, sampleSet);
+    }
+
+    private List<LocalDate> selectDates(
+            List<LocalDate> dates,
+            int samples,
+            BacktestSampleSet sampleSet
+    ) {
+        checkSamples(samples);
         int required = samples + HISTORY_SIZE + 1;
         if (dates.size() < required) {
             throw new BacktestDataInsufficientException(

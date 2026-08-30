@@ -2,15 +2,13 @@ package com.opspilot.ai.forecast.backtest;
 
 import com.opspilot.ai.forecast.ForecastDirection;
 import com.opspilot.ai.forecast.GoldForecastRule;
-import com.opspilot.ai.marketdata.MarketPrice;
-import com.opspilot.ai.marketdata.MarketPriceRepository;
+import com.opspilot.ai.marketdata.GoldDailyBar;
+import com.opspilot.ai.marketdata.GoldDailyBarRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.DayOfWeek;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,46 +19,44 @@ import java.util.UUID;
 public class HorizonDiagnosticService {
 
     private static final String SYMBOL = "XAUUSD";
+    private static final String PROVIDER = "twelve_data";
     private static final List<Integer> HORIZONS = List.of(1, 5, 20);
 
     private final BacktestService backtests;
-    private final MarketPriceRepository prices;
+    private final GoldDailyBarRepository bars;
     private final GoldForecastRule rule;
     private final FactorDiagnosticService factors;
 
     public HorizonDiagnosticService(
             BacktestService backtests,
-            MarketPriceRepository prices,
+            GoldDailyBarRepository bars,
             GoldForecastRule rule,
             FactorDiagnosticService factors
     ) {
         this.backtests = backtests;
-        this.prices = prices;
+        this.bars = bars;
         this.rule = rule;
         this.factors = factors;
     }
 
     public HorizonDiagnosticReport diagnose(UUID id) {
         List<BacktestCase> cases = backtests.results(id, 120);
-        Map<BacktestCase, List<MarketPrice>> futurePrices = loadPrices(cases);
+        Map<BacktestCase, List<GoldDailyBar>> futureBars = loadBars(cases);
         List<HorizonDiagnostic> result = new ArrayList<>();
         for (int sessions : HORIZONS) {
-            result.add(diagnose(id, cases, futurePrices, sessions));
+            result.add(diagnose(id, cases, futureBars, sessions));
         }
         return new HorizonDiagnosticReport(id, List.copyOf(result));
     }
 
-    private Map<BacktestCase, List<MarketPrice>> loadPrices(
+    private Map<BacktestCase, List<GoldDailyBar>> loadBars(
             List<BacktestCase> cases
     ) {
-        Map<BacktestCase, List<MarketPrice>> result = new IdentityHashMap<>();
+        Map<BacktestCase, List<GoldDailyBar>> result = new IdentityHashMap<>();
         for (BacktestCase item : cases) {
-            List<MarketPrice> future = prices.findAfter(
-                            SYMBOL, item.asOfDate(), 60
-                    ).stream()
-                    .filter(price -> weekday(price.priceDate().getDayOfWeek()))
-                    .sorted(Comparator.comparing(MarketPrice::priceDate))
-                    .toList();
+            List<GoldDailyBar> future = bars.findAfter(
+                    SYMBOL, PROVIDER, item.asOfDate(), 60
+            );
             result.put(item, future);
         }
         return result;
@@ -69,16 +65,16 @@ public class HorizonDiagnosticService {
     private HorizonDiagnostic diagnose(
             UUID id,
             List<BacktestCase> cases,
-            Map<BacktestCase, List<MarketPrice>> futurePrices,
+            Map<BacktestCase, List<GoldDailyBar>> futureBars,
             int sessions
     ) {
         List<BacktestCase> available = new ArrayList<>();
         Map<BacktestCase, ForecastDirection> actual = new IdentityHashMap<>();
         for (BacktestCase item : cases) {
-            List<MarketPrice> future = futurePrices.get(item);
+            List<GoldDailyBar> future = futureBars.get(item);
             if (future.size() < sessions) continue;
 
-            BigDecimal target = future.get(sessions - 1).referencePrice();
+            BigDecimal target = future.get(sessions - 1).close();
             BigDecimal change = target.subtract(item.basePrice())
                     .divide(item.basePrice(), 8, RoundingMode.HALF_UP)
                     .multiply(new BigDecimal("100"));
@@ -94,9 +90,5 @@ public class HorizonDiagnosticService {
                 available.size(),
                 report.factors()
         );
-    }
-
-    private boolean weekday(DayOfWeek day) {
-        return day != DayOfWeek.SATURDAY && day != DayOfWeek.SUNDAY;
     }
 }

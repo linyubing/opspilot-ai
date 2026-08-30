@@ -31,4 +31,11 @@ public interface GoldDailyBarRepository {
             String provider,
             LocalDate baseDate
     );
+
+    List<GoldDailyBar> findAfter(
+            String symbol,
+            String provider,
+            LocalDate baseDate,
+            int limit
+    );
 }

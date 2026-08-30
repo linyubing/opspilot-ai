@@ -101,6 +101,24 @@ class JdbcGoldDailyBarRepositoryTests {
         });
     }
 
+    @Test
+    void findsBarsAfterDateInOrder() {
+        repository.saveAll(List.of(
+                bar("2026-08-27", "4400"),
+                bar("2026-08-28", "4456"),
+                bar("2026-09-01", "4500")
+        ));
+
+        assertThat(repository.findAfter(
+                "XAUUSD", PROVIDER,
+                LocalDate.parse("2026-08-27"), 2
+        )).extracting(GoldDailyBar::priceDate)
+                .containsExactly(
+                        LocalDate.parse("2026-08-28"),
+                        LocalDate.parse("2026-09-01")
+                );
+    }
+
     private GoldDailyBar bar(String date, String close) {
         BigDecimal closePrice = new BigDecimal(close);
         return new GoldDailyBar(

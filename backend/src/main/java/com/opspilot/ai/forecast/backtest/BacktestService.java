@@ -2,8 +2,8 @@ package com.opspilot.ai.forecast.backtest;
 
 import com.opspilot.ai.forecast.GoldForecastProperties;
 import com.opspilot.ai.forecast.GoldForecastRule;
-import com.opspilot.ai.marketdata.MarketPrice;
-import com.opspilot.ai.marketdata.MarketPriceRepository;
+import com.opspilot.ai.marketdata.GoldDailyBar;
+import com.opspilot.ai.marketdata.GoldDailyBarRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.Clock;
@@ -18,22 +18,23 @@ import java.util.UUID;
 public class BacktestService {
 
     private static final String SYMBOL = "XAUUSD";
+    private static final String PROVIDER = "twelve_data";
     private static final int MAX_SAMPLES = 120;
 
-    private final MarketPriceRepository priceRepo;
+    private final GoldDailyBarRepository barRepo;
     private final BacktestRepository repo;
     private final BacktestDateSelector selector;
     private final GoldForecastProperties properties;
     private final Clock clock;
 
     public BacktestService(
-            MarketPriceRepository priceRepo,
+            GoldDailyBarRepository barRepo,
             BacktestRepository repo,
             BacktestDateSelector selector,
             GoldForecastProperties properties,
             Clock clock
     ) {
-        this.priceRepo = priceRepo;
+        this.barRepo = barRepo;
         this.repo = repo;
         this.selector = selector;
         this.properties = properties;
@@ -47,11 +48,15 @@ public class BacktestService {
     /** 创建指定提示词版本的回测任务。 */
     public BacktestTask create(int samples, BacktestPromptVersion version) {
         checkCreate(samples, version);
-        List<MarketPrice> prices = priceRepo.findAll(SYMBOL);
+        List<GoldDailyBar> bars = barRepo.findAll(SYMBOL, PROVIDER);
         return saveTask(
                 samples,
                 version,
-                selector.select(prices, samples)
+                selector.selectBars(
+                        bars,
+                        samples,
+                        BacktestSampleSet.DEFAULT
+                )
         );
     }
 
@@ -62,8 +67,12 @@ public class BacktestService {
             BacktestSampleSet sampleSet
     ) {
         checkCreate(samples, version);
-        List<MarketPrice> prices = priceRepo.findAll(SYMBOL);
-        List<LocalDate> dates = selector.select(prices, samples, sampleSet);
+        List<GoldDailyBar> bars = barRepo.findAll(SYMBOL, PROVIDER);
+        List<LocalDate> dates = selector.selectBars(
+                bars,
+                samples,
+                sampleSet
+        );
 
         return saveTask(samples, version, dates);
     }
@@ -82,6 +91,7 @@ public class BacktestService {
                 properties.modelName(),
                 version.version(),
                 GoldForecastRule.RULE_VERSION,
+                BacktestPriceBasis.OHLC_CLOSE,
                 BacktestStatus.CREATED,
                 0,
                 0,

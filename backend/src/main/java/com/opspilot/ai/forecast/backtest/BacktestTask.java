@@ -13,6 +13,7 @@ public record BacktestTask(
         String modelName,
         String promptVersion,
         String ruleVersion,
+        BacktestPriceBasis priceBasis,
         BacktestStatus status,
         int completedCount,
         int hitCount,
@@ -22,4 +23,30 @@ public record BacktestTask(
         OffsetDateTime startedAt,
         OffsetDateTime completedAt
 ) {
+    /** 兼容改造前的调用；新建回测必须显式填写价格口径。 */
+    public BacktestTask(
+            UUID id,
+            LocalDate startDate,
+            LocalDate endDate,
+            int sampleCount,
+            String modelName,
+            String promptVersion,
+            String ruleVersion,
+            BacktestStatus status,
+            int completedCount,
+            int hitCount,
+            int failedCount,
+            String lastError,
+            OffsetDateTime createdAt,
+            OffsetDateTime startedAt,
+            OffsetDateTime completedAt
+    ) {
+        this(
+                id, startDate, endDate, sampleCount, modelName,
+                promptVersion, ruleVersion,
+                BacktestPriceBasis.LEGACY_REFERENCE, status,
+                completedCount, hitCount, failedCount, lastError,
+                createdAt, startedAt, completedAt
+        );
+    }
 }

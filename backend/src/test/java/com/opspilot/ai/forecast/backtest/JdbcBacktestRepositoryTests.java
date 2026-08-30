@@ -64,6 +64,7 @@ class JdbcBacktestRepositoryTests {
         BacktestTask running = repo.findTask(taskId).orElseThrow();
 
         assertThat(created.status()).isEqualTo(BacktestStatus.CREATED);
+        assertThat(created.priceBasis()).isEqualTo(BacktestPriceBasis.OHLC_CLOSE);
         assertThat(started).isTrue();
         assertThat(first).isTrue();
         assertThat(repeated).isFalse();
@@ -134,6 +135,7 @@ class JdbcBacktestRepositoryTests {
                 "glm-4.7",
                 "gold-backtest-prompt-v1",
                 "gold-direction-rule-v1",
+                BacktestPriceBasis.OHLC_CLOSE,
                 BacktestStatus.CREATED,
                 0, 0, 0, null,
                 NOW, null, null

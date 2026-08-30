@@ -5,8 +5,8 @@ import com.opspilot.ai.analysis.GoldReturnMetrics;
 import com.opspilot.ai.analysis.ResearchFactorAssessment;
 import com.opspilot.ai.analysis.GoldFactorStatus;
 import com.opspilot.ai.forecast.GoldForecastRule;
-import com.opspilot.ai.marketdata.MarketPrice;
-import com.opspilot.ai.marketdata.MarketPriceRepository;
+import com.opspilot.ai.marketdata.GoldDailyBar;
+import com.opspilot.ai.marketdata.GoldDailyBarRepository;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -31,18 +31,18 @@ class HorizonDiagnosticServiceTests {
     void comparesThreeHorizons() {
         UUID id = UUID.randomUUID();
         BacktestService backtests = mock(BacktestService.class);
-        MarketPriceRepository prices = mock(MarketPriceRepository.class);
+        GoldDailyBarRepository bars = mock(GoldDailyBarRepository.class);
         BacktestCase item = item();
         LocalDate date = item.asOfDate();
         when(backtests.results(id, 120)).thenReturn(List.of(item));
-        when(prices.findAfter(
-                eq("XAUUSD"), eq(date), anyInt()
+        when(bars.findAfter(
+                eq("XAUUSD"), eq("twelve_data"), eq(date), anyInt()
         ))
-                .thenReturn(futurePrices());
+                .thenReturn(futureBars());
         FactorDiagnosticService factors = new FactorDiagnosticService(backtests);
 
         HorizonDiagnosticReport report = new HorizonDiagnosticService(
-                backtests, prices, new GoldForecastRule(), factors
+                backtests, bars, new GoldForecastRule(), factors
         ).diagnose(id);
 
         assertThat(report.horizons()).extracting(HorizonDiagnostic::sessions)
@@ -52,8 +52,8 @@ class HorizonDiagnosticServiceTests {
         assertThat(momentumAccuracy(report, 1)).isEqualByComparingTo("0.0000");
         assertThat(momentumAccuracy(report, 5)).isEqualByComparingTo("1.0000");
         assertThat(momentumAccuracy(report, 20)).isEqualByComparingTo("0.0000");
-        verify(prices, times(1)).findAfter(
-                eq("XAUUSD"), eq(date), anyInt()
+        verify(bars, times(1)).findAfter(
+                eq("XAUUSD"), eq("twelve_data"), eq(date), anyInt()
         );
     }
 
@@ -87,8 +87,8 @@ class HorizonDiagnosticServiceTests {
         return item;
     }
 
-    private List<MarketPrice> futurePrices() {
-        List<MarketPrice> result = new ArrayList<>();
+    private List<GoldDailyBar> futureBars() {
+        List<GoldDailyBar> result = new ArrayList<>();
         LocalDate date = LocalDate.parse("2026-01-02");
         int session = 0;
         while (session < 20) {
@@ -101,9 +101,10 @@ class HorizonDiagnosticServiceTests {
                         : session == 20
                         ? new BigDecimal("90")
                         : new BigDecimal("100");
-                result.add(new MarketPrice(
-                        "XAUUSD", date, value, "usd", "troy_ounce",
-                        "test", OffsetDateTime.parse("2026-01-01T00:00:00Z")
+                result.add(new GoldDailyBar(
+                        "XAUUSD", date, value, value, value, value,
+                        "usd", "troy_ounce", "twelve_data",
+                        OffsetDateTime.parse("2026-01-01T00:00:00Z")
                 ));
             }
             date = date.plusDays(1);

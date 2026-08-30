@@ -6,8 +6,8 @@ import com.opspilot.ai.analysis.GoldResearchSnapshotService;
 import com.opspilot.ai.analysis.GoldReturnMetrics;
 import com.opspilot.ai.analysis.ResearchFactorAssessment;
 import com.opspilot.ai.forecast.GoldForecastRule;
-import com.opspilot.ai.marketdata.MarketPrice;
-import com.opspilot.ai.marketdata.MarketPriceRepository;
+import com.opspilot.ai.marketdata.GoldDailyBar;
+import com.opspilot.ai.marketdata.GoldDailyBarRepository;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -26,18 +26,18 @@ class HistoricalHorizonDiagnosticServiceTests {
     @Test
     void diagnosesSelectedHistory() {
         LocalDate date = LocalDate.parse("2026-01-01");
-        MarketPriceRepository prices = mock(MarketPriceRepository.class);
+        GoldDailyBarRepository bars = mock(GoldDailyBarRepository.class);
         BacktestDateSelector selector = mock(BacktestDateSelector.class);
         GoldResearchSnapshotService snapshots = mock(GoldResearchSnapshotService.class);
         BacktestService backtests = mock(BacktestService.class);
-        when(prices.findAll("XAUUSD")).thenReturn(futurePrices());
-        when(selector.select(futurePrices(), 1, BacktestSampleSet.HOLDOUT))
+        when(bars.findAll("XAUUSD", "twelve_data")).thenReturn(futureBars());
+        when(selector.selectBars(futureBars(), 1, BacktestSampleSet.HOLDOUT))
                 .thenReturn(List.of(date));
         GoldResearchSnapshot snapshot = snapshot();
         when(snapshots.createSnapshot(date)).thenReturn(snapshot);
 
         HistoricalHorizonReport report = new HistoricalHorizonDiagnosticService(
-                prices, selector, snapshots, new GoldForecastRule(),
+                bars, selector, snapshots, new GoldForecastRule(),
                 new FactorDiagnosticService(backtests)
         ).diagnose(1);
 
@@ -69,14 +69,15 @@ class HistoricalHorizonDiagnosticServiceTests {
         return snapshot;
     }
 
-    private List<MarketPrice> futurePrices() {
-        List<MarketPrice> result = new ArrayList<>();
+    private List<GoldDailyBar> futureBars() {
+        List<GoldDailyBar> result = new ArrayList<>();
         LocalDate date = LocalDate.parse("2026-01-01");
         for (int index = 0; index < 30; index++) {
-            result.add(new MarketPrice(
-                    "XAUUSD", date.plusDays(index),
-                    new BigDecimal("100").add(BigDecimal.valueOf(index)),
-                    "usd", "troy_ounce", "test",
+            BigDecimal close = new BigDecimal("100")
+                    .add(BigDecimal.valueOf(index));
+            result.add(new GoldDailyBar(
+                    "XAUUSD", date.plusDays(index), close, close, close, close,
+                    "usd", "troy_ounce", "twelve_data",
                     OffsetDateTime.parse("2026-01-01T00:00:00Z")
             ));
         }

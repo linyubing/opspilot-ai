@@ -169,4 +169,28 @@ public class JdbcGoldDailyBarRepository implements GoldDailyBarRepository {
                 baseDate
         ).stream().findFirst();
     }
+
+    @Override
+    public List<GoldDailyBar> findAfter(
+            String symbol,
+            String provider,
+            LocalDate baseDate,
+            int limit
+    ) {
+        return jdbc.query(
+                "select " + COLUMNS + """
+                        from gold_daily_bar
+                        where symbol = ?
+                          and provider = ?
+                          and price_date > ?
+                        order by price_date
+                        limit ?
+                        """,
+                mapper,
+                symbol,
+                provider,
+                baseDate,
+                limit
+        );
+    }
 }

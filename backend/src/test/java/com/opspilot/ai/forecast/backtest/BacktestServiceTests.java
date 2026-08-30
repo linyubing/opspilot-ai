@@ -2,8 +2,8 @@ package com.opspilot.ai.forecast.backtest;
 
 import com.opspilot.ai.forecast.GoldForecastProperties;
 import com.opspilot.ai.forecast.GoldForecastRule;
-import com.opspilot.ai.marketdata.MarketPrice;
-import com.opspilot.ai.marketdata.MarketPriceRepository;
+import com.opspilot.ai.marketdata.GoldDailyBar;
+import com.opspilot.ai.marketdata.GoldDailyBarRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -34,18 +34,18 @@ class BacktestServiceTests {
 
     private static final Instant NOW = Instant.parse("2026-08-28T08:00:00Z");
 
-    private MarketPriceRepository priceRepo;
+    private GoldDailyBarRepository barRepo;
     private BacktestRepository repo;
     private BacktestDateSelector selector;
     private BacktestService service;
 
     @BeforeEach
     void setUp() {
-        priceRepo = mock(MarketPriceRepository.class);
+        barRepo = mock(GoldDailyBarRepository.class);
         repo = mock(BacktestRepository.class);
         selector = mock(BacktestDateSelector.class);
         service = new BacktestService(
-                priceRepo,
+                barRepo,
                 repo,
                 selector,
                 new GoldForecastProperties("glm-4.7"),
@@ -57,14 +57,17 @@ class BacktestServiceTests {
 
     @Test
     void createsTaskFromSettleableDates() {
-        List<MarketPrice> history = prices(101);
+        List<GoldDailyBar> history = bars(101);
         List<LocalDate> selected = List.of(
                 LocalDate.parse("2012-01-03"),
                 LocalDate.parse("2020-06-15"),
                 LocalDate.parse("2026-08-19")
         );
-        when(priceRepo.findAll("XAUUSD")).thenReturn(history);
-        when(selector.select(history, 3)).thenReturn(selected);
+        when(barRepo.findAll("XAUUSD", "twelve_data"))
+                .thenReturn(history);
+        when(selector.selectBars(
+                history, 3, BacktestSampleSet.DEFAULT
+        )).thenReturn(selected);
 
         BacktestTask task = service.create(3);
 
@@ -84,10 +87,13 @@ class BacktestServiceTests {
 
     @Test
     void createsCandidateTask() {
-        List<MarketPrice> history = prices(101);
+        List<GoldDailyBar> history = bars(101);
         List<LocalDate> selected = List.of(LocalDate.parse("2026-08-19"));
-        when(priceRepo.findAll("XAUUSD")).thenReturn(history);
-        when(selector.select(history, 1)).thenReturn(selected);
+        when(barRepo.findAll("XAUUSD", "twelve_data"))
+                .thenReturn(history);
+        when(selector.selectBars(
+                history, 1, BacktestSampleSet.DEFAULT
+        )).thenReturn(selected);
 
         BacktestTask task = service.create(
                 1,
@@ -101,10 +107,11 @@ class BacktestServiceTests {
 
     @Test
     void createsTaskFromHoldoutSamples() {
-        List<MarketPrice> history = prices(101);
+        List<GoldDailyBar> history = bars(101);
         List<LocalDate> selected = List.of(LocalDate.parse("2026-08-18"));
-        when(priceRepo.findAll("XAUUSD")).thenReturn(history);
-        when(selector.select(history, 1, BacktestSampleSet.HOLDOUT))
+        when(barRepo.findAll("XAUUSD", "twelve_data"))
+                .thenReturn(history);
+        when(selector.selectBars(history, 1, BacktestSampleSet.HOLDOUT))
                 .thenReturn(selected);
 
         BacktestTask task = service.create(
@@ -128,9 +135,12 @@ class BacktestServiceTests {
 
     @Test
     void rejectsInsufficientPrices() {
-        List<MarketPrice> history = prices(80);
-        when(priceRepo.findAll("XAUUSD")).thenReturn(history);
-        when(selector.select(history, 60)).thenThrow(
+        List<GoldDailyBar> history = bars(80);
+        when(barRepo.findAll("XAUUSD", "twelve_data"))
+                .thenReturn(history);
+        when(selector.selectBars(
+                history, 60, BacktestSampleSet.DEFAULT
+        )).thenThrow(
                 new BacktestDataInsufficientException(
                         "黄金有效交易日期不足，需要=81，实际=80"
                 )
@@ -182,17 +192,22 @@ class BacktestServiceTests {
                 .hasMessageContaining("1 到 120");
     }
 
-    private List<MarketPrice> prices(int count) {
-        List<MarketPrice> result = new ArrayList<>();
+    private List<GoldDailyBar> bars(int count) {
+        List<GoldDailyBar> result = new ArrayList<>();
         LocalDate newest = LocalDate.parse("2026-08-20");
         for (int index = 0; index < count; index++) {
-            result.add(new MarketPrice(
+            BigDecimal close = new BigDecimal("2500")
+                    .subtract(BigDecimal.valueOf(index));
+            result.add(new GoldDailyBar(
                     "XAUUSD",
                     newest.minusDays(index),
-                    new BigDecimal("2500").subtract(BigDecimal.valueOf(index)),
+                    close,
+                    close.add(BigDecimal.TEN),
+                    close.subtract(BigDecimal.TEN),
+                    close,
                     "usd",
                     "troy_ounce",
-                    "test",
+                    "twelve_data",
                     OffsetDateTime.ofInstant(NOW, ZoneOffset.UTC)
             ));
         }
