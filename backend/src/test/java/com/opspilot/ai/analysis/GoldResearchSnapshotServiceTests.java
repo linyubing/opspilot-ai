@@ -2,8 +2,8 @@ package com.opspilot.ai.analysis;
 
 import com.opspilot.ai.macrodata.MacroObservation;
 import com.opspilot.ai.macrodata.MacroObservationRepository;
-import com.opspilot.ai.marketdata.MarketPrice;
-import com.opspilot.ai.marketdata.MarketPriceRepository;
+import com.opspilot.ai.marketdata.GoldDailyBar;
+import com.opspilot.ai.marketdata.GoldDailyBarRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,17 +32,17 @@ class GoldResearchSnapshotServiceTests {
     private static final OffsetDateTime RATE_COLLECTED_AT =
             OffsetDateTime.parse("2026-08-26T02:00:00Z");
 
-    private MarketPriceRepository marketPriceRepository;
+    private GoldDailyBarRepository goldRepository;
     private MacroObservationRepository macroObservationRepository;
     private GoldResearchSnapshotService service;
 
     @BeforeEach
     void setUp() {
-        marketPriceRepository = mock(MarketPriceRepository.class);
+        goldRepository = mock(GoldDailyBarRepository.class);
         macroObservationRepository =
                 mock(MacroObservationRepository.class);
         service = new GoldResearchSnapshotService(
-                marketPriceRepository,
+                goldRepository,
                 macroObservationRepository,
                 new RealRateFactorEvaluator(),
                 new DollarIndexFactorEvaluator()
@@ -55,7 +55,7 @@ class GoldResearchSnapshotServiceTests {
     @DisplayName("按黄金基准日分别选择各因子的最新可用数据")
     void usesLatestAvailableDataForEachFactor() {
         // 固定数值只验证算法，不代表真实行情。
-        List<MarketPrice> goldPrices = goldPrices(21);
+        List<GoldDailyBar> goldPrices = goldPrices(21);
         goldPrices.add(goldPrice(
                 LocalDate.parse("2026-08-25"),
                 "2300"
@@ -76,7 +76,7 @@ class GoldResearchSnapshotServiceTests {
         ));
         Collections.rotate(dollarIndexes, 3);
 
-        when(marketPriceRepository.findRecent("XAUUSD", 120))
+        when(goldRepository.findRecent("XAUUSD", "twelve_data", 120))
                 .thenReturn(goldPrices);
         when(macroObservationRepository.findRecent("DFII10", 120))
                 .thenReturn(realRates);
@@ -138,7 +138,7 @@ class GoldResearchSnapshotServiceTests {
         assertThat(snapshot.disclaimer())
                 .contains("不构成黄金方向预测或投资建议");
 
-        verify(marketPriceRepository).findRecent("XAUUSD", 120);
+        verify(goldRepository).findRecent("XAUUSD", "twelve_data", 120);
         verify(macroObservationRepository).findRecent("DFII10", 120);
         verify(macroObservationRepository).findRecent("DTWEXBGS", 120);
     }
@@ -147,20 +147,20 @@ class GoldResearchSnapshotServiceTests {
     @DisplayName("历史快照只使用截止日期及之前的数据")
     void createsHistoricalSnapshotWithoutFutureData() {
         LocalDate asOf = ANALYSIS_DATE;
-        List<MarketPrice> liveGold = goldPrices(21);
+        List<GoldDailyBar> liveGold = goldPrices(21);
         liveGold.add(goldPrice(LocalDate.parse("2026-08-25"), "9999"));
         List<MacroObservation> liveRates = realRates(21);
         liveRates.add(realRate(LocalDate.parse("2026-08-25"), "9.99"));
         List<MacroObservation> liveDollars = dollarIndexes(21);
         liveDollars.add(dollarIndex(LocalDate.parse("2026-08-25"), "999"));
 
-        when(marketPriceRepository.findRecent("XAUUSD", 120))
+        when(goldRepository.findRecent("XAUUSD", "twelve_data", 120))
                 .thenReturn(liveGold);
         when(macroObservationRepository.findRecent("DFII10", 120))
                 .thenReturn(liveRates);
         when(macroObservationRepository.findRecent("DTWEXBGS", 120))
                 .thenReturn(liveDollars);
-        when(marketPriceRepository.findRecent("XAUUSD", asOf, 120))
+        when(goldRepository.findRecent("XAUUSD", "twelve_data", asOf, 120))
                 .thenReturn(goldPrices(21));
         when(macroObservationRepository.findRecent("DFII10", asOf, 120))
                 .thenReturn(realRates(21));
@@ -174,7 +174,7 @@ class GoldResearchSnapshotServiceTests {
         assertThat(snapshot.latestDollarIndexDate()).isBeforeOrEqualTo(asOf);
         assertThat(snapshot.gold().currentPrice())
                 .isNotEqualByComparingTo("9999");
-        verify(marketPriceRepository).findRecent("XAUUSD", asOf, 120);
+        verify(goldRepository).findRecent("XAUUSD", "twelve_data", asOf, 120);
         verify(macroObservationRepository).findRecent("DFII10", asOf, 120);
         verify(macroObservationRepository).findRecent("DTWEXBGS", asOf, 120);
     }
@@ -182,7 +182,7 @@ class GoldResearchSnapshotServiceTests {
     @Test
     @DisplayName("任一数据源只有 20 条观测时明确报告数据不足")
     void rejectsInsufficientObservations() {
-        when(marketPriceRepository.findRecent("XAUUSD", 120))
+        when(goldRepository.findRecent("XAUUSD", "twelve_data", 120))
                 .thenReturn(goldPrices(20));
         when(macroObservationRepository.findRecent("DFII10", 120))
                 .thenReturn(realRates(20));
@@ -196,12 +196,12 @@ class GoldResearchSnapshotServiceTests {
     @Test
     @DisplayName("参与计算的黄金价格为零时拒绝生成结论")
     void rejectsNonPositiveGoldPrice() {
-        List<MarketPrice> prices = goldPrices(21);
+        List<GoldDailyBar> prices = goldPrices(21);
         prices.set(5, goldPrice(
                 ANALYSIS_DATE.minusDays(5),
                 "0"
         ));
-        when(marketPriceRepository.findRecent("XAUUSD", 120))
+        when(goldRepository.findRecent("XAUUSD", "twelve_data", 120))
                 .thenReturn(prices);
         when(macroObservationRepository.findRecent("DFII10", 120))
                 .thenReturn(realRates(21));
@@ -214,7 +214,7 @@ class GoldResearchSnapshotServiceTests {
     @Test
     @DisplayName("任一数据源为空时不生成部分研究快照")
     void rejectsEmptyDataSource() {
-        when(marketPriceRepository.findRecent("XAUUSD", 120))
+        when(goldRepository.findRecent("XAUUSD", "twelve_data", 120))
                 .thenReturn(List.of());
         when(macroObservationRepository.findRecent("DFII10", 120))
                 .thenReturn(realRates(21));
@@ -227,7 +227,7 @@ class GoldResearchSnapshotServiceTests {
     @Test
     @DisplayName("没有广义美元指数时拒绝生成部分研究快照")
     void rejectsMissingDollarIndexData() {
-        when(marketPriceRepository.findRecent("XAUUSD", 120))
+        when(goldRepository.findRecent("XAUUSD", "twelve_data", 120))
                 .thenReturn(goldPrices(21));
         when(macroObservationRepository.findRecent("DFII10", 120))
                 .thenReturn(realRates(21));
@@ -242,7 +242,7 @@ class GoldResearchSnapshotServiceTests {
     @Test
     @DisplayName("美元指数只有20条观测时报告数据不足")
     void rejectsInsufficientDollarIndexObservations() {
-        when(marketPriceRepository.findRecent("XAUUSD", 120))
+        when(goldRepository.findRecent("XAUUSD", "twelve_data", 120))
                 .thenReturn(goldPrices(21));
         when(macroObservationRepository.findRecent("DFII10", 120))
                 .thenReturn(realRates(21));
@@ -260,7 +260,7 @@ class GoldResearchSnapshotServiceTests {
     void rejectsDuplicateDollarIndexDates() {
         List<MacroObservation> indexes = dollarIndexes(21);
         indexes.add(dollarIndex(ANALYSIS_DATE, "119.00"));
-        when(marketPriceRepository.findRecent("XAUUSD", 120))
+        when(goldRepository.findRecent("XAUUSD", "twelve_data", 120))
                 .thenReturn(goldPrices(21));
         when(macroObservationRepository.findRecent("DFII10", 120))
                 .thenReturn(realRates(21));
@@ -281,7 +281,7 @@ class GoldResearchSnapshotServiceTests {
                 ANALYSIS_DATE.minusDays(5),
                 "0"
         ));
-        when(marketPriceRepository.findRecent("XAUUSD", 120))
+        when(goldRepository.findRecent("XAUUSD", "twelve_data", 120))
                 .thenReturn(goldPrices(21));
         when(macroObservationRepository.findRecent("DFII10", 120))
                 .thenReturn(realRates(21));
@@ -297,9 +297,9 @@ class GoldResearchSnapshotServiceTests {
     @Test
     @DisplayName("重复观测日期不会被静默覆盖")
     void rejectsDuplicateObservationDates() {
-        List<MarketPrice> prices = goldPrices(21);
+        List<GoldDailyBar> prices = goldPrices(21);
         prices.add(goldPrice(ANALYSIS_DATE, "2199"));
-        when(marketPriceRepository.findRecent("XAUUSD", 120))
+        when(goldRepository.findRecent("XAUUSD", "twelve_data", 120))
                 .thenReturn(prices);
         when(macroObservationRepository.findRecent("DFII10", 120))
                 .thenReturn(realRates(21));
@@ -312,9 +312,9 @@ class GoldResearchSnapshotServiceTests {
     @Test
     @DisplayName("观测日期为空时返回明确的数据完整性错误")
     void rejectsMissingObservationDate() {
-        List<MarketPrice> prices = goldPrices(21);
+        List<GoldDailyBar> prices = goldPrices(21);
         prices.add(goldPrice(null, "2200"));
-        when(marketPriceRepository.findRecent("XAUUSD", 120))
+        when(goldRepository.findRecent("XAUUSD", "twelve_data", 120))
                 .thenReturn(prices);
         when(macroObservationRepository.findRecent("DFII10", 120))
                 .thenReturn(realRates(21));
@@ -333,8 +333,8 @@ class GoldResearchSnapshotServiceTests {
                 );
     }
 
-    private List<MarketPrice> goldPrices(int count) {
-        List<MarketPrice> prices = new ArrayList<>();
+    private List<GoldDailyBar> goldPrices(int count) {
+        List<GoldDailyBar> prices = new ArrayList<>();
         for (int index = 0; index < count; index++) {
             prices.add(goldPrice(
                     ANALYSIS_DATE.minusDays(index),
@@ -386,14 +386,18 @@ class GoldResearchSnapshotServiceTests {
         };
     }
 
-    private MarketPrice goldPrice(LocalDate date, String value) {
-        return new MarketPrice(
+    private GoldDailyBar goldPrice(LocalDate date, String value) {
+        BigDecimal close = new BigDecimal(value);
+        return new GoldDailyBar(
                 "XAUUSD",
                 date,
-                new BigDecimal(value),
+                close,
+                close.add(BigDecimal.TEN),
+                close.subtract(BigDecimal.TEN),
+                close,
                 "usd",
                 "troy_ounce",
-                "alpha_vantage",
+                "twelve_data",
                 GOLD_COLLECTED_AT
         );
     }

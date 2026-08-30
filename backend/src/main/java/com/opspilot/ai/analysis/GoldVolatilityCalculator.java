@@ -1,6 +1,7 @@
 package com.opspilot.ai.analysis;
 
 import com.opspilot.ai.marketdata.MarketPrice;
+import com.opspilot.ai.marketdata.GoldDailyBar;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -49,6 +50,43 @@ public class GoldVolatilityCalculator {
                 .setScale(4, RoundingMode.HALF_UP);
     }
 
+    /** 使用真实黄金日线的收盘价计算 20 日年化波动率。 */
+    public BigDecimal calculateBars(List<GoldDailyBar> bars) {
+        if (bars == null || bars.size() < PRICE_COUNT) {
+            throw new InsufficientResearchDataException(
+                    "计算20日实际波动率至少需要21根黄金日线"
+            );
+        }
+
+        List<GoldDailyBar> recent = bars.stream()
+                .sorted(Comparator.comparing(GoldDailyBar::priceDate))
+                .skip(bars.size() - PRICE_COUNT)
+                .toList();
+
+        double[] returns = new double[PRICE_COUNT - 1];
+        double sum = 0;
+        for (int index = 1; index < recent.size(); index++) {
+            double previous = close(recent.get(index - 1));
+            double current = close(recent.get(index));
+            double dailyReturn = Math.log(current / previous);
+            returns[index - 1] = dailyReturn;
+            sum += dailyReturn;
+        }
+
+        double average = sum / returns.length;
+        double squaredSum = 0;
+        for (double dailyReturn : returns) {
+            double difference = dailyReturn - average;
+            squaredSum += difference * difference;
+        }
+
+        double annualized = Math.sqrt(squaredSum / returns.length)
+                * Math.sqrt(TRADING_DAYS)
+                * 100;
+        return BigDecimal.valueOf(annualized)
+                .setScale(4, RoundingMode.HALF_UP);
+    }
+
     private double value(MarketPrice price) {
         if (price == null
                 || price.referencePrice() == null
@@ -58,5 +96,14 @@ public class GoldVolatilityCalculator {
             );
         }
         return price.referencePrice().doubleValue();
+    }
+
+    private double close(GoldDailyBar bar) {
+        if (bar == null || bar.close() == null || bar.close().signum() <= 0) {
+            throw new InvalidResearchDataException(
+                    "计算实际波动率的黄金收盘价必须大于0"
+            );
+        }
+        return bar.close().doubleValue();
     }
 }

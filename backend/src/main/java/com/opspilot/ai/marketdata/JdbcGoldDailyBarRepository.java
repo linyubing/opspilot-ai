@@ -91,6 +91,26 @@ public class JdbcGoldDailyBarRepository implements GoldDailyBarRepository {
     public List<GoldDailyBar> findRecent(
             String symbol,
             String provider,
+            int limit
+    ) {
+        return jdbc.query(
+                "select " + COLUMNS + """
+                        from gold_daily_bar
+                        where symbol = ? and provider = ?
+                        order by price_date desc
+                        limit ?
+                        """,
+                mapper,
+                symbol,
+                provider,
+                limit
+        );
+    }
+
+    @Override
+    public List<GoldDailyBar> findRecent(
+            String symbol,
+            String provider,
             LocalDate endDate,
             int limit
     ) {

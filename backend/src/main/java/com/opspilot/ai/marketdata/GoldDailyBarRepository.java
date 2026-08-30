@@ -14,6 +14,12 @@ public interface GoldDailyBarRepository {
     List<GoldDailyBar> findRecent(
             String symbol,
             String provider,
+            int limit
+    );
+
+    List<GoldDailyBar> findRecent(
+            String symbol,
+            String provider,
             LocalDate endDate,
             int limit
     );

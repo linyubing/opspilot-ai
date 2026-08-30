@@ -1,6 +1,7 @@
 package com.opspilot.ai.analysis;
 
 import com.opspilot.ai.marketdata.MarketPrice;
+import com.opspilot.ai.marketdata.GoldDailyBar;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -29,6 +30,22 @@ class GoldVolatilityCalculatorTests {
         assertThat(result).isEqualByComparingTo("151.3002");
     }
 
+    @Test
+    void calculatesFromBarClose() {
+        List<GoldDailyBar> bars = new ArrayList<>();
+        LocalDate start = LocalDate.parse("2026-01-01");
+        for (int index = 0; index < 21; index++) {
+            String close = index % 2 == 0 ? "100" : "110";
+            bars.add(bar(start.plusDays(index), close));
+        }
+        Collections.reverse(bars);
+
+        BigDecimal result = new GoldVolatilityCalculator()
+                .calculateBars(bars);
+
+        assertThat(result).isEqualByComparingTo("151.3002");
+    }
+
     private MarketPrice price(LocalDate date, String value) {
         return new MarketPrice(
                 "XAUUSD",
@@ -37,6 +54,22 @@ class GoldVolatilityCalculatorTests {
                 "usd",
                 "troy_ounce",
                 "test",
+                OffsetDateTime.parse("2026-01-30T00:00:00Z")
+        );
+    }
+
+    private GoldDailyBar bar(LocalDate date, String close) {
+        BigDecimal value = new BigDecimal(close);
+        return new GoldDailyBar(
+                "XAUUSD",
+                date,
+                value.add(BigDecimal.ONE),
+                value.add(BigDecimal.TEN),
+                value.subtract(BigDecimal.TEN),
+                value,
+                "usd",
+                "troy_ounce",
+                "twelve_data",
                 OffsetDateTime.parse("2026-01-30T00:00:00Z")
         );
     }
