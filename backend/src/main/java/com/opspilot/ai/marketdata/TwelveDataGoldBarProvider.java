@@ -1,18 +1,72 @@
 package com.opspilot.ai.marketdata;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientException;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.time.Clock;
 import java.util.ArrayList;
 import java.util.List;
 
 /** 解析 Twelve Data 返回的 XAU/USD 日线，暂不负责持久化。 */
+@Component
 public class TwelveDataGoldBarProvider {
 
     private static final String SYMBOL = "XAUUSD";
     private static final String PROVIDER = "twelve_data";
+
+    private RestClient restClient;
+    private TwelveDataProperties properties;
+    private Clock clock;
+
+    TwelveDataGoldBarProvider() {
+    }
+
+    @Autowired
+    public TwelveDataGoldBarProvider(
+            @Qualifier("twelveDataRestClient") RestClient restClient,
+            TwelveDataProperties properties,
+            Clock clock
+    ) {
+        this.restClient = restClient;
+        this.properties = properties;
+        this.clock = clock;
+    }
+
+    public List<GoldDailyBar> fetchDailyBars() {
+        if (properties.apiKey() == null
+                || properties.apiKey().isBlank()) {
+            throw new MarketDataUnavailableException(
+                    "Twelve Data API Key 未配置"
+            );
+        }
+        try {
+            JsonNode root = restClient.get()
+                    .uri(builder -> builder
+                            .path("/time_series")
+                            .queryParam("symbol", "XAU/USD")
+                            .queryParam("interval", "1day")
+                            .queryParam("outputsize", 5000)
+                            .queryParam("apikey", properties.apiKey())
+                            .build())
+                    .retrieve()
+                    .body(JsonNode.class);
+            return parse(root, OffsetDateTime.now(clock));
+        } catch (MarketDataUnavailableException exception) {
+            throw exception;
+        } catch (RestClientException exception) {
+            throw new MarketDataUnavailableException(
+                    "Twelve Data 黄金日线请求失败",
+                    exception
+            );
+        }
+    }
 
     List<GoldDailyBar> parse(JsonNode root, OffsetDateTime collectedAt) {
         validateRoot(root);

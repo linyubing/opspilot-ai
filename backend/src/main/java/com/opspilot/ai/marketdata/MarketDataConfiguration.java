@@ -10,11 +10,29 @@ import java.net.http.HttpClient;
 import java.time.Clock;
 
 @Configuration
-@EnableConfigurationProperties(MarketDataProperties.class)
+@EnableConfigurationProperties({
+        MarketDataProperties.class,
+        TwelveDataProperties.class
+})
 public class MarketDataConfiguration {
 
     @Bean
     RestClient alphaVantageRestClient(MarketDataProperties properties) {
+        HttpClient httpClient = HttpClient.newBuilder()
+                .connectTimeout(properties.connectTimeout())
+                .build();
+        JdkClientHttpRequestFactory requestFactory =
+                new JdkClientHttpRequestFactory(httpClient);
+        requestFactory.setReadTimeout(properties.readTimeout());
+
+        return RestClient.builder()
+                .baseUrl(properties.baseUrl().toString())
+                .requestFactory(requestFactory)
+                .build();
+    }
+
+    @Bean
+    RestClient twelveDataRestClient(TwelveDataProperties properties) {
         HttpClient httpClient = HttpClient.newBuilder()
                 .connectTimeout(properties.connectTimeout())
                 .build();

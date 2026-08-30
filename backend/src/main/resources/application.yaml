@@ -109,6 +109,12 @@ opspilot:
       model-name: glm-4.7
 
   market-data:
+    twelve-data:
+      base-url: https://api.twelvedata.com
+      # OHLC Key 只从环境变量读取，禁止写入配置文件和 Git。
+      api-key: ${TWELVE_DATA_API_KEY:}
+      connect-timeout: 5s
+      read-timeout: 20s
     alpha-vantage:
       base-url: https://www.alphavantage.co
       # 黄金行情 Key 只从环境变量读取，禁止写入配置文件和 Git。
