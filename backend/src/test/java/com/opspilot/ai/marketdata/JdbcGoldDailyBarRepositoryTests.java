@@ -45,14 +45,71 @@ class JdbcGoldDailyBarRepositoryTests {
                 });
     }
 
+    @Test
+    void findsRecentWithoutFutureBars() {
+        repository.saveAll(List.of(
+                bar("2026-08-27", "4400"),
+                bar("2026-08-28", "4456"),
+                bar("2026-09-01", "4500")
+        ));
+
+        List<GoldDailyBar> bars = repository.findRecent(
+                "XAUUSD",
+                PROVIDER,
+                LocalDate.parse("2026-08-28"),
+                2
+        );
+
+        assertThat(bars)
+                .extracting(GoldDailyBar::priceDate)
+                .containsExactly(
+                        LocalDate.parse("2026-08-28"),
+                        LocalDate.parse("2026-08-27")
+                );
+    }
+
+    @Test
+    void findsAllInDateOrder() {
+        repository.saveAll(List.of(
+                bar("2026-08-28", "4456"),
+                bar("2026-08-27", "4400")
+        ));
+
+        assertThat(repository.findAll("XAUUSD", PROVIDER))
+                .extracting(GoldDailyBar::priceDate)
+                .containsExactly(
+                        LocalDate.parse("2026-08-27"),
+                        LocalDate.parse("2026-08-28")
+                );
+    }
+
+    @Test
+    void findsNextRealBar() {
+        repository.saveAll(List.of(
+                bar("2026-08-28", "4456"),
+                bar("2026-09-01", "4500")
+        ));
+
+        assertThat(repository.findNext(
+                "XAUUSD",
+                PROVIDER,
+                LocalDate.parse("2026-08-28")
+        )).hasValueSatisfying(next -> {
+            assertThat(next.priceDate())
+                    .isEqualTo(LocalDate.parse("2026-09-01"));
+            assertThat(next.close()).isEqualByComparingTo("4500");
+        });
+    }
+
     private GoldDailyBar bar(String date, String close) {
+        BigDecimal closePrice = new BigDecimal(close);
         return new GoldDailyBar(
                 "XAUUSD",
                 LocalDate.parse(date),
-                new BigDecimal("4601.3"),
-                new BigDecimal("4637.2"),
-                new BigDecimal("4444.6"),
-                new BigDecimal(close),
+                closePrice,
+                closePrice.add(BigDecimal.TEN),
+                closePrice.subtract(BigDecimal.TEN),
+                closePrice,
                 "usd",
                 "troy_ounce",
                 PROVIDER,

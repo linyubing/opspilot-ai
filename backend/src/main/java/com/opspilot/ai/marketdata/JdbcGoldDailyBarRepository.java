@@ -86,4 +86,67 @@ public class JdbcGoldDailyBarRepository implements GoldDailyBarRepository {
                 provider
         ).stream().findFirst();
     }
+
+    @Override
+    public List<GoldDailyBar> findRecent(
+            String symbol,
+            String provider,
+            LocalDate endDate,
+            int limit
+    ) {
+        return jdbc.query(
+                "select " + COLUMNS + """
+                        from gold_daily_bar
+                        where symbol = ?
+                          and provider = ?
+                          and price_date <= ?
+                        order by price_date desc
+                        limit ?
+                        """,
+                mapper,
+                symbol,
+                provider,
+                endDate,
+                limit
+        );
+    }
+
+    @Override
+    public List<GoldDailyBar> findAll(
+            String symbol,
+            String provider
+    ) {
+        return jdbc.query(
+                "select " + COLUMNS + """
+                        from gold_daily_bar
+                        where symbol = ? and provider = ?
+                        order by price_date
+                        """,
+                mapper,
+                symbol,
+                provider
+        );
+    }
+
+    @Override
+    public Optional<GoldDailyBar> findNext(
+            String symbol,
+            String provider,
+            LocalDate baseDate
+    ) {
+        return jdbc.query(
+                "select " + COLUMNS + """
+                        from gold_daily_bar
+                        where symbol = ?
+                          and provider = ?
+                          and price_date > ?
+                        order by price_date
+                        limit 1
+                        """,
+                mapper,
+                symbol,
+                provider,
+                baseDate
+        ).stream().findFirst();
+    }
 }
