@@ -481,6 +481,7 @@ async function loadEvaluation(id) {
         ]);
         cases = Array.isArray(loadedCases) ? loadedCases : [];
         activeId = id;
+        localStorage.setItem("goldBacktestId", id);
         compareResult.hidden = true;
         compareError.hidden = true;
         compareStatus.textContent = "请输入使用 v2 候选提示词的回测任务 ID。";

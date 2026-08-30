@@ -17,19 +17,19 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class GoldForecastDataFreshnessPolicyTests {
 
     private static final Clock CLOCK = Clock.fixed(
-            Instant.parse("2026-08-27T12:00:00Z"),
+            Instant.parse("2026-08-30T12:00:00Z"),
             ZoneOffset.UTC
     );
     private final GoldForecastDataFreshnessPolicy policy =
             new GoldForecastDataFreshnessPolicy(CLOCK);
 
     @Test
-    @DisplayName("黄金三天和宏观七天边界内允许生成预测")
+    @DisplayName("按各数据源独立时效允许官方最新数据生成预测")
     void acceptsBoundaryDates() {
         assertThatCode(() -> policy.validate(snapshot(
-                "2026-08-24",
-                "2026-08-20",
-                "2026-08-20"
+                "2026-08-28",
+                "2026-08-27",
+                "2026-08-21"
         ))).doesNotThrowAnyException();
     }
 
@@ -37,20 +37,20 @@ class GoldForecastDataFreshnessPolicyTests {
     @DisplayName("黄金价格超过三天时拒绝生成预测")
     void rejectsStaleGoldPrice() {
         assertStale(
-                snapshot("2026-08-23", "2026-08-25", "2026-08-21"),
+                snapshot("2026-08-26", "2026-08-27", "2026-08-21"),
                 "黄金价格"
         );
     }
 
     @Test
-    @DisplayName("任一宏观数据超过七天时拒绝生成预测")
+    @DisplayName("宏观数据超过各自时效时拒绝生成预测")
     void rejectsStaleMacroData() {
         assertStale(
-                snapshot("2026-08-26", "2026-08-19", "2026-08-21"),
+                snapshot("2026-08-28", "2026-08-22", "2026-08-21"),
                 "实际利率"
         );
         assertStale(
-                snapshot("2026-08-26", "2026-08-25", "2026-08-19"),
+                snapshot("2026-08-28", "2026-08-27", "2026-08-19"),
                 "美元指数"
         );
     }
@@ -59,8 +59,8 @@ class GoldForecastDataFreshnessPolicyTests {
     @DisplayName("任一观测日期来自未来时拒绝生成预测")
     void rejectsFutureObservationDate() {
         assertThatThrownBy(() -> policy.validate(snapshot(
-                "2026-08-28",
-                "2026-08-25",
+                "2026-08-31",
+                "2026-08-27",
                 "2026-08-21"
         )))
                 .isInstanceOf(StaleGoldForecastDataException.class)

@@ -13,7 +13,8 @@ import java.util.Objects;
 public class GoldForecastDataFreshnessPolicy {
 
     private static final int GOLD_MAX_AGE_DAYS = 3;
-    private static final int MACRO_MAX_AGE_DAYS = 7;
+    private static final int REAL_RATE_MAX_AGE_DAYS = 7;
+    private static final int DOLLAR_INDEX_MAX_AGE_DAYS = 10;
 
     private final Clock clock;
 
@@ -35,13 +36,13 @@ public class GoldForecastDataFreshnessPolicy {
                 "实际利率",
                 snapshot.latestRealRateDate(),
                 currentDate,
-                MACRO_MAX_AGE_DAYS
+                REAL_RATE_MAX_AGE_DAYS
         );
         validateDate(
                 "美元指数",
                 snapshot.latestDollarIndexDate(),
                 currentDate,
-                MACRO_MAX_AGE_DAYS
+                DOLLAR_INDEX_MAX_AGE_DAYS
         );
     }
 

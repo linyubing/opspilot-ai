@@ -52,8 +52,8 @@ class GoldResearchSnapshotServiceTests {
     }
 
     @Test
-    @DisplayName("按最新共同日期计算可复算的 1、5、20 期指标")
-    void calculatesMetricsFromCommonDates() {
+    @DisplayName("按黄金基准日分别选择各因子的最新可用数据")
+    void usesLatestAvailableDataForEachFactor() {
         // 固定数值只验证算法，不代表真实行情。
         List<MarketPrice> goldPrices = goldPrices(21);
         goldPrices.add(goldPrice(
@@ -85,7 +85,8 @@ class GoldResearchSnapshotServiceTests {
 
         GoldResearchSnapshot snapshot = service.createSnapshot();
 
-        assertThat(snapshot.analysisDate()).isEqualTo(ANALYSIS_DATE);
+        assertThat(snapshot.analysisDate())
+                .isEqualTo(LocalDate.parse("2026-08-25"));
         assertThat(snapshot.latestGoldDate())
                 .isEqualTo(LocalDate.parse("2026-08-25"));
         assertThat(snapshot.latestRealRateDate())
@@ -93,42 +94,42 @@ class GoldResearchSnapshotServiceTests {
         assertThat(snapshot.latestDollarIndexDate())
                 .isEqualTo(LocalDate.parse("2026-08-25"));
         assertThat(snapshot.gold().currentPrice())
-                .isEqualByComparingTo("2200");
+                .isEqualByComparingTo("2300");
         assertThat(snapshot.gold().return1())
-                .isEqualByComparingTo("10.0000");
+                .isEqualByComparingTo("4.5455");
         assertThat(snapshot.gold().return5())
-                .isEqualByComparingTo("4.7619");
+                .isEqualByComparingTo("12.1951");
         assertThat(snapshot.gold().return20())
-                .isEqualByComparingTo("22.2222");
+                .isEqualByComparingTo("12.1951");
         assertThat(snapshot.gold().collectedAt())
                 .isEqualTo(GOLD_COLLECTED_AT);
 
         assertThat(snapshot.realRate().currentRate())
-                .isEqualByComparingTo("2.38");
+                .isEqualByComparingTo("2.40");
         assertThat(snapshot.realRate().percentagePointChange1())
-                .isEqualByComparingTo("0.080000");
+                .isEqualByComparingTo("0.020000");
         assertThat(snapshot.realRate().percentagePointChange5())
-                .isEqualByComparingTo("0.180000");
+                .isEqualByComparingTo("0.150000");
         assertThat(snapshot.realRate().percentagePointChange20())
-                .isEqualByComparingTo("0.280000");
+                .isEqualByComparingTo("0.150000");
         assertThat(snapshot.realRate().basisPointChange1())
-                .isEqualByComparingTo("8.00");
+                .isEqualByComparingTo("2.00");
         assertThat(snapshot.realRate().basisPointChange5())
-                .isEqualByComparingTo("18.00");
+                .isEqualByComparingTo("15.00");
         assertThat(snapshot.realRate().basisPointChange20())
-                .isEqualByComparingTo("28.00");
+                .isEqualByComparingTo("15.00");
         assertThat(snapshot.realRate().collectedAt())
                 .isEqualTo(RATE_COLLECTED_AT);
         assertThat(snapshot.realRateAssessment().status())
                 .isEqualTo(GoldFactorStatus.PRESSURING);
         assertThat(snapshot.dollarIndex().currentIndex())
-                .isEqualByComparingTo("120.00");
+                .isEqualByComparingTo("121.00");
         assertThat(snapshot.dollarIndex().return1())
-                .isEqualByComparingTo("2.5641");
+                .isEqualByComparingTo("0.8333");
         assertThat(snapshot.dollarIndex().return5())
-                .isEqualByComparingTo("2.5641");
+                .isEqualByComparingTo("3.4188");
         assertThat(snapshot.dollarIndex().return20())
-                .isEqualByComparingTo("2.5641");
+                .isEqualByComparingTo("3.4188");
         assertThat(snapshot.dollarIndexAssessment().status())
                 .isEqualTo(GoldFactorStatus.PRESSURING);
         assertThat(snapshot.researchVersion())
@@ -178,8 +179,8 @@ class GoldResearchSnapshotServiceTests {
     }
 
     @Test
-    @DisplayName("只有 20 个共同日期时明确报告数据不足")
-    void rejectsInsufficientCommonDates() {
+    @DisplayName("任一数据源只有 20 条观测时明确报告数据不足")
+    void rejectsInsufficientObservations() {
         when(marketPriceRepository.findRecent("XAUUSD", 120))
                 .thenReturn(goldPrices(20));
         when(macroObservationRepository.findRecent("DFII10", 120))
@@ -238,8 +239,8 @@ class GoldResearchSnapshotServiceTests {
     }
 
     @Test
-    @DisplayName("三方共同日期只有20个时报告数据不足")
-    void rejectsInsufficientThreeWayCommonDates() {
+    @DisplayName("美元指数只有20条观测时报告数据不足")
+    void rejectsInsufficientDollarIndexObservations() {
         when(marketPriceRepository.findRecent("XAUUSD", 120))
                 .thenReturn(goldPrices(21));
         when(macroObservationRepository.findRecent("DFII10", 120))

@@ -28,7 +28,7 @@ public class GoldResearchSnapshotService {
     private static final String DOLLAR_INDEX_SERIES_ID = "DTWEXBGS";
     private static final String RESEARCH_VERSION = "gold-multifactor-v2";
     private static final int QUERY_LIMIT = 120;
-    private static final int REQUIRED_COMMON_DATE_COUNT = 21;
+    private static final int REQUIRED_OBSERVATION_COUNT = 21;
 
     private static final BigDecimal ONE_HUNDRED =
             new BigDecimal("100");
@@ -109,21 +109,6 @@ public class GoldResearchSnapshotService {
 
         validateSourceData(goldPrices, realRates, dollarIndexes);
 
-        LocalDate latestGoldDate = goldPrices.stream()
-                .map(MarketPrice::priceDate)
-                .max(LocalDate::compareTo)
-                .orElseThrow();
-
-        LocalDate latestRealRateDate = realRates.stream()
-                .map(MacroObservation::observationDate)
-                .max(LocalDate::compareTo)
-                .orElseThrow();
-
-        LocalDate latestDollarIndexDate = dollarIndexes.stream()
-                .map(MacroObservation::observationDate)
-                .max(LocalDate::compareTo)
-                .orElseThrow();
-
         Map<LocalDate, MarketPrice> goldByDate =
                 indexGoldPrices(goldPrices);
 
@@ -133,52 +118,42 @@ public class GoldResearchSnapshotService {
         Map<LocalDate, MacroObservation> dollarIndexByDate =
                 indexDollarIndexes(dollarIndexes);
 
-        /*
-         * 只保留两个数据源都有记录的日期。
-         * 不使用插值，也不拿前一个工作日的数据冒充当天数据。
-         */
-        List<LocalDate> commonDates = goldByDate.keySet()
-                .stream()
-                .filter(realRateByDate::containsKey)
-                .filter(dollarIndexByDate::containsKey)
-                .sorted(Comparator.reverseOrder())
+        List<MarketPrice> sortedGold = goldByDate.values().stream()
+                .sorted(Comparator.comparing(MarketPrice::priceDate).reversed())
+                .toList();
+        List<MacroObservation> sortedRates = realRateByDate.values().stream()
+                .sorted(Comparator.comparing(MacroObservation::observationDate).reversed())
+                .toList();
+        List<MacroObservation> sortedDollars = dollarIndexByDate.values().stream()
+                .sorted(Comparator.comparing(MacroObservation::observationDate).reversed())
                 .toList();
 
-        if (commonDates.size() < REQUIRED_COMMON_DATE_COUNT) {
-            throw new InsufficientResearchDataException(
-                    "共同观测日期不足，实际="
-                            + commonDates.size()
-                            + "，最低要求="
-                            + REQUIRED_COMMON_DATE_COUNT
-            );
-        }
+        validateCount("黄金价格", sortedGold.size());
+        validateCount("实际利率", sortedRates.size());
+        validateCount("广义美元指数", sortedDollars.size());
 
-        MarketPrice currentGold =
-                goldByDate.get(commonDates.get(0));
-        MarketPrice gold1 =
-                goldByDate.get(commonDates.get(1));
-        MarketPrice gold5 =
-                goldByDate.get(commonDates.get(5));
-        MarketPrice gold20 =
-                goldByDate.get(commonDates.get(20));
+        /*
+         * 各市场按自己的发布节奏取最新值，不要求观测日期完全相同。
+         * 原始日期仍保留在快照中，不能把旧宏观数据伪装成黄金基准日数据。
+         */
+        MarketPrice currentGold = sortedGold.get(0);
+        MarketPrice gold1 = sortedGold.get(1);
+        MarketPrice gold5 = sortedGold.get(5);
+        MarketPrice gold20 = sortedGold.get(20);
 
-        MacroObservation currentRealRate =
-                realRateByDate.get(commonDates.get(0));
-        MacroObservation realRate1 =
-                realRateByDate.get(commonDates.get(1));
-        MacroObservation realRate5 =
-                realRateByDate.get(commonDates.get(5));
-        MacroObservation realRate20 =
-                realRateByDate.get(commonDates.get(20));
+        MacroObservation currentRealRate = sortedRates.get(0);
+        MacroObservation realRate1 = sortedRates.get(1);
+        MacroObservation realRate5 = sortedRates.get(5);
+        MacroObservation realRate20 = sortedRates.get(20);
 
-        MacroObservation currentDollarIndex =
-                dollarIndexByDate.get(commonDates.get(0));
-        MacroObservation dollarIndex1 =
-                dollarIndexByDate.get(commonDates.get(1));
-        MacroObservation dollarIndex5 =
-                dollarIndexByDate.get(commonDates.get(5));
-        MacroObservation dollarIndex20 =
-                dollarIndexByDate.get(commonDates.get(20));
+        MacroObservation currentDollarIndex = sortedDollars.get(0);
+        MacroObservation dollarIndex1 = sortedDollars.get(1);
+        MacroObservation dollarIndex5 = sortedDollars.get(5);
+        MacroObservation dollarIndex20 = sortedDollars.get(20);
+
+        LocalDate latestGoldDate = currentGold.priceDate();
+        LocalDate latestRealRateDate = currentRealRate.observationDate();
+        LocalDate latestDollarIndexDate = currentDollarIndex.observationDate();
 
         validateGoldPrice(currentGold);
         validateGoldPrice(gold1);
@@ -268,7 +243,7 @@ public class GoldResearchSnapshotService {
                 );
 
         return new GoldResearchSnapshot(
-                commonDates.get(0),
+                latestGoldDate,
                 latestGoldDate,
                 latestRealRateDate,
                 latestDollarIndexDate,
@@ -280,6 +255,15 @@ public class GoldResearchSnapshotService {
                 RESEARCH_VERSION,
                 DISCLAIMER
         );
+    }
+
+    private void validateCount(String dataName, int count) {
+        if (count < REQUIRED_OBSERVATION_COUNT) {
+            throw new InsufficientResearchDataException(
+                    dataName + "观测数量不足，实际=" + count
+                            + "，最低要求=" + REQUIRED_OBSERVATION_COUNT
+            );
+        }
     }
 
     private void validateSourceData(

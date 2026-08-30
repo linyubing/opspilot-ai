@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="查看黄金下一有效交易日方向预测及其可信度">
+    <title>黄金行情预测</title>
+    <link rel="stylesheet" href="/forecast.css?v=1">
+</head>
+<body>
+<main class="shell">
+    <header class="hero">
+        <div>
+            <p class="eyebrow">黄金研究助手</p>
+            <h1>下一有效交易日预测</h1>
+            <p>基于预测时已经公开的真实市场数据，预测上涨、中性或下跌。</p>
+        </div>
+        <button id="generateButton" type="button">同步最新数据并生成预测</button>
+    </header>
+
+    <p id="status" class="status">正在读取最新预测……</p>
+    <section id="errorBox" class="error" hidden></section>
+
+    <section id="emptyBox" class="empty" hidden>
+        <h2>还没有正式预测</h2>
+        <p>点击上方按钮后，系统会同步真实数据、调用大模型并保存一条不可覆盖的预测。</p>
+    </section>
+
+    <section id="report" hidden>
+        <article id="directionCard" class="direction-card">
+            <div>
+                <span class="label">预测方向</span>
+                <strong id="direction">—</strong>
+            </div>
+            <dl>
+                <div><dt>黄金基准日</dt><dd id="baseDate">—</dd></div>
+                <div><dt>黄金基准价</dt><dd id="basePrice">—</dd></div>
+                <div><dt>验证状态</dt><dd id="forecastStatus">—</dd></div>
+                <div><dt>生成时间</dt><dd id="createdAt">—</dd></div>
+            </dl>
+        </article>
+
+        <section class="panel">
+            <div class="heading">
+                <h2>本次预测依据</h2>
+                <span id="modelName" class="pill"></span>
+            </div>
+            <p id="reasoning" class="reasoning"></p>
+            <h3>预测失效条件</h3>
+            <ul id="conditions"></ul>
+        </section>
+
+        <section class="panel">
+            <div class="heading">
+                <h2>输入数据日期</h2>
+                <span>不同市场按各自发布节奏取最新可用值</span>
+            </div>
+            <div class="source-grid">
+                <article><span>黄金价格</span><strong id="goldDate">—</strong><small id="goldLag"></small></article>
+                <article><span>实际利率</span><strong id="rateDate">—</strong><small id="rateLag"></small></article>
+                <article><span>美元指数</span><strong id="dollarDate">—</strong><small id="dollarLag"></small></article>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="heading"><h2>大模型研究解读</h2></div>
+            <p id="summary" class="reasoning"></p>
+            <div class="analysis-grid">
+                <article><h3>实际利率</h3><p id="rateAnalysis"></p></article>
+                <article><h3>美元指数</h3><p id="dollarAnalysis"></p></article>
+            </div>
+        </section>
+    </section>
+
+    <section class="panel accuracy-panel">
+        <div class="heading">
+            <h2>准确率参考</h2>
+            <a href="/backtest.html">查看历史回测准确率 →</a>
+        </div>
+        <div class="accuracy-grid">
+            <article><span>正式预测已结算</span><strong id="resolvedCount">0</strong></article>
+            <article><span>正式预测累计准确率</span><strong id="overallAccuracy">暂无</strong></article>
+            <article><span>最近 20 条准确率</span><strong id="rollingAccuracy">暂无</strong></article>
+            <article><span>当前回测准确率</span><strong id="backtestAccuracy">未选择回测</strong></article>
+        </div>
+        <p class="note">历史回测衡量方法过去的表现；本次预测必须等下一条真实金价发布后才能判断准不准。</p>
+    </section>
+</main>
+<script src="/forecast.js?v=1" defer></script>
+</body>
+</html>
