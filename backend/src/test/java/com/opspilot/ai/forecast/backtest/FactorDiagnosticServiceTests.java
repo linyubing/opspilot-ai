@@ -51,6 +51,28 @@ class FactorDiagnosticServiceTests {
         assertThat(dollar.directionalAccuracy()).isEqualByComparingTo("0.5000");
     }
 
+    @Test
+    void diagnosesShortTermReversal() {
+        UUID id = UUID.randomUUID();
+        BacktestService backtests = mock(BacktestService.class);
+        List<BacktestCase> cases = List.of(
+                item("1", "2", "0", ForecastDirection.BEARISH),
+                item("-1", "-2", "0", ForecastDirection.BULLISH),
+                item("1", "-2", "0", ForecastDirection.NEUTRAL)
+        );
+        when(backtests.results(id, 120)).thenReturn(cases);
+
+        FactorDiagnosticReport report =
+                new FactorDiagnosticService(backtests).diagnose(id);
+
+        FactorDiagnostic reversal = report.factors().stream()
+                .filter(item -> "SHORT_TERM_REVERSAL".equals(item.factor()))
+                .findFirst()
+                .orElseThrow();
+        assertThat(reversal.accuracy()).isEqualByComparingTo("1.0000");
+        assertThat(reversal.signals()).isEqualTo(new DirectionCounts(1, 1, 1));
+    }
+
     private BacktestCase item(
             String return20,
             ForecastDirection actual,
@@ -62,12 +84,38 @@ class FactorDiagnosticServiceTests {
         when(item.snapshot()).thenReturn(snapshot);
         when(item.actualDirection()).thenReturn(actual);
         when(snapshot.gold()).thenReturn(mock(GoldReturnMetrics.class));
+        when(snapshot.gold().return1()).thenReturn(BigDecimal.ZERO);
+        when(snapshot.gold().return5()).thenReturn(BigDecimal.ZERO);
         when(snapshot.gold().return20()).thenReturn(new BigDecimal(return20));
         when(snapshot.realRateAssessment()).thenReturn(
                 new ResearchFactorAssessment(realRate, "test", "test")
         );
         when(snapshot.dollarIndexAssessment()).thenReturn(
                 new ResearchFactorAssessment(dollar, "test", "test")
+        );
+        return item;
+    }
+
+    private BacktestCase item(
+            String return1,
+            String return5,
+            String return20,
+            ForecastDirection actual
+    ) {
+        BacktestCase item = mock(BacktestCase.class);
+        GoldResearchSnapshot snapshot = mock(GoldResearchSnapshot.class);
+        GoldReturnMetrics gold = mock(GoldReturnMetrics.class);
+        when(item.snapshot()).thenReturn(snapshot);
+        when(item.actualDirection()).thenReturn(actual);
+        when(snapshot.gold()).thenReturn(gold);
+        when(gold.return1()).thenReturn(new BigDecimal(return1));
+        when(gold.return5()).thenReturn(new BigDecimal(return5));
+        when(gold.return20()).thenReturn(new BigDecimal(return20));
+        when(snapshot.realRateAssessment()).thenReturn(
+                new ResearchFactorAssessment(GoldFactorStatus.NEUTRAL, "test", "test")
+        );
+        when(snapshot.dollarIndexAssessment()).thenReturn(
+                new ResearchFactorAssessment(GoldFactorStatus.NEUTRAL, "test", "test")
         );
         return item;
     }

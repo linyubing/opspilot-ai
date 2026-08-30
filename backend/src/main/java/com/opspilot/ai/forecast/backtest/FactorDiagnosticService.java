@@ -59,9 +59,32 @@ public class FactorDiagnosticService {
                                 "DOLLAR_INDEX", samples,
                                 item -> status(item.snapshot()
                                         .dollarIndexAssessment().status())
+                        ),
+                        diagnose(
+                                "SHORT_TERM_REVERSAL", samples,
+                                this::shortReversal
                         )
                 )
         );
+    }
+
+    /** 根据 1 日与 5 日收益率是否同向，生成未经调参的短期反转信号。 */
+    private ForecastDirection shortReversal(FactorSample item) {
+        int daily = item.snapshot().gold().return1().signum();
+        int weekly = item.snapshot().gold().return5().signum();
+
+        // 短期连续上涨，判断接下来可能回落。
+        if (daily > 0 && weekly > 0) {
+            return ForecastDirection.BEARISH;
+        }
+
+        // 短期连续下跌，判断接下来可能反弹。
+        if (daily < 0 && weekly < 0) {
+            return ForecastDirection.BULLISH;
+        }
+
+        // 两个周期方向冲突时，不强行预测。
+        return ForecastDirection.NEUTRAL;
     }
 
     private FactorDiagnostic diagnose(

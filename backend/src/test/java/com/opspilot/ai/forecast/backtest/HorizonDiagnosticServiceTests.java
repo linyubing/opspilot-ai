@@ -75,6 +75,8 @@ class HorizonDiagnosticServiceTests {
         when(item.basePrice()).thenReturn(new BigDecimal("100"));
         when(item.snapshot()).thenReturn(snapshot);
         when(snapshot.gold()).thenReturn(gold);
+        when(gold.return1()).thenReturn(BigDecimal.ZERO);
+        when(gold.return5()).thenReturn(BigDecimal.ZERO);
         when(gold.return20()).thenReturn(BigDecimal.ONE);
         when(snapshot.realRateAssessment()).thenReturn(new ResearchFactorAssessment(
                 GoldFactorStatus.NEUTRAL, "test", "test"
