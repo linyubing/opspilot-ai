@@ -33,10 +33,7 @@ function lag(baseDate, sourceDate) {
     return days === 0 ? "与基准日一致" : `较基准日滞后 ${days} 天`;
 }
 
-function renderReport(data) {
-    const snapshot = data.snapshot.snapshot;
-    const forecast = data.forecast;
-    const narrative = data.narrative.content;
+function renderForecast(forecast) {
     const direction = forecast.predictedDirection;
 
     reportBox.hidden = false;
@@ -45,6 +42,7 @@ function renderReport(data) {
     card.className = `direction-card ${direction === "BULLISH" ? "up" : direction === "BEARISH" ? "down" : "flat"}`;
     text("direction", directions[direction] || direction);
     text("baseDate", forecast.baseDate);
+    text("targetSession", forecast.targetDate || `基准日 ${forecast.baseDate} 后的下一有效黄金交易日`);
     text("basePrice", forecast.basePrice == null ? "—" : `$${Number(forecast.basePrice).toFixed(2)}`);
     text("forecastStatus", statuses[forecast.status] || forecast.status);
     text("createdAt", forecast.createdAt ? new Date(forecast.createdAt).toLocaleString("zh-CN") : "—");
@@ -57,6 +55,27 @@ function renderReport(data) {
         li.textContent = item;
         return li;
     }));
+}
+
+function renderForecastOnly(forecast) {
+    renderForecast(forecast);
+    text("goldDate", forecast.baseDate);
+    text("goldLag", "预测采用的黄金基准行情");
+    text("rateDate", "研究解读尚未生成");
+    text("rateLag", "");
+    text("dollarDate", "研究解读尚未生成");
+    text("dollarLag", "");
+    text("summary", "方向预测已生成，完整研究解读尚未生成。");
+    text("rateAnalysis", "—");
+    text("dollarAnalysis", "—");
+}
+
+function renderReport(data) {
+    const snapshot = data.snapshot.snapshot;
+    const forecast = data.forecast;
+    const narrative = data.narrative.content;
+
+    renderForecast(forecast);
 
     text("goldDate", snapshot.latestGoldDate);
     text("rateDate", snapshot.latestRealRateDate);
@@ -72,16 +91,25 @@ function renderReport(data) {
 async function loadLatest() {
     errorBox.hidden = true;
     try {
-        const data = await request("/api/research/gold/daily-report/latest");
-        renderReport(data);
-        statusText.textContent = "已加载最新正式预测。";
-    } catch (error) {
-        if (error.status === 404) {
+        const forecasts = await request("/api/research/gold/forecasts?limit=1");
+        if (forecasts.length === 0) {
             reportBox.hidden = true;
             emptyBox.hidden = false;
             statusText.textContent = "当前还没有正式预测。";
             return;
         }
+
+        renderForecastOnly(forecasts[0]);
+        statusText.textContent = "已加载最新正式预测，完整研究解读尚未生成。";
+
+        try {
+            const report = await request("/api/research/gold/daily-report/latest");
+            renderReport(report);
+            statusText.textContent = "已加载最新正式预测。";
+        } catch (reportError) {
+            if (reportError.status !== 404) throw reportError;
+        }
+    } catch (error) {
         showError(error);
     }
 }

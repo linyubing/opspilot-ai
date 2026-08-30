@@ -64,7 +64,9 @@ class BacktestRunnerTests {
         runner = new BacktestRunner(
                 repo, priceRepo, snapshots, new BacktestPromptBuilder(),
                 new CandidateBacktestPromptBuilder(),
-                new ImprovedBacktestPromptBuilder(), gateway,
+                new ImprovedBacktestPromptBuilder(),
+                new CalibratedBacktestPromptBuilder(new BacktestPromptBuilder()),
+                gateway,
                 new GoldForecastValidator(), new NextValidMarketPriceSelector(),
                 new GoldForecastRule(), Clock.fixed(NOW, ZoneOffset.UTC)
         );
@@ -145,6 +147,28 @@ class BacktestRunnerTests {
                 ImprovedBacktestPromptBuilder.VERSION
         );
         assertThat(captor.getValue().content()).contains("中性只能用于");
+    }
+
+    @Test
+    void usesCalibratedPromptVersion() {
+        when(repo.findTask(TASK_ID)).thenReturn(Optional.of(task(
+                BacktestPromptVersion.CALIBRATED.version()
+        )));
+
+        runner.run(TASK_ID);
+
+        ArgumentCaptor<com.opspilot.ai.forecast.GoldForecastPrompt> captor =
+                ArgumentCaptor.forClass(
+                        com.opspilot.ai.forecast.GoldForecastPrompt.class
+                );
+        verify(gateway).generate(captor.capture());
+        assertThat(captor.getValue().version()).isEqualTo(
+                "gold-backtest-prompt-v4"
+        );
+        assertThat(captor.getValue().content())
+                .contains("0.5%")
+                .contains("-0.5%")
+                .contains("NEUTRAL");
     }
 
     @Test

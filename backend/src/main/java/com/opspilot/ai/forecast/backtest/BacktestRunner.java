@@ -36,6 +36,7 @@ public class BacktestRunner {
     private final BacktestPromptBuilder baseBuilder;
     private final CandidateBacktestPromptBuilder candidateBuilder;
     private final ImprovedBacktestPromptBuilder improvedBuilder;
+    private final CalibratedBacktestPromptBuilder calibratedBuilder;
     private final GoldForecastGateway gateway;
     private final GoldForecastValidator validator;
     private final NextValidMarketPriceSelector priceSelector;
@@ -49,6 +50,7 @@ public class BacktestRunner {
             BacktestPromptBuilder baseBuilder,
             CandidateBacktestPromptBuilder candidateBuilder,
             ImprovedBacktestPromptBuilder improvedBuilder,
+            CalibratedBacktestPromptBuilder calibratedBuilder,
             GoldForecastGateway gateway,
             GoldForecastValidator validator,
             NextValidMarketPriceSelector priceSelector,
@@ -61,6 +63,7 @@ public class BacktestRunner {
         this.baseBuilder = baseBuilder;
         this.candidateBuilder = candidateBuilder;
         this.improvedBuilder = improvedBuilder;
+        this.calibratedBuilder = calibratedBuilder;
         this.gateway = gateway;
         this.validator = validator;
         this.priceSelector = priceSelector;
@@ -154,6 +157,9 @@ public class BacktestRunner {
         }
         if (ImprovedBacktestPromptBuilder.VERSION.equals(task.promptVersion())) {
             return improvedBuilder.build(caseId, snapshot);
+        }
+        if (CalibratedBacktestPromptBuilder.VERSION.equals(task.promptVersion())) {
+            return calibratedBuilder.build(caseId, snapshot);
         }
         if (BacktestPromptBuilder.VERSION.equals(task.promptVersion())) {
             return baseBuilder.build(caseId, snapshot);

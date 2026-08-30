@@ -25,6 +25,7 @@ class GoldForecastPageTests {
         assertThat(script)
                 .contains("/api/research/gold/daily-report")
                 .contains("/api/research/gold/daily-report/latest")
+                .contains("/api/research/gold/forecasts?limit=1")
                 .contains("/api/research/gold/forecasts/evaluation")
                 .contains("latestGoldDate")
                 .contains("latestRealRateDate")

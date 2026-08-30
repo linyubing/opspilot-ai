@@ -4,7 +4,8 @@ package com.opspilot.ai.forecast.backtest;
 public enum BacktestPromptVersion {
     BASELINE(BacktestPromptBuilder.VERSION),
     CANDIDATE(CandidateBacktestPromptBuilder.VERSION),
-    IMPROVED(ImprovedBacktestPromptBuilder.VERSION);
+    IMPROVED(ImprovedBacktestPromptBuilder.VERSION),
+    CALIBRATED(CalibratedBacktestPromptBuilder.VERSION);
 
     private final String version;
 
