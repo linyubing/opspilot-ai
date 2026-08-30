@@ -73,6 +73,8 @@ class JdbcGoldResearchSnapshotRepositoryTests {
         assertThat(result.record().id()).isNotNull();
         assertThat(result.record().snapshot().gold().currentPrice())
                 .isEqualByComparingTo("2500.00");
+        assertThat(result.record().snapshot().gold().volatility20())
+                .isEqualByComparingTo("18.7500");
         assertThat(result.record().snapshot().dollarIndex().currentIndex())
                 .isEqualByComparingTo("118.062800");
         assertThat(result.record().snapshot().dollarIndexAssessment().status())
@@ -201,6 +203,7 @@ class JdbcGoldResearchSnapshotRepositoryTests {
                         new BigDecimal("0.1000"),
                         new BigDecimal("1.2000"),
                         new BigDecimal("2.3000"),
+                        new BigDecimal("18.7500"),
                         collectedAt
                 ),
                 new RealRateChangeMetrics(

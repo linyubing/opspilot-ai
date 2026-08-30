@@ -36,6 +36,7 @@ public class JdbcGoldResearchSnapshotRepository
             gold_return_1,
             gold_return_5,
             gold_return_20,
+            gold_volatility_20,
             gold_collected_at,
             real_rate,
             real_rate_change_1,
@@ -117,6 +118,7 @@ public class JdbcGoldResearchSnapshotRepository
                                 resultSet.getBigDecimal("gold_return_1"),
                                 resultSet.getBigDecimal("gold_return_5"),
                                 resultSet.getBigDecimal("gold_return_20"),
+                                resultSet.getBigDecimal("gold_volatility_20"),
                                 resultSet.getObject(
                                         "gold_collected_at",
                                         OffsetDateTime.class
@@ -187,6 +189,7 @@ public class JdbcGoldResearchSnapshotRepository
                     gold_return_1,
                     gold_return_5,
                     gold_return_20,
+                    gold_volatility_20,
                     gold_collected_at,
                     real_rate,
                     real_rate_change_1,
@@ -210,6 +213,7 @@ public class JdbcGoldResearchSnapshotRepository
                 )
                 values (
                     ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                    ?,
                     ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
                     ?, ?, ?, ?, ?, ?, ?, ?, ?
                 )
@@ -228,6 +232,7 @@ public class JdbcGoldResearchSnapshotRepository
                 snapshot.gold().return1(),
                 snapshot.gold().return5(),
                 snapshot.gold().return20(),
+                snapshot.gold().volatility20(),
                 snapshot.gold().collectedAt(),
                 snapshot.realRate().currentRate(),
                 snapshot.realRate().percentagePointChange1(),

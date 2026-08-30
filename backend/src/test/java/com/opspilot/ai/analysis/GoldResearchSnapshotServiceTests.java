@@ -101,6 +101,7 @@ class GoldResearchSnapshotServiceTests {
                 .isEqualByComparingTo("12.1951");
         assertThat(snapshot.gold().return20())
                 .isEqualByComparingTo("12.1951");
+        assertThat(snapshot.gold().volatility20()).isPositive();
         assertThat(snapshot.gold().collectedAt())
                 .isEqualTo(GOLD_COLLECTED_AT);
 

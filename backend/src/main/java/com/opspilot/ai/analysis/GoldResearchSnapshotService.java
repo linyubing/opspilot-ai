@@ -41,6 +41,8 @@ public class GoldResearchSnapshotService {
     private final MacroObservationRepository macroObservationRepository;
     private final RealRateFactorEvaluator evaluator;
     private final DollarIndexFactorEvaluator dollarIndexEvaluator;
+    private final GoldVolatilityCalculator volatilityCalculator =
+            new GoldVolatilityCalculator();
 
     public GoldResearchSnapshotService(
             MarketPriceRepository marketPriceRepository,
@@ -184,6 +186,7 @@ public class GoldResearchSnapshotService {
                         currentGold.referencePrice(),
                         gold20.referencePrice()
                 ),
+                volatilityCalculator.calculate(sortedGold),
                 currentGold.collectedAt()
         );
 
