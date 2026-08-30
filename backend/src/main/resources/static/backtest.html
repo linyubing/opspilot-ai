@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="查看黄金方向预测的历史回测指标和中文评估结论">
     <title>黄金回测评估</title>
-    <link rel="stylesheet" href="/backtest.css?v=8">
+    <link rel="stylesheet" href="/backtest.css?v=9">
 </head>
 <body>
 <main class="page-shell">
@@ -160,6 +160,28 @@
                     <tbody id="horizonRows"></tbody>
                 </table>
             </div>
+            <div class="history-horizon-actions">
+                <button id="historyHorizonButton" type="button">
+                    用 120 条历史样本重新诊断
+                </button>
+                <span id="historyHorizonStatus" aria-live="polite">
+                    当前表格来自本回测任务的小样本。
+                </span>
+            </div>
+            <div id="historyHorizonResult" class="table-wrap" hidden>
+                <table class="matrix-table horizon-table">
+                    <thead>
+                    <tr>
+                        <th scope="col">扩大样本周期</th>
+                        <th scope="col">可用样本</th>
+                        <th scope="col">黄金动量</th>
+                        <th scope="col">实际利率</th>
+                        <th scope="col">美元指数</th>
+                    </tr>
+                    </thead>
+                    <tbody id="historyHorizonRows"></tbody>
+                </table>
+            </div>
         </section>
 
         <section id="comparePanel" class="data-panel compare-panel">
@@ -228,6 +250,6 @@
         </section>
     </section>
 </main>
-<script src="/backtest.js?v=8" defer></script>
+<script src="/backtest.js?v=9" defer></script>
 </body>
 </html>

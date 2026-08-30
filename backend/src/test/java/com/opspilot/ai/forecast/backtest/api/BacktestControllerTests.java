@@ -20,6 +20,8 @@ import com.opspilot.ai.forecast.backtest.FactorDiagnosticService;
 import com.opspilot.ai.forecast.backtest.HorizonDiagnostic;
 import com.opspilot.ai.forecast.backtest.HorizonDiagnosticReport;
 import com.opspilot.ai.forecast.backtest.HorizonDiagnosticService;
+import com.opspilot.ai.forecast.backtest.HistoricalHorizonDiagnosticService;
+import com.opspilot.ai.forecast.backtest.HistoricalHorizonReport;
 import com.opspilot.ai.forecast.backtest.review.BacktestErrorPattern;
 import com.opspilot.ai.forecast.backtest.review.BacktestReviewContent;
 import com.opspilot.ai.forecast.backtest.review.BacktestReviewService;
@@ -59,6 +61,7 @@ class BacktestControllerTests {
     private BacktestComparisonService comparison;
     private FactorDiagnosticService diagnostics;
     private HorizonDiagnosticService horizons;
+    private HistoricalHorizonDiagnosticService historyHorizons;
     private MockMvc mvc;
 
     @BeforeEach
@@ -70,10 +73,11 @@ class BacktestControllerTests {
         comparison = mock(BacktestComparisonService.class);
         diagnostics = mock(FactorDiagnosticService.class);
         horizons = mock(HorizonDiagnosticService.class);
+        historyHorizons = mock(HistoricalHorizonDiagnosticService.class);
         mvc = MockMvcBuilders.standaloneSetup(
                 new BacktestController(
                         service, jobs, evaluation, review, comparison,
-                        diagnostics, horizons
+                        diagnostics, horizons, historyHorizons
                 )
         ).build();
     }
@@ -317,6 +321,23 @@ class BacktestControllerTests {
                 .andExpect(jsonPath(
                         "$.horizons[0].factors[0].directionalAccuracy"
                 ).value(0.5833));
+    }
+
+    @Test
+    void getsExpandedHorizonDiagnostics() throws Exception {
+        when(historyHorizons.diagnose(120)).thenReturn(
+                new HistoricalHorizonReport(
+                        120,
+                        List.of(new HorizonDiagnostic(20, 93, List.of()))
+                )
+        );
+
+        mvc.perform(get("/api/research/gold/backtests/horizons/history")
+                        .param("samples", "120"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.requestedSamples").value(120))
+                .andExpect(jsonPath("$.horizons[0].sessions").value(20))
+                .andExpect(jsonPath("$.horizons[0].sampleCount").value(93));
     }
 
     private BacktestEvaluation evaluation(String accuracy, String balanced) {

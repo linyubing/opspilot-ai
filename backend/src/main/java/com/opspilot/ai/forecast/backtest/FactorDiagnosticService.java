@@ -33,25 +33,32 @@ public class FactorDiagnosticService {
             List<BacktestCase> cases,
             Function<BacktestCase, ForecastDirection> actual
     ) {
+        List<FactorSample> samples = cases.stream()
+                .map(item -> new FactorSample(
+                        item.snapshot(), actual.apply(item)
+                ))
+                .toList();
+        return diagnose(id, samples);
+    }
+
+    FactorDiagnosticReport diagnose(UUID id, List<FactorSample> samples) {
         return new FactorDiagnosticReport(
                 id,
-                cases.size(),
+                samples.size(),
                 List.of(
                         diagnose(
-                                "GOLD_MOMENTUM_20", cases,
-                                this::momentum, actual
+                                "GOLD_MOMENTUM_20", samples,
+                                this::momentum
                         ),
                         diagnose(
-                                "REAL_RATE", cases,
+                                "REAL_RATE", samples,
                                 item -> status(item.snapshot()
-                                        .realRateAssessment().status()),
-                                actual
+                                        .realRateAssessment().status())
                         ),
                         diagnose(
-                                "DOLLAR_INDEX", cases,
+                                "DOLLAR_INDEX", samples,
                                 item -> status(item.snapshot()
-                                        .dollarIndexAssessment().status()),
-                                actual
+                                        .dollarIndexAssessment().status())
                         )
                 )
         );
@@ -59,19 +66,18 @@ public class FactorDiagnosticService {
 
     private FactorDiagnostic diagnose(
             String factor,
-            List<BacktestCase> cases,
-            Function<BacktestCase, ForecastDirection> signal,
-            Function<BacktestCase, ForecastDirection> actual
+            List<FactorSample> samples,
+            Function<FactorSample, ForecastDirection> signal
     ) {
-        List<ForecastDirection> signals = cases.stream().map(signal).toList();
+        List<ForecastDirection> signals = samples.stream().map(signal).toList();
         int directional = (int) signals.stream()
                 .filter(value -> value != ForecastDirection.NEUTRAL)
                 .count();
         int hits = 0;
         int directionalHits = 0;
-        for (int index = 0; index < cases.size(); index++) {
+        for (int index = 0; index < samples.size(); index++) {
             ForecastDirection value = signals.get(index);
-            if (value == actual.apply(cases.get(index))) {
+            if (value == samples.get(index).actual()) {
                 hits++;
                 if (value != ForecastDirection.NEUTRAL) {
                     directionalHits++;
@@ -81,11 +87,11 @@ public class FactorDiagnosticService {
 
         return new FactorDiagnostic(
                 factor,
-                cases.size(),
+                samples.size(),
                 directional,
-                ratio(directional, cases.size()),
+                ratio(directional, samples.size()),
                 hits,
-                ratio(hits, cases.size()),
+                ratio(hits, samples.size()),
                 directionalHits,
                 ratio(directionalHits, directional),
                 new DirectionCounts(
@@ -97,7 +103,7 @@ public class FactorDiagnosticService {
     }
 
     /** 20 期收益率只按方向诊断，不虚构未经验证的数值阈值。 */
-    private ForecastDirection momentum(BacktestCase item) {
+    private ForecastDirection momentum(FactorSample item) {
         int sign = item.snapshot().gold().return20().signum();
         if (sign > 0) return ForecastDirection.BULLISH;
         if (sign < 0) return ForecastDirection.BEARISH;

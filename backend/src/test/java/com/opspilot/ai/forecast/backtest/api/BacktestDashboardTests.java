@@ -42,7 +42,10 @@ class BacktestDashboardTests {
                         org.hamcrest.Matchers.containsString("id=\"horizonPanel\"")
                 ))
                 .andExpect(content().string(
-                        org.hamcrest.Matchers.containsString("/backtest.js?v=8")
+                        org.hamcrest.Matchers.containsString("id=\"historyHorizonButton\"")
+                ))
+                .andExpect(content().string(
+                        org.hamcrest.Matchers.containsString("/backtest.js?v=9")
                 ));
     }
 

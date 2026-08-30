@@ -7,6 +7,7 @@ import com.opspilot.ai.forecast.backtest.BacktestPromptVersion;
 import com.opspilot.ai.forecast.backtest.BacktestSampleSet;
 import com.opspilot.ai.forecast.backtest.FactorDiagnosticService;
 import com.opspilot.ai.forecast.backtest.HorizonDiagnosticService;
+import com.opspilot.ai.forecast.backtest.HistoricalHorizonDiagnosticService;
 import com.opspilot.ai.forecast.backtest.BacktestService;
 import com.opspilot.ai.forecast.backtest.review.BacktestReviewService;
 import org.springframework.http.HttpStatus;
@@ -34,6 +35,7 @@ public class BacktestController {
     private final BacktestComparisonService comparison;
     private final FactorDiagnosticService diagnostics;
     private final HorizonDiagnosticService horizons;
+    private final HistoricalHorizonDiagnosticService historyHorizons;
 
     public BacktestController(
             BacktestService service,
@@ -42,7 +44,8 @@ public class BacktestController {
             BacktestReviewService review,
             BacktestComparisonService comparison,
             FactorDiagnosticService diagnostics,
-            HorizonDiagnosticService horizons
+            HorizonDiagnosticService horizons,
+            HistoricalHorizonDiagnosticService historyHorizons
     ) {
         this.service = service;
         this.jobs = jobs;
@@ -51,6 +54,7 @@ public class BacktestController {
         this.comparison = comparison;
         this.diagnostics = diagnostics;
         this.horizons = horizons;
+        this.historyHorizons = historyHorizons;
     }
 
     @PostMapping
@@ -137,5 +141,14 @@ public class BacktestController {
     @GetMapping("/{id}/horizons")
     public HorizonDiagnosticResponse horizons(@PathVariable("id") UUID id) {
         return HorizonDiagnosticResponse.from(horizons.diagnose(id));
+    }
+
+    @GetMapping("/horizons/history")
+    public HistoricalHorizonResponse historyHorizons(
+            @RequestParam(name = "samples", defaultValue = "120") int samples
+    ) {
+        return HistoricalHorizonResponse.from(
+                historyHorizons.diagnose(samples)
+        );
     }
 }

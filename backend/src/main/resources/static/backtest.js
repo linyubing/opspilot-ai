@@ -34,6 +34,10 @@ const compareError = document.getElementById("compareError");
 const compareResult = document.getElementById("compareResult");
 const factorList = document.getElementById("factorList");
 const horizonRows = document.getElementById("horizonRows");
+const historyHorizonButton = document.getElementById("historyHorizonButton");
+const historyHorizonStatus = document.getElementById("historyHorizonStatus");
+const historyHorizonResult = document.getElementById("historyHorizonResult");
+const historyHorizonRows = document.getElementById("historyHorizonRows");
 let cases = [];
 let activeId = null;
 let reviewRequest = null;
@@ -182,7 +186,7 @@ function renderFactors(data) {
     factorList.replaceChildren(...factors.map(factorCard));
 }
 
-function renderHorizons(data) {
+function renderHorizons(data, target = horizonRows) {
     const rows = (data?.horizons || []).map(horizon => {
         const row = document.createElement("tr");
         const values = Object.fromEntries(
@@ -201,7 +205,28 @@ function renderHorizons(data) {
         });
         return row;
     });
-    horizonRows.replaceChildren(...rows);
+    target.replaceChildren(...rows);
+}
+
+async function loadHistoryHorizons() {
+    historyHorizonButton.disabled = true;
+    historyHorizonStatus.textContent = "正在用本地真实历史数据计算，不调用大模型……";
+    try {
+        const response = await fetch(
+            "/api/research/gold/backtests/horizons/history?samples=120",
+            {headers: {Accept: "application/json"}}
+        );
+        if (!response.ok) throw new Error(await readError(response));
+        const data = await response.json();
+        renderHorizons(data, historyHorizonRows);
+        historyHorizonResult.hidden = false;
+        historyHorizonStatus.textContent =
+            `已从 ${formatCount(data.requestedSamples)} 条候选日期完成扩大样本诊断。`;
+    } catch (error) {
+        historyHorizonStatus.textContent = error.message || "扩大样本诊断失败。";
+    } finally {
+        historyHorizonButton.disabled = false;
+    }
 }
 
 function formatReturn(value) {
@@ -488,6 +513,7 @@ form.addEventListener("submit", event => {
 missOnly.addEventListener("change", renderCases);
 reviewButton.addEventListener("click", loadReview);
 compareButton.addEventListener("click", loadComparison);
+historyHorizonButton.addEventListener("click", loadHistoryHorizons);
 
 const initialId = new URLSearchParams(location.search).get("id");
 if (initialId) {

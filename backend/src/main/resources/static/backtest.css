@@ -499,3 +499,11 @@ button, input { font: inherit; }
     font-variant-numeric: tabular-nums;
     font-weight: 600;
 }
+
+.history-horizon-actions {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 18px;
+    color: var(--muted);
+}
