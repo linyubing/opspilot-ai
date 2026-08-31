@@ -9,11 +9,13 @@ import org.tribuo.classification.LabelFactory;
 import org.tribuo.classification.sgd.linear.LogisticRegressionTrainer;
 import org.tribuo.impl.ArrayExample;
 import org.tribuo.provenance.SimpleDataSourceProvenance;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
 
 /** 使用 Tribuo 训练可解释的黄金三分类逻辑回归模型。 */
+@Component("tribuoGoldTrainer")
 public class TribuoGoldTrainer implements GoldTrainer {
 
     private static final List<String> FEATURE_NAMES = GoldFeatures.NAMES.stream()

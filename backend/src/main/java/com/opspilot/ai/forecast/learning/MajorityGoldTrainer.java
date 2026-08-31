@@ -1,12 +1,14 @@
 package com.opspilot.ai.forecast.learning;
 
 import com.opspilot.ai.forecast.ForecastDirection;
+import org.springframework.stereotype.Component;
 
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
 /** 训练始终输出训练集多数方向的基础分类器。 */
+@Component("majorityGoldTrainer")
 public class MajorityGoldTrainer implements GoldTrainer {
 
     @Override

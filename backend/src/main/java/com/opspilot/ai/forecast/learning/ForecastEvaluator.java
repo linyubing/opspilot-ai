@@ -1,6 +1,7 @@
 package com.opspilot.ai.forecast.learning;
 
 import com.opspilot.ai.forecast.ForecastDirection;
+import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -9,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 /** 计算覆盖率、方向准确率、平衡准确率和概率误差。 */
+@Component
 public class ForecastEvaluator {
 
     public ForecastMetrics evaluate(List<SettledPrediction> predictions) {
