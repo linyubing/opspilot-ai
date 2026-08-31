@@ -28,6 +28,7 @@ class GoldForecastPageTests {
                 .contains("id=\"barLow\"")
                 .contains("id=\"barClose\"")
                 .contains("id=\"basePriceLabel\"")
+                .contains("id=\"targetLabel\"")
                 .contains("forecast.js");
         assertThat(script)
                 .contains("/api/research/gold/daily-report")
@@ -39,6 +40,8 @@ class GoldForecastPageTests {
                 .contains("latestGoldDate")
                 .contains("latestRealRateDate")
                 .contains("latestDollarIndexDate")
+                .contains("expectedTargetDate")
+                .contains("预计目标交易日")
                 .contains("BULLISH: \"上涨\"")
                 .contains("BEARISH: \"下跌\"");
     }

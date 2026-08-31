@@ -70,7 +70,8 @@ function renderForecast(forecast) {
     card.className = `direction-card ${direction === "BULLISH" ? "up" : direction === "BEARISH" ? "down" : "flat"}`;
     text("direction", directions[direction] || direction);
     text("baseDate", forecast.baseDate);
-    text("targetSession", forecast.targetDate || `基准日 ${forecast.baseDate} 后的下一有效黄金交易日`);
+    text("targetLabel", forecast.targetDate ? "真实结算日" : "预计目标交易日");
+    text("targetSession", forecast.targetDate || forecast.expectedTargetDate || `基准日 ${forecast.baseDate} 后的下一有效黄金交易日`);
     text("basePrice", money(forecast.basePrice));
     text("forecastStatus", statuses[forecast.status] || forecast.status);
     text("createdAt", forecast.createdAt ? new Date(forecast.createdAt).toLocaleString("zh-CN") : "-");

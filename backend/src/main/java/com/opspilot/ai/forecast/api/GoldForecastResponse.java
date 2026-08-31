@@ -5,18 +5,20 @@ import com.opspilot.ai.forecast.ForecastStatus;
 import com.opspilot.ai.forecast.StoredGoldDirectionForecast;
 
 import java.math.BigDecimal;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
-/** 对外返回黄金方向预测及评分字段，不暴露提示词和模型原始响应。 */
+/** 对外返回黄金方向预测和结算字段，不暴露提示词和模型原始响应。 */
 public record GoldForecastResponse(
         UUID id, UUID snapshotId, LocalDate baseDate, BigDecimal basePrice,
         ForecastDirection predictedDirection, String reasoning,
         List<String> invalidationConditions, String modelName,
         String promptVersion, String promptHash, String forecastRuleVersion,
-        ForecastStatus status, LocalDate targetDate, BigDecimal targetPrice,
+        ForecastStatus status, String expectedTargetDate,
+        LocalDate targetDate, BigDecimal targetPrice,
         BigDecimal actualReturn, ForecastDirection actualDirection,
         Boolean hit, OffsetDateTime resolvedAt, OffsetDateTime createdAt
 ) {
@@ -25,9 +27,18 @@ public record GoldForecastResponse(
                 record.id(), record.snapshotId(), record.baseDate(), record.basePrice(),
                 record.predictedDirection(), record.reasoning(), record.invalidationConditions(),
                 record.modelName(), record.promptVersion(), record.promptHash(),
-                record.forecastRuleVersion(), record.status(), record.targetDate(),
-                record.targetPrice(), record.actualReturn(), record.actualDirection(),
-                record.hit(), record.resolvedAt(), record.createdAt()
+                record.forecastRuleVersion(), record.status(), nextWeekday(record.baseDate()).toString(),
+                record.targetDate(), record.targetPrice(), record.actualReturn(),
+                record.actualDirection(), record.hit(), record.resolvedAt(), record.createdAt()
         );
+    }
+
+    private static LocalDate nextWeekday(LocalDate baseDate) {
+        LocalDate date = baseDate.plusDays(1);
+        while (date.getDayOfWeek() == DayOfWeek.SATURDAY
+                || date.getDayOfWeek() == DayOfWeek.SUNDAY) {
+            date = date.plusDays(1);
+        }
+        return date;
     }
 }

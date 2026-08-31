@@ -73,7 +73,9 @@ class GoldForecastControllerTests {
     void returnsRecentForecasts() throws Exception {
         when(repository.findRecent(5)).thenReturn(List.of(record()));
         mockMvc.perform(get("/api/research/gold/forecasts").param("limit", "5"))
-                .andExpect(status().isOk()).andExpect(jsonPath("$[0].modelName").value("glm-4.7"));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].modelName").value("glm-4.7"))
+                .andExpect(jsonPath("$[0].expectedTargetDate").value("2026-08-28"));
     }
 
     @Test
