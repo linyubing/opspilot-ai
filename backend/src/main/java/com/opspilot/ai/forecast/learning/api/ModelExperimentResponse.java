@@ -42,7 +42,7 @@ public record ModelExperimentResponse(
         );
     }
 
-    /** 保存页面需要的开发验证指标。 */
+    /** 保存页面需要展示的开发验证指标。 */
     public record MetricResponse(
             int sampleCount,
             int coveredCount,

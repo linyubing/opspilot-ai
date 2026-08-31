@@ -22,7 +22,7 @@ async function request(url, options = {}) {
 }
 
 function text(id, value) {
-    byId(id).textContent = value ?? "—";
+    byId(id).textContent = value ?? "-";
 }
 
 function percent(value) {
@@ -30,7 +30,7 @@ function percent(value) {
 }
 
 function money(value) {
-    return value == null ? "—" : `$${Number(value).toFixed(2)}`;
+    return value == null ? "-" : `$${Number(value).toFixed(2)}`;
 }
 
 async function loadGoldBar() {
@@ -41,24 +41,17 @@ async function loadGoldBar() {
     text("barHigh", money(bar.high));
     text("barLow", money(bar.low));
     text("barClose", money(bar.close));
-    text("barProvider", bar.provider === "twelve_data"
-        ? "Twelve Data"
-        : bar.provider);
+    text("barProvider", bar.provider === "twelve_data" ? "Twelve Data" : bar.provider);
     renderPriceBasis();
 }
 
 function renderPriceBasis() {
-    if (!latestForecast || !latestBar
-            || latestForecast.baseDate !== latestBar.priceDate) {
+    if (!latestForecast || !latestBar || latestForecast.baseDate !== latestBar.priceDate) {
         text("basePriceLabel", "预测基准价");
         return;
     }
-    const matchesClose = Math.abs(
-        Number(latestForecast.basePrice) - Number(latestBar.close)
-    ) < 0.005;
-    text("basePriceLabel", matchesClose
-        ? "基准日收盘价"
-        : "历史预测基准价（旧口径）");
+    const matchesClose = Math.abs(Number(latestForecast.basePrice) - Number(latestBar.close)) < 0.005;
+    text("basePriceLabel", matchesClose ? "基准日收盘价" : "历史预测基准价（旧口径）");
 }
 
 function lag(baseDate, sourceDate) {
@@ -80,7 +73,7 @@ function renderForecast(forecast) {
     text("targetSession", forecast.targetDate || `基准日 ${forecast.baseDate} 后的下一有效黄金交易日`);
     text("basePrice", money(forecast.basePrice));
     text("forecastStatus", statuses[forecast.status] || forecast.status);
-    text("createdAt", forecast.createdAt ? new Date(forecast.createdAt).toLocaleString("zh-CN") : "—");
+    text("createdAt", forecast.createdAt ? new Date(forecast.createdAt).toLocaleString("zh-CN") : "-");
     text("modelName", forecast.modelName);
     text("reasoning", forecast.reasoning);
     renderPriceBasis();
@@ -102,8 +95,8 @@ function renderForecastOnly(forecast) {
     text("dollarDate", "研究解读尚未生成");
     text("dollarLag", "");
     text("summary", "方向预测已生成，完整研究解读尚未生成。");
-    text("rateAnalysis", "—");
-    text("dollarAnalysis", "—");
+    text("rateAnalysis", "-");
+    text("dollarAnalysis", "-");
 }
 
 function renderReport(data) {
@@ -181,7 +174,7 @@ function showError(error) {
 async function generate() {
     generateButton.disabled = true;
     errorBox.hidden = true;
-    statusText.textContent = "正在同步真实数据并调用大模型，可能需要几十秒……";
+    statusText.textContent = "正在同步真实数据并调用大模型，可能需要几十秒...";
     try {
         await request("/api/research/gold/daily-report", {method: "POST"});
         await Promise.all([loadLatest(), loadAccuracy(), loadGoldBar()]);

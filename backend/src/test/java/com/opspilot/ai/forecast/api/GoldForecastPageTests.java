@@ -22,6 +22,7 @@ class GoldForecastPageTests {
                 .contains("同步最新数据并生成预测")
                 .contains("历史回测准确率")
                 .contains("真实黄金日线")
+                .contains("模型实验")
                 .contains("id=\"barOpen\"")
                 .contains("id=\"barHigh\"")
                 .contains("id=\"barLow\"")

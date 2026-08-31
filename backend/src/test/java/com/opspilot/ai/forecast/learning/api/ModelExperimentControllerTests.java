@@ -35,7 +35,7 @@ class ModelExperimentControllerTests {
     }
 
     @Test
-    void returnsDevelopmentMetricsWithoutHoldoutAccuracy() throws Exception {
+    void returnsMetricsWithoutHoldoutAccuracy() throws Exception {
         when(service.run(ForecastHorizon.FIVE_DAYS)).thenReturn(report());
 
         mvc.perform(get("/api/research/gold/model-experiments")

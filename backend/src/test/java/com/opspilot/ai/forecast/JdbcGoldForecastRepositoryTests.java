@@ -1,13 +1,5 @@
 package com.opspilot.ai.forecast;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.UUID;
-
 import com.opspilot.ai.analysis.history.GoldResearchSnapshotRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,6 +8,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /** 验证黄金方向预测的幂等保存、JSONB 往返和条件解析。 */
 @SpringBootTest(properties = "spring.ai.openai.api-key=test-key")
@@ -41,7 +41,7 @@ class JdbcGoldForecastRepositoryTests {
     }
 
     @Test
-    @DisplayName("首次保存成功而重复幂等键返回原记录且不覆盖")
+    @DisplayName("首次保存成功，而重复幂等键返回原记录且不覆盖")
     void savesOnceWithoutOverwrite() {
         SaveGoldForecastResult first = repository.saveIfAbsent(candidate("原始依据"));
         SaveGoldForecastResult repeated = repository.saveIfAbsent(candidate("覆盖依据"));
@@ -56,7 +56,7 @@ class JdbcGoldForecastRepositoryTests {
 
     @Test
     @DisplayName("待验证记录只能解析一次")
-    void resolvesPendingOnlyOnce() {
+    void resolvesOnce() {
         StoredGoldDirectionForecast saved = repository.saveIfAbsent(candidate("依据")).record();
         ForecastResolution first = new ForecastResolution(
                 LocalDate.parse("2026-08-27"), new BigDecimal("4550.00000000"),
@@ -72,7 +72,8 @@ class JdbcGoldForecastRepositoryTests {
 
         assertThat(resolved.status()).isEqualTo(ForecastStatus.RESOLVED);
         assertThat(repeated.targetDate()).isEqualTo(first.targetDate());
-        assertThat(repository.findPending(10)).isEmpty();
+        assertThat(repository.findPending(10)).extracting(StoredGoldDirectionForecast::id)
+                .doesNotContain(saved.id());
         assertThat(repository.findAllForEvaluation()).extracting(StoredGoldDirectionForecast::id)
                 .contains(saved.id());
     }

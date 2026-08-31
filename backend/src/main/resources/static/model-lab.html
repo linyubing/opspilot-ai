@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="比较黄金统计预测模型的开发验证表现">
+    <meta name="description" content="比较黄金统计预测模型在开发验证区间的表现">
     <title>黄金模型实验室</title>
     <link rel="stylesheet" href="/model-lab.css?v=1">
 </head>
@@ -13,7 +13,7 @@
         <div>
             <a class="back-link" href="/forecast.html">← 返回黄金预测</a>
             <h1>黄金模型实验室</h1>
-            <p>用相同的真实历史区间，对比多数类基线与逻辑回归。</p>
+            <p>使用同一批真实历史样本，对比多数类基线和逻辑回归模型。</p>
         </div>
         <nav class="horizon-tabs" aria-label="预测周期">
             <button data-horizon="NEXT_DAY" type="button">1 个交易日</button>
@@ -22,36 +22,42 @@
         </nav>
     </header>
 
-    <p id="status" class="status" aria-live="polite">正在运行 5 个交易日实验……</p>
+    <p id="status" class="status" aria-live="polite">正在运行 5 个交易日实验...</p>
     <section id="error" class="error" role="alert" hidden></section>
 
     <section id="result" hidden>
         <section class="scope-panel">
-            <div><span>训练起点</span><strong id="trainStart">—</strong></div>
-            <div><span>验证区间</span><strong id="validationRange">—</strong></div>
-            <div><span>验证样本</span><strong id="validationSamples">—</strong></div>
-            <div><span>重新训练</span><strong id="refitCount">—</strong></div>
+            <div><span>训练起点</span><strong id="trainStart">-</strong></div>
+            <div><span>验证区间</span><strong id="validationRange">-</strong></div>
+            <div><span>验证样本</span><strong id="validationSamples">-</strong></div>
+            <div><span>重新训练</span><strong id="refitCount">-</strong></div>
         </section>
 
         <section class="model-grid">
             <article class="model-card baseline">
-                <header><h2>多数类基线</h2><p>始终预测训练窗口中数量最多的方向</p></header>
+                <header>
+                    <h2>多数类基线</h2>
+                    <p>每次只预测训练窗口中数量最多的方向，用来衡量最低可接受水平。</p>
+                </header>
                 <div class="metric-grid">
-                    <div><span>总体准确率</span><strong id="majorityAccuracy">—</strong></div>
-                    <div><span>平衡准确率</span><strong id="majorityBalanced">—</strong></div>
-                    <div><span>覆盖率</span><strong id="majorityCoverage">—</strong></div>
-                    <div><span>Brier 分数</span><strong id="majorityBrier">—</strong></div>
+                    <div><span>总体准确率</span><strong id="majorityAccuracy">-</strong></div>
+                    <div><span>平衡准确率</span><strong id="majorityBalanced">-</strong></div>
+                    <div><span>覆盖率</span><strong id="majorityCoverage">-</strong></div>
+                    <div><span>Brier 分数</span><strong id="majorityBrier">-</strong></div>
                 </div>
                 <div class="recall-row" id="majorityRecalls"></div>
             </article>
 
             <article class="model-card logistic">
-                <header><h2>逻辑回归</h2><p>根据 16 个真实价格与宏观特征输出三方向概率</p></header>
+                <header>
+                    <h2>逻辑回归</h2>
+                    <p>根据真实黄金 OHLC、实际利率、美元指数等特征输出三方向概率。</p>
+                </header>
                 <div class="metric-grid">
-                    <div><span>总体准确率</span><strong id="logisticAccuracy">—</strong></div>
-                    <div><span>平衡准确率</span><strong id="logisticBalanced">—</strong></div>
-                    <div><span>覆盖率</span><strong id="logisticCoverage">—</strong></div>
-                    <div><span>Brier 分数</span><strong id="logisticBrier">—</strong></div>
+                    <div><span>总体准确率</span><strong id="logisticAccuracy">-</strong></div>
+                    <div><span>平衡准确率</span><strong id="logisticBalanced">-</strong></div>
+                    <div><span>覆盖率</span><strong id="logisticCoverage">-</strong></div>
+                    <div><span>Brier 分数</span><strong id="logisticBrier">-</strong></div>
                 </div>
                 <div class="recall-row" id="logisticRecalls"></div>
             </article>
@@ -60,9 +66,9 @@
         <section class="holdout-panel">
             <div>
                 <h2>最终留出样本尚未启用</h2>
-                <p>当前结果只用于开发区间筛选，不能据此宣布正式准确率提高。</p>
+                <p>当前结果只用于开发区间筛选，最终留出样本尚未启用，不能据此宣布正式准确率提高。</p>
             </div>
-            <strong id="holdoutRange">—</strong>
+            <strong id="holdoutRange">-</strong>
         </section>
     </section>
 </main>

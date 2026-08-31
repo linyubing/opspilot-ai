@@ -147,16 +147,16 @@ class JdbcGoldResearchSnapshotRepositoryTests {
     @Test
     @DisplayName("最近快照按分析日期倒序并限制数量")
     void findsRecentSnapshots() {
-        save("2026-08-22");
-        save("2026-08-25");
-        save("2026-08-24");
+        save("2099-08-22");
+        save("2099-08-25");
+        save("2099-08-24");
 
         assertThat(repository.findRecent(2))
                 .extracting(record ->
                         record.snapshot().analysisDate())
                 .containsExactly(
-                        LocalDate.parse("2026-08-25"),
-                        LocalDate.parse("2026-08-24")
+                        LocalDate.parse("2099-08-25"),
+                        LocalDate.parse("2099-08-24")
                 );
     }
 

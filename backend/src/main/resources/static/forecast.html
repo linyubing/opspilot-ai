@@ -18,7 +18,7 @@
         <button id="generateButton" type="button">同步最新数据并生成预测</button>
     </header>
 
-    <p id="status" class="status">正在读取最新预测……</p>
+    <p id="status" class="status">正在读取最新预测...</p>
     <section id="errorBox" class="error" hidden></section>
 
     <section id="emptyBox" class="empty" hidden>
@@ -30,14 +30,14 @@
         <article id="directionCard" class="direction-card">
             <div>
                 <span class="label">预测方向</span>
-                <strong id="direction">—</strong>
+                <strong id="direction">-</strong>
             </div>
             <dl>
-                <div><dt>黄金基准日</dt><dd id="baseDate">—</dd></div>
-                <div><dt>预测目标</dt><dd id="targetSession">—</dd></div>
-                <div><dt id="basePriceLabel">预测基准价</dt><dd id="basePrice">—</dd></div>
-                <div><dt>验证状态</dt><dd id="forecastStatus">—</dd></div>
-                <div><dt>生成时间</dt><dd id="createdAt">—</dd></div>
+                <div><dt>黄金基准日</dt><dd id="baseDate">-</dd></div>
+                <div><dt>预测目标</dt><dd id="targetSession">-</dd></div>
+                <div><dt id="basePriceLabel">预测基准价</dt><dd id="basePrice">-</dd></div>
+                <div><dt>验证状态</dt><dd id="forecastStatus">-</dd></div>
+                <div><dt>生成时间</dt><dd id="createdAt">-</dd></div>
             </dl>
         </article>
 
@@ -46,14 +46,14 @@
                 <h2>真实黄金日线</h2>
                 <span id="barProvider">Twelve Data</span>
             </div>
-            <p class="bar-meta">行情日期：<strong id="barDate">—</strong>，单位：美元/金衡盎司</p>
+            <p class="bar-meta">行情日期：<strong id="barDate">-</strong>，单位：美元/金衡盎司</p>
             <div class="bar-grid">
-                <article><span>开盘</span><strong id="barOpen">—</strong></article>
-                <article><span>最高</span><strong id="barHigh">—</strong></article>
-                <article><span>最低</span><strong id="barLow">—</strong></article>
-                <article><span>收盘</span><strong id="barClose">—</strong></article>
+                <article><span>开盘</span><strong id="barOpen">-</strong></article>
+                <article><span>最高</span><strong id="barHigh">-</strong></article>
+                <article><span>最低</span><strong id="barLow">-</strong></article>
+                <article><span>收盘</span><strong id="barClose">-</strong></article>
             </div>
-            <p class="note">预测基准价和后续结算价统一使用真实日线收盘价，不使用开盘价代替。</p>
+            <p class="note">预测基准价和后续结算价统一使用真实日线收盘价，不使用开盘价替代。</p>
         </section>
 
         <section class="panel">
@@ -72,9 +72,9 @@
                 <span>不同市场按各自发布节奏取最新可用值</span>
             </div>
             <div class="source-grid">
-                <article><span>黄金价格</span><strong id="goldDate">—</strong><small id="goldLag"></small></article>
-                <article><span>实际利率</span><strong id="rateDate">—</strong><small id="rateLag"></small></article>
-                <article><span>美元指数</span><strong id="dollarDate">—</strong><small id="dollarLag"></small></article>
+                <article><span>黄金价格</span><strong id="goldDate">-</strong><small id="goldLag"></small></article>
+                <article><span>实际利率</span><strong id="rateDate">-</strong><small id="rateLag"></small></article>
+                <article><span>美元指数</span><strong id="dollarDate">-</strong><small id="dollarLag"></small></article>
             </div>
         </section>
 
@@ -91,7 +91,11 @@
     <section class="panel accuracy-panel">
         <div class="heading">
             <h2>准确率参考</h2>
-            <span><a href="/backtest.html">查看历史回测准确率</a> · <a href="/model-lab.html">模型实验</a></span>
+            <span>
+                <a href="/backtest.html">查看历史回测准确率</a>
+                ·
+                <a href="/model-lab.html">模型实验</a>
+            </span>
         </div>
         <div class="accuracy-grid">
             <article><span>正式预测已结算</span><strong id="resolvedCount">0</strong></article>
