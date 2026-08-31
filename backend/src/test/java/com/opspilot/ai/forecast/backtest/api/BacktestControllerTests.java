@@ -143,6 +143,15 @@ class BacktestControllerTests {
     }
 
     @Test
+    void resumesInterruptedRunningTask() throws Exception {
+        when(jobs.resume(ID)).thenReturn(task(BacktestStatus.RUNNING));
+
+        mvc.perform(post("/api/research/gold/backtests/{id}/resume", ID))
+                .andExpect(status().isAccepted())
+                .andExpect(jsonPath("$.status").value("RUNNING"));
+    }
+
+    @Test
     void getsTask() throws Exception {
         when(service.get(ID)).thenReturn(task(BacktestStatus.COMPLETED));
 

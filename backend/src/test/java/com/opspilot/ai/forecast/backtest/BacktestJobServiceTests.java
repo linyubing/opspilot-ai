@@ -11,6 +11,7 @@ import java.time.ZoneOffset;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -65,16 +66,63 @@ class BacktestJobServiceTests {
         verifyNoInteractions(runner);
     }
 
+    @Test
+    void resumesRunningTaskOnlyOnceInCurrentProcess() {
+        UUID id = UUID.randomUUID();
+        BacktestRepository repo = mock(BacktestRepository.class);
+        BacktestService service = mock(BacktestService.class);
+        BacktestRunner runner = mock(BacktestRunner.class);
+        RecordingExecutor executor = new RecordingExecutor();
+        BacktestTask task = task(id);
+        when(service.get(id)).thenReturn(task);
+        BacktestJobService jobs = new BacktestJobService(
+                repo, service, runner, executor,
+                Clock.fixed(NOW, ZoneOffset.UTC)
+        );
+
+        assertThat(jobs.resume(id)).isEqualTo(task);
+        assertThat(jobs.resume(id)).isEqualTo(task);
+
+        assertThat(executor.submitted).isEqualTo(1);
+        executor.task.run();
+        verify(runner).run(id);
+    }
+
+    @Test
+    void rejectsResumeWhenTaskIsNotRunning() {
+        UUID id = UUID.randomUUID();
+        BacktestRepository repo = mock(BacktestRepository.class);
+        BacktestService service = mock(BacktestService.class);
+        BacktestRunner runner = mock(BacktestRunner.class);
+        RecordingExecutor executor = new RecordingExecutor();
+        BacktestTask task = task(id, BacktestStatus.COMPLETED);
+        when(service.get(id)).thenReturn(task);
+        BacktestJobService jobs = new BacktestJobService(
+                repo, service, runner, executor,
+                Clock.fixed(NOW, ZoneOffset.UTC)
+        );
+
+        assertThatThrownBy(() -> jobs.resume(id))
+                .isInstanceOf(InvalidBacktestRequestException.class);
+
+        assertThat(executor.submitted).isZero();
+        verifyNoInteractions(runner);
+    }
+
     private OffsetDateTime time() {
         return OffsetDateTime.ofInstant(NOW, ZoneOffset.UTC);
     }
 
     private BacktestTask task(UUID id) {
+        return task(id, BacktestStatus.RUNNING);
+    }
+
+    private BacktestTask task(UUID id, BacktestStatus status) {
         return new BacktestTask(
                 id, LocalDate.parse("2026-08-20"),
                 LocalDate.parse("2026-08-20"), 1, "glm-4.7",
                 BacktestPromptBuilder.VERSION, "rule-v1",
-                BacktestStatus.RUNNING, 0, 0, 0,
+                status, 0, 0, 0,
                 null, time(), time(), null
         );
     }

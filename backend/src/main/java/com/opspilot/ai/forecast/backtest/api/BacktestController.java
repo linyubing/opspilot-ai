@@ -83,6 +83,14 @@ public class BacktestController {
                 .body(BacktestTaskResponse.from(jobs.start(id)));
     }
 
+    @PostMapping("/{id}/resume")
+    public ResponseEntity<BacktestTaskResponse> resume(
+            @PathVariable("id") UUID id
+    ) {
+        return ResponseEntity.accepted()
+                .body(BacktestTaskResponse.from(jobs.resume(id)));
+    }
+
     @GetMapping("/{id}")
     public BacktestTaskResponse get(@PathVariable("id") UUID id) {
         return BacktestTaskResponse.from(service.get(id));
