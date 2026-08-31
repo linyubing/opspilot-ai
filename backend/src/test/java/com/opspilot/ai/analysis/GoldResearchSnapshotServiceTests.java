@@ -10,8 +10,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.client.ChatClient;
 
 import java.math.BigDecimal;
+import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -177,6 +180,39 @@ class GoldResearchSnapshotServiceTests {
         verify(goldRepository).findRecent("XAUUSD", "twelve_data", asOf, 120);
         verify(macroObservationRepository).findRecent("DFII10", asOf, 120);
         verify(macroObservationRepository).findRecent("DTWEXBGS", asOf, 120);
+    }
+
+    @Test
+    @DisplayName("正式日线预测不使用当天尚未完成的黄金日线")
+    void skipsTodayGoldBarForDailySnapshot() {
+        Clock clock = Clock.fixed(
+                Instant.parse("2026-08-31T09:35:00Z"),
+                ZoneId.of("America/New_York")
+        );
+        GoldResearchSnapshotService dailyService =
+                new GoldResearchSnapshotService(
+                        goldRepository,
+                        macroObservationRepository,
+                        new RealRateFactorEvaluator(),
+                        new DollarIndexFactorEvaluator(),
+                        clock
+                );
+
+        List<GoldDailyBar> prices = goldPrices(21);
+        prices.add(goldPrice(LocalDate.parse("2026-08-31"), "9999"));
+        when(goldRepository.findRecent("XAUUSD", "twelve_data", 120))
+                .thenReturn(prices);
+        when(macroObservationRepository.findRecent("DFII10", 120))
+                .thenReturn(realRates(21));
+        when(macroObservationRepository.findRecent("DTWEXBGS", 120))
+                .thenReturn(dollarIndexes(21));
+
+        GoldResearchSnapshot snapshot = dailyService.createSnapshot();
+
+        assertThat(snapshot.latestGoldDate())
+                .isEqualTo(ANALYSIS_DATE);
+        assertThat(snapshot.gold().currentPrice())
+                .isNotEqualByComparingTo("9999");
     }
 
     @Test

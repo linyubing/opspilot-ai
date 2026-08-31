@@ -9,7 +9,9 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
+import java.time.Clock;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -30,6 +32,8 @@ public class GoldResearchSnapshotService {
     private static final String RESEARCH_VERSION = "gold-multifactor-v2";
     private static final int QUERY_LIMIT = 120;
     private static final int REQUIRED_OBSERVATION_COUNT = 21;
+    private static final ZoneId MARKET_ZONE =
+            ZoneId.of("America/New_York");
 
     private static final BigDecimal ONE_HUNDRED =
             new BigDecimal("100");
@@ -42,6 +46,7 @@ public class GoldResearchSnapshotService {
     private final MacroObservationRepository macroObservationRepository;
     private final RealRateFactorEvaluator evaluator;
     private final DollarIndexFactorEvaluator dollarIndexEvaluator;
+    private final Clock clock;
     private final GoldVolatilityCalculator volatilityCalculator =
             new GoldVolatilityCalculator();
 
@@ -51,10 +56,27 @@ public class GoldResearchSnapshotService {
             RealRateFactorEvaluator evaluator,
             DollarIndexFactorEvaluator dollarIndexEvaluator
     ) {
+        this(
+                goldRepository,
+                macroObservationRepository,
+                evaluator,
+                dollarIndexEvaluator,
+                Clock.system(MARKET_ZONE)
+        );
+    }
+
+    GoldResearchSnapshotService(
+            GoldDailyBarRepository goldRepository,
+            MacroObservationRepository macroObservationRepository,
+            RealRateFactorEvaluator evaluator,
+            DollarIndexFactorEvaluator dollarIndexEvaluator,
+            Clock clock
+    ) {
         this.goldRepository = goldRepository;
         this.macroObservationRepository = macroObservationRepository;
         this.evaluator = evaluator;
         this.dollarIndexEvaluator = dollarIndexEvaluator;
+        this.clock = clock;
     }
 
     public GoldResearchSnapshot createSnapshot() {
@@ -76,7 +98,11 @@ public class GoldResearchSnapshotService {
                         QUERY_LIMIT
                 );
 
-        return calculate(goldPrices, realRates, dollarIndexes);
+        return calculate(
+                removeOpenMarketDay(goldPrices),
+                realRates,
+                dollarIndexes
+        );
     }
 
     /**
@@ -260,6 +286,17 @@ public class GoldResearchSnapshotService {
                 RESEARCH_VERSION,
                 DISCLAIMER
         );
+    }
+
+    private List<GoldDailyBar> removeOpenMarketDay(
+            List<GoldDailyBar> prices
+    ) {
+        LocalDate marketToday = LocalDate.now(clock);
+        return prices.stream()
+                // 当天日线在交易日结束前只是盘中蜡烛，不能当正式收盘价。
+                .filter(price -> price.priceDate() == null
+                        || price.priceDate().isBefore(marketToday))
+                .toList();
     }
 
     private void validateCount(String dataName, int count) {
