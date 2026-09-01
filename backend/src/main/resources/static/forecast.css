@@ -60,6 +60,9 @@ h1 { margin: 2px 0 6px; font-size: clamp(34px, 5vw, 58px); line-height: 1.15; }
 .analysis-grid h3, .analysis-grid p { margin: 0; }
 .analysis-grid p { margin-top: 8px; }
 .note { margin: 16px 0 0; color: var(--muted); font-size: 14px; }
+.miss-reason { border-left: 3px solid var(--warn, #d97706); }
+.miss-title { display: block; font-size: 15px; margin: 4px 0; }
+.miss-reason ul { margin: 8px 0 0; padding-left: 18px; color: var(--muted); }
 [hidden] { display: none !important; }
 
 @media (max-width: 760px) {

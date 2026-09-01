@@ -2,7 +2,7 @@ package com.opspilot.ai.forecast.api;
 
 import com.opspilot.ai.forecast.GoldForecastEvaluationService;
 import com.opspilot.ai.forecast.GoldForecastGenerationService;
-import com.opspilot.ai.forecast.GoldForecastRepository;
+import com.opspilot.ai.forecast.GoldForecastHistoryService;
 import com.opspilot.ai.forecast.GoldForecastResolutionService;
 import com.opspilot.ai.forecast.GoldSettlementService;
 import com.opspilot.ai.forecast.SaveGoldForecastResult;
@@ -27,7 +27,7 @@ public class GoldForecastController {
     private final GoldForecastResolutionService resolutionService;
     private final GoldForecastEvaluationService evaluationService;
     private final GoldSettlementService settlementService;
-    private final GoldForecastRepository repository;
+    private final GoldForecastHistoryService historyService;
     private final GoldForecastReviewService reviewService;
 
     public GoldForecastController(
@@ -35,14 +35,14 @@ public class GoldForecastController {
             GoldForecastResolutionService resolutionService,
             GoldForecastEvaluationService evaluationService,
             GoldSettlementService settlementService,
-            GoldForecastRepository repository,
+            GoldForecastHistoryService historyService,
             GoldForecastReviewService reviewService
     ) {
         this.generationService = generationService;
         this.resolutionService = resolutionService;
         this.evaluationService = evaluationService;
         this.settlementService = settlementService;
-        this.repository = repository;
+        this.historyService = historyService;
         this.reviewService = reviewService;
     }
 
@@ -57,7 +57,7 @@ public class GoldForecastController {
 
     @GetMapping("/forecasts")
     public List<GoldForecastResponse> history(@RequestParam(defaultValue = "20") int limit) {
-        return repository.findRecent(limit).stream().map(GoldForecastResponse::from).toList();
+        return historyService.retrieveRecent(limit);
     }
 
     @PostMapping("/forecasts/resolve")

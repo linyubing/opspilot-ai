@@ -78,6 +78,7 @@ function renderForecast(forecast) {
     text("modelName", forecast.modelName);
     text("reasoning", forecast.reasoning);
     renderPriceBasis();
+    renderMissReason(forecast.missReason);
 
     const conditions = byId("conditions");
     conditions.replaceChildren(...(forecast.invalidationConditions || []).map(item => {
@@ -85,6 +86,24 @@ function renderForecast(forecast) {
         li.textContent = item;
         return li;
     }));
+}
+
+function renderMissReason(missReason) {
+    const panel = byId("missReasonPanel");
+    if (!missReason || !missReason.code) {
+        panel.hidden = true;
+        return;
+    }
+    text("missReasonCode", missReason.code);
+    text("missReasonTitle", missReason.title);
+    text("missReasonDetail", missReason.detail);
+    const tags = byId("missReasonTags");
+    tags.replaceChildren(...(missReason.tags || []).filter(Boolean).map(item => {
+        const li = document.createElement("li");
+        li.textContent = item;
+        return li;
+    }));
+    panel.hidden = false;
 }
 
 function renderForecastOnly(forecast) {

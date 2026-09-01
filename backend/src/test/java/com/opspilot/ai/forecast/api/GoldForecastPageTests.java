@@ -29,8 +29,12 @@ class GoldForecastPageTests {
                 .contains("id=\"barClose\"")
                 .contains("id=\"basePriceLabel\"")
                 .contains("id=\"targetLabel\"")
+                .contains("未命中原因")
+                .contains("id=\"missReasonPanel\"")
                 .contains("forecast.js");
         assertThat(script)
+                .contains("renderMissReason")
+                .contains("missReasonPanel")
                 .contains("/api/research/gold/daily-report")
                 .contains("/api/research/gold/daily-report/latest")
                 .contains("/api/research/gold/forecasts?limit=1")

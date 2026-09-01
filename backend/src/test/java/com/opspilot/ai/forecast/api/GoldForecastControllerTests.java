@@ -35,7 +35,7 @@ class GoldForecastControllerTests {
     @Mock private GoldForecastResolutionService resolutionService;
     @Mock private GoldForecastEvaluationService evaluationService;
     @Mock private GoldSettlementService settlementService;
-    @Mock private GoldForecastRepository repository;
+    @Mock private GoldForecastHistoryService historyService;
     @Mock private GoldForecastReviewService reviewService;
     private MockMvc mockMvc;
 
@@ -43,7 +43,7 @@ class GoldForecastControllerTests {
     void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(new GoldForecastController(
                 generationService, resolutionService, evaluationService,
-                settlementService, repository, reviewService
+                settlementService, historyService, reviewService
         )).build();
     }
 
@@ -71,11 +71,30 @@ class GoldForecastControllerTests {
 
     @Test
     void returnsRecentForecasts() throws Exception {
-        when(repository.findRecent(5)).thenReturn(List.of(record()));
+        GoldForecastResponse response = GoldForecastResponse.from(record());
+        when(historyService.retrieveRecent(5)).thenReturn(List.of(response));
         mockMvc.perform(get("/api/research/gold/forecasts").param("limit", "5"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].modelName").value("glm-4.7"))
                 .andExpect(jsonPath("$[0].expectedTargetDate").value("2026-08-28"));
+    }
+
+    @Test
+    @DisplayName("历史预测附带失败归因原因")
+    void returnsRecentForecastsWithMissReason() throws Exception {
+        GoldForecastResponse response = GoldForecastResponse.from(
+                record(),
+                new GoldForecastMissReason(
+                        "direction_mismatch", "方向判断失误",
+                        "预测方向与实际结算方向相反，属于常规方向性失误。",
+                        List.of("directionMismatch")
+                )
+        );
+        when(historyService.retrieveRecent(20)).thenReturn(List.of(response));
+        mockMvc.perform(get("/api/research/gold/forecasts"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].missReason.code").value("direction_mismatch"))
+                .andExpect(jsonPath("$[0].missReason.tags[0]").value("directionMismatch"));
     }
 
     @Test

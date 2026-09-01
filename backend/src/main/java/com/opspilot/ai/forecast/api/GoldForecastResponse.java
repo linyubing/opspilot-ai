@@ -2,6 +2,7 @@ package com.opspilot.ai.forecast.api;
 
 import com.opspilot.ai.forecast.ForecastDirection;
 import com.opspilot.ai.forecast.ForecastStatus;
+import com.opspilot.ai.forecast.GoldForecastMissReason;
 import com.opspilot.ai.forecast.StoredGoldDirectionForecast;
 
 import java.math.BigDecimal;
@@ -20,16 +21,24 @@ public record GoldForecastResponse(
         ForecastStatus status, String expectedTargetDate,
         LocalDate targetDate, BigDecimal targetPrice,
         BigDecimal actualReturn, ForecastDirection actualDirection,
-        Boolean hit, OffsetDateTime resolvedAt, OffsetDateTime createdAt
+        Boolean hit, GoldForecastMissReason missReason,
+        OffsetDateTime resolvedAt, OffsetDateTime createdAt
 ) {
     public static GoldForecastResponse from(StoredGoldDirectionForecast record) {
+        return from(record, null);
+    }
+
+    public static GoldForecastResponse from(
+            StoredGoldDirectionForecast record, GoldForecastMissReason missReason
+    ) {
         return new GoldForecastResponse(
                 record.id(), record.snapshotId(), record.baseDate(), record.basePrice(),
                 record.predictedDirection(), record.reasoning(), record.invalidationConditions(),
                 record.modelName(), record.promptVersion(), record.promptHash(),
                 record.forecastRuleVersion(), record.status(), nextWeekday(record.baseDate()).toString(),
                 record.targetDate(), record.targetPrice(), record.actualReturn(),
-                record.actualDirection(), record.hit(), record.resolvedAt(), record.createdAt()
+                record.actualDirection(), record.hit(), missReason,
+                record.resolvedAt(), record.createdAt()
         );
     }
 
