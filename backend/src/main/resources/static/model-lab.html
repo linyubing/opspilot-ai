@@ -71,7 +71,42 @@
             <strong id="holdoutRange">-</strong>
         </section>
     </section>
+
+    <section class="experiment-history">
+        <h2>实验历史</h2>
+        <p class="history-hint">点击"保存实验"将当前预览结果持久化，可在下方查看历史记录。</p>
+        <button id="saveExperiment" type="button" class="btn-save">保存实验</button>
+        <div id="saveStatus" class="save-status" hidden></div>
+        <ul id="experimentList" class="experiment-list"></ul>
+    </section>
+
+    <section id="experimentDetail" class="experiment-detail" hidden>
+        <h2>实验详情</h2>
+        <div class="detail-grid">
+            <div><span>实验 ID</span><strong id="detailId">-</strong></div>
+            <div><span>状态</span><strong id="detailStatus">-</strong></div>
+            <div><span>数据集指纹</span><strong id="detailHash">-</strong></div>
+            <div><span>特征版本</span><strong id="detailFeatureVersion">-</strong></div>
+            <div><span>标签版本</span><strong id="detailLabelVersion">-</strong></div>
+            <div><span>分割版本</span><strong id="detailSplitVersion">-</strong></div>
+            <div><span>数据范围</span><strong id="detailDataRange">-</strong></div>
+            <div><span>训练起点</span><strong id="detailTrainStart">-</strong></div>
+            <div><span>验证区间</span><strong id="detailValidationRange">-</strong></div>
+            <div><span>留出区间</span><strong id="detailHoldoutRange">-</strong></div>
+            <div><span>验证样本</span><strong id="detailValidationSamples">-</strong></div>
+            <div><span>留出样本</span><strong id="detailHoldoutSamples">-</strong></div>
+            <div><span>Git 提交</span><strong id="detailGitCommit">-</strong></div>
+            <div><span>创建时间</span><strong id="detailCreatedAt">-</strong></div>
+            <div><span>开始时间</span><strong id="detailStartedAt">-</strong></div>
+            <div><span>完成时间</span><strong id="detailCompletedAt">-</strong></div>
+        </div>
+        <div id="detailFailure" class="detail-failure" hidden>
+            <h3>失败信息</h3>
+            <pre id="detailFailureMessage"></pre>
+        </div>
+        <button id="closeDetail" type="button" class="btn-close">关闭</button>
+    </section>
 </main>
-<script src="/model-lab.js?v=1" defer></script>
+<script src="/model-lab.js?v=2" defer></script>
 </body>
 </html>

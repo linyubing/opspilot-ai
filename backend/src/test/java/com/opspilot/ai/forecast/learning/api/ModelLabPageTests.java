@@ -28,6 +28,17 @@ class ModelLabPageTests {
     }
 
     @Test
+    void showsExperimentHistorySection() throws IOException {
+        String html = read("model-lab.html");
+
+        assertThat(html)
+                .contains("实验历史")
+                .contains("保存实验")
+                .contains("experimentList")
+                .contains("experimentDetail");
+    }
+
+    @Test
     void forecastPageLinksToModelLab() throws IOException {
         assertThat(read("forecast.html"))
                 .contains("href=\"/model-lab.html\"")

@@ -3,6 +3,7 @@ package com.opspilot.ai.forecast.learning.api;
 import com.opspilot.ai.forecast.ForecastDirection;
 import com.opspilot.ai.forecast.learning.ForecastHorizon;
 import com.opspilot.ai.forecast.learning.ForecastMetrics;
+import com.opspilot.ai.forecast.learning.ModelExperimentService;
 import com.opspilot.ai.forecast.learning.WalkForwardReport;
 import com.opspilot.ai.forecast.learning.WalkForwardService;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,13 +25,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class ModelExperimentControllerTests {
 
     private WalkForwardService service;
+    private ModelExperimentService experimentService;
     private MockMvc mvc;
 
     @BeforeEach
     void setUp() {
         service = mock(WalkForwardService.class);
+        experimentService = mock(ModelExperimentService.class);
         mvc = MockMvcBuilders.standaloneSetup(
-                new ModelExperimentController(service)
+                new ModelExperimentController(service, experimentService)
         ).build();
     }
 
@@ -44,8 +47,7 @@ class ModelExperimentControllerTests {
                 .andExpect(jsonPath("$.horizon").value("FIVE_DAYS"))
                 .andExpect(jsonPath("$.majority.accuracy").isNumber())
                 .andExpect(jsonPath("$.logistic.balancedAccuracy").isNumber())
-                .andExpect(jsonPath("$.finalHoldout.samples").value(240))
-                .andExpect(jsonPath("$.finalHoldout.accuracy").doesNotExist());
+                .andExpect(jsonPath("$.finalHoldoutSamples").value(240));
     }
 
     @Test
