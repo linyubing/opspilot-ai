@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -30,36 +31,50 @@ public class GoldDatasetBuilder {
     private final GoldDailyBarRepository repository;
     private final GoldResearchSnapshotService snapshots;
     private final GoldForecastRule rule;
+    private final GoldFeatureCalculator calculator;
 
     public GoldDatasetBuilder(
             GoldDailyBarRepository repository,
             GoldResearchSnapshotService snapshots,
-            GoldForecastRule rule
+            GoldForecastRule rule,
+            GoldFeatureCalculator calculator
     ) {
         this.repository = repository;
         this.snapshots = snapshots;
         this.rule = rule;
+        this.calculator = calculator;
     }
 
     public GoldDataset build(ForecastHorizon horizon) {
         Objects.requireNonNull(horizon, "预测周期不能为空");
-        List<GoldDailyBar> bars = repository.findAll(SYMBOL, PROVIDER).stream()
+        // 一次查询全部日线，避免每个样本重复查询
+        List<GoldDailyBar> allBars = repository.findAll(SYMBOL, PROVIDER).stream()
                 .sorted(Comparator.comparing(GoldDailyBar::priceDate))
                 .toList();
 
         List<GoldSample> samples = new ArrayList<>();
         int skipped = 0;
-        for (int i = HISTORY; i + horizon.sessions() < bars.size(); i++) {
-            GoldDailyBar base = bars.get(i);
-            GoldDailyBar target = bars.get(i + horizon.sessions());
+        for (int i = HISTORY; i + horizon.sessions() < allBars.size(); i++) {
+            GoldDailyBar base = allBars.get(i);
+            GoldDailyBar target = allBars.get(i + horizon.sessions());
             try {
                 GoldResearchSnapshot snapshot = snapshots.createSnapshot(base.priceDate());
                 validateDates(snapshot);
+
+                // 计算 OHLC 特征
+                java.util.Optional<GoldOhlcFeatures> ohlcOpt = calculator.compute(
+                        base.priceDate(), allBars);
+                if (ohlcOpt.isEmpty()) {
+                    // OHLC 数据不足，跳过该样本
+                    skipped++;
+                    continue;
+                }
+
                 samples.add(new GoldSample(
                         base.priceDate(),
                         target.priceDate(),
                         horizon,
-                        features(base, snapshot),
+                        features(base, snapshot, ohlcOpt.get()),
                         rule.classify(change(target.close(), base.close()))
                 ));
             } catch (InsufficientResearchDataException exception) {
@@ -72,9 +87,11 @@ public class GoldDatasetBuilder {
 
     private GoldFeatures features(
             GoldDailyBar bar,
-            GoldResearchSnapshot snapshot
+            GoldResearchSnapshot snapshot,
+            GoldOhlcFeatures ohlc
     ) {
         Map<String, Double> values = new HashMap<>();
+        // 原有 16 个真实因子
         values.put("gold_return_1", number(snapshot.gold().return1()));
         values.put("gold_return_5", number(snapshot.gold().return5()));
         values.put("gold_return_20", number(snapshot.gold().return20()));
@@ -93,59 +110,9 @@ public class GoldDatasetBuilder {
         values.put("dollar_return_20", number(snapshot.dollarIndex().return20()));
         values.put("dollar_age", (double) ChronoUnit.DAYS.between(
                 snapshot.latestDollarIndexDate(), snapshot.analysisDate()));
-        // OHLC 技术特征（使用 GoldFeatureWindow 计算）
-        GoldFeatureWindow window = new GoldFeatureWindow(
-                snapshot.analysisDate(),
-                repository.findAll("XAUUSD", "twelve_data"));
-        if (window.size() >= 20) {
-            values.put("return1", bdr(window.returnN(1)));
-            values.put("return3", bdr(window.returnN(3)));
-            values.put("return5", bdr(window.returnN(5)));
-            values.put("return10", bdr(window.returnN(10)));
-            values.put("return20", bdr(window.returnN(20)));
-            values.put("overnightGap", bdr(window.overnightGap()));
-            values.put("intradayReturn", bdr(window.intradayReturn()));
-            values.put("dailyRange", bdr(window.dailyRange()));
-            values.put("closeLocation", bdr(window.closeLocation()));
-            values.put("atr14", bdr(window.atr14()));
-            values.put("volatility5", bdr(window.volatility(5)));
-            values.put("volatility20", bdr(window.volatility(20)));
-            values.put("ma5Distance", bdr(window.maDistance(5)));
-            values.put("ma20Distance", bdr(window.maDistance(20)));
-            values.put("ma5Slope", bdr(window.maSlope(5)));
-            values.put("ma20Slope", bdr(window.maSlope(20)));
-            values.put("rsi14", bdr(window.rsi14()));
-            values.put("drawdown20", bdr(window.drawdown20()));
-            values.put("highBreakout20", bdr(window.highBreakout20()));
-            values.put("lowBreakdown20", bdr(window.lowBreakdown20()));
-        } else {
-            // 数据不足时使用默认值 0.0
-            values.put("return1", 0.0);
-            values.put("return3", 0.0);
-            values.put("return5", 0.0);
-            values.put("return10", 0.0);
-            values.put("return20", 0.0);
-            values.put("overnightGap", 0.0);
-            values.put("intradayReturn", 0.0);
-            values.put("dailyRange", 0.0);
-            values.put("closeLocation", 0.5);
-            values.put("atr14", 0.0);
-            values.put("volatility5", 0.0);
-            values.put("volatility20", 0.0);
-            values.put("ma5Distance", 0.0);
-            values.put("ma20Distance", 0.0);
-            values.put("ma5Slope", 0.0);
-            values.put("ma20Slope", 0.0);
-            values.put("rsi14", 50.0);
-            values.put("drawdown20", 0.0);
-            values.put("highBreakout20", 0.0);
-            values.put("lowBreakdown20", 0.0);
-        }
+        // 合并 20 个 OHLC 特征
+        values.putAll(ohlc.values());
         return new GoldFeatures(values);
-    }
-
-    private double bdr(java.math.BigDecimal value) {
-        return (value != null) ? value.doubleValue() : 0.0;
     }
 
     private void validateDates(GoldResearchSnapshot snapshot) {

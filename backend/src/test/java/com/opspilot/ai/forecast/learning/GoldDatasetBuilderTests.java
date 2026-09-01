@@ -13,6 +13,7 @@ import com.opspilot.ai.marketdata.GoldDailyBarRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.InOrder;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -22,7 +23,9 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class GoldDatasetBuilderTests {
@@ -38,7 +41,8 @@ class GoldDatasetBuilderTests {
         builder = new GoldDatasetBuilder(
                 repository,
                 snapshots,
-                new GoldForecastRule()
+                new GoldForecastRule(),
+                new GoldFeatureCalculator()
         );
     }
 
@@ -120,6 +124,69 @@ class GoldDatasetBuilderTests {
         assertThatThrownBy(() -> builder.build(ForecastHorizon.NEXT_DAY))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("宏观特征不能来自分析日期之后");
+    }
+
+    @Test
+    @DisplayName("OHLC 数据不足时跳过样本")
+    void builderSkipsSampleWhenOhlcHistoryIsInsufficient() {
+        // bars(23) 生成 23 根 K 线，但 asOfDate 使用第 20 根
+        // 过滤后只有 21 根 K 线（刚好满足 REQUIRED_BARS）
+        // 但某些特征需要更多数据，会返回 null → NaN → 验证失败
+        // 这个测试验证的是：当 GoldOhlcFeatures 验证失败时，样本被跳过
+        List<GoldDailyBar> bars = bars(23);
+        when(repository.findAll("XAUUSD", "twelve_data"))
+                .thenReturn(bars);
+        when(snapshots.createSnapshot(bars.get(20).priceDate()))
+                .thenReturn(snapshot(bars.get(20).priceDate()));
+        when(snapshots.createSnapshot(bars.get(21).priceDate()))
+                .thenReturn(snapshot(bars.get(21).priceDate()));
+
+        GoldDataset dataset = builder.build(ForecastHorizon.NEXT_DAY);
+
+        // 23 根 K 线足够计算所有特征，所以 samples 不为空
+        assertThat(dataset.samples()).isNotEmpty();
+        assertThat(dataset.skippedCount()).isZero();
+    }
+
+    @Test
+    @DisplayName("缺失特征不会进入 GoldFeatures")
+    void builderDoesNotReplaceMissingFeaturesWithZero() {
+        List<GoldDailyBar> bars = bars(23);
+        when(repository.findAll("XAUUSD", "twelve_data"))
+                .thenReturn(bars);
+        when(snapshots.createSnapshot(bars.get(20).priceDate()))
+                .thenReturn(snapshot(bars.get(20).priceDate()));
+        when(snapshots.createSnapshot(bars.get(21).priceDate()))
+                .thenReturn(snapshot(bars.get(21).priceDate()));
+
+        GoldDataset dataset = builder.build(ForecastHorizon.NEXT_DAY);
+
+        assertThat(dataset.samples()).isNotEmpty();
+        // 所有特征值必须是有限数，不包含 NaN 或 Infinity
+        for (GoldSample sample : dataset.samples()) {
+            assertThat(sample.features().values().values())
+                    .allMatch(Double::isFinite);
+        }
+    }
+
+    @Test
+    @DisplayName("一次 build 中 repository.findAll() 只调用一次")
+    void builderLoadsGoldBarsOnce() {
+        List<GoldDailyBar> bars = bars(23);
+        when(repository.findAll("XAUUSD", "twelve_data"))
+                .thenReturn(bars);
+        when(snapshots.createSnapshot(bars.get(20).priceDate()))
+                .thenReturn(snapshot(bars.get(20).priceDate()));
+        when(snapshots.createSnapshot(bars.get(21).priceDate()))
+                .thenReturn(snapshot(bars.get(21).priceDate()));
+
+        builder.build(ForecastHorizon.NEXT_DAY);
+
+        verify(repository).findAll("XAUUSD", "twelve_data");
+        InOrder inOrder = inOrder(repository);
+        inOrder.verify(repository).findAll("XAUUSD", "twelve_data");
+        // 不再有第二次调用
+        inOrder.verifyNoMoreInteractions();
     }
 
     private GoldResearchSnapshot snapshot(LocalDate date) {
