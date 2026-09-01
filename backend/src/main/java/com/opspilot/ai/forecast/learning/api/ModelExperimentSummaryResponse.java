@@ -13,6 +13,7 @@ import java.util.UUID;
 /** 实验摘要响应，不包含大型混淆矩阵。 */
 public record ModelExperimentSummaryResponse(
         UUID id,
+        UUID comparisonId,
         String horizon,
         String status,
         String featureProfile,
@@ -48,6 +49,7 @@ public record ModelExperimentSummaryResponse(
 
         return new ModelExperimentSummaryResponse(
                 experiment.id(),
+                experiment.comparisonId(),
                 experiment.horizon(),
                 experiment.status().name(),
                 experiment.featureProfile().name(),
@@ -81,10 +83,8 @@ public record ModelExperimentSummaryResponse(
             BigDecimal base16Balanced = summaries.stream()
                     .filter(other -> "BASE_16".equals(other.featureProfile())
                             && other.balancedAccuracy() != null
-                            && other.horizon().equals(s.horizon())
-                            && other.datasetHashPrefix().equals(s.datasetHashPrefix())
-                            && other.labelVersion().equals(s.labelVersion())
-                            && other.splitVersion().equals(s.splitVersion()))
+                            && other.comparisonId() != null
+                            && other.comparisonId().equals(s.comparisonId()))
                     .findFirst()
                     .map(ModelExperimentSummaryResponse::balancedAccuracy)
                     .orElse(null);
@@ -92,7 +92,7 @@ public record ModelExperimentSummaryResponse(
             if (base16Balanced != null) {
                 BigDecimal improvement = computeImprovement(s.balancedAccuracy(), base16Balanced);
                 result.add(new ModelExperimentSummaryResponse(
-                        s.id(), s.horizon(), s.status(),
+                        s.id(), s.comparisonId(), s.horizon(), s.status(),
                         s.featureProfile(), s.datasetHashPrefix(),
                         s.featureVersion(), s.labelVersion(), s.splitVersion(),
                         s.gitCommit(), s.createdAt(),

@@ -128,10 +128,11 @@ class ModelExperimentControllerTests {
     }
 
     @Test
-    void compareReturns201WithThreeExperiments() throws Exception {
-        ModelExperiment exp1 = createExperimentWithProfile(FeatureProfile.BASE_16);
-        ModelExperiment exp2 = createExperimentWithProfile(FeatureProfile.OHLC_20);
-        ModelExperiment exp3 = createExperimentWithProfile(FeatureProfile.ALL_36);
+    void compareReturns201WithComparisonIdAndThreeExperiments() throws Exception {
+        UUID comparisonId = UUID.randomUUID();
+        ModelExperiment exp1 = createExperimentWithProfile(FeatureProfile.BASE_16, comparisonId);
+        ModelExperiment exp2 = createExperimentWithProfile(FeatureProfile.OHLC_20, comparisonId);
+        ModelExperiment exp3 = createExperimentWithProfile(FeatureProfile.ALL_36, comparisonId);
         ModelExperimentMetric majorityMetric = createMetric(ModelType.MAJORITY);
         ModelExperimentMetric logisticMetric = createMetric(ModelType.LOGISTIC);
 
@@ -144,9 +145,16 @@ class ModelExperimentControllerTests {
         mvc.perform(post("/api/research/gold/model-experiments/compare")
                         .param("horizon", "FIVE_DAYS"))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$[0].featureProfile").value("BASE_16"))
-                .andExpect(jsonPath("$[1].featureProfile").value("OHLC_20"))
-                .andExpect(jsonPath("$[2].featureProfile").value("ALL_36"));
+                .andExpect(jsonPath("$.comparisonId").value(comparisonId.toString()))
+                .andExpect(jsonPath("$.horizon").value("NEXT_DAY"))
+                .andExpect(jsonPath("$.experiments").isArray())
+                .andExpect(jsonPath("$.experiments.length()").value(3))
+                .andExpect(jsonPath("$.experiments[0].featureProfile").value("BASE_16"))
+                .andExpect(jsonPath("$.experiments[0].comparisonId").value(comparisonId.toString()))
+                .andExpect(jsonPath("$.experiments[1].featureProfile").value("OHLC_20"))
+                .andExpect(jsonPath("$.experiments[1].comparisonId").value(comparisonId.toString()))
+                .andExpect(jsonPath("$.experiments[2].featureProfile").value("ALL_36"))
+                .andExpect(jsonPath("$.experiments[2].comparisonId").value(comparisonId.toString()));
     }
 
     @Test
@@ -214,7 +222,7 @@ class ModelExperimentControllerTests {
     void nonCompletedExperimentAllowsNullMetrics() throws Exception {
         UUID id = UUID.randomUUID();
         ModelExperiment experiment = new ModelExperiment(
-                id, "NEXT_DAY", "v1", "v1", "v1", "hash",
+                id, null, "NEXT_DAY", "v1", "v1", "v1", "hash",
                 FeatureProfile.ALL_36, Map.of(), LocalDate.MIN, LocalDate.MAX,
                 LocalDate.MIN, LocalDate.MIN, LocalDate.MAX,
                 LocalDate.MIN, LocalDate.MAX, 0, 0,
@@ -233,13 +241,13 @@ class ModelExperimentControllerTests {
     }
 
     private ModelExperiment createExperiment() {
-        return createExperimentWithProfile(FeatureProfile.ALL_36);
+        return createExperimentWithProfile(FeatureProfile.ALL_36, null);
     }
 
-    private ModelExperiment createExperimentWithProfile(FeatureProfile profile) {
+    private ModelExperiment createExperimentWithProfile(FeatureProfile profile, UUID comparisonId) {
         UUID id = UUID.randomUUID();
         return new ModelExperiment(
-                id, "NEXT_DAY", "gold-features-v2", "gold-label-v1", "gold-temporal-split-v1",
+                id, comparisonId, "NEXT_DAY", "gold-features-v2", "gold-label-v1", "gold-temporal-split-v1",
                 "abc123def456", profile, Map.of("horizon", "NEXT_DAY"),
                 LocalDate.of(2020, 1, 1), LocalDate.of(2025, 12, 31),
                 LocalDate.of(2020, 1, 1), LocalDate.of(2024, 1, 1), LocalDate.of(2024, 12, 31),

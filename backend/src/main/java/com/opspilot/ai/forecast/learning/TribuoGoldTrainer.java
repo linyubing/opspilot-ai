@@ -19,18 +19,9 @@ import java.util.Set;
 @Component("tribuoGoldTrainer")
 public class TribuoGoldTrainer implements GoldTrainer {
 
-    private static final List<String> ALL_FEATURE_NAMES = GoldFeatures.NAMES.stream()
-            .sorted()
-            .toList();
-
     @Override
     public String name() {
         return "logistic-v1";
-    }
-
-    @Override
-    public GoldClassifier train(List<GoldSample> samples) {
-        return train(samples, GoldFeatures.NAMES);
     }
 
     @Override

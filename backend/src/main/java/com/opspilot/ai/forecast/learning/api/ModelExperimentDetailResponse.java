@@ -13,6 +13,7 @@ import java.util.UUID;
 /** 实验详情响应，包含完整元数据和参数。 */
 public record ModelExperimentDetailResponse(
         UUID id,
+        UUID comparisonId,
         String horizon,
         String status,
         String datasetHash,
@@ -42,6 +43,7 @@ public record ModelExperimentDetailResponse(
         ModelExperiment experiment = result.experiment();
         return new ModelExperimentDetailResponse(
                 experiment.id(),
+                experiment.comparisonId(),
                 experiment.horizon(),
                 experiment.status().name(),
                 experiment.datasetHash(),
@@ -76,6 +78,7 @@ public record ModelExperimentDetailResponse(
     ) {
         return new ModelExperimentDetailResponse(
                 experiment.id(),
+                experiment.comparisonId(),
                 experiment.horizon(),
                 experiment.status().name(),
                 experiment.datasetHash(),

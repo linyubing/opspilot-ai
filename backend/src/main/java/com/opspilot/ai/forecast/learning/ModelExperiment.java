@@ -8,6 +8,7 @@ import java.util.UUID;
 /** 黄金监督学习模型实验记录。 */
 public record ModelExperiment(
         UUID id,
+        UUID comparisonId,
         String horizon,
         String featureVersion,
         String labelVersion,

@@ -32,13 +32,23 @@ class ModelExperimentSchemaTests {
         ).stream().map(r -> r.get("column_name").toString()).toList();
 
         assertThat(columns).contains(
-                "id", "horizon", "feature_version", "label_version", "split_version",
+                "id", "comparison_id", "horizon", "feature_version", "label_version", "split_version",
                 "dataset_hash", "feature_profile", "parameter_json",
                 "data_start", "data_end",
                 "train_start", "validation_start", "validation_end",
                 "holdout_start", "holdout_end", "validation_samples", "holdout_samples",
                 "status", "git_commit", "failure_message", "created_at", "started_at", "completed_at"
         );
+    }
+
+    @Test
+    void hasComparisonIdColumn() {
+        var columns = jdbc.queryForList(
+                "select column_name from information_schema.columns " +
+                        "where table_name = 'gold_model_experiment' " +
+                        "and column_name = 'comparison_id'"
+        );
+        assertThat(columns).hasSize(1);
     }
 
     @Test

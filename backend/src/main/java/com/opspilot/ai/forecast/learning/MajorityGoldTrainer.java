@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /** 训练始终输出训练集多数方向的基础分类器。 */
 @Component("majorityGoldTrainer")
@@ -17,7 +18,7 @@ public class MajorityGoldTrainer implements GoldTrainer {
     }
 
     @Override
-    public GoldClassifier train(List<GoldSample> samples) {
+    public GoldClassifier train(List<GoldSample> samples, Set<String> featureNames) {
         if (samples == null || samples.isEmpty()) {
             throw new IllegalArgumentException("训练样本不能为空");
         }

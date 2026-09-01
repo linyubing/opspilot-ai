@@ -62,10 +62,11 @@ public class ModelExperimentService {
         String datasetHash = fingerprint.hash(dataset);
         TemporalDataset split = splitter.split(dataset.samples(), horizon);
 
-        return runSingleExperiment(experimentId, now, horizon, profile, datasetHash, dataset, split);
+        return runSingleExperiment(experimentId, null, now, horizon, profile, datasetHash, dataset, split);
     }
 
     public List<ModelExperimentResult> compare(ForecastHorizon horizon) {
+        UUID comparisonId = UUID.randomUUID();
         UUID experimentId1 = UUID.randomUUID();
         UUID experimentId2 = UUID.randomUUID();
         UUID experimentId3 = UUID.randomUUID();
@@ -76,14 +77,15 @@ public class ModelExperimentService {
         TemporalDataset split = splitter.split(dataset.samples(), horizon);
 
         List<ModelExperimentResult> results = new ArrayList<>();
-        results.add(runSingleExperiment(experimentId1, now, horizon, FeatureProfile.BASE_16, datasetHash, dataset, split));
-        results.add(runSingleExperiment(experimentId2, now, horizon, FeatureProfile.OHLC_20, datasetHash, dataset, split));
-        results.add(runSingleExperiment(experimentId3, now, horizon, FeatureProfile.ALL_36, datasetHash, dataset, split));
+        results.add(runSingleExperiment(experimentId1, comparisonId, now, horizon, FeatureProfile.BASE_16, datasetHash, dataset, split));
+        results.add(runSingleExperiment(experimentId2, comparisonId, now, horizon, FeatureProfile.OHLC_20, datasetHash, dataset, split));
+        results.add(runSingleExperiment(experimentId3, comparisonId, now, horizon, FeatureProfile.ALL_36, datasetHash, dataset, split));
         return results;
     }
 
     private ModelExperimentResult runSingleExperiment(
             UUID experimentId,
+            UUID comparisonId,
             OffsetDateTime now,
             ForecastHorizon horizon,
             FeatureProfile profile,
@@ -93,6 +95,7 @@ public class ModelExperimentService {
     ) {
         ModelExperiment experiment = new ModelExperiment(
                 experimentId,
+                comparisonId,
                 horizon.name(),
                 GoldFeatures.VERSION,
                 GoldForecastRule.RULE_VERSION,
@@ -132,6 +135,7 @@ public class ModelExperimentService {
 
             ModelExperiment completed = new ModelExperiment(
                     experimentId,
+                    experiment.comparisonId(),
                     experiment.horizon(),
                     experiment.featureVersion(),
                     experiment.labelVersion(),

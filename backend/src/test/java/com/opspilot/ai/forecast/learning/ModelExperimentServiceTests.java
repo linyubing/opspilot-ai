@@ -173,6 +173,29 @@ class ModelExperimentServiceTests {
     }
 
     @Test
+    void compareExperimentsShareSameComparisonId() {
+        ForecastHorizon horizon = ForecastHorizon.NEXT_DAY;
+        GoldDataset dataset = createSampleDataset();
+        TemporalDataset split = createSampleSplit();
+
+        when(datasetBuilder.build(horizon)).thenReturn(dataset);
+        when(fingerprint.hash(dataset)).thenReturn("sameHash123");
+        when(splitter.split(dataset.samples(), horizon)).thenReturn(split);
+        when(walkForward.run(split, horizon, FeatureProfile.BASE_16)).thenReturn(createReport());
+        when(walkForward.run(split, horizon, FeatureProfile.OHLC_20)).thenReturn(createReport());
+        when(walkForward.run(split, horizon, FeatureProfile.ALL_36)).thenReturn(createReport());
+        when(properties.gitCommit()).thenReturn("unknown");
+
+        List<ModelExperimentResult> results = service.compare(horizon);
+
+        UUID comparisonId = results.get(0).experiment().comparisonId();
+        assertThat(comparisonId).isNotNull();
+        for (ModelExperimentResult r : results) {
+            assertThat(r.experiment().comparisonId()).isEqualTo(comparisonId);
+        }
+    }
+
+    @Test
     void compareExperimentsShareSameHashAndDates() {
         ForecastHorizon horizon = ForecastHorizon.NEXT_DAY;
         GoldDataset dataset = createSampleDataset();
@@ -196,6 +219,23 @@ class ModelExperimentServiceTests {
             assertThat(r.experiment().dataStart()).isEqualTo(dataStart);
             assertThat(r.experiment().validationStart()).isEqualTo(validStart);
         }
+    }
+
+    @Test
+    void singleRunHasNullComparisonId() {
+        ForecastHorizon horizon = ForecastHorizon.NEXT_DAY;
+        GoldDataset dataset = createSampleDataset();
+        TemporalDataset split = createSampleSplit();
+
+        when(datasetBuilder.build(horizon)).thenReturn(dataset);
+        when(fingerprint.hash(dataset)).thenReturn("abc123");
+        when(splitter.split(dataset.samples(), horizon)).thenReturn(split);
+        when(walkForward.run(split, horizon, FeatureProfile.ALL_36)).thenReturn(createReport());
+        when(properties.gitCommit()).thenReturn("unknown");
+
+        ModelExperimentResult result = service.run(horizon);
+
+        assertThat(result.experiment().comparisonId()).isNull();
     }
 
     @Test

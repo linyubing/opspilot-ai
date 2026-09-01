@@ -158,7 +158,7 @@ class WalkForwardServiceTests {
         }
 
         @Override
-        public GoldClassifier train(List<GoldSample> samples) {
+        public GoldClassifier train(List<GoldSample> samples, java.util.Set<String> featureNames) {
             trainingSets.add(List.copyOf(samples));
             return features -> probabilities;
         }

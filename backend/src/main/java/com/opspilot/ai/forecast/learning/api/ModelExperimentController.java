@@ -67,14 +67,11 @@ public class ModelExperimentController {
     }
 
     @PostMapping("/compare")
-    public ResponseEntity<List<ModelExperimentDetailResponse>> compare(
+    public ResponseEntity<CompareResponse> compare(
             @RequestParam(defaultValue = "FIVE_DAYS") String horizon
     ) {
         List<ModelExperimentResult> results = experimentService.compare(parse(horizon));
-        List<ModelExperimentDetailResponse> responses = results.stream()
-                .map(ModelExperimentDetailResponse::from)
-                .toList();
-        return ResponseEntity.status(201).body(responses);
+        return ResponseEntity.status(201).body(CompareResponse.from(results));
     }
 
     @GetMapping("/history")

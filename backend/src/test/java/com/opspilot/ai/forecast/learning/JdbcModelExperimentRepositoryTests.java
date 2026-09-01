@@ -35,6 +35,18 @@ class JdbcModelExperimentRepositoryTests {
         assertThat(found).isPresent();
         assertThat(found.get().horizon()).isEqualTo("FIVE_DAYS");
         assertThat(found.get().status()).isEqualTo(ModelExperimentStatus.CREATED);
+        assertThat(found.get().comparisonId()).isNull();
+    }
+
+    @Test
+    void createsExperimentWithComparisonId() {
+        UUID comparisonId = UUID.randomUUID();
+        ModelExperiment experiment = createSampleExperimentWithComparisonId(comparisonId);
+        repo.create(experiment);
+
+        var found = repo.findById(experiment.id());
+        assertThat(found).isPresent();
+        assertThat(found.get().comparisonId()).isEqualTo(comparisonId);
     }
 
     @Test
@@ -58,6 +70,7 @@ class JdbcModelExperimentRepositoryTests {
 
         ModelExperiment completed = new ModelExperiment(
                 experiment.id(),
+                experiment.comparisonId(),
                 experiment.horizon(),
                 experiment.featureVersion(),
                 experiment.labelVersion(),
@@ -131,6 +144,7 @@ class JdbcModelExperimentRepositoryTests {
 
         ModelExperiment completed = new ModelExperiment(
                 experiment.id(),
+                experiment.comparisonId(),
                 experiment.horizon(),
                 experiment.featureVersion(),
                 experiment.labelVersion(),
@@ -171,11 +185,16 @@ class JdbcModelExperimentRepositoryTests {
     }
 
     private ModelExperiment createSampleExperiment() {
+        return createSampleExperimentWithComparisonId(null);
+    }
+
+    private ModelExperiment createSampleExperimentWithComparisonId(UUID comparisonId) {
         UUID id = UUID.randomUUID();
         OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
 
         return new ModelExperiment(
                 id,
+                comparisonId,
                 "FIVE_DAYS",
                 "gold-features-v2",
                 "gold-label-v1",

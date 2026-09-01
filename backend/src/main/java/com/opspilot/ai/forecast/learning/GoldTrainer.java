@@ -7,9 +7,9 @@ import java.util.Set;
 public interface GoldTrainer {
     String name();
 
-    GoldClassifier train(List<GoldSample> samples);
+    GoldClassifier train(List<GoldSample> samples, Set<String> featureNames);
 
-    default GoldClassifier train(List<GoldSample> samples, Set<String> featureNames) {
-        return train(samples);
+    default GoldClassifier train(List<GoldSample> samples) {
+        return train(samples, GoldFeatures.NAMES);
     }
 }

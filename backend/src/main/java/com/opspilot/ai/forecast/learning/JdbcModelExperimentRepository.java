@@ -29,14 +29,15 @@ public class JdbcModelExperimentRepository implements ModelExperimentRepository 
     public void create(ModelExperiment experiment) {
         jdbc.update("""
                 insert into gold_model_experiment (
-                    id, horizon, feature_version, label_version, split_version,
+                    id, comparison_id, horizon, feature_version, label_version, split_version,
                     dataset_hash, feature_profile, parameter_json, data_start, data_end,
                     train_start, validation_start, validation_end,
                     holdout_start, holdout_end, validation_samples, holdout_samples,
                     status, git_commit, failure_message, created_at, started_at, completed_at
-                ) values (?, ?, ?, ?, ?, ?, ?, ?::jsonb, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) values (?, ?, ?, ?, ?, ?, ?, ?, ?::jsonb, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
-                experiment.id(), experiment.horizon(),
+                experiment.id(), experiment.comparisonId(),
+                experiment.horizon(),
                 experiment.featureVersion(), experiment.labelVersion(),
                 experiment.splitVersion(), experiment.datasetHash(),
                 experiment.featureProfile().name(),
@@ -147,6 +148,7 @@ public class JdbcModelExperimentRepository implements ModelExperimentRepository 
     private RowMapper<ModelExperiment> experimentRowMapper() {
         return (rs, rowNum) -> new ModelExperiment(
                 rs.getObject("id", UUID.class),
+                rs.getObject("comparison_id", UUID.class),
                 rs.getString("horizon"),
                 rs.getString("feature_version"),
                 rs.getString("label_version"),
