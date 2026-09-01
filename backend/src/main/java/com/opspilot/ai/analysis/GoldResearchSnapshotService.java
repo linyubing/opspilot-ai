@@ -4,6 +4,7 @@ import com.opspilot.ai.macrodata.MacroObservation;
 import com.opspilot.ai.macrodata.MacroObservationRepository;
 import com.opspilot.ai.marketdata.GoldDailyBar;
 import com.opspilot.ai.marketdata.GoldDailyBarRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -50,6 +51,7 @@ public class GoldResearchSnapshotService {
     private final GoldVolatilityCalculator volatilityCalculator =
             new GoldVolatilityCalculator();
 
+    @Autowired
     public GoldResearchSnapshotService(
             GoldDailyBarRepository goldRepository,
             MacroObservationRepository macroObservationRepository,
