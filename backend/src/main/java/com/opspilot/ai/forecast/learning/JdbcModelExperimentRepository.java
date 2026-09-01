@@ -30,15 +30,16 @@ public class JdbcModelExperimentRepository implements ModelExperimentRepository 
         jdbc.update("""
                 insert into gold_model_experiment (
                     id, horizon, feature_version, label_version, split_version,
-                    dataset_hash, parameter_json, data_start, data_end,
+                    dataset_hash, feature_profile, parameter_json, data_start, data_end,
                     train_start, validation_start, validation_end,
                     holdout_start, holdout_end, validation_samples, holdout_samples,
                     status, git_commit, failure_message, created_at, started_at, completed_at
-                ) values (?, ?, ?, ?, ?, ?, ?::jsonb, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) values (?, ?, ?, ?, ?, ?, ?, ?::jsonb, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 experiment.id(), experiment.horizon(),
                 experiment.featureVersion(), experiment.labelVersion(),
                 experiment.splitVersion(), experiment.datasetHash(),
+                experiment.featureProfile(),
                 toJson(experiment.parameters()),
                 experiment.dataStart(), experiment.dataEnd(),
                 experiment.trainStart(), experiment.validationStart(),
@@ -151,6 +152,7 @@ public class JdbcModelExperimentRepository implements ModelExperimentRepository 
                 rs.getString("label_version"),
                 rs.getString("split_version"),
                 rs.getString("dataset_hash"),
+                rs.getString("feature_profile"),
                 parseJson(rs.getString("parameter_json")),
                 rs.getDate("data_start").toLocalDate(),
                 rs.getDate("data_end").toLocalDate(),

@@ -1,6 +1,7 @@
 package com.opspilot.ai.forecast.learning.api;
 
 import com.opspilot.ai.chat.api.ApiError;
+import com.opspilot.ai.forecast.learning.FeatureProfile;
 import com.opspilot.ai.forecast.learning.ForecastHorizon;
 import com.opspilot.ai.forecast.learning.ModelExperiment;
 import com.opspilot.ai.forecast.learning.ModelExperimentMetric;
@@ -19,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 /** 提供黄金统计模型实验的即时预览和持久化管理。 */
@@ -29,6 +29,8 @@ public class ModelExperimentController {
 
     private static final String HORIZON_ERROR =
             "预测周期只支持 NEXT_DAY、FIVE_DAYS、TWENTY_DAYS";
+    private static final String PROFILE_ERROR =
+            "特征组合只支持 BASE_16、OHLC_20、ALL_36";
 
     private final WalkForwardService walkForward;
     private final ModelExperimentService experimentService;
@@ -43,16 +45,20 @@ public class ModelExperimentController {
 
     @GetMapping
     public ModelExperimentResponse get(
-            @RequestParam(defaultValue = "FIVE_DAYS") String horizon
+            @RequestParam(defaultValue = "FIVE_DAYS") String horizon,
+            @RequestParam(defaultValue = "ALL_36") String featureProfile
     ) {
         return ModelExperimentResponse.from(walkForward.run(parse(horizon)));
     }
 
     @PostMapping
     public ResponseEntity<ModelExperimentDetailResponse> create(
-            @RequestParam(defaultValue = "NEXT_DAY") String horizon
+            @RequestParam(defaultValue = "NEXT_DAY") String horizon,
+            @RequestParam(defaultValue = "ALL_36") String featureProfile
     ) {
-        ModelExperimentResult result = experimentService.run(parse(horizon));
+        ModelExperimentResult result = experimentService.run(
+                parse(horizon), parseProfile(featureProfile)
+        );
         return ResponseEntity.status(201).body(
                 ModelExperimentDetailResponse.from(result)
         );
@@ -66,7 +72,7 @@ public class ModelExperimentController {
             throw new IllegalArgumentException("limit 必须在 1 到 100 之间");
         }
         List<ModelExperiment> experiments = experimentService.findRecent(limit);
-        return experiments.stream()
+        List<ModelExperimentSummaryResponse> summaries = experiments.stream()
                 .map(exp -> {
                     List<ModelExperimentMetric> metrics = experimentService.findMetrics(exp.id());
                     ModelExperimentMetric majority = metrics.stream()
@@ -78,6 +84,19 @@ public class ModelExperimentController {
                     return ModelExperimentSummaryResponse.from(exp, majority, logistic);
                 })
                 .toList();
+
+        java.math.BigDecimal base16Balanced = summaries.stream()
+                .filter(s -> "BASE_16".equals(s.featureProfile()) && s.balancedAccuracy() != null)
+                .findFirst()
+                .map(ModelExperimentSummaryResponse::balancedAccuracy)
+                .orElse(null);
+
+        if (base16Balanced != null) {
+            return summaries.stream()
+                    .map(s -> ModelExperimentSummaryResponse.withBase16Improvement(s, base16Balanced))
+                    .toList();
+        }
+        return summaries;
     }
 
     @GetMapping("/{id}")
@@ -94,11 +113,11 @@ public class ModelExperimentController {
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ApiError> handleInvalidHorizon(
+    public ResponseEntity<ApiError> handleInvalidInput(
             IllegalArgumentException exception
     ) {
         return ResponseEntity.badRequest().body(
-                new ApiError("INVALID_FORECAST_HORIZON", exception.getMessage())
+                new ApiError("INVALID_INPUT", exception.getMessage())
         );
     }
 
@@ -116,6 +135,14 @@ public class ModelExperimentController {
             return ForecastHorizon.valueOf(value);
         } catch (IllegalArgumentException exception) {
             throw new IllegalArgumentException(HORIZON_ERROR);
+        }
+    }
+
+    private FeatureProfile parseProfile(String value) {
+        try {
+            return FeatureProfile.valueOf(value);
+        } catch (IllegalArgumentException exception) {
+            throw new IllegalArgumentException(PROFILE_ERROR);
         }
     }
 }

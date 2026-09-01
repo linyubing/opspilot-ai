@@ -11,6 +11,7 @@ import java.time.OffsetDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 /** 管理黄金模型实验的创建、执行和查询。 */
@@ -50,6 +51,10 @@ public class ModelExperimentService {
     }
 
     public ModelExperimentResult run(ForecastHorizon horizon) {
+        return run(horizon, FeatureProfile.ALL_36);
+    }
+
+    public ModelExperimentResult run(ForecastHorizon horizon, FeatureProfile profile) {
         UUID experimentId = UUID.randomUUID();
         OffsetDateTime now = now();
 
@@ -57,6 +62,7 @@ public class ModelExperimentService {
         String datasetHash = fingerprint.hash(dataset);
 
         TemporalDataset split = splitter.split(dataset.samples(), horizon);
+        TemporalDataset filtered = filterFeatures(split, profile.featureNames());
 
         ModelExperiment experiment = new ModelExperiment(
                 experimentId,
@@ -65,7 +71,8 @@ public class ModelExperimentService {
                 GoldForecastRule.RULE_VERSION,
                 TemporalSplitter.VERSION,
                 datasetHash,
-                buildParameters(horizon),
+                profile.name(),
+                buildParameters(horizon, profile),
                 dataset.samples().getFirst().asOfDate(),
                 dataset.samples().getLast().asOfDate(),
                 split.training().getFirst().asOfDate(),
@@ -87,7 +94,7 @@ public class ModelExperimentService {
         repo.markRunning(experimentId, now);
 
         try {
-            WalkForwardReport report = walkForward.run(split, horizon);
+            WalkForwardReport report = walkForward.run(filtered, horizon);
 
             ModelExperimentMetric majorityMetric = toMetric(
                     experimentId, ModelType.MAJORITY, report.majority()
@@ -103,6 +110,7 @@ public class ModelExperimentService {
                     experiment.labelVersion(),
                     experiment.splitVersion(),
                     experiment.datasetHash(),
+                    experiment.featureProfile(),
                     experiment.parameters(),
                     experiment.dataStart(),
                     experiment.dataEnd(),
@@ -187,17 +195,43 @@ public class ModelExperimentService {
         return result;
     }
 
-    private Map<String, Object> buildParameters(ForecastHorizon horizon) {
+    private Map<String, Object> buildParameters(ForecastHorizon horizon, FeatureProfile profile) {
         return Map.of(
                 "horizon", horizon.name(),
+                "featureProfile", profile.name(),
+                "featureCount", profile.featureNames().size(),
                 "refitEvery", REFIT_EVERY,
                 "confidenceThreshold", CONFIDENCE_THRESHOLD,
                 "majorityTrainer", "MajorityGoldTrainer",
                 "logisticTrainer", "TribuoGoldTrainer",
-                "featureCount", GoldFeatures.NAMES.size(),
                 "featureVersion", GoldFeatures.VERSION,
                 "labelVersion", GoldForecastRule.RULE_VERSION,
                 "splitVersion", TemporalSplitter.VERSION
+        );
+    }
+
+    private TemporalDataset filterFeatures(TemporalDataset split, Set<String> allowedNames) {
+        return new TemporalDataset(
+                split.training().stream().map(s -> filterSample(s, allowedNames)).toList(),
+                split.validation().stream().map(s -> filterSample(s, allowedNames)).toList(),
+                split.finalHoldout().stream().map(s -> filterSample(s, allowedNames)).toList()
+        );
+    }
+
+    private GoldSample filterSample(GoldSample sample, Set<String> allowedNames) {
+        Map<String, Double> filtered = new LinkedHashMap<>();
+        for (String name : allowedNames) {
+            Double value = sample.features().values().get(name);
+            if (value != null) {
+                filtered.put(name, value);
+            }
+        }
+        return new GoldSample(
+                sample.asOfDate(),
+                sample.targetDate(),
+                sample.horizon(),
+                new GoldFeatures(filtered),
+                sample.label()
         );
     }
 

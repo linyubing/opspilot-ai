@@ -89,7 +89,8 @@ class ModelExperimentControllerTests {
         ModelExperimentMetric logisticMetric = createMetric(ModelType.LOGISTIC);
         ModelExperimentResult result = new ModelExperimentResult(experiment, majorityMetric, logisticMetric);
 
-        when(experimentService.run(ForecastHorizon.NEXT_DAY)).thenReturn(result);
+        when(experimentService.run(ForecastHorizon.NEXT_DAY,
+                com.opspilot.ai.forecast.learning.FeatureProfile.ALL_36)).thenReturn(result);
 
         mvc.perform(post("/api/research/gold/model-experiments")
                         .param("horizon", "NEXT_DAY"))
@@ -166,7 +167,7 @@ class ModelExperimentControllerTests {
         UUID id = UUID.randomUUID();
         ModelExperiment experiment = new ModelExperiment(
                 id, "NEXT_DAY", "v1", "v1", "v1", "hash",
-                Map.of(), LocalDate.MIN, LocalDate.MAX,
+                "ALL_36", Map.of(), LocalDate.MIN, LocalDate.MAX,
                 LocalDate.MIN, LocalDate.MIN, LocalDate.MAX,
                 LocalDate.MIN, LocalDate.MAX, 0, 0,
                 ModelExperimentStatus.RUNNING, "unknown", null,
@@ -187,7 +188,7 @@ class ModelExperimentControllerTests {
         UUID id = UUID.randomUUID();
         return new ModelExperiment(
                 id, "NEXT_DAY", "gold-features-v2", "gold-label-v1", "gold-temporal-split-v1",
-                "abc123def456", Map.of("horizon", "NEXT_DAY"),
+                "abc123def456", "ALL_36", Map.of("horizon", "NEXT_DAY"),
                 LocalDate.of(2020, 1, 1), LocalDate.of(2025, 12, 31),
                 LocalDate.of(2020, 1, 1), LocalDate.of(2024, 1, 1), LocalDate.of(2024, 12, 31),
                 LocalDate.of(2025, 1, 10), LocalDate.of(2025, 12, 31), 240, 240,

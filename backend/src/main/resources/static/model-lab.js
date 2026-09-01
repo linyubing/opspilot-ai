@@ -1,7 +1,8 @@
 const statusText = document.querySelector("#status");
 const errorBox = document.querySelector("#error");
 const result = document.querySelector("#result");
-const buttons = [...document.querySelectorAll("[data-horizon]")];
+const horizonButtons = [...document.querySelectorAll("[data-horizon]")];
+const profileButtons = [...document.querySelectorAll("[data-profile]")];
 
 const horizonNames = {
     NEXT_DAY: "1 个交易日",
@@ -9,8 +10,15 @@ const horizonNames = {
     TWENTY_DAYS: "20 个交易日"
 };
 
+const profileNames = {
+    BASE_16: "BASE_16（16 个基础特征）",
+    OHLC_20: "OHLC_20（20 个 OHLC 技术特征）",
+    ALL_36: "ALL_36（全部 36 个特征）"
+};
+
 const percent = value => value == null ? "无法计算" : `${(Number(value) * 100).toFixed(2)}%`;
 const number = value => value == null ? "无法计算" : Number(value).toFixed(4);
+const improvement = value => value == null ? "无数据" : `${(Number(value) * 100).toFixed(2)}%`;
 
 function fillRecalls(id, values = {}) {
     document.querySelector(id).innerHTML = [
@@ -29,8 +37,11 @@ function fillMetrics(prefix, data) {
 }
 
 let currentHorizon = "FIVE_DAYS";
+let currentProfile = "ALL_36";
 
 function render(data) {
+    document.querySelector("#activeProfile").textContent =
+        profileNames[data.featureProfile] || data.featureProfile || "ALL_36";
     document.querySelector("#trainStart").textContent = data.trainStart;
     document.querySelector("#validationRange").textContent = `${data.validationStart} 至 ${data.validationEnd}`;
     document.querySelector("#validationSamples").textContent = `${data.validationSamples} 条`;
@@ -39,32 +50,45 @@ function render(data) {
         `${data.finalHoldout.samples} 条，${data.finalHoldout.start} 至 ${data.finalHoldout.end}`;
     fillMetrics("majority", data.majority);
     fillMetrics("logistic", data.logistic);
+
+    if (data.logistic && data.logistic.logLoss != null) {
+        document.querySelector("#logisticLogLoss").textContent = number(data.logistic.logLoss);
+    }
+
     result.hidden = false;
 }
 
-async function load(horizon) {
+async function load(horizon, profile) {
     currentHorizon = horizon;
+    currentProfile = profile;
     errorBox.hidden = true;
     result.hidden = true;
-    buttons.forEach(button => {
+    horizonButtons.forEach(button => {
         button.classList.toggle("active", button.dataset.horizon === horizon);
         button.disabled = true;
     });
-    statusText.textContent = `正在构建真实历史样本，并运行 ${horizonNames[horizon]} 滚动验证...`;
+    profileButtons.forEach(button => {
+        button.classList.toggle("active", button.dataset.profile === profile);
+        button.disabled = true;
+    });
+    statusText.textContent = `正在构建真实历史样本，运行 ${horizonNames[horizon]} ${profileNames[profile]} 滚动验证...`;
     try {
-        const response = await fetch(`/api/research/gold/model-experiments?horizon=${horizon}`);
+        const response = await fetch(
+            `/api/research/gold/model-experiments?horizon=${horizon}&featureProfile=${profile}`
+        );
         const data = await response.json();
         if (!response.ok) {
             throw new Error(data.message || "模型实验运行失败");
         }
         render(data);
-        statusText.textContent = `开发验证区间实验已完成：${horizonNames[horizon]}`;
+        statusText.textContent = `开发验证区间实验已完成：${horizonNames[horizon]} / ${profileNames[profile]}`;
     } catch (error) {
         errorBox.textContent = error.message;
         errorBox.hidden = false;
         statusText.textContent = "模型实验未完成";
     } finally {
-        buttons.forEach(button => button.disabled = false);
+        horizonButtons.forEach(button => button.disabled = false);
+        profileButtons.forEach(button => button.disabled = false);
     }
 }
 
@@ -75,9 +99,10 @@ async function saveExperiment() {
     saveStatus.textContent = "正在保存实验...";
     saveStatus.hidden = false;
     try {
-        const response = await fetch(`/api/research/gold/model-experiments?horizon=${currentHorizon}`, {
-            method: "POST"
-        });
+        const response = await fetch(
+            `/api/research/gold/model-experiments?horizon=${currentHorizon}&featureProfile=${currentProfile}`,
+            { method: "POST" }
+        );
         const data = await response.json();
         if (!response.ok) {
             throw new Error(data.message || "保存实验失败");
@@ -90,6 +115,13 @@ async function saveExperiment() {
     } finally {
         saveBtn.disabled = false;
     }
+}
+
+function formatImprovement(value) {
+    if (value == null) return "-";
+    const num = Number(value);
+    const sign = num > 0 ? "+" : "";
+    return `${sign}${(num * 100).toFixed(2)}%`;
 }
 
 async function loadHistory() {
@@ -105,7 +137,15 @@ async function loadHistory() {
             : experiments.map(exp => `
                 <li class="experiment-item" data-id="${exp.id}">
                     <span class="exp-horizon">${horizonNames[exp.horizon] || exp.horizon}</span>
+                    <span class="exp-profile">${exp.featureProfile || "ALL_36"}</span>
                     <span class="exp-status">${exp.status}</span>
+                    <span class="exp-metrics">
+                        准确率 ${percent(exp.logisticAccuracy)}
+                        | 平衡准确率 ${percent(exp.balancedAccuracy)}
+                        ${exp.relativeMajorityImprovement != null
+                            ? ` | 基线提升 ${formatImprovement(exp.relativeMajorityImprovement)}`
+                            : ""}
+                    </span>
                     <span class="exp-hash">${exp.datasetHashPrefix}...</span>
                     <span class="exp-time">${formatTime(exp.createdAt)}</span>
                 </li>
@@ -129,6 +169,7 @@ async function showDetail(id) {
         }
         document.querySelector("#detailId").textContent = data.id;
         document.querySelector("#detailStatus").textContent = data.status;
+        document.querySelector("#detailFeatureProfile").textContent = data.featureProfile || "ALL_36";
         document.querySelector("#detailHash").textContent = data.datasetHash;
         document.querySelector("#detailFeatureVersion").textContent = data.featureVersion;
         document.querySelector("#detailLabelVersion").textContent = data.labelVersion;
@@ -143,7 +184,7 @@ async function showDetail(id) {
         document.querySelector("#detailCreatedAt").textContent = formatTime(data.createdAt);
         document.querySelector("#detailStartedAt").textContent = data.startedAt ? formatTime(data.startedAt) : "-";
         document.querySelector("#detailCompletedAt").textContent = data.completedAt ? formatTime(data.completedAt) : "-";
-        
+
         const failureBox = document.querySelector("#detailFailure");
         if (data.failureMessage) {
             failureBox.hidden = false;
@@ -174,6 +215,7 @@ document.querySelector("#closeDetail").addEventListener("click", () => {
     document.querySelector("#experimentDetail").hidden = true;
 });
 
-buttons.forEach(button => button.addEventListener("click", () => load(button.dataset.horizon)));
-load("FIVE_DAYS");
+horizonButtons.forEach(button => button.addEventListener("click", () => load(button.dataset.horizon, currentProfile)));
+profileButtons.forEach(button => button.addEventListener("click", () => load(currentHorizon, button.dataset.profile)));
+load("FIVE_DAYS", "ALL_36");
 loadHistory();

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="比较黄金统计预测模型在开发验证区间的表现">
     <title>黄金模型实验室</title>
-    <link rel="stylesheet" href="/model-lab.css?v=1">
+    <link rel="stylesheet" href="/model-lab.css?v=2">
 </head>
 <body>
 <main class="shell">
@@ -20,12 +20,19 @@
             <button data-horizon="FIVE_DAYS" type="button" class="active">5 个交易日</button>
             <button data-horizon="TWENTY_DAYS" type="button">20 个交易日</button>
         </nav>
+        <nav class="profile-tabs" aria-label="特征组合">
+            <button data-profile="BASE_16" type="button">BASE_16</button>
+            <button data-profile="OHLC_20" type="button">OHLC_20</button>
+            <button data-profile="ALL_36" type="button" class="active">ALL_36</button>
+        </nav>
     </header>
 
     <p id="status" class="status" aria-live="polite">正在运行 5 个交易日实验...</p>
     <section id="error" class="error" role="alert" hidden></section>
 
     <section id="result" hidden>
+        <div class="profile-badge" id="activeProfile">ALL_36</div>
+
         <section class="scope-panel">
             <div><span>训练起点</span><strong id="trainStart">-</strong></div>
             <div><span>验证区间</span><strong id="validationRange">-</strong></div>
@@ -51,15 +58,20 @@
             <article class="model-card logistic">
                 <header>
                     <h2>逻辑回归</h2>
-                    <p>根据真实黄金 OHLC、实际利率、美元指数等特征输出三方向概率。</p>
+                    <p>根据所选特征输出三方向概率。</p>
                 </header>
                 <div class="metric-grid">
                     <div><span>总体准确率</span><strong id="logisticAccuracy">-</strong></div>
                     <div><span>平衡准确率</span><strong id="logisticBalanced">-</strong></div>
                     <div><span>覆盖率</span><strong id="logisticCoverage">-</strong></div>
                     <div><span>Brier 分数</span><strong id="logisticBrier">-</strong></div>
+                    <div><span>logLoss</span><strong id="logisticLogLoss">-</strong></div>
                 </div>
                 <div class="recall-row" id="logisticRecalls"></div>
+                <div class="improvement-row">
+                    <div><span>相对多数类基线提升</span><strong id="relativeMajority">-</strong></div>
+                    <div><span>相对 BASE_16 提升</span><strong id="relativeBase16">-</strong></div>
+                </div>
             </article>
         </section>
 
@@ -70,6 +82,8 @@
             </div>
             <strong id="holdoutRange">-</strong>
         </section>
+
+        <p class="dev-notice">以上为开发验证结果，不是最终留出准确率。</p>
     </section>
 
     <section class="experiment-history">
@@ -85,6 +99,7 @@
         <div class="detail-grid">
             <div><span>实验 ID</span><strong id="detailId">-</strong></div>
             <div><span>状态</span><strong id="detailStatus">-</strong></div>
+            <div><span>特征组合</span><strong id="detailFeatureProfile">-</strong></div>
             <div><span>数据集指纹</span><strong id="detailHash">-</strong></div>
             <div><span>特征版本</span><strong id="detailFeatureVersion">-</strong></div>
             <div><span>标签版本</span><strong id="detailLabelVersion">-</strong></div>
@@ -107,6 +122,6 @@
         <button id="closeDetail" type="button" class="btn-close">关闭</button>
     </section>
 </main>
-<script src="/model-lab.js?v=2" defer></script>
+<script src="/model-lab.js?v=3" defer></script>
 </body>
 </html>
