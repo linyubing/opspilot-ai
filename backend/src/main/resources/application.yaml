@@ -96,6 +96,11 @@ opspilot:
         # 北京时间工作日上午 8:30，同步上一交易日已经发布的行情。
         cron: "${GOLD_SETTLEMENT_SCHEDULE_CRON:0 30 8 * * MON-FRI}"
         zone: "${GOLD_SETTLEMENT_SCHEDULE_ZONE:Asia/Shanghai}"
+      # 固定休市日（MM-dd 格式），周末自动排除，此处仅列出黄金市场特有的休市日。
+      holidays:
+        - "01-01"
+        - "07-04"
+        - "12-25"
   research:
     gold:
       daily-report-schedule:

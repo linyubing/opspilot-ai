@@ -15,15 +15,18 @@ public class GoldForecastHistoryService {
     private final GoldForecastRepository forecastRepository;
     private final GoldResearchSnapshotRepository snapshotRepository;
     private final GoldForecastMissAnalyzer missAnalyzer;
+    private final GoldTradingCalendar tradingCalendar;
 
     public GoldForecastHistoryService(
             GoldForecastRepository forecastRepository,
             GoldResearchSnapshotRepository snapshotRepository,
-            GoldForecastMissAnalyzer missAnalyzer
+            GoldForecastMissAnalyzer missAnalyzer,
+            GoldTradingCalendar tradingCalendar
     ) {
         this.forecastRepository = forecastRepository;
         this.snapshotRepository = snapshotRepository;
         this.missAnalyzer = missAnalyzer;
+        this.tradingCalendar = tradingCalendar;
     }
 
     public List<GoldForecastResponse> retrieveRecent(int limit) {
@@ -33,7 +36,8 @@ public class GoldForecastHistoryService {
                         snapshotRepository.findById(forecast.snapshotId())
                                 .map(stored -> stored.snapshot())
                                 .map(snapshot -> missAnalyzer.analyze(forecast, snapshot))
-                                .orElse(null)
+                                .orElse(null),
+                        tradingCalendar
                 ))
                 .toList();
     }

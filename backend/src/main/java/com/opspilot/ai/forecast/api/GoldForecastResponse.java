@@ -3,6 +3,7 @@ package com.opspilot.ai.forecast.api;
 import com.opspilot.ai.forecast.ForecastDirection;
 import com.opspilot.ai.forecast.ForecastStatus;
 import com.opspilot.ai.forecast.GoldForecastMissReason;
+import com.opspilot.ai.forecast.GoldTradingCalendar;
 import com.opspilot.ai.forecast.StoredGoldDirectionForecast;
 
 import java.math.BigDecimal;
@@ -31,11 +32,22 @@ public record GoldForecastResponse(
     public static GoldForecastResponse from(
             StoredGoldDirectionForecast record, GoldForecastMissReason missReason
     ) {
+        return from(record, missReason, null);
+    }
+
+    public static GoldForecastResponse from(
+            StoredGoldDirectionForecast record,
+            GoldForecastMissReason missReason,
+            GoldTradingCalendar calendar
+    ) {
+        LocalDate expectedTarget = calendar != null
+                ? calendar.nextBusinessDay(record.baseDate())
+                : nextWeekday(record.baseDate());
         return new GoldForecastResponse(
                 record.id(), record.snapshotId(), record.baseDate(), record.basePrice(),
                 record.predictedDirection(), record.reasoning(), record.invalidationConditions(),
                 record.modelName(), record.promptVersion(), record.promptHash(),
-                record.forecastRuleVersion(), record.status(), nextWeekday(record.baseDate()).toString(),
+                record.forecastRuleVersion(), record.status(), expectedTarget.toString(),
                 record.targetDate(), record.targetPrice(), record.actualReturn(),
                 record.actualDirection(), record.hit(), missReason,
                 record.resolvedAt(), record.createdAt()
