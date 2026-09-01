@@ -67,6 +67,44 @@ class BacktestEvaluationServiceTests {
         assertThat(result.promotionReady()).isTrue();
     }
 
+    @Test
+    void rollingAccuracyUsesLatestBaseDates() {
+        UUID id = UUID.randomUUID();
+        BacktestService service = mock(BacktestService.class);
+        BacktestRepository repo = mock(BacktestRepository.class);
+        when(service.get(id)).thenReturn(task(id, BacktestSampleSet.HOLDOUT));
+
+        List<BacktestCase> mixed = new ArrayList<>(cases(id, 10));
+        mixed.addAll(cases(id, 10));
+        when(repo.findCases(id, 120)).thenReturn(mixed);
+
+        BacktestEvaluation result =
+                new BacktestEvaluationService(service, repo).evaluate(id);
+
+        assertThat(result.rolling20Accuracy()).isNotNull();
+    }
+
+    @Test
+    void createdAtDoesNotChangeRollingWindow() {
+        UUID id = UUID.randomUUID();
+        BacktestService service = mock(BacktestService.class);
+        BacktestRepository repo = mock(BacktestRepository.class);
+        when(service.get(id)).thenReturn(task(id, BacktestSampleSet.HOLDOUT));
+
+        List<BacktestCase> first = cases(id, 10);
+        List<BacktestCase> second = cases(id, 10);
+        when(repo.findCases(id, 120)).thenReturn(first);
+        BacktestEvaluation result1 =
+                new BacktestEvaluationService(service, repo).evaluate(id);
+
+        when(repo.findCases(id, 120)).thenReturn(second);
+        BacktestEvaluation result2 =
+                new BacktestEvaluationService(service, repo).evaluate(id);
+
+        assertThat(result1.rolling20Accuracy())
+                .isEqualByComparingTo(result2.rolling20Accuracy());
+    }
+
     private List<BacktestCase> cases(UUID id) {
         return cases(id, 21);
     }

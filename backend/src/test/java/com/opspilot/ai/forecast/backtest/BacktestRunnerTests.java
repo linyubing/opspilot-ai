@@ -213,6 +213,100 @@ class BacktestRunnerTests {
         verify(repo, never()).complete(any(), any());
     }
 
+    @Test
+    void rejectsSnapshotAfterCaseDate() {
+        LocalDate pastDate = DATE.minusDays(1);
+        when(snapshots.createSnapshot(DATE)).thenReturn(
+                snapshotFromDate(DATE.plusDays(1))
+        );
+
+        runner.run(TASK_ID);
+
+        verify(repo).recordFailure(eq(TASK_ID), contains("分析日期必须等于回测日期"));
+        verify(repo, never()).saveCase(any());
+    }
+
+    @Test
+    void rejectsFutureRealRateObservation() {
+        when(snapshots.createSnapshot(DATE)).thenReturn(
+                snapshotWithRealRateDate(DATE.plusDays(1))
+        );
+
+        runner.run(TASK_ID);
+
+        verify(repo).recordFailure(eq(TASK_ID), contains("实际利率数据日期不得晚于回测日期"));
+        verify(repo, never()).saveCase(any());
+    }
+
+    @Test
+    void rejectsFutureDollarIndexObservation() {
+        when(snapshots.createSnapshot(DATE)).thenReturn(
+                snapshotWithDollarIndexDate(DATE.plusDays(1))
+        );
+
+        runner.run(TASK_ID);
+
+        verify(repo).recordFailure(eq(TASK_ID), contains("美元指数数据日期不得晚于回测日期"));
+        verify(repo, never()).saveCase(any());
+    }
+
+    @Test
+    void rejectsSettlementOnOrBeforeCaseDate() {
+        when(barRepo.findNext(
+                "XAUUSD", "twelve_data", DATE
+        )).thenReturn(Optional.of(bar(DATE, "2520")));
+
+        runner.run(TASK_ID);
+
+        verify(repo).recordFailure(eq(TASK_ID), contains("结算日必须晚于回测日期"));
+        verify(repo, never()).saveCase(any());
+    }
+
+    @Test
+    void usesBaseDayCloseForOhlcBacktest() {
+        runner.run(TASK_ID);
+
+        ArgumentCaptor<BacktestCase> captor =
+                ArgumentCaptor.forClass(BacktestCase.class);
+        verify(repo).saveCase(captor.capture());
+        BacktestCase item = captor.getValue();
+        assertThat(item.basePrice()).isEqualByComparingTo("2500");
+    }
+
+    @Test
+    void usesNextAvailableBarCloseForSettlement() {
+        runner.run(TASK_ID);
+
+        ArgumentCaptor<BacktestCase> captor =
+                ArgumentCaptor.forClass(BacktestCase.class);
+        verify(repo).saveCase(captor.capture());
+        BacktestCase item = captor.getValue();
+        assertThat(item.targetPrice()).isEqualByComparingTo("2520");
+    }
+
+    @Test
+    void calculatesCloseToCloseReturn() {
+        runner.run(TASK_ID);
+
+        ArgumentCaptor<BacktestCase> captor =
+                ArgumentCaptor.forClass(BacktestCase.class);
+        verify(repo).saveCase(captor.capture());
+        BacktestCase item = captor.getValue();
+        // (2520 - 2500) / 2500 * 100 = 0.8
+        assertThat(item.actualReturn()).isEqualByComparingTo("0.800000");
+    }
+
+    @Test
+    void doesNotUseCurrentSystemDateForHistoricalCase() {
+        runner.run(TASK_ID);
+
+        ArgumentCaptor<BacktestCase> captor =
+                ArgumentCaptor.forClass(BacktestCase.class);
+        verify(repo).saveCase(captor.capture());
+        BacktestCase item = captor.getValue();
+        assertThat(item.asOfDate()).isEqualTo(DATE);
+    }
+
     private BacktestTask task() {
         return task(BacktestPromptBuilder.VERSION);
     }
@@ -239,9 +333,67 @@ class BacktestRunnerTests {
     }
 
     private GoldResearchSnapshot snapshot() {
+        return snapshotFromDate(DATE);
+    }
+
+    private GoldResearchSnapshot snapshotFromDate(LocalDate analysisDate) {
         OffsetDateTime now = OffsetDateTime.ofInstant(NOW, ZoneOffset.UTC);
         return new GoldResearchSnapshot(
-                DATE, DATE, DATE, DATE,
+                analysisDate, analysisDate, analysisDate, analysisDate,
+                new GoldReturnMetrics(
+                        new BigDecimal("2500"), BigDecimal.ZERO,
+                        BigDecimal.ZERO, BigDecimal.ZERO, now
+                ),
+                new RealRateChangeMetrics(
+                        new BigDecimal("1.8"), BigDecimal.ZERO,
+                        BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO,
+                        BigDecimal.ZERO, BigDecimal.ZERO, now
+                ),
+                new DollarIndexChangeMetrics(
+                        new BigDecimal("118"), BigDecimal.ZERO,
+                        BigDecimal.ZERO, BigDecimal.ZERO, now
+                ),
+                new ResearchFactorAssessment(
+                        GoldFactorStatus.SUPPORTIVE, "rate-v1", "支撑"
+                ),
+                new ResearchFactorAssessment(
+                        GoldFactorStatus.NEUTRAL, "dollar-v1", "中性"
+                ),
+                "gold-multifactor-v2", "不构成投资建议"
+        );
+    }
+
+    private GoldResearchSnapshot snapshotWithRealRateDate(LocalDate realRateDate) {
+        OffsetDateTime now = OffsetDateTime.ofInstant(NOW, ZoneOffset.UTC);
+        return new GoldResearchSnapshot(
+                DATE, DATE, realRateDate, DATE,
+                new GoldReturnMetrics(
+                        new BigDecimal("2500"), BigDecimal.ZERO,
+                        BigDecimal.ZERO, BigDecimal.ZERO, now
+                ),
+                new RealRateChangeMetrics(
+                        new BigDecimal("1.8"), BigDecimal.ZERO,
+                        BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO,
+                        BigDecimal.ZERO, BigDecimal.ZERO, now
+                ),
+                new DollarIndexChangeMetrics(
+                        new BigDecimal("118"), BigDecimal.ZERO,
+                        BigDecimal.ZERO, BigDecimal.ZERO, now
+                ),
+                new ResearchFactorAssessment(
+                        GoldFactorStatus.SUPPORTIVE, "rate-v1", "支撑"
+                ),
+                new ResearchFactorAssessment(
+                        GoldFactorStatus.NEUTRAL, "dollar-v1", "中性"
+                ),
+                "gold-multifactor-v2", "不构成投资建议"
+        );
+    }
+
+    private GoldResearchSnapshot snapshotWithDollarIndexDate(LocalDate dollarIndexDate) {
+        OffsetDateTime now = OffsetDateTime.ofInstant(NOW, ZoneOffset.UTC);
+        return new GoldResearchSnapshot(
+                DATE, DATE, DATE, dollarIndexDate,
                 new GoldReturnMetrics(
                         new BigDecimal("2500"), BigDecimal.ZERO,
                         BigDecimal.ZERO, BigDecimal.ZERO, now

@@ -37,10 +37,10 @@ public class BacktestEvaluationService {
 
         List<BacktestCase> cases = repo.findCases(id, 120);
 
-        // 最近创建的 20 条样本用于观察近期表现。
+        // 按 asOfDate 降序取最近 20 条，用于观察近期表现。
         List<BacktestCase> latest = cases.stream()
                 .sorted(Comparator.comparing(
-                        BacktestCase::createdAt
+                        BacktestCase::asOfDate
                 ).reversed())
                 .limit(20)
                 .toList();

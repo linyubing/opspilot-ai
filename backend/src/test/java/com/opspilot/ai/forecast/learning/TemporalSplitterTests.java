@@ -66,6 +66,57 @@ class TemporalSplitterTests {
                 .hasMessageContaining("所需数量=" + required);
     }
 
+    @Test
+    @DisplayName("训练集和验证集之间保留间隔")
+    void keepsGapBetweenTrainingAndValidation() {
+        TemporalDataset result = splitter.split(
+                samples(1_000, ForecastHorizon.NEXT_DAY),
+                ForecastHorizon.NEXT_DAY
+        );
+
+        LocalDate lastTrainingTarget = result.training().getLast().targetDate();
+        LocalDate firstValidationAsOf = result.validation().getFirst().asOfDate();
+        assertThat(lastTrainingTarget).isBefore(firstValidationAsOf);
+    }
+
+    @Test
+    @DisplayName("验证集和留出集之间保留间隔")
+    void keepsGapBetweenValidationAndHoldout() {
+        TemporalDataset result = splitter.split(
+                samples(1_000, ForecastHorizon.NEXT_DAY),
+                ForecastHorizon.NEXT_DAY
+        );
+
+        LocalDate lastValidationTarget = result.validation().getLast().targetDate();
+        LocalDate firstHoldoutAsOf = result.finalHoldout().getFirst().asOfDate();
+        assertThat(lastValidationTarget).isBefore(firstHoldoutAsOf);
+    }
+
+    @Test
+    @DisplayName("训练样本目标日期早于验证集分析日期")
+    void trainingTargetsAreResolvedBeforePredictionDate() {
+        TemporalDataset result = splitter.split(
+                samples(1_000, ForecastHorizon.NEXT_DAY),
+                ForecastHorizon.NEXT_DAY
+        );
+
+        LocalDate validationFirstAsOf = result.validation().getFirst().asOfDate();
+        for (GoldSample sample : result.training()) {
+            assertThat(sample.targetDate()).isBefore(validationFirstAsOf);
+        }
+    }
+
+    @Test
+    @DisplayName("留出集不进入训练集")
+    void holdoutNeverEntersTraining() {
+        TemporalDataset result = splitter.split(
+                samples(1_000, ForecastHorizon.NEXT_DAY),
+                ForecastHorizon.NEXT_DAY
+        );
+
+        assertThat(result.training()).doesNotContainAnyElementsOf(result.finalHoldout());
+    }
+
     private List<GoldSample> samples(
             int count,
             ForecastHorizon horizon

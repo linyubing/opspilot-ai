@@ -93,6 +93,18 @@ class WalkForwardServiceTests {
                         .doesNotContainAnyElementsOf(dataset.finalHoldout()));
     }
 
+    @Test
+    void walkForwardDoesNotTrainOnUnresolvedLabels() {
+        service.run(ForecastHorizon.NEXT_DAY);
+
+        for (int block = 0; block < 12; block++) {
+            List<GoldSample> training = logistic.trainingSets.get(block);
+            GoldSample firstScored = dataset.validation().get(block * 20);
+            assertThat(training.getLast().targetDate())
+                    .isBefore(firstScored.asOfDate());
+        }
+    }
+
     private TemporalDataset dataset() {
         LocalDate start = LocalDate.parse("2020-01-01");
         List<GoldSample> training = samples(start, 0, 500);

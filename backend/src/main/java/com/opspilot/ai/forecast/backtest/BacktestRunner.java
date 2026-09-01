@@ -101,6 +101,8 @@ public class BacktestRunner {
     private BacktestCase runOne(BacktestTask task, LocalDate date) {
         UUID caseId = UUID.randomUUID();
         GoldResearchSnapshot snapshot = snapshotService.createSnapshot(date);
+        validateTimeConstraints(snapshot, date);
+
         GoldForecastPrompt prompt = buildPrompt(task, caseId, snapshot);
         GeneratedGoldForecast generated = gateway.generate(prompt);
         validator.validate(generated.content());
@@ -113,8 +115,16 @@ public class BacktestRunner {
                 "回测日期之后没有可结算的真实价格，日期=" + date
         ));
 
+        if (!nextBar.priceDate().isAfter(date)) {
+            throw new BacktestDataInsufficientException(
+                    "结算日必须晚于回测日期，结算日=" + nextBar.priceDate()
+                            + "，回测日期=" + date
+            );
+        }
+
         BigDecimal basePrice = snapshot.gold().currentPrice();
-        BigDecimal actualReturn = nextBar.close()
+        BigDecimal targetClose = nextBar.close();
+        BigDecimal actualReturn = targetClose
                 .subtract(basePrice)
                 .divide(basePrice, 8, RoundingMode.HALF_UP)
                 .multiply(new BigDecimal("100"))
@@ -132,7 +142,7 @@ public class BacktestRunner {
                 generated.content().reasoning(),
                 generated.content().invalidationConditions(),
                 nextBar.priceDate(),
-                nextBar.close(),
+                targetClose,
                 actualReturn,
                 actual,
                 hit,
@@ -143,6 +153,37 @@ public class BacktestRunner {
                 generated.rawResponse(),
                 now()
         );
+    }
+
+    /** 验证快照时间约束，确保不会使用未来数据。 */
+    private void validateTimeConstraints(GoldResearchSnapshot snapshot, LocalDate caseDate) {
+        if (!snapshot.analysisDate().equals(caseDate)) {
+            throw new BacktestDataInsufficientException(
+                    "快照分析日期必须等于回测日期，analysisDate="
+                            + snapshot.analysisDate() + "，caseDate=" + caseDate
+            );
+        }
+        if (snapshot.latestGoldDate() != null
+                && snapshot.latestGoldDate().isAfter(caseDate)) {
+            throw new BacktestDataInsufficientException(
+                    "黄金数据日期不得晚于回测日期，latestGoldDate="
+                            + snapshot.latestGoldDate() + "，caseDate=" + caseDate
+            );
+        }
+        if (snapshot.latestRealRateDate() != null
+                && snapshot.latestRealRateDate().isAfter(caseDate)) {
+            throw new BacktestDataInsufficientException(
+                    "实际利率数据日期不得晚于回测日期，latestRealRateDate="
+                            + snapshot.latestRealRateDate() + "，caseDate=" + caseDate
+            );
+        }
+        if (snapshot.latestDollarIndexDate() != null
+                && snapshot.latestDollarIndexDate().isAfter(caseDate)) {
+            throw new BacktestDataInsufficientException(
+                    "美元指数数据日期不得晚于回测日期，latestDollarIndexDate="
+                            + snapshot.latestDollarIndexDate() + "，caseDate=" + caseDate
+            );
+        }
     }
 
     /** 按任务冻结的版本选择提示词，避免运行期间发生版本漂移。 */
