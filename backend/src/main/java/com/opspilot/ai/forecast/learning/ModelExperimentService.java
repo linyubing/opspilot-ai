@@ -6,9 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.Clock;
 import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -27,6 +26,8 @@ public class ModelExperimentService {
     private final ModelExperimentRepository repo;
     private final ModelExperimentProperties properties;
     private final ObjectMapper objectMapper;
+    private final TemporalSplitter splitter;
+    private final Clock clock;
 
     public ModelExperimentService(
             GoldDatasetBuilder datasetBuilder,
@@ -34,7 +35,9 @@ public class ModelExperimentService {
             GoldDatasetFingerprint fingerprint,
             ModelExperimentRepository repo,
             ModelExperimentProperties properties,
-            ObjectMapper objectMapper
+            ObjectMapper objectMapper,
+            TemporalSplitter splitter,
+            Clock clock
     ) {
         this.datasetBuilder = datasetBuilder;
         this.walkForward = walkForward;
@@ -42,6 +45,8 @@ public class ModelExperimentService {
         this.repo = repo;
         this.properties = properties;
         this.objectMapper = objectMapper;
+        this.splitter = splitter;
+        this.clock = clock;
     }
 
     public ModelExperiment run(ForecastHorizon horizon) {
@@ -50,6 +55,8 @@ public class ModelExperimentService {
 
         GoldDataset dataset = datasetBuilder.build(horizon);
         String datasetHash = fingerprint.hash(dataset);
+
+        TemporalDataset split = splitter.split(dataset.samples(), horizon);
 
         ModelExperiment experiment = new ModelExperiment(
                 experimentId,
@@ -61,13 +68,13 @@ public class ModelExperimentService {
                 buildParameters(horizon),
                 dataset.samples().getFirst().asOfDate(),
                 dataset.samples().getLast().asOfDate(),
-                dataset.samples().getFirst().asOfDate(),
-                dataset.samples().getFirst().asOfDate(),
-                dataset.samples().getLast().asOfDate(),
-                dataset.samples().getFirst().asOfDate(),
-                dataset.samples().getLast().asOfDate(),
-                0,
-                0,
+                split.validation().getFirst().asOfDate(),
+                split.validation().getFirst().asOfDate(),
+                split.validation().getLast().asOfDate(),
+                split.finalHoldout().getFirst().asOfDate(),
+                split.finalHoldout().getLast().asOfDate(),
+                split.validation().size(),
+                split.finalHoldout().size(),
                 ModelExperimentStatus.CREATED,
                 properties.gitCommit(),
                 null,
@@ -81,8 +88,6 @@ public class ModelExperimentService {
 
         try {
             WalkForwardReport report = walkForward.run(dataset, horizon);
-
-            TemporalDataset split = new TemporalSplitter().split(dataset.samples(), horizon);
 
             ModelExperimentMetric majorityMetric = toMetric(
                     experimentId, ModelType.MAJORITY, report.majority()
@@ -104,10 +109,10 @@ public class ModelExperimentService {
                     experiment.trainStart(),
                     experiment.validationStart(),
                     experiment.validationEnd(),
-                    split.finalHoldout().getFirst().asOfDate(),
-                    split.finalHoldout().getLast().asOfDate(),
-                    split.validation().size(),
-                    split.finalHoldout().size(),
+                    experiment.holdoutStart(),
+                    experiment.holdoutEnd(),
+                    experiment.validationSamples(),
+                    experiment.holdoutSamples(),
                     ModelExperimentStatus.COMPLETED,
                     experiment.gitCommit(),
                     null,
@@ -164,7 +169,7 @@ public class ModelExperimentService {
         return recalls.entrySet().stream()
                 .collect(Collectors.toMap(
                         e -> e.getKey().name(),
-                        e -> e.getValue() == null ? BigDecimal.ZERO : e.getValue()
+                        e -> e.getValue()
                 ));
     }
 
@@ -197,7 +202,7 @@ public class ModelExperimentService {
     }
 
     private OffsetDateTime now() {
-        return OffsetDateTime.now(ZoneOffset.UTC);
+        return OffsetDateTime.now(clock);
     }
 
     private String safeMessage(Exception e) {

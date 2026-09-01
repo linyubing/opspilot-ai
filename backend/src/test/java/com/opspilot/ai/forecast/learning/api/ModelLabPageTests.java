@@ -39,6 +39,15 @@ class ModelLabPageTests {
     }
 
     @Test
+    void initialLoadDoesNotPost() throws IOException {
+        String js = read("model-lab.js");
+
+        assertThat(js)
+                .contains("loadHistory()")
+                .doesNotContain("load(\"NEXT_DAY\")");
+    }
+
+    @Test
     void forecastPageLinksToModelLab() throws IOException {
         assertThat(read("forecast.html"))
                 .contains("href=\"/model-lab.html\"")

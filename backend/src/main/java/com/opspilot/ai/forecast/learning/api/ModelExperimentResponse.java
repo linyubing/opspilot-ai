@@ -16,10 +16,14 @@ public record ModelExperimentResponse(
         int refitCount,
         ForecastMetrics majority,
         ForecastMetrics logistic,
-        int finalHoldoutSamples,
-        LocalDate finalHoldoutStart,
-        LocalDate finalHoldoutEnd
+        FinalHoldout finalHoldout
 ) {
+    public record FinalHoldout(
+            int samples,
+            LocalDate start,
+            LocalDate end
+    ) {}
+
     public static ModelExperimentResponse from(WalkForwardReport report) {
         return new ModelExperimentResponse(
                 report.horizon().name(),
@@ -31,9 +35,11 @@ public record ModelExperimentResponse(
                 report.refitCount(),
                 report.majority(),
                 report.logistic(),
-                report.finalHoldoutSamples(),
-                report.finalHoldoutStart(),
-                report.finalHoldoutEnd()
+                new FinalHoldout(
+                        report.finalHoldoutSamples(),
+                        report.finalHoldoutStart(),
+                        report.finalHoldoutEnd()
+                )
         );
     }
 }

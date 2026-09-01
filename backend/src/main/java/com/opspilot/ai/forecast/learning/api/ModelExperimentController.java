@@ -58,8 +58,10 @@ public class ModelExperimentController {
     public List<ModelExperimentSummaryResponse> history(
             @RequestParam(defaultValue = "20") int limit
     ) {
-        int safeLimit = Math.max(1, Math.min(100, limit));
-        return experimentService.findRecent(safeLimit).stream()
+        if (limit < 1 || limit > 100) {
+            throw new IllegalArgumentException("limit 必须在 1 到 100 之间");
+        }
+        return experimentService.findRecent(limit).stream()
                 .map(ModelExperimentSummaryResponse::from)
                 .toList();
     }

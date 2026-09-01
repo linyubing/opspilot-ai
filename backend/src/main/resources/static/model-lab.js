@@ -36,7 +36,7 @@ function render(data) {
     document.querySelector("#validationSamples").textContent = `${data.validationSamples} 条`;
     document.querySelector("#refitCount").textContent = `${data.refitCount} 次，每 ${data.refitEvery} 条一次`;
     document.querySelector("#holdoutRange").textContent =
-        `${data.finalHoldoutSamples} 条，${data.finalHoldoutStart} 至 ${data.finalHoldoutEnd}`;
+        `${data.finalHoldout.samples} 条，${data.finalHoldout.start} 至 ${data.finalHoldout.end}`;
     fillMetrics("majority", data.majority);
     fillMetrics("logistic", data.logistic);
     result.hidden = false;

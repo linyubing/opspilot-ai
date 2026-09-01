@@ -47,7 +47,8 @@ class ModelExperimentControllerTests {
                 .andExpect(jsonPath("$.horizon").value("FIVE_DAYS"))
                 .andExpect(jsonPath("$.majority.accuracy").isNumber())
                 .andExpect(jsonPath("$.logistic.balancedAccuracy").isNumber())
-                .andExpect(jsonPath("$.finalHoldoutSamples").value(240));
+                .andExpect(jsonPath("$.finalHoldout.samples").value(240))
+                .andExpect(jsonPath("$.finalHoldout.accuracy").doesNotExist());
     }
 
     @Test

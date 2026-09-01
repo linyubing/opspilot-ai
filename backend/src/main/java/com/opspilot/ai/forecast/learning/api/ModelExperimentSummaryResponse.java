@@ -15,7 +15,9 @@ public record ModelExperimentSummaryResponse(
         String featureVersion,
         String labelVersion,
         String gitCommit,
-        OffsetDateTime createdAt
+        OffsetDateTime createdAt,
+        BigDecimal majorityAccuracy,
+        BigDecimal logisticAccuracy
 ) {
     public static ModelExperimentSummaryResponse from(ModelExperiment experiment) {
         return new ModelExperimentSummaryResponse(
@@ -26,7 +28,9 @@ public record ModelExperimentSummaryResponse(
                 experiment.featureVersion(),
                 experiment.labelVersion(),
                 experiment.gitCommit(),
-                experiment.createdAt()
+                experiment.createdAt(),
+                null,
+                null
         );
     }
 }

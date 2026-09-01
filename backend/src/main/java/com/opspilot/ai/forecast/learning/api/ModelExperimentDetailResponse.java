@@ -1,5 +1,6 @@
 package com.opspilot.ai.forecast.learning.api;
 
+import com.opspilot.ai.forecast.learning.ForecastMetrics;
 import com.opspilot.ai.forecast.learning.ModelExperiment;
 
 import java.time.LocalDate;
@@ -30,7 +31,9 @@ public record ModelExperimentDetailResponse(
         String failureMessage,
         OffsetDateTime createdAt,
         OffsetDateTime startedAt,
-        OffsetDateTime completedAt
+        OffsetDateTime completedAt,
+        ForecastMetrics majority,
+        ForecastMetrics logistic
 ) {
     public static ModelExperimentDetailResponse from(ModelExperiment experiment) {
         return new ModelExperimentDetailResponse(
@@ -55,7 +58,9 @@ public record ModelExperimentDetailResponse(
                 experiment.failureMessage(),
                 experiment.createdAt(),
                 experiment.startedAt(),
-                experiment.completedAt()
+                experiment.completedAt(),
+                null,
+                null
         );
     }
 }

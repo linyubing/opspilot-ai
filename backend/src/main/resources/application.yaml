@@ -137,6 +137,5 @@ opspilot:
       connect-timeout: 5s
       read-timeout: 20s
 
-opspilot:
   build:
     git-commit: ${GIT_COMMIT:unknown}
