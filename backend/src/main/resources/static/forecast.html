@@ -89,6 +89,18 @@
         </section>
 
         <section class="panel">
+            <div class="heading">
+                <h2>数据新鲜度</h2>
+                <span id="dataStatusOverall" class="pill">-</span>
+            </div>
+            <div class="source-grid">
+                <article><span>黄金价格</span><strong id="goldStatus" class="status-pill">-</strong><small id="goldStatusDetail"></small></article>
+                <article><span>实际利率</span><strong id="rateStatus" class="status-pill">-</strong><small id="rateStatusDetail"></small></article>
+                <article><span>美元指数</span><strong id="dollarStatus" class="status-pill">-</strong><small id="dollarStatusDetail"></small></article>
+            </div>
+        </section>
+
+        <section class="panel">
             <div class="heading"><h2>大模型研究解读</h2></div>
             <p id="summary" class="reasoning"></p>
             <div class="analysis-grid">
@@ -116,6 +128,6 @@
         <p class="note">历史回测衡量方法过去的表现；本次预测必须等下一条真实金价发布后才能判断准不准。</p>
     </section>
 </main>
-<script src="/forecast.js?v=5" defer></script>
+<script src="/forecast.js?v=6" defer></script>
 </body>
 </html>

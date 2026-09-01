@@ -183,6 +183,32 @@ async function loadAccuracy() {
     }
 }
 
+const dataStates = {FRESH: "新鲜", STALE: "过期", UNKNOWN: "未知"};
+
+function renderDataStatus(data) {
+    text("dataStatusOverall", dataStates[data.overall] || data.overall || "-");
+    const byCode = {};
+    (data.items || []).forEach(item => {
+        byCode[item.code] = item;
+        const badge = byId(`${item.code}Status`);
+        if (badge) {
+            badge.textContent = dataStates[item.state] || item.state;
+            badge.className = `status-pill ${item.state === "STALE" ? "stale" : item.state === "FRESH" ? "fresh" : ""}`;
+        }
+        const note = byId(`${item.code}StatusDetail`);
+        if (note) note.textContent = item.detail || "";
+    });
+}
+
+async function loadDataStatus() {
+    try {
+        const data = await request("/api/research/gold/data-status");
+        renderDataStatus(data);
+    } catch (error) {
+        text("dataStatusOverall", "读取失败");
+    }
+}
+
 function showError(error) {
     errorBox.textContent = error instanceof TypeError
         ? "无法连接后端服务，请确认应用已经启动。"
@@ -197,7 +223,7 @@ async function generate() {
     statusText.textContent = "正在同步真实数据并调用大模型，可能需要几十秒...";
     try {
         await request("/api/research/gold/daily-report", {method: "POST"});
-        await Promise.all([loadLatest(), loadAccuracy(), loadGoldBar()]);
+        await Promise.all([loadLatest(), loadAccuracy(), loadGoldBar(), loadDataStatus()]);
         statusText.textContent = "预测已保存，等待下一有效交易日真实价格验证。";
     } catch (error) {
         showError(error);
@@ -207,4 +233,4 @@ async function generate() {
 }
 
 generateButton.addEventListener("click", generate);
-Promise.all([loadLatest(), loadAccuracy(), loadGoldBar()]).catch(showError);
+Promise.all([loadLatest(), loadAccuracy(), loadGoldBar(), loadDataStatus()]).catch(showError);

@@ -63,6 +63,9 @@ h1 { margin: 2px 0 6px; font-size: clamp(34px, 5vw, 58px); line-height: 1.15; }
 .miss-reason { border-left: 3px solid var(--warn, #d97706); }
 .miss-title { display: block; font-size: 15px; margin: 4px 0; }
 .miss-reason ul { margin: 8px 0 0; padding-left: 18px; color: var(--muted); }
+.status-pill { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 12px; }
+.status-pill.fresh { background: rgba(22, 163, 74, .15); color: #16a34a; }
+.status-pill.stale { background: rgba(220, 38, 38, .15); color: #dc2626; }
 [hidden] { display: none !important; }
 
 @media (max-width: 760px) {
