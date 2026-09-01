@@ -25,7 +25,7 @@ class GoldLearningTypesTests {
     void rejectsIncompleteFeatures() {
         assertThatThrownBy(() -> new GoldFeatures(Map.of("gold_return_1", 1.0)))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("16");
+                .hasMessageContaining("36");
     }
 
     @Test

@@ -93,7 +93,59 @@ public class GoldDatasetBuilder {
         values.put("dollar_return_20", number(snapshot.dollarIndex().return20()));
         values.put("dollar_age", (double) ChronoUnit.DAYS.between(
                 snapshot.latestDollarIndexDate(), snapshot.analysisDate()));
+        // OHLC 技术特征（使用 GoldFeatureWindow 计算）
+        GoldFeatureWindow window = new GoldFeatureWindow(
+                snapshot.analysisDate(),
+                repository.findAll("XAUUSD", "twelve_data"));
+        if (window.size() >= 20) {
+            values.put("return1", bdr(window.returnN(1)));
+            values.put("return3", bdr(window.returnN(3)));
+            values.put("return5", bdr(window.returnN(5)));
+            values.put("return10", bdr(window.returnN(10)));
+            values.put("return20", bdr(window.returnN(20)));
+            values.put("overnightGap", bdr(window.overnightGap()));
+            values.put("intradayReturn", bdr(window.intradayReturn()));
+            values.put("dailyRange", bdr(window.dailyRange()));
+            values.put("closeLocation", bdr(window.closeLocation()));
+            values.put("atr14", bdr(window.atr14()));
+            values.put("volatility5", bdr(window.volatility(5)));
+            values.put("volatility20", bdr(window.volatility(20)));
+            values.put("ma5Distance", bdr(window.maDistance(5)));
+            values.put("ma20Distance", bdr(window.maDistance(20)));
+            values.put("ma5Slope", bdr(window.maSlope(5)));
+            values.put("ma20Slope", bdr(window.maSlope(20)));
+            values.put("rsi14", bdr(window.rsi14()));
+            values.put("drawdown20", bdr(window.drawdown20()));
+            values.put("highBreakout20", bdr(window.highBreakout20()));
+            values.put("lowBreakdown20", bdr(window.lowBreakdown20()));
+        } else {
+            // 数据不足时使用默认值 0.0
+            values.put("return1", 0.0);
+            values.put("return3", 0.0);
+            values.put("return5", 0.0);
+            values.put("return10", 0.0);
+            values.put("return20", 0.0);
+            values.put("overnightGap", 0.0);
+            values.put("intradayReturn", 0.0);
+            values.put("dailyRange", 0.0);
+            values.put("closeLocation", 0.5);
+            values.put("atr14", 0.0);
+            values.put("volatility5", 0.0);
+            values.put("volatility20", 0.0);
+            values.put("ma5Distance", 0.0);
+            values.put("ma20Distance", 0.0);
+            values.put("ma5Slope", 0.0);
+            values.put("ma20Slope", 0.0);
+            values.put("rsi14", 50.0);
+            values.put("drawdown20", 0.0);
+            values.put("highBreakout20", 0.0);
+            values.put("lowBreakdown20", 0.0);
+        }
         return new GoldFeatures(values);
+    }
+
+    private double bdr(java.math.BigDecimal value) {
+        return (value != null) ? value.doubleValue() : 0.0;
     }
 
     private void validateDates(GoldResearchSnapshot snapshot) {
