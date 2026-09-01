@@ -1,6 +1,7 @@
 package com.opspilot.ai.forecast.learning.api;
 
 import com.opspilot.ai.forecast.learning.ModelExperiment;
+import com.opspilot.ai.forecast.learning.ModelExperimentMetric;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
@@ -19,7 +20,11 @@ public record ModelExperimentSummaryResponse(
         BigDecimal majorityAccuracy,
         BigDecimal logisticAccuracy
 ) {
-    public static ModelExperimentSummaryResponse from(ModelExperiment experiment) {
+    public static ModelExperimentSummaryResponse from(
+            ModelExperiment experiment,
+            ModelExperimentMetric majority,
+            ModelExperimentMetric logistic
+    ) {
         return new ModelExperimentSummaryResponse(
                 experiment.id(),
                 experiment.horizon(),
@@ -29,8 +34,8 @@ public record ModelExperimentSummaryResponse(
                 experiment.labelVersion(),
                 experiment.gitCommit(),
                 experiment.createdAt(),
-                null,
-                null
+                majority != null ? majority.accuracy() : null,
+                logistic != null ? logistic.accuracy() : null
         );
     }
 }

@@ -67,18 +67,27 @@ public class JdbcModelExperimentRepository implements ModelExperimentRepository 
             ModelExperiment completed,
             List<ModelExperimentMetric> metrics
     ) {
-        jdbc.update("""
+        int updated = jdbc.update("""
                 update gold_model_experiment
                 set status = 'COMPLETED', completed_at = ?,
-                    holdout_samples = ?, holdout_start = ?, holdout_end = ?
+                    train_start = ?, validation_start = ?, validation_end = ?,
+                    holdout_start = ?, holdout_end = ?,
+                    validation_samples = ?, holdout_samples = ?
                 where id = ?
                 """,
                 completed.completedAt(),
-                completed.holdoutSamples(),
+                completed.trainStart(),
+                completed.validationStart(),
+                completed.validationEnd(),
                 completed.holdoutStart(),
                 completed.holdoutEnd(),
+                completed.validationSamples(),
+                completed.holdoutSamples(),
                 id
         );
+        if (updated == 0) {
+            throw new ModelExperimentNotFoundException("实验不存在，编号=" + id);
+        }
         for (ModelExperimentMetric metric : metrics) {
             jdbc.update("""
                     insert into gold_model_experiment_metric (

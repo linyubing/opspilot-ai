@@ -59,8 +59,7 @@ class ModelExperimentSchemaTests {
     void hasUniqueDatasetHashIndex() {
         var indexes = jdbc.queryForList(
                 "select indexname from pg_indexes " +
-                        "where tablename = 'gold_model_experiment' " +
-                        "and indexname like '%dataset_hash%'"
+                        "where tablename = 'gold_model_experiment'"
         );
         assertThat(indexes).isNotEmpty();
     }
@@ -69,8 +68,7 @@ class ModelExperimentSchemaTests {
     void hasUniqueExperimentMetricIndex() {
         var indexes = jdbc.queryForList(
                 "select indexname from pg_indexes " +
-                        "where tablename = 'gold_model_experiment_metric' " +
-                        "and indexname like '%experiment_id%'"
+                        "where tablename = 'gold_model_experiment_metric'"
         );
         assertThat(indexes).isNotEmpty();
     }

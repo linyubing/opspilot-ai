@@ -8,10 +8,10 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.OffsetDateTime;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 /** 管理黄金模型实验的创建、执行和查询。 */
 @Service
@@ -49,7 +49,7 @@ public class ModelExperimentService {
         this.clock = clock;
     }
 
-    public ModelExperiment run(ForecastHorizon horizon) {
+    public ModelExperimentResult run(ForecastHorizon horizon) {
         UUID experimentId = UUID.randomUUID();
         OffsetDateTime now = now();
 
@@ -68,7 +68,7 @@ public class ModelExperimentService {
                 buildParameters(horizon),
                 dataset.samples().getFirst().asOfDate(),
                 dataset.samples().getLast().asOfDate(),
-                split.validation().getFirst().asOfDate(),
+                split.training().getFirst().asOfDate(),
                 split.validation().getFirst().asOfDate(),
                 split.validation().getLast().asOfDate(),
                 split.finalHoldout().getFirst().asOfDate(),
@@ -87,7 +87,7 @@ public class ModelExperimentService {
         repo.markRunning(experimentId, now);
 
         try {
-            WalkForwardReport report = walkForward.run(dataset, horizon);
+            WalkForwardReport report = walkForward.run(split, horizon);
 
             ModelExperimentMetric majorityMetric = toMetric(
                     experimentId, ModelType.MAJORITY, report.majority()
@@ -122,7 +122,7 @@ public class ModelExperimentService {
             );
 
             repo.complete(experimentId, completed, List.of(majorityMetric, logisticMetric));
-            return completed;
+            return new ModelExperimentResult(completed, majorityMetric, logisticMetric);
         } catch (Exception e) {
             String message = safeMessage(e);
             repo.fail(experimentId, message, now());
@@ -166,25 +166,25 @@ public class ModelExperimentService {
     }
 
     private Map<String, Object> toRecallsMap(Map<ForecastDirection, BigDecimal> recalls) {
-        return recalls.entrySet().stream()
-                .collect(Collectors.toMap(
-                        e -> e.getKey().name(),
-                        e -> e.getValue()
-                ));
+        Map<String, Object> result = new LinkedHashMap<>();
+        for (ForecastDirection direction : ForecastDirection.values()) {
+            result.put(direction.name(), recalls.get(direction));
+        }
+        return result;
     }
 
     private Map<String, Map<String, Integer>> toConfusionMatrixMap(
             Map<ForecastDirection, Map<ForecastDirection, Integer>> matrix
     ) {
-        return matrix.entrySet().stream()
-                .collect(Collectors.toMap(
-                        e -> e.getKey().name(),
-                        e -> e.getValue().entrySet().stream()
-                                .collect(Collectors.toMap(
-                                        inner -> inner.getKey().name(),
-                                        Map.Entry::getValue
-                                ))
-                ));
+        Map<String, Map<String, Integer>> result = new LinkedHashMap<>();
+        for (Map.Entry<ForecastDirection, Map<ForecastDirection, Integer>> outer : matrix.entrySet()) {
+            Map<String, Integer> inner = new LinkedHashMap<>();
+            for (Map.Entry<ForecastDirection, Integer> entry : outer.getValue().entrySet()) {
+                inner.put(entry.getKey().name(), entry.getValue());
+            }
+            result.put(outer.getKey().name(), inner);
+        }
+        return result;
     }
 
     private Map<String, Object> buildParameters(ForecastHorizon horizon) {

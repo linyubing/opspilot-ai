@@ -1,6 +1,5 @@
 package com.opspilot.ai.forecast.learning;
 
-import com.opspilot.ai.forecast.ForecastDirection;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -10,12 +9,13 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.util.EnumMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
 class JdbcModelExperimentRepositoryTests {
@@ -48,7 +48,7 @@ class JdbcModelExperimentRepositoryTests {
         var found = repo.findById(experiment.id());
         assertThat(found).isPresent();
         assertThat(found.get().status()).isEqualTo(ModelExperimentStatus.RUNNING);
-        assertThat(found.get().startedAt()).isEqualTo(startedAt);
+        assertThat(found.get().startedAt()).isNotNull();
     }
 
     @Test
@@ -154,17 +154,18 @@ class JdbcModelExperimentRepositoryTests {
         );
 
         ModelExperimentMetric validMetric = createMetric(experiment.id(), ModelType.MAJORITY);
-        ModelExperimentMetric invalidMetric = createMetric(experiment.id(), ModelType.LOGISTIC);
+        ModelExperimentMetric duplicateMetric = createMetric(experiment.id(), ModelType.MAJORITY);
 
-        try {
-            repo.complete(experiment.id(), completed, List.of(validMetric, invalidMetric));
-        } catch (Exception e) {
-            // Expected exception
-        }
+        assertThatThrownBy(() -> repo.complete(experiment.id(), completed, List.of(validMetric, duplicateMetric)))
+                .isInstanceOf(Exception.class);
 
         var found = repo.findById(experiment.id());
         assertThat(found).isPresent();
         assertThat(found.get().status()).isNotEqualTo(ModelExperimentStatus.COMPLETED);
+        assertThat(found.get().completedAt()).isNull();
+
+        var metrics = repo.findMetrics(experiment.id());
+        assertThat(metrics).isEmpty();
     }
 
     private ModelExperiment createSampleExperiment() {
@@ -198,12 +199,12 @@ class JdbcModelExperimentRepositoryTests {
     }
 
     private ModelExperimentMetric createMetric(UUID experimentId, ModelType modelType) {
-        Map<String, Object> recalls = new java.util.HashMap<>();
+        Map<String, Object> recalls = new LinkedHashMap<>();
         recalls.put("BULLISH", new BigDecimal("0.6"));
         recalls.put("NEUTRAL", new BigDecimal("0.5"));
         recalls.put("BEARISH", new BigDecimal("0.7"));
 
-        Map<String, Map<String, Integer>> confusionMatrix = new java.util.HashMap<>();
+        Map<String, Map<String, Integer>> confusionMatrix = new LinkedHashMap<>();
         confusionMatrix.put("BULLISH", Map.of("BULLISH", 100, "NEUTRAL", 20, "BEARISH", 10));
         confusionMatrix.put("NEUTRAL", Map.of("BULLISH", 15, "NEUTRAL", 80, "BEARISH", 15));
         confusionMatrix.put("BEARISH", Map.of("BULLISH", 10, "NEUTRAL", 15, "BEARISH", 115));

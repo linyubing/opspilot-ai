@@ -3,8 +3,11 @@ package com.opspilot.ai.forecast.learning.api;
 import com.opspilot.ai.chat.api.ApiError;
 import com.opspilot.ai.forecast.learning.ForecastHorizon;
 import com.opspilot.ai.forecast.learning.ModelExperiment;
+import com.opspilot.ai.forecast.learning.ModelExperimentMetric;
 import com.opspilot.ai.forecast.learning.ModelExperimentNotFoundException;
+import com.opspilot.ai.forecast.learning.ModelExperimentResult;
 import com.opspilot.ai.forecast.learning.ModelExperimentService;
+import com.opspilot.ai.forecast.learning.ModelType;
 import com.opspilot.ai.forecast.learning.WalkForwardService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -16,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /** 提供黄金统计模型实验的即时预览和持久化管理。 */
@@ -48,9 +52,9 @@ public class ModelExperimentController {
     public ResponseEntity<ModelExperimentDetailResponse> create(
             @RequestParam(defaultValue = "NEXT_DAY") String horizon
     ) {
-        ModelExperiment experiment = experimentService.run(parse(horizon));
+        ModelExperimentResult result = experimentService.run(parse(horizon));
         return ResponseEntity.status(201).body(
-                ModelExperimentDetailResponse.from(experiment)
+                ModelExperimentDetailResponse.from(result)
         );
     }
 
@@ -61,15 +65,32 @@ public class ModelExperimentController {
         if (limit < 1 || limit > 100) {
             throw new IllegalArgumentException("limit 必须在 1 到 100 之间");
         }
-        return experimentService.findRecent(limit).stream()
-                .map(ModelExperimentSummaryResponse::from)
+        List<ModelExperiment> experiments = experimentService.findRecent(limit);
+        return experiments.stream()
+                .map(exp -> {
+                    List<ModelExperimentMetric> metrics = experimentService.findMetrics(exp.id());
+                    ModelExperimentMetric majority = metrics.stream()
+                            .filter(m -> m.modelType() == ModelType.MAJORITY)
+                            .findFirst().orElse(null);
+                    ModelExperimentMetric logistic = metrics.stream()
+                            .filter(m -> m.modelType() == ModelType.LOGISTIC)
+                            .findFirst().orElse(null);
+                    return ModelExperimentSummaryResponse.from(exp, majority, logistic);
+                })
                 .toList();
     }
 
     @GetMapping("/{id}")
     public ModelExperimentDetailResponse detail(@PathVariable UUID id) {
         ModelExperiment experiment = experimentService.findById(id);
-        return ModelExperimentDetailResponse.from(experiment);
+        List<ModelExperimentMetric> metrics = experimentService.findMetrics(id);
+        ModelExperimentMetric majority = metrics.stream()
+                .filter(m -> m.modelType() == ModelType.MAJORITY)
+                .findFirst().orElse(null);
+        ModelExperimentMetric logistic = metrics.stream()
+                .filter(m -> m.modelType() == ModelType.LOGISTIC)
+                .findFirst().orElse(null);
+        return ModelExperimentDetailResponse.from(experiment, majority, logistic);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

@@ -48,6 +48,24 @@ class ModelLabPageTests {
     }
 
     @Test
+    void historyDisplaysAccuracy() throws IOException {
+        String js = read("model-lab.js");
+
+        assertThat(js)
+                .contains("Accuracy")
+                .contains("accuracy");
+    }
+
+    @Test
+    void detailDisplaysBothModelMetrics() throws IOException {
+        String js = read("model-lab.js");
+
+        assertThat(js)
+                .contains("majority")
+                .contains("logistic");
+    }
+
+    @Test
     void forecastPageLinksToModelLab() throws IOException {
         assertThat(read("forecast.html"))
                 .contains("href=\"/model-lab.html\"")

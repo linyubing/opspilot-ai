@@ -42,6 +42,10 @@ public class WalkForwardService {
 
     public WalkForwardReport run(GoldDataset dataset, ForecastHorizon horizon) {
         TemporalDataset data = splitter.split(dataset.samples(), horizon);
+        return run(data, horizon);
+    }
+
+    public WalkForwardReport run(TemporalDataset data, ForecastHorizon horizon) {
         List<SettledPrediction> majorityPredictions = new ArrayList<>();
         List<SettledPrediction> logisticPredictions = new ArrayList<>();
         List<GoldSample> validation = data.validation();
