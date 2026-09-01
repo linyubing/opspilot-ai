@@ -21,7 +21,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -60,15 +59,33 @@ class ModelExperimentServiceTests {
         when(datasetBuilder.build(horizon)).thenReturn(dataset);
         when(fingerprint.hash(dataset)).thenReturn("abc123");
         when(splitter.split(dataset.samples(), horizon)).thenReturn(split);
-        when(walkForward.run(split, horizon)).thenReturn(createReport());
+        when(walkForward.run(split, horizon, FeatureProfile.ALL_36)).thenReturn(createReport());
         when(properties.gitCommit()).thenReturn("unknown");
 
         ModelExperimentResult result = service.run(horizon);
 
         verify(datasetBuilder, org.mockito.Mockito.times(1)).build(horizon);
         verify(splitter, org.mockito.Mockito.times(1)).split(dataset.samples(), horizon);
-        verify(walkForward, org.mockito.Mockito.times(1)).run(split, horizon);
+        verify(walkForward, org.mockito.Mockito.times(1)).run(split, horizon, FeatureProfile.ALL_36);
         assertThat(result.experiment().status()).isEqualTo(ModelExperimentStatus.COMPLETED);
+    }
+
+    @Test
+    void passesProfileToWalkForward() {
+        ForecastHorizon horizon = ForecastHorizon.NEXT_DAY;
+        GoldDataset dataset = createSampleDataset();
+        TemporalDataset split = createSampleSplit();
+
+        when(datasetBuilder.build(horizon)).thenReturn(dataset);
+        when(fingerprint.hash(dataset)).thenReturn("abc123");
+        when(splitter.split(dataset.samples(), horizon)).thenReturn(split);
+        when(walkForward.run(split, horizon, FeatureProfile.BASE_16)).thenReturn(createReport());
+        when(properties.gitCommit()).thenReturn("unknown");
+
+        ModelExperimentResult result = service.run(horizon, FeatureProfile.BASE_16);
+
+        verify(walkForward).run(split, horizon, FeatureProfile.BASE_16);
+        assertThat(result.experiment().featureProfile()).isEqualTo(FeatureProfile.BASE_16);
     }
 
     @Test
@@ -80,7 +97,7 @@ class ModelExperimentServiceTests {
         when(datasetBuilder.build(horizon)).thenReturn(dataset);
         when(fingerprint.hash(dataset)).thenReturn("abc123def456");
         when(splitter.split(dataset.samples(), horizon)).thenReturn(split);
-        when(walkForward.run(split, horizon)).thenReturn(createReport());
+        when(walkForward.run(split, horizon, FeatureProfile.ALL_36)).thenReturn(createReport());
         when(properties.gitCommit()).thenReturn("unknown");
 
         ModelExperimentResult result = service.run(horizon);
@@ -97,7 +114,7 @@ class ModelExperimentServiceTests {
         when(datasetBuilder.build(horizon)).thenReturn(dataset);
         when(fingerprint.hash(dataset)).thenReturn("abc123");
         when(splitter.split(dataset.samples(), horizon)).thenReturn(split);
-        when(walkForward.run(split, horizon)).thenReturn(createReport());
+        when(walkForward.run(split, horizon, FeatureProfile.ALL_36)).thenReturn(createReport());
         when(properties.gitCommit()).thenReturn("unknown");
 
         ModelExperimentResult result = service.run(horizon);
@@ -120,7 +137,7 @@ class ModelExperimentServiceTests {
         when(datasetBuilder.build(horizon)).thenReturn(dataset);
         when(fingerprint.hash(dataset)).thenReturn("abc123");
         when(splitter.split(dataset.samples(), horizon)).thenReturn(split);
-        when(walkForward.run(split, horizon)).thenReturn(createReport());
+        when(walkForward.run(split, horizon, FeatureProfile.ALL_36)).thenReturn(createReport());
         when(properties.gitCommit()).thenReturn("unknown");
 
         ModelExperimentResult result = service.run(horizon);
@@ -132,6 +149,56 @@ class ModelExperimentServiceTests {
     }
 
     @Test
+    void compareRunsThreeProfiles() {
+        ForecastHorizon horizon = ForecastHorizon.NEXT_DAY;
+        GoldDataset dataset = createSampleDataset();
+        TemporalDataset split = createSampleSplit();
+
+        when(datasetBuilder.build(horizon)).thenReturn(dataset);
+        when(fingerprint.hash(dataset)).thenReturn("abc123");
+        when(splitter.split(dataset.samples(), horizon)).thenReturn(split);
+        when(walkForward.run(split, horizon, FeatureProfile.BASE_16)).thenReturn(createReport());
+        when(walkForward.run(split, horizon, FeatureProfile.OHLC_20)).thenReturn(createReport());
+        when(walkForward.run(split, horizon, FeatureProfile.ALL_36)).thenReturn(createReport());
+        when(properties.gitCommit()).thenReturn("unknown");
+
+        List<ModelExperimentResult> results = service.compare(horizon);
+
+        assertThat(results).hasSize(3);
+        assertThat(results.get(0).experiment().featureProfile()).isEqualTo(FeatureProfile.BASE_16);
+        assertThat(results.get(1).experiment().featureProfile()).isEqualTo(FeatureProfile.OHLC_20);
+        assertThat(results.get(2).experiment().featureProfile()).isEqualTo(FeatureProfile.ALL_36);
+        verify(datasetBuilder, org.mockito.Mockito.times(1)).build(horizon);
+        verify(splitter, org.mockito.Mockito.times(1)).split(dataset.samples(), horizon);
+    }
+
+    @Test
+    void compareExperimentsShareSameHashAndDates() {
+        ForecastHorizon horizon = ForecastHorizon.NEXT_DAY;
+        GoldDataset dataset = createSampleDataset();
+        TemporalDataset split = createSampleSplit();
+
+        when(datasetBuilder.build(horizon)).thenReturn(dataset);
+        when(fingerprint.hash(dataset)).thenReturn("sameHash123");
+        when(splitter.split(dataset.samples(), horizon)).thenReturn(split);
+        when(walkForward.run(split, horizon, FeatureProfile.BASE_16)).thenReturn(createReport());
+        when(walkForward.run(split, horizon, FeatureProfile.OHLC_20)).thenReturn(createReport());
+        when(walkForward.run(split, horizon, FeatureProfile.ALL_36)).thenReturn(createReport());
+        when(properties.gitCommit()).thenReturn("unknown");
+
+        List<ModelExperimentResult> results = service.compare(horizon);
+
+        String hash = results.get(0).experiment().datasetHash();
+        LocalDate dataStart = results.get(0).experiment().dataStart();
+        LocalDate validStart = results.get(0).experiment().validationStart();
+        for (ModelExperimentResult r : results) {
+            assertThat(r.experiment().datasetHash()).isEqualTo(hash);
+            assertThat(r.experiment().dataStart()).isEqualTo(dataStart);
+            assertThat(r.experiment().validationStart()).isEqualTo(validStart);
+        }
+    }
+
+    @Test
     void failedExperimentHasCorrectStatusAndMessage() {
         ForecastHorizon horizon = ForecastHorizon.NEXT_DAY;
         GoldDataset dataset = createSampleDataset();
@@ -140,7 +207,8 @@ class ModelExperimentServiceTests {
         when(datasetBuilder.build(horizon)).thenReturn(dataset);
         when(fingerprint.hash(dataset)).thenReturn("abc123");
         when(splitter.split(dataset.samples(), horizon)).thenReturn(split);
-        when(walkForward.run(split, horizon)).thenThrow(new RuntimeException("训练失败"));
+        when(walkForward.run(split, horizon, FeatureProfile.ALL_36))
+                .thenThrow(new RuntimeException("训练失败"));
         when(properties.gitCommit()).thenReturn("unknown");
 
         assertThatThrownBy(() -> service.run(horizon))
@@ -159,7 +227,8 @@ class ModelExperimentServiceTests {
         when(datasetBuilder.build(horizon)).thenReturn(dataset);
         when(fingerprint.hash(dataset)).thenReturn("abc123");
         when(splitter.split(dataset.samples(), horizon)).thenReturn(split);
-        when(walkForward.run(split, horizon)).thenReturn(createReportWithNullRecall());
+        when(walkForward.run(split, horizon, FeatureProfile.ALL_36))
+                .thenReturn(createReportWithNullRecall());
         when(properties.gitCommit()).thenReturn("unknown");
 
         ModelExperimentResult result = service.run(horizon);
@@ -188,7 +257,8 @@ class ModelExperimentServiceTests {
         when(datasetBuilder.build(horizon)).thenReturn(dataset);
         when(fingerprint.hash(dataset)).thenReturn("abc123");
         when(splitter.split(dataset.samples(), horizon)).thenReturn(split);
-        when(walkForward.run(split, horizon)).thenThrow(new RuntimeException(longMessage));
+        when(walkForward.run(split, horizon, FeatureProfile.ALL_36))
+                .thenThrow(new RuntimeException(longMessage));
         when(properties.gitCommit()).thenReturn("unknown");
 
         assertThatThrownBy(() -> service.run(horizon))

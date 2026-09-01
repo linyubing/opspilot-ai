@@ -33,10 +33,23 @@ class ModelExperimentSchemaTests {
 
         assertThat(columns).contains(
                 "id", "horizon", "feature_version", "label_version", "split_version",
-                "dataset_hash", "parameter_json", "data_start", "data_end",
+                "dataset_hash", "feature_profile", "parameter_json",
+                "data_start", "data_end",
                 "train_start", "validation_start", "validation_end",
                 "holdout_start", "holdout_end", "validation_samples", "holdout_samples",
                 "status", "git_commit", "failure_message", "created_at", "started_at", "completed_at"
+        );
+    }
+
+    @Test
+    void hasFeatureProfileCheckConstraint() {
+        var constraints = jdbc.queryForList(
+                "select conname from pg_constraint " +
+                        "where conrelid = 'gold_model_experiment'::regclass " +
+                        "and contype = 'c'"
+        );
+        assertThat(constraints).anyMatch(
+                r -> r.get("conname").toString().contains("feature_profile")
         );
     }
 

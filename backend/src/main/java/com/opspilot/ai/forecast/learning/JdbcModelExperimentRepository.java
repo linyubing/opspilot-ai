@@ -39,7 +39,7 @@ public class JdbcModelExperimentRepository implements ModelExperimentRepository 
                 experiment.id(), experiment.horizon(),
                 experiment.featureVersion(), experiment.labelVersion(),
                 experiment.splitVersion(), experiment.datasetHash(),
-                experiment.featureProfile(),
+                experiment.featureProfile().name(),
                 toJson(experiment.parameters()),
                 experiment.dataStart(), experiment.dataEnd(),
                 experiment.trainStart(), experiment.validationStart(),
@@ -152,7 +152,9 @@ public class JdbcModelExperimentRepository implements ModelExperimentRepository 
                 rs.getString("label_version"),
                 rs.getString("split_version"),
                 rs.getString("dataset_hash"),
-                rs.getString("feature_profile"),
+                rs.getString("feature_profile") != null
+                        ? FeatureProfile.valueOf(rs.getString("feature_profile"))
+                        : FeatureProfile.ALL_36,
                 parseJson(rs.getString("parameter_json")),
                 rs.getDate("data_start").toLocalDate(),
                 rs.getDate("data_end").toLocalDate(),

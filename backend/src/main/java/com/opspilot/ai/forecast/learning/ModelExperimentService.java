@@ -8,10 +8,10 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 /** 管理黄金模型实验的创建、执行和查询。 */
@@ -60,10 +60,37 @@ public class ModelExperimentService {
 
         GoldDataset dataset = datasetBuilder.build(horizon);
         String datasetHash = fingerprint.hash(dataset);
-
         TemporalDataset split = splitter.split(dataset.samples(), horizon);
-        TemporalDataset filtered = filterFeatures(split, profile.featureNames());
 
+        return runSingleExperiment(experimentId, now, horizon, profile, datasetHash, dataset, split);
+    }
+
+    public List<ModelExperimentResult> compare(ForecastHorizon horizon) {
+        UUID experimentId1 = UUID.randomUUID();
+        UUID experimentId2 = UUID.randomUUID();
+        UUID experimentId3 = UUID.randomUUID();
+        OffsetDateTime now = now();
+
+        GoldDataset dataset = datasetBuilder.build(horizon);
+        String datasetHash = fingerprint.hash(dataset);
+        TemporalDataset split = splitter.split(dataset.samples(), horizon);
+
+        List<ModelExperimentResult> results = new ArrayList<>();
+        results.add(runSingleExperiment(experimentId1, now, horizon, FeatureProfile.BASE_16, datasetHash, dataset, split));
+        results.add(runSingleExperiment(experimentId2, now, horizon, FeatureProfile.OHLC_20, datasetHash, dataset, split));
+        results.add(runSingleExperiment(experimentId3, now, horizon, FeatureProfile.ALL_36, datasetHash, dataset, split));
+        return results;
+    }
+
+    private ModelExperimentResult runSingleExperiment(
+            UUID experimentId,
+            OffsetDateTime now,
+            ForecastHorizon horizon,
+            FeatureProfile profile,
+            String datasetHash,
+            GoldDataset dataset,
+            TemporalDataset split
+    ) {
         ModelExperiment experiment = new ModelExperiment(
                 experimentId,
                 horizon.name(),
@@ -71,7 +98,7 @@ public class ModelExperimentService {
                 GoldForecastRule.RULE_VERSION,
                 TemporalSplitter.VERSION,
                 datasetHash,
-                profile.name(),
+                profile,
                 buildParameters(horizon, profile),
                 dataset.samples().getFirst().asOfDate(),
                 dataset.samples().getLast().asOfDate(),
@@ -94,7 +121,7 @@ public class ModelExperimentService {
         repo.markRunning(experimentId, now);
 
         try {
-            WalkForwardReport report = walkForward.run(filtered, horizon);
+            WalkForwardReport report = walkForward.run(split, horizon, profile);
 
             ModelExperimentMetric majorityMetric = toMetric(
                     experimentId, ModelType.MAJORITY, report.majority()
@@ -207,31 +234,6 @@ public class ModelExperimentService {
                 "featureVersion", GoldFeatures.VERSION,
                 "labelVersion", GoldForecastRule.RULE_VERSION,
                 "splitVersion", TemporalSplitter.VERSION
-        );
-    }
-
-    private TemporalDataset filterFeatures(TemporalDataset split, Set<String> allowedNames) {
-        return new TemporalDataset(
-                split.training().stream().map(s -> filterSample(s, allowedNames)).toList(),
-                split.validation().stream().map(s -> filterSample(s, allowedNames)).toList(),
-                split.finalHoldout().stream().map(s -> filterSample(s, allowedNames)).toList()
-        );
-    }
-
-    private GoldSample filterSample(GoldSample sample, Set<String> allowedNames) {
-        Map<String, Double> filtered = new LinkedHashMap<>();
-        for (String name : allowedNames) {
-            Double value = sample.features().values().get(name);
-            if (value != null) {
-                filtered.put(name, value);
-            }
-        }
-        return new GoldSample(
-                sample.asOfDate(),
-                sample.targetDate(),
-                sample.horizon(),
-                new GoldFeatures(filtered),
-                sample.label()
         );
     }
 

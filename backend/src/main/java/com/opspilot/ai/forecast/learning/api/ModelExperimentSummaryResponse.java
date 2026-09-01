@@ -6,6 +6,8 @@ import com.opspilot.ai.forecast.learning.ModelExperimentMetric;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /** 实验摘要响应，不包含大型混淆矩阵。 */
@@ -17,6 +19,7 @@ public record ModelExperimentSummaryResponse(
         String datasetHashPrefix,
         String featureVersion,
         String labelVersion,
+        String splitVersion,
         String gitCommit,
         OffsetDateTime createdAt,
         BigDecimal majorityAccuracy,
@@ -47,10 +50,11 @@ public record ModelExperimentSummaryResponse(
                 experiment.id(),
                 experiment.horizon(),
                 experiment.status().name(),
-                experiment.featureProfile(),
+                experiment.featureProfile().name(),
                 experiment.datasetHash().substring(0, Math.min(12, experiment.datasetHash().length())),
                 experiment.featureVersion(),
                 experiment.labelVersion(),
+                experiment.splitVersion(),
                 experiment.gitCommit(),
                 experiment.createdAt(),
                 majority != null ? majority.accuracy() : null,
@@ -65,25 +69,45 @@ public record ModelExperimentSummaryResponse(
         );
     }
 
-    public static ModelExperimentSummaryResponse withBase16Improvement(
-            ModelExperimentSummaryResponse base,
-            BigDecimal base16LogisticBalanced
+    public static List<ModelExperimentSummaryResponse> fillBase16Improvements(
+            List<ModelExperimentSummaryResponse> summaries
     ) {
-        BigDecimal improvement = computeImprovement(
-                base.balancedAccuracy(), base16LogisticBalanced
-        );
-        return new ModelExperimentSummaryResponse(
-                base.id(), base.horizon(), base.status(),
-                base.featureProfile(), base.datasetHashPrefix(),
-                base.featureVersion(), base.labelVersion(),
-                base.gitCommit(), base.createdAt(),
-                base.majorityAccuracy(), base.logisticAccuracy(),
-                base.balancedAccuracy(), base.coverage(),
-                base.brierScore(), base.logLoss(),
-                base.majorityBalancedAccuracy(),
-                base.relativeMajorityImprovement(),
-                improvement
-        );
+        List<ModelExperimentSummaryResponse> result = new ArrayList<>();
+        for (ModelExperimentSummaryResponse s : summaries) {
+            if ("BASE_16".equals(s.featureProfile()) || s.balancedAccuracy() == null) {
+                result.add(s);
+                continue;
+            }
+            BigDecimal base16Balanced = summaries.stream()
+                    .filter(other -> "BASE_16".equals(other.featureProfile())
+                            && other.balancedAccuracy() != null
+                            && other.horizon().equals(s.horizon())
+                            && other.datasetHashPrefix().equals(s.datasetHashPrefix())
+                            && other.labelVersion().equals(s.labelVersion())
+                            && other.splitVersion().equals(s.splitVersion()))
+                    .findFirst()
+                    .map(ModelExperimentSummaryResponse::balancedAccuracy)
+                    .orElse(null);
+
+            if (base16Balanced != null) {
+                BigDecimal improvement = computeImprovement(s.balancedAccuracy(), base16Balanced);
+                result.add(new ModelExperimentSummaryResponse(
+                        s.id(), s.horizon(), s.status(),
+                        s.featureProfile(), s.datasetHashPrefix(),
+                        s.featureVersion(), s.labelVersion(), s.splitVersion(),
+                        s.gitCommit(), s.createdAt(),
+                        s.majorityAccuracy(), s.logisticAccuracy(),
+                        s.balancedAccuracy(), s.coverage(),
+                        s.brierScore(), s.logLoss(),
+                        s.majorityBalancedAccuracy(),
+                        s.relativeMajorityImprovement(),
+                        improvement
+                ));
+            } else {
+                result.add(s);
+            }
+        }
+        return result;
     }
 
     private static BigDecimal computeImprovement(BigDecimal current, BigDecimal baseline) {

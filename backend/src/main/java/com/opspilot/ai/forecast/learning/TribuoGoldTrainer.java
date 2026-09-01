@@ -13,12 +13,13 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /** 使用 Tribuo 训练可解释的黄金三分类逻辑回归模型。 */
 @Component("tribuoGoldTrainer")
 public class TribuoGoldTrainer implements GoldTrainer {
 
-    private static final List<String> FEATURE_NAMES = GoldFeatures.NAMES.stream()
+    private static final List<String> ALL_FEATURE_NAMES = GoldFeatures.NAMES.stream()
             .sorted()
             .toList();
 
@@ -29,9 +30,16 @@ public class TribuoGoldTrainer implements GoldTrainer {
 
     @Override
     public GoldClassifier train(List<GoldSample> samples) {
+        return train(samples, GoldFeatures.NAMES);
+    }
+
+    @Override
+    public GoldClassifier train(List<GoldSample> samples, Set<String> featureNames) {
         if (samples == null || samples.isEmpty()) {
             throw new IllegalArgumentException("训练样本不能为空");
         }
+        List<String> sorted = featureNames.stream().sorted().toList();
+        String[] names = sorted.toArray(String[]::new);
 
         LabelFactory factory = new LabelFactory();
         MutableDataset<Label> dataset = new MutableDataset<>(
@@ -39,21 +47,22 @@ public class TribuoGoldTrainer implements GoldTrainer {
                 factory
         );
         for (GoldSample sample : samples) {
-            dataset.add(example(new Label(sample.label().name()), sample.features()));
+            dataset.add(example(new Label(sample.label().name()), sample.features(), names, sorted));
         }
 
         Model<Label> model = new LogisticRegressionTrainer().train(dataset);
         return features -> probabilities(model.predict(
-                example(LabelFactory.UNKNOWN_LABEL, features)
+                example(LabelFactory.UNKNOWN_LABEL, features, names, sorted)
         ));
     }
 
     private ArrayExample<Label> example(
             Label label,
-            GoldFeatures features
+            GoldFeatures features,
+            String[] names,
+            List<String> sorted
     ) {
-        String[] names = FEATURE_NAMES.toArray(String[]::new);
-        double[] values = FEATURE_NAMES.stream()
+        double[] values = sorted.stream()
                 .mapToDouble(name -> features.values().get(name))
                 .toArray();
         return new ArrayExample<>(label, names, values);

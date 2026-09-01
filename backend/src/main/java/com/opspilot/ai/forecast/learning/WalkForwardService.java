@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /** 在开发验证区间滚动重训并比较多数类与逻辑回归模型。 */
 @Service
@@ -36,16 +37,30 @@ public class WalkForwardService {
     }
 
     public WalkForwardReport run(ForecastHorizon horizon) {
+        return run(horizon, FeatureProfile.ALL_36);
+    }
+
+    public WalkForwardReport run(ForecastHorizon horizon, FeatureProfile profile) {
         GoldDataset raw = builder.build(horizon);
-        return run(raw, horizon);
+        TemporalDataset data = splitter.split(raw.samples(), horizon);
+        return run(data, horizon, profile);
     }
 
     public WalkForwardReport run(GoldDataset dataset, ForecastHorizon horizon) {
+        return run(dataset, horizon, FeatureProfile.ALL_36);
+    }
+
+    public WalkForwardReport run(GoldDataset dataset, ForecastHorizon horizon, FeatureProfile profile) {
         TemporalDataset data = splitter.split(dataset.samples(), horizon);
-        return run(data, horizon);
+        return run(data, horizon, profile);
     }
 
     public WalkForwardReport run(TemporalDataset data, ForecastHorizon horizon) {
+        return run(data, horizon, FeatureProfile.ALL_36);
+    }
+
+    public WalkForwardReport run(TemporalDataset data, ForecastHorizon horizon, FeatureProfile profile) {
+        Set<String> featureNames = profile.featureNames();
         List<SettledPrediction> majorityPredictions = new ArrayList<>();
         List<SettledPrediction> logisticPredictions = new ArrayList<>();
         List<GoldSample> validation = data.validation();
@@ -59,8 +74,8 @@ public class WalkForwardService {
                     validation.subList(0, start),
                     block.getFirst().asOfDate()
             );
-            GoldClassifier majority = majorityTrainer.train(training);
-            GoldClassifier logistic = logisticTrainer.train(training);
+            GoldClassifier majority = majorityTrainer.train(training, featureNames);
+            GoldClassifier logistic = logisticTrainer.train(training, featureNames);
             refits++;
 
             for (GoldSample sample : block) {

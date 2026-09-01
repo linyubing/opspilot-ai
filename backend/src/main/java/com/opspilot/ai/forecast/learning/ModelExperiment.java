@@ -13,7 +13,7 @@ public record ModelExperiment(
         String labelVersion,
         String splitVersion,
         String datasetHash,
-        String featureProfile,
+        FeatureProfile featureProfile,
         Map<String, Object> parameters,
         LocalDate dataStart,
         LocalDate dataEnd,

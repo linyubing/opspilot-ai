@@ -1,5 +1,6 @@
 package com.opspilot.ai.forecast.learning.api;
 
+import com.opspilot.ai.forecast.learning.FeatureProfile;
 import com.opspilot.ai.forecast.learning.WalkForwardReport;
 
 import java.time.LocalDate;
@@ -7,6 +8,7 @@ import java.time.LocalDate;
 /** 即时预览实验结果响应。 */
 public record ModelExperimentResponse(
         String horizon,
+        String featureProfile,
         LocalDate trainStart,
         LocalDate validationStart,
         LocalDate validationEnd,
@@ -23,9 +25,10 @@ public record ModelExperimentResponse(
             LocalDate end
     ) {}
 
-    public static ModelExperimentResponse from(WalkForwardReport report) {
+    public static ModelExperimentResponse from(WalkForwardReport report, FeatureProfile profile) {
         return new ModelExperimentResponse(
                 report.horizon().name(),
+                profile.name(),
                 report.trainStart(),
                 report.validationStart(),
                 report.validationEnd(),

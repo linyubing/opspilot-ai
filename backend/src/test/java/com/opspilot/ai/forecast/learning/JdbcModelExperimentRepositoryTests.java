@@ -181,7 +181,7 @@ class JdbcModelExperimentRepositoryTests {
                 "gold-label-v1",
                 "gold-temporal-split-v1",
                 "abc123def456",
-                "ALL_36",
+                FeatureProfile.ALL_36,
                 Map.of("horizon", "FIVE_DAYS"),
                 LocalDate.of(2020, 1, 1),
                 LocalDate.of(2025, 12, 31),

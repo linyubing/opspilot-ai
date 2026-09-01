@@ -1,6 +1,7 @@
 package com.opspilot.ai.forecast.learning.api;
 
 import com.opspilot.ai.forecast.ForecastDirection;
+import com.opspilot.ai.forecast.learning.FeatureProfile;
 import com.opspilot.ai.forecast.learning.ForecastHorizon;
 import com.opspilot.ai.forecast.learning.ForecastMetrics;
 import com.opspilot.ai.forecast.learning.ModelExperiment;
@@ -51,12 +52,13 @@ class ModelExperimentControllerTests {
 
     @Test
     void oldGetReturnsCompatibleJsonStructure() throws Exception {
-        when(service.run(ForecastHorizon.FIVE_DAYS)).thenReturn(report());
+        when(service.run(ForecastHorizon.FIVE_DAYS, FeatureProfile.ALL_36)).thenReturn(report());
 
         mvc.perform(get("/api/research/gold/model-experiments")
                         .param("horizon", "FIVE_DAYS"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.horizon").value("FIVE_DAYS"))
+                .andExpect(jsonPath("$.featureProfile").value("ALL_36"))
                 .andExpect(jsonPath("$.majority.sampleCount").value(240))
                 .andExpect(jsonPath("$.majority.coveredCount").value(200))
                 .andExpect(jsonPath("$.majority.accuracy").isNumber())
@@ -73,12 +75,33 @@ class ModelExperimentControllerTests {
     }
 
     @Test
+    void getWithBase16ProfileRunsBase16() throws Exception {
+        when(service.run(ForecastHorizon.FIVE_DAYS, FeatureProfile.BASE_16)).thenReturn(report());
+
+        mvc.perform(get("/api/research/gold/model-experiments")
+                        .param("horizon", "FIVE_DAYS")
+                        .param("featureProfile", "BASE_16"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.featureProfile").value("BASE_16"));
+    }
+
+    @Test
     void rejectsInvalidHorizonInChinese() throws Exception {
         mvc.perform(get("/api/research/gold/model-experiments")
                         .param("horizon", "WEEK"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value(
                         "预测周期只支持 NEXT_DAY、FIVE_DAYS、TWENTY_DAYS"
+                ));
+    }
+
+    @Test
+    void rejectsInvalidProfile() throws Exception {
+        mvc.perform(get("/api/research/gold/model-experiments")
+                        .param("featureProfile", "INVALID"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value(
+                        "特征组合只支持 BASE_16、OHLC_20、ALL_36"
                 ));
     }
 
@@ -90,17 +113,40 @@ class ModelExperimentControllerTests {
         ModelExperimentResult result = new ModelExperimentResult(experiment, majorityMetric, logisticMetric);
 
         when(experimentService.run(ForecastHorizon.NEXT_DAY,
-                com.opspilot.ai.forecast.learning.FeatureProfile.ALL_36)).thenReturn(result);
+                FeatureProfile.ALL_36)).thenReturn(result);
 
         mvc.perform(post("/api/research/gold/model-experiments")
                         .param("horizon", "NEXT_DAY"))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.status").value("COMPLETED"))
+                .andExpect(jsonPath("$.featureProfile").value("ALL_36"))
                 .andExpect(jsonPath("$.majority.sampleCount").value(240))
                 .andExpect(jsonPath("$.majority.accuracy").value(0.6000))
                 .andExpect(jsonPath("$.logistic.sampleCount").value(240))
                 .andExpect(jsonPath("$.logistic.accuracy").value(0.6000));
+    }
+
+    @Test
+    void compareReturns201WithThreeExperiments() throws Exception {
+        ModelExperiment exp1 = createExperimentWithProfile(FeatureProfile.BASE_16);
+        ModelExperiment exp2 = createExperimentWithProfile(FeatureProfile.OHLC_20);
+        ModelExperiment exp3 = createExperimentWithProfile(FeatureProfile.ALL_36);
+        ModelExperimentMetric majorityMetric = createMetric(ModelType.MAJORITY);
+        ModelExperimentMetric logisticMetric = createMetric(ModelType.LOGISTIC);
+
+        when(experimentService.compare(ForecastHorizon.FIVE_DAYS)).thenReturn(List.of(
+                new ModelExperimentResult(exp1, majorityMetric, logisticMetric),
+                new ModelExperimentResult(exp2, majorityMetric, logisticMetric),
+                new ModelExperimentResult(exp3, majorityMetric, logisticMetric)
+        ));
+
+        mvc.perform(post("/api/research/gold/model-experiments/compare")
+                        .param("horizon", "FIVE_DAYS"))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$[0].featureProfile").value("BASE_16"))
+                .andExpect(jsonPath("$[1].featureProfile").value("OHLC_20"))
+                .andExpect(jsonPath("$[2].featureProfile").value("ALL_36"));
     }
 
     @Test
@@ -116,6 +162,7 @@ class ModelExperimentControllerTests {
         mvc.perform(get("/api/research/gold/model-experiments/" + id))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("COMPLETED"))
+                .andExpect(jsonPath("$.featureProfile").value("ALL_36"))
                 .andExpect(jsonPath("$.majority.sampleCount").value(240))
                 .andExpect(jsonPath("$.majority.accuracy").isNumber())
                 .andExpect(jsonPath("$.logistic.sampleCount").value(240))
@@ -136,6 +183,7 @@ class ModelExperimentControllerTests {
                         .param("limit", "10"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(experiment.id().toString()))
+                .andExpect(jsonPath("$[0].featureProfile").value("ALL_36"))
                 .andExpect(jsonPath("$[0].majorityAccuracy").value(0.6000))
                 .andExpect(jsonPath("$[0].logisticAccuracy").value(0.6000));
     }
@@ -167,7 +215,7 @@ class ModelExperimentControllerTests {
         UUID id = UUID.randomUUID();
         ModelExperiment experiment = new ModelExperiment(
                 id, "NEXT_DAY", "v1", "v1", "v1", "hash",
-                "ALL_36", Map.of(), LocalDate.MIN, LocalDate.MAX,
+                FeatureProfile.ALL_36, Map.of(), LocalDate.MIN, LocalDate.MAX,
                 LocalDate.MIN, LocalDate.MIN, LocalDate.MAX,
                 LocalDate.MIN, LocalDate.MAX, 0, 0,
                 ModelExperimentStatus.RUNNING, "unknown", null,
@@ -185,10 +233,14 @@ class ModelExperimentControllerTests {
     }
 
     private ModelExperiment createExperiment() {
+        return createExperimentWithProfile(FeatureProfile.ALL_36);
+    }
+
+    private ModelExperiment createExperimentWithProfile(FeatureProfile profile) {
         UUID id = UUID.randomUUID();
         return new ModelExperiment(
                 id, "NEXT_DAY", "gold-features-v2", "gold-label-v1", "gold-temporal-split-v1",
-                "abc123def456", "ALL_36", Map.of("horizon", "NEXT_DAY"),
+                "abc123def456", profile, Map.of("horizon", "NEXT_DAY"),
                 LocalDate.of(2020, 1, 1), LocalDate.of(2025, 12, 31),
                 LocalDate.of(2020, 1, 1), LocalDate.of(2024, 1, 1), LocalDate.of(2024, 12, 31),
                 LocalDate.of(2025, 1, 10), LocalDate.of(2025, 12, 31), 240, 240,

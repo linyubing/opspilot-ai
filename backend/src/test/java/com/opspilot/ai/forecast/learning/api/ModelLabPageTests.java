@@ -28,6 +28,16 @@ class ModelLabPageTests {
     }
 
     @Test
+    void showsFeatureProfileTabs() throws IOException {
+        String html = read("model-lab.html");
+
+        assertThat(html)
+                .contains("data-profile=\"BASE_16\"")
+                .contains("data-profile=\"OHLC_20\"")
+                .contains("data-profile=\"ALL_36\"");
+    }
+
+    @Test
     void showsExperimentHistorySection() throws IOException {
         String html = read("model-lab.html");
 
@@ -39,19 +49,30 @@ class ModelLabPageTests {
     }
 
     @Test
+    void showsDevNoticeAndRelativeImprovement() throws IOException {
+        String html = read("model-lab.html");
+
+        assertThat(html)
+                .contains("开发验证结果")
+                .contains("相对多数类基线提升")
+                .contains("相对 BASE_16 提升");
+    }
+
+    @Test
     void initialLoadDoesNotPost() throws IOException {
         String js = read("model-lab.js");
 
         assertThat(js)
                 .contains("loadHistory()")
-                .doesNotContain("load(\"NEXT_DAY\")");
+                .doesNotContain("load(\"NEXT_DAY\"");
     }
 
     @Test
-    void historyDisplaysAccuracy() throws IOException {
+    void historyDisplaysProfileAndAccuracy() throws IOException {
         String js = read("model-lab.js");
 
         assertThat(js)
+                .contains("featureProfile")
                 .contains("Accuracy")
                 .contains("accuracy");
     }

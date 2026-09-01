@@ -48,7 +48,9 @@ public class ModelExperimentController {
             @RequestParam(defaultValue = "FIVE_DAYS") String horizon,
             @RequestParam(defaultValue = "ALL_36") String featureProfile
     ) {
-        return ModelExperimentResponse.from(walkForward.run(parse(horizon)));
+        ForecastHorizon h = parse(horizon);
+        FeatureProfile p = parseProfile(featureProfile);
+        return ModelExperimentResponse.from(walkForward.run(h, p), p);
     }
 
     @PostMapping
@@ -62,6 +64,17 @@ public class ModelExperimentController {
         return ResponseEntity.status(201).body(
                 ModelExperimentDetailResponse.from(result)
         );
+    }
+
+    @PostMapping("/compare")
+    public ResponseEntity<List<ModelExperimentDetailResponse>> compare(
+            @RequestParam(defaultValue = "FIVE_DAYS") String horizon
+    ) {
+        List<ModelExperimentResult> results = experimentService.compare(parse(horizon));
+        List<ModelExperimentDetailResponse> responses = results.stream()
+                .map(ModelExperimentDetailResponse::from)
+                .toList();
+        return ResponseEntity.status(201).body(responses);
     }
 
     @GetMapping("/history")
@@ -85,18 +98,7 @@ public class ModelExperimentController {
                 })
                 .toList();
 
-        java.math.BigDecimal base16Balanced = summaries.stream()
-                .filter(s -> "BASE_16".equals(s.featureProfile()) && s.balancedAccuracy() != null)
-                .findFirst()
-                .map(ModelExperimentSummaryResponse::balancedAccuracy)
-                .orElse(null);
-
-        if (base16Balanced != null) {
-            return summaries.stream()
-                    .map(s -> ModelExperimentSummaryResponse.withBase16Improvement(s, base16Balanced))
-                    .toList();
-        }
-        return summaries;
+        return ModelExperimentSummaryResponse.fillBase16Improvements(summaries);
     }
 
     @GetMapping("/{id}")
