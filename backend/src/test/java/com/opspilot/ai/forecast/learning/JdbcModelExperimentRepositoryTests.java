@@ -1,5 +1,7 @@
 package com.opspilot.ai.forecast.learning;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -9,6 +11,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +28,23 @@ class JdbcModelExperimentRepositoryTests {
 
     @Autowired
     private JdbcTemplate jdbc;
+
+    private long initialExperimentCount;
+    private final List<UUID> createdExperimentIds = new ArrayList<>();
+
+    @BeforeEach
+    void setUp() {
+        initialExperimentCount = countExperiments();
+    }
+
+    @AfterEach
+    void cleanUp() {
+        for (UUID id : createdExperimentIds) {
+            jdbc.update("delete from gold_model_experiment_metric where experiment_id = ?", id);
+            jdbc.update("delete from gold_model_experiment where id = ?", id);
+        }
+        assertThat(countExperiments()).isEqualTo(initialExperimentCount);
+    }
 
     @Test
     void createsAndFindsExperiment() {
@@ -190,6 +210,7 @@ class JdbcModelExperimentRepositoryTests {
 
     private ModelExperiment createSampleExperimentWithComparisonId(UUID comparisonId) {
         UUID id = UUID.randomUUID();
+        createdExperimentIds.add(id);
         OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
 
         return new ModelExperiment(
@@ -243,6 +264,13 @@ class JdbcModelExperimentRepositoryTests {
                 new BigDecimal("1.2000"),
                 recalls,
                 confusionMatrix
+        );
+    }
+
+    private long countExperiments() {
+        return jdbc.queryForObject(
+                "select count(*) from gold_model_experiment",
+                Long.class
         );
     }
 }
