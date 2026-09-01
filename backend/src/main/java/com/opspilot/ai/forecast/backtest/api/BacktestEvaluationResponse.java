@@ -27,7 +27,12 @@ public record BacktestEvaluationResponse(
         BacktestConclusion conclusion,
         DirectionEvaluation bullish,
         DirectionEvaluation neutral,
-        DirectionEvaluation bearish
+        DirectionEvaluation bearish,
+        int signalCount,
+        BigDecimal coverage,
+        boolean probabilityMetricsAvailable,
+        BigDecimal brierScore,
+        BigDecimal logLoss
 ) {
     public static BacktestEvaluationResponse from(BacktestEvaluation value) {
         return new BacktestEvaluationResponse(
@@ -38,7 +43,10 @@ public record BacktestEvaluationResponse(
                 value.balancedAccuracy(), value.beatsBaseline(),
                 value.promotionReady(), value.confusionMatrix(),
                 BacktestConclusion.from(value),
-                value.bullish(), value.neutral(), value.bearish()
+                value.bullish(), value.neutral(), value.bearish(),
+                value.signalCount(), value.coverage(),
+                value.probabilityMetricsAvailable(),
+                value.brierScore(), value.logLoss()
         );
     }
 }

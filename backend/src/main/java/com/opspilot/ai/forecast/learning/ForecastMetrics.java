@@ -15,12 +15,13 @@ public record ForecastMetrics(
         BigDecimal accuracy,
         BigDecimal balancedAccuracy,
         BigDecimal brierScore,
+        BigDecimal logLoss,
         Map<ForecastDirection, BigDecimal> recalls,
         Map<ForecastDirection, Map<ForecastDirection, Integer>> confusionMatrix,
         boolean promotionReady
 ) {
     public ForecastMetrics {
-        // EnumMap 允许用 null 明确表示“该类别没有样本，召回率不可计算”。
+        // EnumMap 允许用 null 明确表示"该类别没有样本，召回率不可计算"。
         recalls = Collections.unmodifiableMap(new EnumMap<>(recalls));
         confusionMatrix = Map.copyOf(confusionMatrix);
     }

@@ -4,6 +4,7 @@ import com.opspilot.ai.forecast.ForecastDirection;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.EnumMap;
 import java.util.List;
@@ -13,6 +14,9 @@ import java.util.Map;
 @Component
 public class ForecastEvaluator {
 
+    private static final BigDecimal EPSILON = new BigDecimal("1e-15");
+    private static final MathContext MC = new MathContext(10, RoundingMode.HALF_UP);
+
     public ForecastMetrics evaluate(List<SettledPrediction> predictions) {
         if (predictions == null || predictions.isEmpty()) {
             throw new IllegalArgumentException("已结算预测不能为空");
@@ -21,8 +25,10 @@ public class ForecastEvaluator {
         int covered = 0;
         int correct = 0;
         double brier = 0;
+        double logLossSum = 0;
         for (SettledPrediction item : predictions) {
             brier += brier(item);
+            logLossSum += logLoss(item);
             if (item.prediction().status() == SignalStatus.NO_SIGNAL) {
                 continue;
             }
@@ -59,6 +65,7 @@ public class ForecastEvaluator {
                 covered == 0 ? BigDecimal.ZERO.setScale(4) : ratio(correct, covered),
                 balanced,
                 BigDecimal.valueOf(brier / predictions.size()).setScale(4, RoundingMode.HALF_UP),
+                BigDecimal.valueOf(logLossSum / predictions.size()).setScale(4, RoundingMode.HALF_UP),
                 recalls,
                 matrix,
                 complete && covered > 0
@@ -83,6 +90,20 @@ public class ForecastEvaluator {
         return square(p.bullish() - target(item.actual(), ForecastDirection.BULLISH))
                 + square(p.neutral() - target(item.actual(), ForecastDirection.NEUTRAL))
                 + square(p.bearish() - target(item.actual(), ForecastDirection.BEARISH));
+    }
+
+    private double logLoss(SettledPrediction item) {
+        DirectionProbabilities p = item.probabilities();
+        double pActual = probabilityForActual(item.actual(), p);
+        return -Math.log(Math.max(pActual, EPSILON.doubleValue()));
+    }
+
+    private double probabilityForActual(ForecastDirection actual, DirectionProbabilities p) {
+        return switch (actual) {
+            case BULLISH -> p.bullish();
+            case NEUTRAL -> p.neutral();
+            case BEARISH -> p.bearish();
+        };
     }
 
     private int target(ForecastDirection actual, ForecastDirection direction) {

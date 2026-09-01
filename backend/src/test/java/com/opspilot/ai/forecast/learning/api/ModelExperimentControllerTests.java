@@ -91,6 +91,7 @@ class ModelExperimentControllerTests {
                 new BigDecimal("0.6000"),
                 new BigDecimal("0.6000"),
                 new BigDecimal("0.4500"),
+                new BigDecimal("1.2000"),
                 recalls,
                 matrix,
                 true

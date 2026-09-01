@@ -40,6 +40,90 @@ class ForecastEvaluatorTests {
         assertThat(metrics.promotionReady()).isFalse();
     }
 
+    @Test
+    void accuracyIsHitRateAmongCovered() {
+        // 只有 5 个有方向信号的样本，其中 3 个命中
+        ForecastMetrics metrics = new ForecastEvaluator().evaluate(List.of(
+                settled(ForecastDirection.BULLISH, ForecastDirection.BULLISH),
+                settled(ForecastDirection.BULLISH, ForecastDirection.NEUTRAL),
+                settled(ForecastDirection.BULLISH, ForecastDirection.BULLISH),
+                settled(ForecastDirection.NEUTRAL, ForecastDirection.NEUTRAL),
+                settled(ForecastDirection.NEUTRAL, ForecastDirection.BULLISH),
+                noSignal(ForecastDirection.BEARISH)
+        ));
+
+        assertThat(metrics.accuracy()).isEqualByComparingTo("0.6000");
+    }
+
+    @Test
+    void balancedAccuracyIsAverageOfRecalls() {
+        ForecastMetrics metrics = new ForecastEvaluator().evaluate(List.of(
+                settled(ForecastDirection.BULLISH, ForecastDirection.BULLISH),
+                settled(ForecastDirection.BULLISH, ForecastDirection.BULLISH),
+                settled(ForecastDirection.NEUTRAL, ForecastDirection.NEUTRAL),
+                settled(ForecastDirection.NEUTRAL, ForecastDirection.NEUTRAL),
+                settled(ForecastDirection.BEARISH, ForecastDirection.BEARISH),
+                settled(ForecastDirection.BEARISH, ForecastDirection.BEARISH)
+        ));
+
+        assertThat(metrics.balancedAccuracy()).isEqualByComparingTo("1.0000");
+    }
+
+    @Test
+    void coverageIsCoveredDividedByTotal() {
+        ForecastMetrics metrics = new ForecastEvaluator().evaluate(List.of(
+                settled(ForecastDirection.BULLISH, ForecastDirection.BULLISH),
+                settled(ForecastDirection.BULLISH, ForecastDirection.BULLISH),
+                noSignal(ForecastDirection.BULLISH),
+                noSignal(ForecastDirection.BULLISH)
+        ));
+
+        assertThat(metrics.sampleCount()).isEqualTo(4);
+        assertThat(metrics.coveredCount()).isEqualTo(2);
+        assertThat(metrics.coverage()).isEqualByComparingTo("0.5000");
+    }
+
+    @Test
+    void confusionMatrixCountsActualVsPredicted() {
+        ForecastMetrics metrics = new ForecastEvaluator().evaluate(List.of(
+                settled(ForecastDirection.BULLISH, ForecastDirection.BULLISH),
+                settled(ForecastDirection.BULLISH, ForecastDirection.BEARISH),
+                settled(ForecastDirection.BEARISH, ForecastDirection.BULLISH),
+                settled(ForecastDirection.BEARISH, ForecastDirection.BEARISH)
+        ));
+
+        assertThat(metrics.confusionMatrix().get(ForecastDirection.BULLISH)
+                .get(ForecastDirection.BULLISH)).isEqualTo(1);
+        assertThat(metrics.confusionMatrix().get(ForecastDirection.BULLISH)
+                .get(ForecastDirection.BEARISH)).isEqualTo(1);
+        assertThat(metrics.confusionMatrix().get(ForecastDirection.BEARISH)
+                .get(ForecastDirection.BULLISH)).isEqualTo(1);
+        assertThat(metrics.confusionMatrix().get(ForecastDirection.BEARISH)
+                .get(ForecastDirection.BEARISH)).isEqualTo(1);
+    }
+
+    @Test
+    void noSignalStillParticipatesInProbabilityMetrics() {
+        ForecastMetrics metrics = new ForecastEvaluator().evaluate(List.of(
+                noSignal(ForecastDirection.BULLISH),
+                noSignal(ForecastDirection.NEUTRAL)
+        ));
+
+        assertThat(metrics.brierScore()).isNotNull();
+        assertThat(metrics.logLoss()).isNotNull();
+    }
+
+    @Test
+    void noSignalDoesNotParticipateInDirectionalAccuracy() {
+        ForecastMetrics metrics = new ForecastEvaluator().evaluate(List.of(
+                noSignal(ForecastDirection.BULLISH),
+                noSignal(ForecastDirection.NEUTRAL)
+        ));
+
+        assertThat(metrics.coveredCount()).isEqualTo(0);
+        assertThat(metrics.accuracy()).isEqualByComparingTo("0.0000");
+    }
+
     private SettledPrediction settled(
             ForecastDirection actual,
             ForecastDirection predicted

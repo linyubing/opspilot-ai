@@ -21,8 +21,42 @@ public record BacktestEvaluation(
         ConfusionMatrix confusionMatrix,
         DirectionEvaluation bullish,
         DirectionEvaluation neutral,
-        DirectionEvaluation bearish
+        DirectionEvaluation bearish,
+        int signalCount,
+        BigDecimal coverage,
+        boolean probabilityMetricsAvailable,
+        BigDecimal brierScore,
+        BigDecimal logLoss
 ) {
+    /** 大模型回测专用构造器：无概率输出，概率指标不可用。 */
+    public BacktestEvaluation(
+            String source,
+            BacktestPriceBasis priceBasis,
+            BacktestSampleSet sampleSet,
+            int sampleCount,
+            BigDecimal accuracy,
+            BigDecimal rolling20Accuracy,
+            BigDecimal neutralBaselineAccuracy,
+            BigDecimal majorityBaselineAccuracy,
+            BigDecimal accuracyLift,
+            BigDecimal balancedAccuracy,
+            boolean beatsBaseline,
+            boolean promotionReady,
+            ConfusionMatrix confusionMatrix,
+            DirectionEvaluation bullish,
+            DirectionEvaluation neutral,
+            DirectionEvaluation bearish
+    ) {
+        this(
+                source, priceBasis, sampleSet, sampleCount, accuracy,
+                rolling20Accuracy, neutralBaselineAccuracy,
+                majorityBaselineAccuracy, accuracyLift, balancedAccuracy,
+                beatsBaseline, promotionReady, confusionMatrix,
+                bullish, neutral, bearish,
+                sampleCount, BigDecimal.ONE, false, null, null
+        );
+    }
+
     /** 兼容原有指标构造，仅供不关心准入状态的旧测试和比较逻辑使用。 */
     public BacktestEvaluation(
             String source,
@@ -43,7 +77,8 @@ public record BacktestEvaluation(
                 BacktestSampleSet.DEFAULT, sampleCount, accuracy,
                 rolling20Accuracy, neutralBaselineAccuracy,
                 majorityBaselineAccuracy, accuracyLift, balancedAccuracy,
-                false, false, confusionMatrix, bullish, neutral, bearish
+                false, false, confusionMatrix, bullish, neutral, bearish,
+                sampleCount, BigDecimal.ONE, false, null, null
         );
     }
 }

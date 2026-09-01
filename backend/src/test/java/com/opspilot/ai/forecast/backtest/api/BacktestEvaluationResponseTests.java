@@ -3,7 +3,10 @@ package com.opspilot.ai.forecast.backtest.api;
 import com.opspilot.ai.forecast.DirectionEvaluation;
 import com.opspilot.ai.forecast.ForecastDirection;
 import com.opspilot.ai.forecast.backtest.BacktestEvaluation;
+import com.opspilot.ai.forecast.backtest.BacktestPriceBasis;
+import com.opspilot.ai.forecast.backtest.BacktestSampleSet;
 import com.opspilot.ai.forecast.backtest.ConfusionMatrix;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -76,5 +79,35 @@ class BacktestEvaluationResponseTests {
                 null, new BigDecimal(lift), new BigDecimal(balanced),
                 ConfusionMatrix.empty(), empty, empty, empty
         );
+    }
+
+    @Test
+    void llmBacktestMarksProbabilityMetricsUnavailable() {
+        BacktestEvaluation evaluation = new BacktestEvaluation(
+                "BACKTEST",
+                BacktestPriceBasis.OHLC_CLOSE,
+                BacktestSampleSet.HOLDOUT,
+                60,
+                new BigDecimal("0.6000"),
+                new BigDecimal("0.5500"),
+                new BigDecimal("0.3000"),
+                new BigDecimal("0.3810"),
+                new BigDecimal("0.2190"),
+                new BigDecimal("0.5238"),
+                true,
+                true,
+                ConfusionMatrix.empty(),
+                new DirectionEvaluation(ForecastDirection.BULLISH, 20, 12, new BigDecimal("0.6000")),
+                new DirectionEvaluation(ForecastDirection.NEUTRAL, 20, 10, new BigDecimal("0.5000")),
+                new DirectionEvaluation(ForecastDirection.BEARISH, 20, 12, new BigDecimal("0.6000"))
+        );
+
+        BacktestEvaluationResponse response = BacktestEvaluationResponse.from(evaluation);
+
+        assertThat(response.signalCount()).isEqualTo(60);
+        assertThat(response.coverage()).isEqualByComparingTo("1.0000");
+        assertThat(response.probabilityMetricsAvailable()).isFalse();
+        assertThat(response.brierScore()).isNull();
+        assertThat(response.logLoss()).isNull();
     }
 }
