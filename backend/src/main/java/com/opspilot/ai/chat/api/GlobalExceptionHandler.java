@@ -28,6 +28,7 @@ import com.opspilot.ai.macrodata.DollarIndexNotFoundException;
 import com.opspilot.ai.macrodata.MacroDataUnavailableException;
 import com.opspilot.ai.marketdata.InvalidMarketDataRequestException;
 import com.opspilot.ai.marketdata.MarketDataUnavailableException;
+import com.opspilot.ai.forecast.learning.ModelUnavailableException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -372,6 +373,23 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity
                 .status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .body(error);
+    }
+
+    /**
+     * 当前运行环境无法加载指定统计模型的原生库。
+     */
+    @ExceptionHandler(ModelUnavailableException.class)
+    public ResponseEntity<ApiError> handleModelUnavailable(
+            ModelUnavailableException exception
+    ) {
+        ApiError error = new ApiError(
+                "XGBOOST_UNAVAILABLE",
+                exception.getMessage()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.SERVICE_UNAVAILABLE)
                 .body(error);
     }
 }

@@ -20,6 +20,22 @@ public interface ModelExperimentRepository {
 
     void fail(UUID id, String message, OffsetDateTime completedAt);
 
+    void createComparison(List<ModelExperiment> experiments);
+
+    void markComparisonRunning(UUID comparisonId, OffsetDateTime startedAt);
+
+    void completeComparison(
+            UUID comparisonId,
+            List<ModelExperiment> experiments,
+            List<ModelExperimentMetric> metrics
+    );
+
+    void failComparison(
+            UUID comparisonId,
+            String message,
+            OffsetDateTime completedAt
+    );
+
     Optional<ModelExperiment> findById(UUID id);
 
     List<ModelExperiment> findRecent(int limit);

@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -30,8 +31,10 @@ class ModelExperimentServiceTests {
     private WalkForwardService walkForward;
     private GoldDatasetFingerprint fingerprint;
     private ModelExperimentRepository repo;
-    private ModelExperimentProperties properties;
+    private GitCommitProvider gitCommitProvider;
+    private XgboostProperties xgboostProperties;
     private TemporalSplitter splitter;
+    private Stage8CandidateEvaluator candidateEvaluator;
     private Clock clock;
     private ModelExperimentService service;
 
@@ -41,12 +44,17 @@ class ModelExperimentServiceTests {
         walkForward = mock(WalkForwardService.class);
         fingerprint = mock(GoldDatasetFingerprint.class);
         repo = mock(ModelExperimentRepository.class);
-        properties = mock(ModelExperimentProperties.class);
+        gitCommitProvider = mock(GitCommitProvider.class);
+        xgboostProperties = mock(XgboostProperties.class);
         splitter = mock(TemporalSplitter.class);
+        candidateEvaluator = mock(Stage8CandidateEvaluator.class);
         clock = Clock.fixed(Instant.parse("2026-09-01T12:00:00Z"), ZoneOffset.UTC);
+        when(candidateEvaluator.evaluate(any())).thenReturn(new Stage8Candidate(false, null, "测试默认值"));
+        when(gitCommitProvider.getRequired()).thenReturn("7e57c99");
         service = new ModelExperimentService(
                 datasetBuilder, walkForward, fingerprint, repo,
-                properties, null, splitter, clock
+                gitCommitProvider, xgboostProperties, null, splitter,
+                candidateEvaluator, clock
         );
     }
 
@@ -60,7 +68,7 @@ class ModelExperimentServiceTests {
         when(fingerprint.hash(dataset)).thenReturn("abc123");
         when(splitter.split(dataset.samples(), horizon)).thenReturn(split);
         when(walkForward.run(split, horizon, FeatureProfile.ALL_36)).thenReturn(createReport());
-        when(properties.gitCommit()).thenReturn("unknown");
+        when(gitCommitProvider.get()).thenReturn("7e57c99");
 
         ModelExperimentResult result = service.run(horizon);
 
@@ -80,7 +88,7 @@ class ModelExperimentServiceTests {
         when(fingerprint.hash(dataset)).thenReturn("abc123");
         when(splitter.split(dataset.samples(), horizon)).thenReturn(split);
         when(walkForward.run(split, horizon, FeatureProfile.BASE_16)).thenReturn(createReport());
-        when(properties.gitCommit()).thenReturn("unknown");
+        when(gitCommitProvider.get()).thenReturn("7e57c99");
 
         ModelExperimentResult result = service.run(horizon, FeatureProfile.BASE_16);
 
@@ -98,7 +106,7 @@ class ModelExperimentServiceTests {
         when(fingerprint.hash(dataset)).thenReturn("abc123def456");
         when(splitter.split(dataset.samples(), horizon)).thenReturn(split);
         when(walkForward.run(split, horizon, FeatureProfile.ALL_36)).thenReturn(createReport());
-        when(properties.gitCommit()).thenReturn("unknown");
+        when(gitCommitProvider.get()).thenReturn("7e57c99");
 
         ModelExperimentResult result = service.run(horizon);
 
@@ -115,7 +123,7 @@ class ModelExperimentServiceTests {
         when(fingerprint.hash(dataset)).thenReturn("abc123");
         when(splitter.split(dataset.samples(), horizon)).thenReturn(split);
         when(walkForward.run(split, horizon, FeatureProfile.ALL_36)).thenReturn(createReport());
-        when(properties.gitCommit()).thenReturn("unknown");
+        when(gitCommitProvider.get()).thenReturn("7e57c99");
 
         ModelExperimentResult result = service.run(horizon);
 
@@ -129,7 +137,7 @@ class ModelExperimentServiceTests {
     }
 
     @Test
-    void savesBothModelMetrics() {
+    void savesAllThreeModelMetrics() {
         ForecastHorizon horizon = ForecastHorizon.NEXT_DAY;
         GoldDataset dataset = createSampleDataset();
         TemporalDataset split = createSampleSplit();
@@ -138,14 +146,16 @@ class ModelExperimentServiceTests {
         when(fingerprint.hash(dataset)).thenReturn("abc123");
         when(splitter.split(dataset.samples(), horizon)).thenReturn(split);
         when(walkForward.run(split, horizon, FeatureProfile.ALL_36)).thenReturn(createReport());
-        when(properties.gitCommit()).thenReturn("unknown");
+        when(gitCommitProvider.get()).thenReturn("7e57c99");
 
         ModelExperimentResult result = service.run(horizon);
 
-        assertThat(result.majority()).isNotNull();
-        assertThat(result.logistic()).isNotNull();
-        assertThat(result.majority().modelType()).isEqualTo(ModelType.MAJORITY);
-        assertThat(result.logistic().modelType()).isEqualTo(ModelType.LOGISTIC);
+        assertThat(result.metric(ModelType.MAJORITY)).isNotNull();
+        assertThat(result.metric(ModelType.LOGISTIC)).isNotNull();
+        assertThat(result.metric(ModelType.XGBOOST)).isNotNull();
+        assertThat(result.metric(ModelType.MAJORITY).modelType()).isEqualTo(ModelType.MAJORITY);
+        assertThat(result.metric(ModelType.LOGISTIC).modelType()).isEqualTo(ModelType.LOGISTIC);
+        assertThat(result.metric(ModelType.XGBOOST).modelType()).isEqualTo(ModelType.XGBOOST);
     }
 
     @Test
@@ -160,14 +170,14 @@ class ModelExperimentServiceTests {
         when(walkForward.run(split, horizon, FeatureProfile.BASE_16)).thenReturn(createReport());
         when(walkForward.run(split, horizon, FeatureProfile.OHLC_20)).thenReturn(createReport());
         when(walkForward.run(split, horizon, FeatureProfile.ALL_36)).thenReturn(createReport());
-        when(properties.gitCommit()).thenReturn("unknown");
+        when(gitCommitProvider.get()).thenReturn("7e57c99");
 
-        List<ModelExperimentResult> results = service.compare(horizon);
+        ModelComparisonResult result = service.compare(horizon);
 
-        assertThat(results).hasSize(3);
-        assertThat(results.get(0).experiment().featureProfile()).isEqualTo(FeatureProfile.BASE_16);
-        assertThat(results.get(1).experiment().featureProfile()).isEqualTo(FeatureProfile.OHLC_20);
-        assertThat(results.get(2).experiment().featureProfile()).isEqualTo(FeatureProfile.ALL_36);
+        assertThat(result.experiments()).hasSize(3);
+        assertThat(result.experiments().get(0).experiment().featureProfile()).isEqualTo(FeatureProfile.BASE_16);
+        assertThat(result.experiments().get(1).experiment().featureProfile()).isEqualTo(FeatureProfile.OHLC_20);
+        assertThat(result.experiments().get(2).experiment().featureProfile()).isEqualTo(FeatureProfile.ALL_36);
         verify(datasetBuilder, org.mockito.Mockito.times(1)).build(horizon);
         verify(splitter, org.mockito.Mockito.times(1)).split(dataset.samples(), horizon);
     }
@@ -184,13 +194,14 @@ class ModelExperimentServiceTests {
         when(walkForward.run(split, horizon, FeatureProfile.BASE_16)).thenReturn(createReport());
         when(walkForward.run(split, horizon, FeatureProfile.OHLC_20)).thenReturn(createReport());
         when(walkForward.run(split, horizon, FeatureProfile.ALL_36)).thenReturn(createReport());
-        when(properties.gitCommit()).thenReturn("unknown");
+        when(gitCommitProvider.get()).thenReturn("7e57c99");
 
-        List<ModelExperimentResult> results = service.compare(horizon);
+        ModelComparisonResult result = service.compare(horizon);
 
-        UUID comparisonId = results.get(0).experiment().comparisonId();
+        UUID comparisonId = result.experiments().get(0).experiment().comparisonId();
         assertThat(comparisonId).isNotNull();
-        for (ModelExperimentResult r : results) {
+        assertThat(result.comparisonId()).isEqualTo(comparisonId);
+        for (ModelExperimentResult r : result.experiments()) {
             assertThat(r.experiment().comparisonId()).isEqualTo(comparisonId);
         }
     }
@@ -207,18 +218,57 @@ class ModelExperimentServiceTests {
         when(walkForward.run(split, horizon, FeatureProfile.BASE_16)).thenReturn(createReport());
         when(walkForward.run(split, horizon, FeatureProfile.OHLC_20)).thenReturn(createReport());
         when(walkForward.run(split, horizon, FeatureProfile.ALL_36)).thenReturn(createReport());
-        when(properties.gitCommit()).thenReturn("unknown");
+        when(gitCommitProvider.get()).thenReturn("7e57c99");
 
-        List<ModelExperimentResult> results = service.compare(horizon);
+        ModelComparisonResult result = service.compare(horizon);
 
-        String hash = results.get(0).experiment().datasetHash();
-        LocalDate dataStart = results.get(0).experiment().dataStart();
-        LocalDate validStart = results.get(0).experiment().validationStart();
-        for (ModelExperimentResult r : results) {
+        String hash = result.experiments().get(0).experiment().datasetHash();
+        LocalDate dataStart = result.experiments().get(0).experiment().dataStart();
+        LocalDate validStart = result.experiments().get(0).experiment().validationStart();
+        for (ModelExperimentResult r : result.experiments()) {
             assertThat(r.experiment().datasetHash()).isEqualTo(hash);
             assertThat(r.experiment().dataStart()).isEqualTo(dataStart);
             assertThat(r.experiment().validationStart()).isEqualTo(validStart);
         }
+    }
+
+    @Test
+    void compareKeepsBatchStartAndCompletionTime() {
+        ForecastHorizon horizon = ForecastHorizon.NEXT_DAY;
+        GoldDataset dataset = createSampleDataset();
+        TemporalDataset split = createSampleSplit();
+        when(datasetBuilder.build(horizon)).thenReturn(dataset);
+        when(fingerprint.hash(dataset)).thenReturn("sameHash123");
+        when(splitter.split(dataset.samples(), horizon)).thenReturn(split);
+        when(walkForward.run(eq(split), eq(horizon), any())).thenReturn(createReport());
+
+        ModelComparisonResult result = service.compare(horizon);
+
+        assertThat(result.experiments())
+                .allSatisfy(item -> {
+                    assertThat(item.experiment().startedAt()).isNotNull();
+                    assertThat(item.experiment().completedAt()).isNotNull();
+                    assertThat(item.experiment().gitCommit()).isEqualTo("7e57c99");
+                });
+    }
+
+    @Test
+    void candidateFailureDoesNotCompleteComparison() {
+        ForecastHorizon horizon = ForecastHorizon.NEXT_DAY;
+        GoldDataset dataset = createSampleDataset();
+        TemporalDataset split = createSampleSplit();
+        when(datasetBuilder.build(horizon)).thenReturn(dataset);
+        when(fingerprint.hash(dataset)).thenReturn("sameHash123");
+        when(splitter.split(dataset.samples(), horizon)).thenReturn(split);
+        when(walkForward.run(eq(split), eq(horizon), any())).thenReturn(createReport());
+        when(candidateEvaluator.evaluate(any())).thenThrow(new IllegalStateException("候选判断失败"));
+
+        assertThatThrownBy(() -> service.compare(horizon))
+                .isInstanceOf(ModelExperimentException.class)
+                .hasMessageContaining("候选判断失败");
+
+        verify(repo, never()).completeComparison(any(), any(), any());
+        verify(repo).failComparison(any(), eq("候选判断失败"), any());
     }
 
     @Test
@@ -231,7 +281,7 @@ class ModelExperimentServiceTests {
         when(fingerprint.hash(dataset)).thenReturn("abc123");
         when(splitter.split(dataset.samples(), horizon)).thenReturn(split);
         when(walkForward.run(split, horizon, FeatureProfile.ALL_36)).thenReturn(createReport());
-        when(properties.gitCommit()).thenReturn("unknown");
+        when(gitCommitProvider.get()).thenReturn("7e57c99");
 
         ModelExperimentResult result = service.run(horizon);
 
@@ -249,7 +299,7 @@ class ModelExperimentServiceTests {
         when(splitter.split(dataset.samples(), horizon)).thenReturn(split);
         when(walkForward.run(split, horizon, FeatureProfile.ALL_36))
                 .thenThrow(new RuntimeException("训练失败"));
-        when(properties.gitCommit()).thenReturn("unknown");
+        when(gitCommitProvider.get()).thenReturn("7e57c99");
 
         assertThatThrownBy(() -> service.run(horizon))
                 .isInstanceOf(ModelExperimentException.class)
@@ -269,12 +319,12 @@ class ModelExperimentServiceTests {
         when(splitter.split(dataset.samples(), horizon)).thenReturn(split);
         when(walkForward.run(split, horizon, FeatureProfile.ALL_36))
                 .thenReturn(createReportWithNullRecall());
-        when(properties.gitCommit()).thenReturn("unknown");
+        when(gitCommitProvider.get()).thenReturn("7e57c99");
 
         ModelExperimentResult result = service.run(horizon);
 
-        assertThat(result.majority().recalls().get(ForecastDirection.BULLISH)).isNull();
-        assertThat(result.logistic().recalls().get(ForecastDirection.NEUTRAL)).isNull();
+        assertThat(result.metric(ModelType.MAJORITY).recalls().get(ForecastDirection.BULLISH)).isNull();
+        assertThat(result.metric(ModelType.LOGISTIC).recalls().get(ForecastDirection.NEUTRAL)).isNull();
     }
 
     @Test
@@ -299,12 +349,23 @@ class ModelExperimentServiceTests {
         when(splitter.split(dataset.samples(), horizon)).thenReturn(split);
         when(walkForward.run(split, horizon, FeatureProfile.ALL_36))
                 .thenThrow(new RuntimeException(longMessage));
-        when(properties.gitCommit()).thenReturn("unknown");
+        when(gitCommitProvider.get()).thenReturn("7e57c99");
 
         assertThatThrownBy(() -> service.run(horizon))
                 .isInstanceOf(ModelExperimentException.class);
 
         verify(repo).fail(any(UUID.class), eq(longMessage.substring(0, 1000)), any());
+    }
+
+    @Test
+    void invalidGitCommitRejectsExperiment() {
+        when(gitCommitProvider.getRequired()).thenThrow(
+                new ModelExperimentException("无法确定当前代码提交版本，实验未运行。请设置 GIT_COMMIT 环境变量或确认构建期 git.properties 已生成。")
+        );
+
+        assertThatThrownBy(() -> service.run(ForecastHorizon.NEXT_DAY))
+                .isInstanceOf(ModelExperimentException.class)
+                .hasMessageContaining("无法确定当前代码提交版本");
     }
 
     private GoldDataset createSampleDataset() {
@@ -358,6 +419,11 @@ class ModelExperimentServiceTests {
     private WalkForwardReport createReport() {
         ForecastMetrics majority = createMetrics();
         ForecastMetrics logistic = createMetrics();
+        ForecastMetrics xgboost = createMetrics();
+        Map<ModelType, ForecastMetrics> metrics = new EnumMap<>(ModelType.class);
+        metrics.put(ModelType.MAJORITY, majority);
+        metrics.put(ModelType.LOGISTIC, logistic);
+        metrics.put(ModelType.XGBOOST, xgboost);
         return new WalkForwardReport(
                 ForecastHorizon.NEXT_DAY,
                 LocalDate.of(2020, 1, 1),
@@ -366,8 +432,7 @@ class ModelExperimentServiceTests {
                 240,
                 20,
                 12,
-                majority,
-                logistic,
+                metrics,
                 240,
                 LocalDate.of(2025, 1, 10),
                 LocalDate.of(2025, 12, 31)
@@ -398,12 +463,21 @@ class ModelExperimentServiceTests {
                 new BigDecimal("0.6000"), new BigDecimal("0.4500"), new BigDecimal("1.2000"),
                 recalls, matrix, true
         );
+        ForecastMetrics xgboost = new ForecastMetrics(
+                240, 200, new BigDecimal("0.8333"), new BigDecimal("0.6000"),
+                new BigDecimal("0.6000"), new BigDecimal("0.4500"), new BigDecimal("1.2000"),
+                recalls, matrix, true
+        );
+        Map<ModelType, ForecastMetrics> metrics = new EnumMap<>(ModelType.class);
+        metrics.put(ModelType.MAJORITY, majority);
+        metrics.put(ModelType.LOGISTIC, logistic);
+        metrics.put(ModelType.XGBOOST, xgboost);
         return new WalkForwardReport(
                 ForecastHorizon.NEXT_DAY,
                 LocalDate.of(2020, 1, 1),
                 LocalDate.of(2024, 1, 1),
                 LocalDate.of(2024, 12, 31),
-                240, 20, 12, majority, logistic, 240,
+                240, 20, 12, metrics, 240,
                 LocalDate.of(2025, 1, 10),
                 LocalDate.of(2025, 12, 31)
         );

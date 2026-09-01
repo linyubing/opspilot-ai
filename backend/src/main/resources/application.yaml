@@ -101,6 +101,18 @@ opspilot:
         - "--01-01"
         - "--07-04"
         - "--12-25"
+      xgboost:
+        num-trees: 200
+        eta: 0.03
+        gamma: 0
+        max-depth: 3
+        min-child-weight: 5
+        subsample: 0.8
+        feature-subsample: 0.8
+        lambda: 1
+        alpha: 0
+        n-thread: 1
+        seed: 20260901
   research:
     gold:
       daily-report-schedule:

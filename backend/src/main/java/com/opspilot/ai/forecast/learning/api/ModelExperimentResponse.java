@@ -1,6 +1,7 @@
 package com.opspilot.ai.forecast.learning.api;
 
 import com.opspilot.ai.forecast.learning.FeatureProfile;
+import com.opspilot.ai.forecast.learning.ModelType;
 import com.opspilot.ai.forecast.learning.WalkForwardReport;
 
 import java.time.LocalDate;
@@ -17,6 +18,7 @@ public record ModelExperimentResponse(
         int refitCount,
         MetricResponse majority,
         MetricResponse logistic,
+        MetricResponse xgboost,
         FinalHoldout finalHoldout
 ) {
     public record FinalHoldout(
@@ -35,8 +37,9 @@ public record ModelExperimentResponse(
                 report.validationSamples(),
                 report.refitEvery(),
                 report.refitCount(),
-                MetricResponse.from(report.majority()),
-                MetricResponse.from(report.logistic()),
+                MetricResponse.from(report.metric(ModelType.MAJORITY)),
+                MetricResponse.from(report.metric(ModelType.LOGISTIC)),
+                MetricResponse.from(report.metric(ModelType.XGBOOST)),
                 new FinalHoldout(
                         report.finalHoldoutSamples(),
                         report.finalHoldoutStart(),

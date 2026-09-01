@@ -20,6 +20,7 @@ class WalkForwardServiceTests {
     private TemporalSplitter splitter;
     private RecordingTrainer majority;
     private RecordingTrainer logistic;
+    private RecordingTrainer xgboost;
     private WalkForwardService service;
     private TemporalDataset dataset;
 
@@ -35,11 +36,16 @@ class WalkForwardServiceTests {
                 "logistic-v1",
                 new DirectionProbabilities(0.8, 0.1, 0.1)
         );
+        xgboost = new RecordingTrainer(
+                "tribuo-xgboost",
+                new DirectionProbabilities(0.3, 0.4, 0.3)
+        );
         service = new WalkForwardService(
                 builder,
                 splitter,
                 majority,
                 logistic,
+                xgboost,
                 new ForecastEvaluator()
         );
         dataset = dataset();
@@ -57,6 +63,7 @@ class WalkForwardServiceTests {
         assertThat(report.refitCount()).isEqualTo(12);
         assertThat(majority.trainingSets).hasSize(12);
         assertThat(logistic.trainingSets).hasSize(12);
+        assertThat(xgboost.trainingSets).hasSize(12);
         for (int block = 0; block < 12; block++) {
             List<GoldSample> training = logistic.trainingSets.get(block);
             GoldSample firstScored = dataset.validation().get(block * 20);
@@ -71,8 +78,9 @@ class WalkForwardServiceTests {
     void comparesModelsOnTheSameValidationSamples() {
         WalkForwardReport report = service.run(ForecastHorizon.NEXT_DAY);
 
-        assertThat(report.majority().sampleCount()).isEqualTo(240);
-        assertThat(report.logistic().sampleCount()).isEqualTo(240);
+        assertThat(report.metric(ModelType.MAJORITY).sampleCount()).isEqualTo(240);
+        assertThat(report.metric(ModelType.LOGISTIC).sampleCount()).isEqualTo(240);
+        assertThat(report.metric(ModelType.XGBOOST).sampleCount()).isEqualTo(240);
         assertThat(report.validationStart())
                 .isEqualTo(dataset.validation().getFirst().asOfDate());
         assertThat(report.validationEnd())

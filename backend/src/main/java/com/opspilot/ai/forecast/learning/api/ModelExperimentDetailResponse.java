@@ -37,7 +37,8 @@ public record ModelExperimentDetailResponse(
         OffsetDateTime startedAt,
         OffsetDateTime completedAt,
         MetricResponse majority,
-        MetricResponse logistic
+        MetricResponse logistic,
+        MetricResponse xgboost
 ) {
     public static ModelExperimentDetailResponse from(ModelExperimentResult result) {
         ModelExperiment experiment = result.experiment();
@@ -66,16 +67,19 @@ public record ModelExperimentDetailResponse(
                 experiment.createdAt(),
                 experiment.startedAt(),
                 experiment.completedAt(),
-                MetricResponse.from(result.majority()),
-                MetricResponse.from(result.logistic())
+                MetricResponse.from(result.metric(ModelType.MAJORITY)),
+                MetricResponse.from(result.metric(ModelType.LOGISTIC)),
+                MetricResponse.from(result.metric(ModelType.XGBOOST))
         );
     }
 
     public static ModelExperimentDetailResponse from(
             ModelExperiment experiment,
-            ModelExperimentMetric majority,
-            ModelExperimentMetric logistic
+            Map<ModelType, ModelExperimentMetric> metrics
     ) {
+        ModelExperimentMetric majority = metrics.get(ModelType.MAJORITY);
+        ModelExperimentMetric logistic = metrics.get(ModelType.LOGISTIC);
+        ModelExperimentMetric xgboost = metrics.get(ModelType.XGBOOST);
         return new ModelExperimentDetailResponse(
                 experiment.id(),
                 experiment.comparisonId(),
@@ -102,7 +106,8 @@ public record ModelExperimentDetailResponse(
                 experiment.startedAt(),
                 experiment.completedAt(),
                 majority != null ? MetricResponse.from(majority) : null,
-                logistic != null ? MetricResponse.from(logistic) : null
+                logistic != null ? MetricResponse.from(logistic) : null,
+                xgboost != null ? MetricResponse.from(xgboost) : null
         );
     }
 }

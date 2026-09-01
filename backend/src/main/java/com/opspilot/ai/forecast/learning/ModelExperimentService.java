@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,9 +26,11 @@ public class ModelExperimentService {
     private final WalkForwardService walkForward;
     private final GoldDatasetFingerprint fingerprint;
     private final ModelExperimentRepository repo;
-    private final ModelExperimentProperties properties;
+    private final GitCommitProvider gitCommitProvider;
+    private final XgboostProperties xgboostProperties;
     private final ObjectMapper objectMapper;
     private final TemporalSplitter splitter;
+    private final Stage8CandidateEvaluator candidateEvaluator;
     private final Clock clock;
 
     public ModelExperimentService(
@@ -35,18 +38,22 @@ public class ModelExperimentService {
             WalkForwardService walkForward,
             GoldDatasetFingerprint fingerprint,
             ModelExperimentRepository repo,
-            ModelExperimentProperties properties,
+            GitCommitProvider gitCommitProvider,
+            XgboostProperties xgboostProperties,
             ObjectMapper objectMapper,
             TemporalSplitter splitter,
+            Stage8CandidateEvaluator candidateEvaluator,
             Clock clock
     ) {
         this.datasetBuilder = datasetBuilder;
         this.walkForward = walkForward;
         this.fingerprint = fingerprint;
         this.repo = repo;
-        this.properties = properties;
+        this.gitCommitProvider = gitCommitProvider;
+        this.xgboostProperties = xgboostProperties;
         this.objectMapper = objectMapper;
         this.splitter = splitter;
+        this.candidateEvaluator = candidateEvaluator;
         this.clock = clock;
     }
 
@@ -55,6 +62,7 @@ public class ModelExperimentService {
     }
 
     public ModelExperimentResult run(ForecastHorizon horizon, FeatureProfile profile) {
+        String gitCommit = gitCommitProvider.getRequired();
         UUID experimentId = UUID.randomUUID();
         OffsetDateTime now = now();
 
@@ -62,25 +70,116 @@ public class ModelExperimentService {
         String datasetHash = fingerprint.hash(dataset);
         TemporalDataset split = splitter.split(dataset.samples(), horizon);
 
-        return runSingleExperiment(experimentId, null, now, horizon, profile, datasetHash, dataset, split);
+        return runSingleExperiment(experimentId, null, now, horizon, profile, datasetHash, dataset, split, gitCommit);
     }
 
-    public List<ModelExperimentResult> compare(ForecastHorizon horizon) {
+    public ModelComparisonResult compare(ForecastHorizon horizon) {
+        String gitCommit = gitCommitProvider.getRequired();
         UUID comparisonId = UUID.randomUUID();
-        UUID experimentId1 = UUID.randomUUID();
-        UUID experimentId2 = UUID.randomUUID();
-        UUID experimentId3 = UUID.randomUUID();
         OffsetDateTime now = now();
 
         GoldDataset dataset = datasetBuilder.build(horizon);
         String datasetHash = fingerprint.hash(dataset);
         TemporalDataset split = splitter.split(dataset.samples(), horizon);
 
+        List<ModelExperiment> experiments = new ArrayList<>();
+        for (FeatureProfile profile : FeatureProfile.values()) {
+            experiments.add(new ModelExperiment(
+                    UUID.randomUUID(),
+                    comparisonId,
+                    horizon.name(),
+                    GoldFeatures.VERSION,
+                    GoldForecastRule.RULE_VERSION,
+                    TemporalSplitter.VERSION,
+                    datasetHash,
+                    profile,
+                    buildParameters(horizon, profile),
+                    dataset.samples().getFirst().asOfDate(),
+                    dataset.samples().getLast().asOfDate(),
+                    split.training().getFirst().asOfDate(),
+                    split.validation().getFirst().asOfDate(),
+                    split.validation().getLast().asOfDate(),
+                    split.finalHoldout().getFirst().asOfDate(),
+                    split.finalHoldout().getLast().asOfDate(),
+                    split.validation().size(),
+                    split.finalHoldout().size(),
+                    ModelExperimentStatus.CREATED,
+                    gitCommit,
+                    null,
+                    now,
+                    now,
+                    null
+            ));
+        }
+
+        repo.createComparison(experiments);
+        repo.markComparisonRunning(comparisonId, now);
+
         List<ModelExperimentResult> results = new ArrayList<>();
-        results.add(runSingleExperiment(experimentId1, comparisonId, now, horizon, FeatureProfile.BASE_16, datasetHash, dataset, split));
-        results.add(runSingleExperiment(experimentId2, comparisonId, now, horizon, FeatureProfile.OHLC_20, datasetHash, dataset, split));
-        results.add(runSingleExperiment(experimentId3, comparisonId, now, horizon, FeatureProfile.ALL_36, datasetHash, dataset, split));
-        return results;
+        try {
+            for (int i = 0; i < experiments.size(); i++) {
+                ModelExperiment experiment = experiments.get(i);
+                FeatureProfile profile = experiment.featureProfile();
+
+                WalkForwardReport report = walkForward.run(split, horizon, profile);
+
+                Map<ModelType, ModelExperimentMetric> persistedMetrics = new EnumMap<>(ModelType.class);
+                List<ModelExperimentMetric> metricList = new ArrayList<>();
+                for (ModelType type : ModelType.values()) {
+                    ModelExperimentMetric metric = toMetric(experiment.id(), type, report.metric(type));
+                    persistedMetrics.put(type, metric);
+                    metricList.add(metric);
+                }
+
+                ModelExperiment completed = new ModelExperiment(
+                        experiment.id(),
+                        experiment.comparisonId(),
+                        experiment.horizon(),
+                        experiment.featureVersion(),
+                        experiment.labelVersion(),
+                        experiment.splitVersion(),
+                        experiment.datasetHash(),
+                        experiment.featureProfile(),
+                        experiment.parameters(),
+                        experiment.dataStart(),
+                        experiment.dataEnd(),
+                        experiment.trainStart(),
+                        experiment.validationStart(),
+                        experiment.validationEnd(),
+                        experiment.holdoutStart(),
+                        experiment.holdoutEnd(),
+                        experiment.validationSamples(),
+                        experiment.holdoutSamples(),
+                        ModelExperimentStatus.COMPLETED,
+                        experiment.gitCommit(),
+                        null,
+                        experiment.createdAt(),
+                        experiment.startedAt(),
+                        now()
+                );
+
+                results.add(new ModelExperimentResult(completed, persistedMetrics));
+            }
+
+            List<ModelExperimentMetric> allMetrics = new ArrayList<>();
+            for (ModelExperimentResult result : results) {
+                allMetrics.addAll(result.metrics().values());
+            }
+            Stage8Candidate candidate = candidateEvaluator.evaluate(results);
+            List<ModelExperiment> completedExperiments = results.stream()
+                    .map(ModelExperimentResult::experiment)
+                    .toList();
+            repo.completeComparison(comparisonId, completedExperiments, allMetrics);
+            return new ModelComparisonResult(comparisonId, horizon, results, candidate);
+        } catch (ModelUnavailableException e) {
+            String message = safeMessage(e);
+            repo.failComparison(comparisonId, message, now());
+            throw e;
+        } catch (Exception e) {
+            String message = safeMessage(e);
+            repo.failComparison(comparisonId, message, now());
+            throw new ModelExperimentException("模型实验执行失败: " + message, e);
+        }
     }
 
     private ModelExperimentResult runSingleExperiment(
@@ -91,7 +190,8 @@ public class ModelExperimentService {
             FeatureProfile profile,
             String datasetHash,
             GoldDataset dataset,
-            TemporalDataset split
+            TemporalDataset split,
+            String gitCommit
     ) {
         ModelExperiment experiment = new ModelExperiment(
                 experimentId,
@@ -113,10 +213,10 @@ public class ModelExperimentService {
                 split.validation().size(),
                 split.finalHoldout().size(),
                 ModelExperimentStatus.CREATED,
-                properties.gitCommit(),
+                gitCommit,
                 null,
                 now,
-                null,
+                now,
                 null
         );
 
@@ -126,12 +226,13 @@ public class ModelExperimentService {
         try {
             WalkForwardReport report = walkForward.run(split, horizon, profile);
 
-            ModelExperimentMetric majorityMetric = toMetric(
-                    experimentId, ModelType.MAJORITY, report.majority()
-            );
-            ModelExperimentMetric logisticMetric = toMetric(
-                    experimentId, ModelType.LOGISTIC, report.logistic()
-            );
+            Map<ModelType, ModelExperimentMetric> persistedMetrics = new EnumMap<>(ModelType.class);
+            List<ModelExperimentMetric> metricList = new ArrayList<>();
+            for (ModelType type : ModelType.values()) {
+                ModelExperimentMetric metric = toMetric(experimentId, type, report.metric(type));
+                persistedMetrics.put(type, metric);
+                metricList.add(metric);
+            }
 
             ModelExperiment completed = new ModelExperiment(
                     experimentId,
@@ -160,8 +261,12 @@ public class ModelExperimentService {
                     now()
             );
 
-            repo.complete(experimentId, completed, List.of(majorityMetric, logisticMetric));
-            return new ModelExperimentResult(completed, majorityMetric, logisticMetric);
+            repo.complete(experimentId, completed, metricList);
+            return new ModelExperimentResult(completed, persistedMetrics);
+        } catch (ModelUnavailableException e) {
+            String message = safeMessage(e);
+            repo.fail(experimentId, message, now());
+            throw e;
         } catch (Exception e) {
             String message = safeMessage(e);
             repo.fail(experimentId, message, now());
@@ -227,18 +332,32 @@ public class ModelExperimentService {
     }
 
     private Map<String, Object> buildParameters(ForecastHorizon horizon, FeatureProfile profile) {
-        return Map.of(
-                "horizon", horizon.name(),
-                "featureProfile", profile.name(),
-                "featureCount", profile.featureNames().size(),
-                "refitEvery", REFIT_EVERY,
-                "confidenceThreshold", CONFIDENCE_THRESHOLD,
-                "majorityTrainer", "MajorityGoldTrainer",
-                "logisticTrainer", "TribuoGoldTrainer",
-                "featureVersion", GoldFeatures.VERSION,
-                "labelVersion", GoldForecastRule.RULE_VERSION,
-                "splitVersion", TemporalSplitter.VERSION
-        );
+        Map<String, Object> params = new LinkedHashMap<>();
+        params.put("horizon", horizon.name());
+        params.put("featureProfile", profile.name());
+        params.put("featureCount", profile.featureNames().size());
+        params.put("refitEvery", REFIT_EVERY);
+        params.put("confidenceThreshold", CONFIDENCE_THRESHOLD);
+        params.put("majorityTrainer", "MajorityGoldTrainer");
+        params.put("logisticTrainer", "TribuoGoldTrainer");
+        params.put("featureVersion", GoldFeatures.VERSION);
+        params.put("labelVersion", GoldForecastRule.RULE_VERSION);
+        params.put("splitVersion", TemporalSplitter.VERSION);
+        Map<String, Object> xgboostParams = new LinkedHashMap<>();
+        xgboostParams.put("name", "tribuo-xgboost");
+        xgboostParams.put("numTrees", xgboostProperties.numTrees());
+        xgboostParams.put("eta", xgboostProperties.eta());
+        xgboostParams.put("gamma", xgboostProperties.gamma());
+        xgboostParams.put("maxDepth", xgboostProperties.maxDepth());
+        xgboostParams.put("minChildWeight", xgboostProperties.minChildWeight());
+        xgboostParams.put("subsample", xgboostProperties.subsample());
+        xgboostParams.put("featureSubsample", xgboostProperties.featureSubsample());
+        xgboostParams.put("lambda", xgboostProperties.lambda());
+        xgboostParams.put("alpha", xgboostProperties.alpha());
+        xgboostParams.put("nThread", xgboostProperties.nThread());
+        xgboostParams.put("seed", xgboostProperties.seed());
+        params.put("xgboostTrainer", xgboostParams);
+        return params;
     }
 
     private OffsetDateTime now() {

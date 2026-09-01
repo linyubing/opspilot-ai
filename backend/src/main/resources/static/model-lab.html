@@ -25,6 +25,7 @@
             <button data-profile="OHLC_20" type="button">OHLC_20</button>
             <button data-profile="ALL_36" type="button" class="active">ALL_36</button>
         </nav>
+        <button id="runComparison" type="button" class="btn-save">运行当前周期三组对比</button>
     </header>
 
     <p id="status" class="status" aria-live="polite">正在运行 5 个交易日实验...</p>
@@ -73,6 +74,29 @@
                     <div><span>相对 BASE_16 提升</span><strong id="relativeBase16">-</strong></div>
                 </div>
             </article>
+
+            <article class="model-card xgboost">
+                <header>
+                    <h2>XGBoost</h2>
+                    <p>用于验证非线性关系，只有同时通过全部阶段8门槛才会成为候选模型。</p>
+                </header>
+                <div class="metric-grid">
+                    <div><span>信号准确率</span><strong id="xgboostAccuracy">-</strong></div>
+                    <div><span>平衡准确率</span><strong id="xgboostBalanced">-</strong></div>
+                    <div><span>覆盖率</span><strong id="xgboostCoverage">-</strong></div>
+                    <div><span>Brier 分数</span><strong id="xgboostBrier">-</strong></div>
+                    <div><span>logLoss</span><strong id="xgboostLogLoss">-</strong></div>
+                </div>
+                <div class="recall-row" id="xgboostRecalls"></div>
+            </article>
+        </section>
+
+        <section id="candidateResult" class="holdout-panel" hidden>
+            <div>
+                <h2 id="candidateTitle">阶段8候选判断</h2>
+                <p id="candidateReason">-</p>
+            </div>
+            <strong id="candidateProfile">-</strong>
         </section>
 
         <section class="holdout-panel">
@@ -83,7 +107,7 @@
             <strong id="holdoutRange">-</strong>
         </section>
 
-        <p class="dev-notice">以上为开发验证结果，不是最终留出准确率。</p>
+        <p class="dev-notice">开发验证结果，尚未进行最终留出集验收。</p>
     </section>
 
     <section class="experiment-history">

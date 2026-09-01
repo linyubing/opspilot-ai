@@ -204,6 +204,88 @@ class JdbcModelExperimentRepositoryTests {
         assertThat(metrics).isEmpty();
     }
 
+    @Test
+    void completesComparisonWithNineMetrics() {
+        UUID comparisonId = UUID.randomUUID();
+        List<ModelExperiment> experiments = createComparison(comparisonId);
+        repo.createComparison(experiments);
+        repo.markComparisonRunning(comparisonId, OffsetDateTime.now(ZoneOffset.UTC));
+
+        List<ModelExperimentMetric> metrics = createComparisonMetrics(experiments);
+        repo.completeComparison(comparisonId, experiments, metrics);
+
+        for (ModelExperiment experiment : experiments) {
+            assertThat(repo.findById(experiment.id()).orElseThrow().status())
+                    .isEqualTo(ModelExperimentStatus.COMPLETED);
+            assertThat(repo.findMetrics(experiment.id()))
+                    .extracting(ModelExperimentMetric::modelType)
+                    .containsExactlyInAnyOrder(ModelType.MAJORITY, ModelType.LOGISTIC, ModelType.XGBOOST);
+        }
+    }
+
+    @Test
+    void comparisonCompletionRollsBackWhenMetricInsertFails() {
+        UUID comparisonId = UUID.randomUUID();
+        List<ModelExperiment> experiments = createComparison(comparisonId);
+        repo.createComparison(experiments);
+        repo.markComparisonRunning(comparisonId, OffsetDateTime.now(ZoneOffset.UTC));
+
+        List<ModelExperimentMetric> metrics = createComparisonMetrics(experiments);
+        metrics.set(8, createMetric(experiments.getFirst().id(), ModelType.MAJORITY));
+
+        assertThatThrownBy(() -> repo.completeComparison(comparisonId, experiments, metrics))
+                .isInstanceOf(Exception.class);
+
+        for (ModelExperiment experiment : experiments) {
+            assertThat(repo.findById(experiment.id()).orElseThrow().status())
+                    .isEqualTo(ModelExperimentStatus.RUNNING);
+            assertThat(repo.findMetrics(experiment.id())).isEmpty();
+        }
+    }
+
+    @Test
+    void failsAllExperimentsInComparison() {
+        UUID comparisonId = UUID.randomUUID();
+        List<ModelExperiment> experiments = createComparison(comparisonId);
+        repo.createComparison(experiments);
+        repo.markComparisonRunning(comparisonId, OffsetDateTime.now(ZoneOffset.UTC));
+
+        repo.failComparison(comparisonId, "XGBoost原生库不可用", OffsetDateTime.now(ZoneOffset.UTC));
+
+        for (ModelExperiment experiment : experiments) {
+            ModelExperiment failed = repo.findById(experiment.id()).orElseThrow();
+            assertThat(failed.status()).isEqualTo(ModelExperimentStatus.FAILED);
+            assertThat(failed.failureMessage()).isEqualTo("XGBoost原生库不可用");
+            assertThat(repo.findMetrics(experiment.id())).isEmpty();
+        }
+    }
+
+    @Test
+    void rejectsComparisonWithDifferentDatasetHash() {
+        UUID comparisonId = UUID.randomUUID();
+        List<ModelExperiment> experiments = new ArrayList<>(createComparison(comparisonId));
+        ModelExperiment source = experiments.get(2);
+        experiments.set(2, new ModelExperiment(
+                source.id(), source.comparisonId(), source.horizon(), source.featureVersion(),
+                source.labelVersion(), source.splitVersion(), "different-hash", source.featureProfile(),
+                source.parameters(), source.dataStart(), source.dataEnd(), source.trainStart(),
+                source.validationStart(), source.validationEnd(), source.holdoutStart(),
+                source.holdoutEnd(), source.validationSamples(), source.holdoutSamples(),
+                source.status(), source.gitCommit(), source.failureMessage(), source.createdAt(),
+                source.startedAt(), source.completedAt()
+        ));
+        repo.createComparison(experiments);
+
+        assertThatThrownBy(() -> repo.completeComparison(
+                comparisonId, experiments, createComparisonMetrics(experiments)))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("数据集指纹");
+
+        for (ModelExperiment experiment : experiments) {
+            assertThat(repo.findMetrics(experiment.id())).isEmpty();
+        }
+    }
+
     private ModelExperiment createSampleExperiment() {
         return createSampleExperimentWithComparisonId(null);
     }
@@ -239,6 +321,37 @@ class JdbcModelExperimentRepositoryTests {
                 null,
                 null
         );
+    }
+
+    private List<ModelExperiment> createComparison(UUID comparisonId) {
+        return List.of(
+                createComparisonExperiment(comparisonId, FeatureProfile.BASE_16),
+                createComparisonExperiment(comparisonId, FeatureProfile.OHLC_20),
+                createComparisonExperiment(comparisonId, FeatureProfile.ALL_36)
+        );
+    }
+
+    private ModelExperiment createComparisonExperiment(UUID comparisonId, FeatureProfile profile) {
+        ModelExperiment source = createSampleExperimentWithComparisonId(comparisonId);
+        return new ModelExperiment(
+                source.id(), source.comparisonId(), source.horizon(), source.featureVersion(),
+                source.labelVersion(), source.splitVersion(), source.datasetHash(), profile,
+                source.parameters(), source.dataStart(), source.dataEnd(), source.trainStart(),
+                source.validationStart(), source.validationEnd(), source.holdoutStart(),
+                source.holdoutEnd(), source.validationSamples(), source.holdoutSamples(),
+                source.status(), source.gitCommit(), source.failureMessage(), source.createdAt(),
+                source.startedAt(), source.completedAt()
+        );
+    }
+
+    private List<ModelExperimentMetric> createComparisonMetrics(List<ModelExperiment> experiments) {
+        List<ModelExperimentMetric> metrics = new ArrayList<>();
+        for (ModelExperiment experiment : experiments) {
+            metrics.add(createMetric(experiment.id(), ModelType.MAJORITY));
+            metrics.add(createMetric(experiment.id(), ModelType.LOGISTIC));
+            metrics.add(createMetric(experiment.id(), ModelType.XGBOOST));
+        }
+        return metrics;
     }
 
     private ModelExperimentMetric createMetric(UUID experimentId, ModelType modelType) {

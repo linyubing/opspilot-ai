@@ -4,7 +4,9 @@ import com.opspilot.ai.forecast.ForecastDirection;
 import com.opspilot.ai.forecast.learning.FeatureProfile;
 import com.opspilot.ai.forecast.learning.ForecastHorizon;
 import com.opspilot.ai.forecast.learning.ForecastMetrics;
+import com.opspilot.ai.forecast.learning.ModelComparisonResult;
 import com.opspilot.ai.forecast.learning.ModelExperiment;
+import com.opspilot.ai.forecast.learning.Stage8Candidate;
 import com.opspilot.ai.forecast.learning.ModelExperimentMetric;
 import com.opspilot.ai.forecast.learning.ModelExperimentNotFoundException;
 import com.opspilot.ai.forecast.learning.ModelExperimentResult;
@@ -69,6 +71,7 @@ class ModelExperimentControllerTests {
                 .andExpect(jsonPath("$.majority.recalls.BULLISH").isNumber())
                 .andExpect(jsonPath("$.majority.promotionReady").value(true))
                 .andExpect(jsonPath("$.logistic.sampleCount").value(240))
+                .andExpect(jsonPath("$.xgboost.sampleCount").value(240))
                 .andExpect(jsonPath("$.finalHoldout.samples").value(240))
                 .andExpect(jsonPath("$.finalHoldout.start").isArray())
                 .andExpect(jsonPath("$.finalHoldout.end").isArray());
@@ -108,9 +111,9 @@ class ModelExperimentControllerTests {
     @Test
     void postReturns201WithMetrics() throws Exception {
         ModelExperiment experiment = createExperiment();
-        ModelExperimentMetric majorityMetric = createMetric(ModelType.MAJORITY);
-        ModelExperimentMetric logisticMetric = createMetric(ModelType.LOGISTIC);
-        ModelExperimentResult result = new ModelExperimentResult(experiment, majorityMetric, logisticMetric);
+        Map<ModelType, ModelExperimentMetric> metricsMap = createMetricsMap();
+
+        ModelExperimentResult result = new ModelExperimentResult(experiment, metricsMap);
 
         when(experimentService.run(ForecastHorizon.NEXT_DAY,
                 FeatureProfile.ALL_36)).thenReturn(result);
@@ -124,7 +127,9 @@ class ModelExperimentControllerTests {
                 .andExpect(jsonPath("$.majority.sampleCount").value(240))
                 .andExpect(jsonPath("$.majority.accuracy").value(0.6000))
                 .andExpect(jsonPath("$.logistic.sampleCount").value(240))
-                .andExpect(jsonPath("$.logistic.accuracy").value(0.6000));
+                .andExpect(jsonPath("$.logistic.accuracy").value(0.6000))
+                .andExpect(jsonPath("$.xgboost.sampleCount").value(240))
+                .andExpect(jsonPath("$.xgboost.accuracy").value(0.6000));
     }
 
     @Test
@@ -133,20 +138,26 @@ class ModelExperimentControllerTests {
         ModelExperiment exp1 = createExperimentWithProfile(FeatureProfile.BASE_16, comparisonId);
         ModelExperiment exp2 = createExperimentWithProfile(FeatureProfile.OHLC_20, comparisonId);
         ModelExperiment exp3 = createExperimentWithProfile(FeatureProfile.ALL_36, comparisonId);
-        ModelExperimentMetric majorityMetric = createMetric(ModelType.MAJORITY);
-        ModelExperimentMetric logisticMetric = createMetric(ModelType.LOGISTIC);
+        Map<ModelType, ModelExperimentMetric> metricsMap = createMetricsMap();
 
-        when(experimentService.compare(ForecastHorizon.FIVE_DAYS)).thenReturn(List.of(
-                new ModelExperimentResult(exp1, majorityMetric, logisticMetric),
-                new ModelExperimentResult(exp2, majorityMetric, logisticMetric),
-                new ModelExperimentResult(exp3, majorityMetric, logisticMetric)
-        ));
+        when(experimentService.compare(ForecastHorizon.FIVE_DAYS)).thenReturn(
+                new ModelComparisonResult(
+                        comparisonId,
+                        ForecastHorizon.FIVE_DAYS,
+                        List.of(
+                                new ModelExperimentResult(exp1, metricsMap),
+                                new ModelExperimentResult(exp2, metricsMap),
+                                new ModelExperimentResult(exp3, metricsMap)
+                        ),
+                        new Stage8Candidate(false, null, "测试")
+                )
+        );
 
         mvc.perform(post("/api/research/gold/model-experiments/compare")
                         .param("horizon", "FIVE_DAYS"))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.comparisonId").value(comparisonId.toString()))
-                .andExpect(jsonPath("$.horizon").value("NEXT_DAY"))
+                .andExpect(jsonPath("$.horizon").value("FIVE_DAYS"))
                 .andExpect(jsonPath("$.experiments").isArray())
                 .andExpect(jsonPath("$.experiments.length()").value(3))
                 .andExpect(jsonPath("$.experiments[0].featureProfile").value("BASE_16"))
@@ -163,9 +174,10 @@ class ModelExperimentControllerTests {
         ModelExperiment experiment = createExperiment();
         ModelExperimentMetric majorityMetric = createMetric(ModelType.MAJORITY);
         ModelExperimentMetric logisticMetric = createMetric(ModelType.LOGISTIC);
+        ModelExperimentMetric xgboostMetric = createMetric(ModelType.XGBOOST);
 
         when(experimentService.findById(id)).thenReturn(experiment);
-        when(experimentService.findMetrics(id)).thenReturn(List.of(majorityMetric, logisticMetric));
+        when(experimentService.findMetrics(id)).thenReturn(List.of(majorityMetric, logisticMetric, xgboostMetric));
 
         mvc.perform(get("/api/research/gold/model-experiments/" + id))
                 .andExpect(status().isOk())
@@ -174,7 +186,9 @@ class ModelExperimentControllerTests {
                 .andExpect(jsonPath("$.majority.sampleCount").value(240))
                 .andExpect(jsonPath("$.majority.accuracy").isNumber())
                 .andExpect(jsonPath("$.logistic.sampleCount").value(240))
-                .andExpect(jsonPath("$.logistic.accuracy").isNumber());
+                .andExpect(jsonPath("$.logistic.accuracy").isNumber())
+                .andExpect(jsonPath("$.xgboost.sampleCount").value(240))
+                .andExpect(jsonPath("$.xgboost.accuracy").isNumber());
     }
 
     @Test
@@ -182,10 +196,11 @@ class ModelExperimentControllerTests {
         ModelExperiment experiment = createExperiment();
         ModelExperimentMetric majorityMetric = createMetric(ModelType.MAJORITY);
         ModelExperimentMetric logisticMetric = createMetric(ModelType.LOGISTIC);
+        ModelExperimentMetric xgboostMetric = createMetric(ModelType.XGBOOST);
 
         when(experimentService.findRecent(10)).thenReturn(List.of(experiment));
         when(experimentService.findMetrics(experiment.id()))
-                .thenReturn(List.of(majorityMetric, logisticMetric));
+                .thenReturn(List.of(majorityMetric, logisticMetric, xgboostMetric));
 
         mvc.perform(get("/api/research/gold/model-experiments/history")
                         .param("limit", "10"))
@@ -193,7 +208,8 @@ class ModelExperimentControllerTests {
                 .andExpect(jsonPath("$[0].id").value(experiment.id().toString()))
                 .andExpect(jsonPath("$[0].featureProfile").value("ALL_36"))
                 .andExpect(jsonPath("$[0].majorityAccuracy").value(0.6000))
-                .andExpect(jsonPath("$[0].logisticAccuracy").value(0.6000));
+                .andExpect(jsonPath("$[0].logisticAccuracy").value(0.6000))
+                .andExpect(jsonPath("$[0].xgboostAccuracy").value(0.6000));
     }
 
     @Test
@@ -226,7 +242,7 @@ class ModelExperimentControllerTests {
                 FeatureProfile.ALL_36, Map.of(), LocalDate.MIN, LocalDate.MAX,
                 LocalDate.MIN, LocalDate.MIN, LocalDate.MAX,
                 LocalDate.MIN, LocalDate.MAX, 0, 0,
-                ModelExperimentStatus.RUNNING, "unknown", null,
+                ModelExperimentStatus.RUNNING, "7e57c99", null,
                 OffsetDateTime.now(ZoneOffset.UTC), null, null
         );
 
@@ -237,7 +253,8 @@ class ModelExperimentControllerTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("RUNNING"))
                 .andExpect(jsonPath("$.majority").doesNotExist())
-                .andExpect(jsonPath("$.logistic").doesNotExist());
+                .andExpect(jsonPath("$.logistic").doesNotExist())
+                .andExpect(jsonPath("$.xgboost").doesNotExist());
     }
 
     private ModelExperiment createExperiment() {
@@ -252,7 +269,7 @@ class ModelExperimentControllerTests {
                 LocalDate.of(2020, 1, 1), LocalDate.of(2025, 12, 31),
                 LocalDate.of(2020, 1, 1), LocalDate.of(2024, 1, 1), LocalDate.of(2024, 12, 31),
                 LocalDate.of(2025, 1, 10), LocalDate.of(2025, 12, 31), 240, 240,
-                ModelExperimentStatus.COMPLETED, "unknown", null,
+                ModelExperimentStatus.COMPLETED, "7e57c99", null,
                 OffsetDateTime.now(ZoneOffset.UTC), OffsetDateTime.now(ZoneOffset.UTC),
                 OffsetDateTime.now(ZoneOffset.UTC)
         );
@@ -277,15 +294,28 @@ class ModelExperimentControllerTests {
         );
     }
 
+    private Map<ModelType, ModelExperimentMetric> createMetricsMap() {
+        Map<ModelType, ModelExperimentMetric> metricsMap = new EnumMap<>(ModelType.class);
+        metricsMap.put(ModelType.MAJORITY, createMetric(ModelType.MAJORITY));
+        metricsMap.put(ModelType.LOGISTIC, createMetric(ModelType.LOGISTIC));
+        metricsMap.put(ModelType.XGBOOST, createMetric(ModelType.XGBOOST));
+        return metricsMap;
+    }
+
     private WalkForwardReport report() {
         ForecastMetrics majority = metrics();
         ForecastMetrics logistic = metrics();
+        ForecastMetrics xgboost = metrics();
+        Map<ModelType, ForecastMetrics> metricsMap = new EnumMap<>(ModelType.class);
+        metricsMap.put(ModelType.MAJORITY, majority);
+        metricsMap.put(ModelType.LOGISTIC, logistic);
+        metricsMap.put(ModelType.XGBOOST, xgboost);
         return new WalkForwardReport(
                 ForecastHorizon.FIVE_DAYS,
                 LocalDate.parse("2020-01-01"),
                 LocalDate.parse("2024-01-01"),
                 LocalDate.parse("2024-12-31"),
-                240, 20, 12, majority, logistic,
+                240, 20, 12, metricsMap,
                 240, LocalDate.parse("2025-01-10"), LocalDate.parse("2025-12-31")
         );
     }

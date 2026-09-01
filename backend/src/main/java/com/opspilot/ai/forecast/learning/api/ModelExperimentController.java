@@ -3,6 +3,7 @@ package com.opspilot.ai.forecast.learning.api;
 import com.opspilot.ai.chat.api.ApiError;
 import com.opspilot.ai.forecast.learning.FeatureProfile;
 import com.opspilot.ai.forecast.learning.ForecastHorizon;
+import com.opspilot.ai.forecast.learning.ModelComparisonResult;
 import com.opspilot.ai.forecast.learning.ModelExperiment;
 import com.opspilot.ai.forecast.learning.ModelExperimentMetric;
 import com.opspilot.ai.forecast.learning.ModelExperimentNotFoundException;
@@ -19,7 +20,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /** 提供黄金统计模型实验的即时预览和持久化管理。 */
@@ -70,8 +73,8 @@ public class ModelExperimentController {
     public ResponseEntity<CompareResponse> compare(
             @RequestParam(defaultValue = "FIVE_DAYS") String horizon
     ) {
-        List<ModelExperimentResult> results = experimentService.compare(parse(horizon));
-        return ResponseEntity.status(201).body(CompareResponse.from(results));
+        ModelComparisonResult result = experimentService.compare(parse(horizon));
+        return ResponseEntity.status(201).body(CompareResponse.from(result));
     }
 
     @GetMapping("/history")
@@ -85,13 +88,11 @@ public class ModelExperimentController {
         List<ModelExperimentSummaryResponse> summaries = experiments.stream()
                 .map(exp -> {
                     List<ModelExperimentMetric> metrics = experimentService.findMetrics(exp.id());
-                    ModelExperimentMetric majority = metrics.stream()
-                            .filter(m -> m.modelType() == ModelType.MAJORITY)
-                            .findFirst().orElse(null);
-                    ModelExperimentMetric logistic = metrics.stream()
-                            .filter(m -> m.modelType() == ModelType.LOGISTIC)
-                            .findFirst().orElse(null);
-                    return ModelExperimentSummaryResponse.from(exp, majority, logistic);
+                    Map<ModelType, ModelExperimentMetric> metricsMap = new EnumMap<>(ModelType.class);
+                    for (ModelExperimentMetric m : metrics) {
+                        metricsMap.put(m.modelType(), m);
+                    }
+                    return ModelExperimentSummaryResponse.from(exp, metricsMap);
                 })
                 .toList();
 
@@ -102,13 +103,11 @@ public class ModelExperimentController {
     public ModelExperimentDetailResponse detail(@PathVariable UUID id) {
         ModelExperiment experiment = experimentService.findById(id);
         List<ModelExperimentMetric> metrics = experimentService.findMetrics(id);
-        ModelExperimentMetric majority = metrics.stream()
-                .filter(m -> m.modelType() == ModelType.MAJORITY)
-                .findFirst().orElse(null);
-        ModelExperimentMetric logistic = metrics.stream()
-                .filter(m -> m.modelType() == ModelType.LOGISTIC)
-                .findFirst().orElse(null);
-        return ModelExperimentDetailResponse.from(experiment, majority, logistic);
+        Map<ModelType, ModelExperimentMetric> metricsMap = new EnumMap<>(ModelType.class);
+        for (ModelExperimentMetric m : metrics) {
+            metricsMap.put(m.modelType(), m);
+        }
+        return ModelExperimentDetailResponse.from(experiment, metricsMap);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

@@ -5,10 +5,12 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
-/** 在开发验证区间滚动重训并比较多数类与逻辑回归模型。 */
+/** 在开发验证区间滚动重训并比较多数类、逻辑回归和XGBoost模型。 */
 @Service
 public class WalkForwardService {
 
@@ -19,6 +21,7 @@ public class WalkForwardService {
     private final TemporalSplitter splitter;
     private final GoldTrainer majorityTrainer;
     private final GoldTrainer logisticTrainer;
+    private final GoldTrainer xgboostTrainer;
     private final ForecastEvaluator evaluator;
     private final ConfidencePolicy policy = new ConfidencePolicy(CONFIDENCE);
 
@@ -27,12 +30,14 @@ public class WalkForwardService {
             TemporalSplitter splitter,
             @Qualifier("majorityGoldTrainer") GoldTrainer majorityTrainer,
             @Qualifier("tribuoGoldTrainer") GoldTrainer logisticTrainer,
+            @Qualifier("xgboostGoldTrainer") GoldTrainer xgboostTrainer,
             ForecastEvaluator evaluator
     ) {
         this.builder = builder;
         this.splitter = splitter;
         this.majorityTrainer = majorityTrainer;
         this.logisticTrainer = logisticTrainer;
+        this.xgboostTrainer = xgboostTrainer;
         this.evaluator = evaluator;
     }
 
@@ -61,8 +66,10 @@ public class WalkForwardService {
 
     public WalkForwardReport run(TemporalDataset data, ForecastHorizon horizon, FeatureProfile profile) {
         Set<String> featureNames = profile.featureNames();
-        List<SettledPrediction> majorityPredictions = new ArrayList<>();
-        List<SettledPrediction> logisticPredictions = new ArrayList<>();
+        Map<ModelType, List<SettledPrediction>> predictions = new EnumMap<>(ModelType.class);
+        for (ModelType type : ModelType.values()) {
+            predictions.put(type, new ArrayList<>());
+        }
         List<GoldSample> validation = data.validation();
         int refits = 0;
 
@@ -76,21 +83,17 @@ public class WalkForwardService {
             );
             GoldClassifier majority = majorityTrainer.train(training, featureNames);
             GoldClassifier logistic = logisticTrainer.train(training, featureNames);
+            GoldClassifier xgboost = xgboostTrainer.train(training, featureNames);
             refits++;
 
             for (GoldSample sample : block) {
-                majorityPredictions.add(settle(sample, majority));
-                logisticPredictions.add(settle(sample, logistic));
+                predictions.get(ModelType.MAJORITY).add(settle(sample, majority));
+                predictions.get(ModelType.LOGISTIC).add(settle(sample, logistic));
+                predictions.get(ModelType.XGBOOST).add(settle(sample, xgboost));
             }
         }
 
-        return report(
-                horizon,
-                data,
-                majorityPredictions,
-                logisticPredictions,
-                refits
-        );
+        return report(horizon, data, predictions, refits);
     }
 
     private List<GoldSample> trainingData(
@@ -121,12 +124,15 @@ public class WalkForwardService {
     private WalkForwardReport report(
             ForecastHorizon horizon,
             TemporalDataset data,
-            List<SettledPrediction> majority,
-            List<SettledPrediction> logistic,
+            Map<ModelType, List<SettledPrediction>> predictions,
             int refits
     ) {
         List<GoldSample> validation = data.validation();
         List<GoldSample> holdout = data.finalHoldout();
+        Map<ModelType, ForecastMetrics> metrics = new EnumMap<>(ModelType.class);
+        for (Map.Entry<ModelType, List<SettledPrediction>> entry : predictions.entrySet()) {
+            metrics.put(entry.getKey(), evaluator.evaluate(entry.getValue()));
+        }
         return new WalkForwardReport(
                 horizon,
                 data.training().getFirst().asOfDate(),
@@ -135,8 +141,7 @@ public class WalkForwardService {
                 validation.size(),
                 REFIT_EVERY,
                 refits,
-                evaluator.evaluate(majority),
-                evaluator.evaluate(logistic),
+                metrics,
                 holdout.size(),
                 holdout.getFirst().asOfDate(),
                 holdout.getLast().asOfDate()

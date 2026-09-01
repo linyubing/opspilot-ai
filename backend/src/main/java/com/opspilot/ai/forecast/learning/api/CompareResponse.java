@@ -1,22 +1,32 @@
 package com.opspilot.ai.forecast.learning.api;
 
-import com.opspilot.ai.forecast.learning.ModelExperimentResult;
+import com.opspilot.ai.forecast.learning.ModelComparisonResult;
+import com.opspilot.ai.forecast.learning.Stage8Candidate;
 
 import java.util.List;
 import java.util.UUID;
 
-/** compare接口响应，包含批次ID和三个实验详情。 */
+/** compare接口响应，包含批次ID、三个实验详情和阶段8候选判断。 */
 public record CompareResponse(
         UUID comparisonId,
         String horizon,
-        List<ModelExperimentDetailResponse> experiments
+        List<ModelExperimentDetailResponse> experiments,
+        boolean stage8Candidate,
+        String candidateProfile,
+        String candidateReason
 ) {
-    public static CompareResponse from(List<ModelExperimentResult> results) {
-        UUID comparisonId = results.isEmpty() ? null : results.getFirst().experiment().comparisonId();
-        String horizon = results.isEmpty() ? null : results.getFirst().experiment().horizon();
-        List<ModelExperimentDetailResponse> experiments = results.stream()
+    public static CompareResponse from(ModelComparisonResult result) {
+        List<ModelExperimentDetailResponse> experiments = result.experiments().stream()
                 .map(ModelExperimentDetailResponse::from)
                 .toList();
-        return new CompareResponse(comparisonId, horizon, experiments);
+        Stage8Candidate candidate = result.candidate();
+        return new CompareResponse(
+                result.comparisonId(),
+                result.horizon().name(),
+                experiments,
+                candidate.passed(),
+                candidate.profile() != null ? candidate.profile().name() : null,
+                candidate.reason()
+        );
     }
 }

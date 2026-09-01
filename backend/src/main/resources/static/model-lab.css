@@ -29,9 +29,10 @@ h1 { margin: 8px 0 4px; font-size: clamp(34px, 5vw, 54px); line-height: 1.15; }
 .scope-panel div:last-child { border-right: 0; }
 .scope-panel span, .metric-grid span { display: block; color: var(--muted); font-size: 14px; }
 .scope-panel strong { display: block; margin-top: 5px; }
-.model-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; margin-top: 18px; }
+.model-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 18px; }
 .model-card { border: 1px solid var(--border); border-top: 5px solid var(--gold); border-radius: 14px; background: var(--surface); overflow: hidden; }
 .model-card.logistic { border-top-color: var(--blue); }
+.model-card.xgboost { border-top-color: #7c3aed; }
 .model-card header { padding: 24px 24px 18px; }
 .model-card h2, .model-card p { margin: 0; }
 .model-card p { margin-top: 4px; color: var(--muted); }

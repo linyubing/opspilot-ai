@@ -118,6 +118,146 @@ public class JdbcModelExperimentRepository implements ModelExperimentRepository 
     }
 
     @Override
+    @Transactional
+    public void createComparison(List<ModelExperiment> experiments) {
+        if (experiments.size() != 3) {
+            throw new IllegalArgumentException("批次实验数量必须为3，实际=" + experiments.size());
+        }
+        for (ModelExperiment experiment : experiments) {
+            create(experiment);
+        }
+    }
+
+    @Override
+    public void markComparisonRunning(UUID comparisonId, OffsetDateTime startedAt) {
+        int updated = jdbc.update("""
+                update gold_model_experiment
+                set status = 'RUNNING', started_at = ?
+                where comparison_id = ?
+                """, startedAt, comparisonId);
+        if (updated != 3) {
+            throw new ModelExperimentException(
+                    "批量标记运行状态失败：预期3条，实际更新" + updated + "条，comparisonId=" + comparisonId
+            );
+        }
+    }
+
+    @Override
+    @Transactional
+    public void completeComparison(
+            UUID comparisonId,
+            List<ModelExperiment> experiments,
+            List<ModelExperimentMetric> metrics
+    ) {
+        if (experiments.size() != 3) {
+            throw new IllegalArgumentException("批次实验数量必须为3，实际=" + experiments.size());
+        }
+        if (metrics.size() != 9) {
+            throw new IllegalArgumentException("批次指标数量必须为9，实际=" + metrics.size());
+        }
+
+        validateComparison(comparisonId, experiments, metrics);
+
+        for (ModelExperimentMetric metric : metrics) {
+            jdbc.update("""
+                    insert into gold_model_experiment_metric (
+                        experiment_id, model_type, sample_count, covered_count,
+                        coverage, accuracy, balanced_accuracy, brier_score, log_loss,
+                        recalls, confusion_matrix
+                    ) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?::jsonb, ?::jsonb)
+                    """,
+                    metric.experimentId(), metric.modelType().name(),
+                    metric.sampleCount(), metric.coveredCount(),
+                    metric.coverage(), metric.accuracy(),
+                    metric.balancedAccuracy(), metric.brierScore(),
+                    metric.logLoss(), toJson(metric.recalls()),
+                    toJson(metric.confusionMatrix())
+            );
+        }
+
+        int updated = jdbc.update("""
+                update gold_model_experiment
+                set status = 'COMPLETED', completed_at = coalesce(?, now())
+                where comparison_id = ?
+                """, experiments.getFirst().completedAt(), comparisonId);
+        if (updated != 3) {
+            throw new ModelExperimentException(
+                    "批量完成状态更新失败：预期3条，实际更新" + updated + "条，comparisonId=" + comparisonId
+            );
+        }
+    }
+
+    private void validateComparison(
+            UUID comparisonId,
+            List<ModelExperiment> experiments,
+            List<ModelExperimentMetric> metrics
+    ) {
+        ModelExperiment first = experiments.getFirst();
+        java.util.Set<FeatureProfile> profiles = new java.util.HashSet<>();
+        java.util.Set<UUID> experimentIds = new java.util.HashSet<>();
+        for (ModelExperiment exp : experiments) {
+            profiles.add(exp.featureProfile());
+            experimentIds.add(exp.id());
+            if (!comparisonId.equals(exp.comparisonId())) {
+                throw new IllegalArgumentException(
+                        "实验comparisonId不匹配：期望=" + comparisonId + "，实际=" + exp.comparisonId()
+                );
+            }
+            if (!first.datasetHash().equals(exp.datasetHash())) {
+                throw new IllegalArgumentException("同一批次的数据集指纹必须一致");
+            }
+            if (!first.horizon().equals(exp.horizon())) {
+                throw new IllegalArgumentException("同一批次的预测周期必须一致");
+            }
+            if (!first.trainStart().equals(exp.trainStart())
+                    || !first.validationStart().equals(exp.validationStart())
+                    || !first.validationEnd().equals(exp.validationEnd())
+                    || !first.holdoutStart().equals(exp.holdoutStart())
+                    || !first.holdoutEnd().equals(exp.holdoutEnd())) {
+                throw new IllegalArgumentException("同一批次的时间分区必须一致");
+            }
+        }
+        if (!profiles.equals(java.util.Set.of(
+                FeatureProfile.BASE_16, FeatureProfile.OHLC_20, FeatureProfile.ALL_36))) {
+            throw new IllegalArgumentException("批次缺少必要的特征组合: " + profiles);
+        }
+
+        Map<UUID, java.util.Set<ModelType>> typesByExperiment = new java.util.HashMap<>();
+        for (ModelExperimentMetric metric : metrics) {
+            if (!experimentIds.contains(metric.experimentId())) {
+                throw new IllegalArgumentException("指标不属于当前批次实验，experimentId=" + metric.experimentId());
+            }
+            typesByExperiment.computeIfAbsent(metric.experimentId(), ignored -> new java.util.HashSet<>())
+                    .add(metric.modelType());
+        }
+        java.util.Set<ModelType> requiredTypes = java.util.Set.of(
+                ModelType.MAJORITY, ModelType.LOGISTIC, ModelType.XGBOOST);
+        for (UUID experimentId : experimentIds) {
+            if (!requiredTypes.equals(typesByExperiment.get(experimentId))) {
+                throw new IllegalArgumentException("每条实验必须包含三种模型指标，experimentId=" + experimentId);
+            }
+        }
+    }
+
+    @Override
+    public void failComparison(
+            UUID comparisonId,
+            String message,
+            OffsetDateTime completedAt
+    ) {
+        int updated = jdbc.update("""
+                update gold_model_experiment
+                set status = 'FAILED', failure_message = ?, completed_at = ?
+                where comparison_id = ?
+                """, message, completedAt, comparisonId);
+        if (updated != 3) {
+            throw new ModelExperimentException(
+                    "批量失败状态更新失败：预期3条，实际更新" + updated + "条，comparisonId=" + comparisonId
+            );
+        }
+    }
+
+    @Override
     public Optional<ModelExperiment> findById(UUID id) {
         List<ModelExperiment> results = jdbc.query(
                 "select * from gold_model_experiment where id = ?",

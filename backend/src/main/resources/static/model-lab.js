@@ -50,12 +50,66 @@ function render(data) {
         `${data.finalHoldout.samples} 条，${data.finalHoldout.start} 至 ${data.finalHoldout.end}`;
     fillMetrics("majority", data.majority);
     fillMetrics("logistic", data.logistic);
+    fillMetrics("xgboost", data.xgboost);
 
     if (data.logistic && data.logistic.logLoss != null) {
         document.querySelector("#logisticLogLoss").textContent = number(data.logistic.logLoss);
     }
+    if (data.xgboost && data.xgboost.logLoss != null) {
+        document.querySelector("#xgboostLogLoss").textContent = number(data.xgboost.logLoss);
+    }
 
     result.hidden = false;
+}
+
+async function runComparison() {
+    const button = document.querySelector("#runComparison");
+    const candidateBox = document.querySelector("#candidateResult");
+    button.disabled = true;
+    errorBox.hidden = true;
+    statusText.textContent = `正在运行 ${horizonNames[currentHorizon]} 的三组真实对比实验...`;
+    try {
+        const response = await fetch(
+            `/api/research/gold/model-experiments/compare?horizon=${currentHorizon}`,
+            { method: "POST" }
+        );
+        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(data.message || "三组对比实验运行失败");
+        }
+
+        const selected = data.experiments.find(item => item.featureProfile === currentProfile)
+            || data.experiments[0];
+        document.querySelector("#activeProfile").textContent = profileNames[selected.featureProfile];
+        document.querySelector("#trainStart").textContent = selected.trainStart;
+        document.querySelector("#validationRange").textContent =
+            `${selected.validationStart} 至 ${selected.validationEnd}`;
+        document.querySelector("#validationSamples").textContent = `${selected.validationSamples} 条`;
+        document.querySelector("#refitCount").textContent = "以批次参数为准";
+        document.querySelector("#holdoutRange").textContent =
+            `${selected.holdoutSamples} 条，${selected.holdoutStart} 至 ${selected.holdoutEnd}`;
+        fillMetrics("majority", selected.majority);
+        fillMetrics("logistic", selected.logistic);
+        fillMetrics("xgboost", selected.xgboost);
+        document.querySelector("#logisticLogLoss").textContent = number(selected.logistic.logLoss);
+        document.querySelector("#xgboostLogLoss").textContent = number(selected.xgboost.logLoss);
+
+        document.querySelector("#candidateTitle").textContent = data.stage8Candidate
+            ? "阶段8候选通过"
+            : "阶段8暂无候选";
+        document.querySelector("#candidateProfile").textContent = data.candidateProfile || "未通过";
+        document.querySelector("#candidateReason").textContent = data.candidateReason;
+        candidateBox.hidden = false;
+        result.hidden = false;
+        statusText.textContent = `对比完成，批次 ID：${data.comparisonId}`;
+        loadHistory();
+    } catch (error) {
+        errorBox.textContent = error.message;
+        errorBox.hidden = false;
+        statusText.textContent = "三组对比实验未完成";
+    } finally {
+        button.disabled = false;
+    }
 }
 
 async function load(horizon, profile) {
@@ -211,6 +265,7 @@ function formatTime(isoString) {
 }
 
 document.querySelector("#saveExperiment").addEventListener("click", saveExperiment);
+document.querySelector("#runComparison").addEventListener("click", runComparison);
 document.querySelector("#closeDetail").addEventListener("click", () => {
     document.querySelector("#experimentDetail").hidden = true;
 });

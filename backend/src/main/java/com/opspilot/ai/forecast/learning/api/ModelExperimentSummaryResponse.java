@@ -2,12 +2,14 @@ package com.opspilot.ai.forecast.learning.api;
 
 import com.opspilot.ai.forecast.learning.ModelExperiment;
 import com.opspilot.ai.forecast.learning.ModelExperimentMetric;
+import com.opspilot.ai.forecast.learning.ModelType;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /** 实验摘要响应，不包含大型混淆矩阵。 */
@@ -25,6 +27,7 @@ public record ModelExperimentSummaryResponse(
         OffsetDateTime createdAt,
         BigDecimal majorityAccuracy,
         BigDecimal logisticAccuracy,
+        BigDecimal xgboostAccuracy,
         BigDecimal balancedAccuracy,
         BigDecimal coverage,
         BigDecimal brierScore,
@@ -35,15 +38,19 @@ public record ModelExperimentSummaryResponse(
 ) {
     public static ModelExperimentSummaryResponse from(
             ModelExperiment experiment,
-            ModelExperimentMetric majority,
-            ModelExperimentMetric logistic
+            Map<ModelType, ModelExperimentMetric> metrics
     ) {
+        ModelExperimentMetric majority = metrics.get(ModelType.MAJORITY);
+        ModelExperimentMetric logistic = metrics.get(ModelType.LOGISTIC);
+        ModelExperimentMetric xgboost = metrics.get(ModelType.XGBOOST);
+
         BigDecimal logAccuracy = logistic != null ? logistic.accuracy() : null;
         BigDecimal logBalanced = logistic != null ? logistic.balancedAccuracy() : null;
         BigDecimal logCoverage = logistic != null ? logistic.coverage() : null;
         BigDecimal logBrier = logistic != null ? logistic.brierScore() : null;
         BigDecimal logLogLoss = logistic != null ? logistic.logLoss() : null;
         BigDecimal majBalanced = majority != null ? majority.balancedAccuracy() : null;
+        BigDecimal xgbAccuracy = xgboost != null ? xgboost.accuracy() : null;
 
         BigDecimal relMajority = computeImprovement(logBalanced, majBalanced);
 
@@ -61,6 +68,7 @@ public record ModelExperimentSummaryResponse(
                 experiment.createdAt(),
                 majority != null ? majority.accuracy() : null,
                 logAccuracy,
+                xgbAccuracy,
                 logBalanced,
                 logCoverage,
                 logBrier,
@@ -96,7 +104,7 @@ public record ModelExperimentSummaryResponse(
                         s.featureProfile(), s.datasetHashPrefix(),
                         s.featureVersion(), s.labelVersion(), s.splitVersion(),
                         s.gitCommit(), s.createdAt(),
-                        s.majorityAccuracy(), s.logisticAccuracy(),
+                        s.majorityAccuracy(), s.logisticAccuracy(), s.xgboostAccuracy(),
                         s.balancedAccuracy(), s.coverage(),
                         s.brierScore(), s.logLoss(),
                         s.majorityBalancedAccuracy(),

@@ -87,6 +87,23 @@ class ModelLabPageTests {
     }
 
     @Test
+    void showsXgboostAndStage8Comparison() throws IOException {
+        String html = read("model-lab.html");
+        String js = read("model-lab.js");
+
+        assertThat(html)
+                .contains("id=\"runComparison\"")
+                .contains("id=\"xgboostAccuracy\"")
+                .contains("id=\"candidateResult\"")
+                .contains("开发验证结果，尚未进行最终留出集验收");
+        assertThat(js)
+                .contains("/compare?horizon=")
+                .contains("stage8Candidate")
+                .contains("candidateReason")
+                .contains("data.xgboost");
+    }
+
+    @Test
     void forecastPageLinksToModelLab() throws IOException {
         assertThat(read("forecast.html"))
                 .contains("href=\"/model-lab.html\"")
