@@ -270,6 +270,7 @@ class BacktestRunnerTests {
                 ArgumentCaptor.forClass(BacktestCase.class);
         verify(repo).saveCase(captor.capture());
         BacktestCase item = captor.getValue();
+        assertThat(item.asOfDate()).isEqualTo(DATE);
         assertThat(item.basePrice()).isEqualByComparingTo("2500");
     }
 
@@ -307,15 +308,49 @@ class BacktestRunnerTests {
         assertThat(item.asOfDate()).isEqualTo(DATE);
     }
 
+    @Test
+    void rejectsEarlierGoldDateForOhlcBacktest() {
+        when(repo.findTask(TASK_ID)).thenReturn(Optional.of(
+                task(BacktestPromptBuilder.VERSION, BacktestPriceBasis.OHLC_CLOSE)
+        ));
+        when(snapshots.createSnapshot(DATE)).thenReturn(
+                snapshotWithGoldDate(DATE.minusDays(1))
+        );
+
+        runner.run(TASK_ID);
+
+        verify(repo).recordFailure(eq(TASK_ID), contains("OHLC回测的黄金数据日期必须等于回测日期"));
+        verify(repo, never()).saveCase(any());
+    }
+
+    @Test
+    void allowsEarlierGoldDateForLegacyReferenceBacktest() {
+        when(repo.findTask(TASK_ID)).thenReturn(Optional.of(
+                task(BacktestPromptBuilder.VERSION, BacktestPriceBasis.LEGACY_REFERENCE)
+        ));
+        when(snapshots.createSnapshot(DATE)).thenReturn(
+                snapshotWithGoldDate(DATE.minusDays(1))
+        );
+
+        runner.run(TASK_ID);
+
+        verify(repo).saveCase(any());
+    }
+
     private BacktestTask task() {
         return task(BacktestPromptBuilder.VERSION);
     }
 
     private BacktestTask task(String promptVersion) {
+        return task(promptVersion, BacktestPriceBasis.OHLC_CLOSE);
+    }
+
+    private BacktestTask task(String promptVersion, BacktestPriceBasis priceBasis) {
         OffsetDateTime now = OffsetDateTime.ofInstant(NOW, ZoneOffset.UTC);
         return new BacktestTask(
                 TASK_ID, DATE, DATE, 1, "glm-4.7",
                 promptVersion, GoldForecastRule.RULE_VERSION,
+                priceBasis, BacktestSampleSet.HOLDOUT,
                 BacktestStatus.RUNNING, 0, 0, 0,
                 null, now, now, null
         );
@@ -394,6 +429,33 @@ class BacktestRunnerTests {
         OffsetDateTime now = OffsetDateTime.ofInstant(NOW, ZoneOffset.UTC);
         return new GoldResearchSnapshot(
                 DATE, DATE, DATE, dollarIndexDate,
+                new GoldReturnMetrics(
+                        new BigDecimal("2500"), BigDecimal.ZERO,
+                        BigDecimal.ZERO, BigDecimal.ZERO, now
+                ),
+                new RealRateChangeMetrics(
+                        new BigDecimal("1.8"), BigDecimal.ZERO,
+                        BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO,
+                        BigDecimal.ZERO, BigDecimal.ZERO, now
+                ),
+                new DollarIndexChangeMetrics(
+                        new BigDecimal("118"), BigDecimal.ZERO,
+                        BigDecimal.ZERO, BigDecimal.ZERO, now
+                ),
+                new ResearchFactorAssessment(
+                        GoldFactorStatus.SUPPORTIVE, "rate-v1", "支撑"
+                ),
+                new ResearchFactorAssessment(
+                        GoldFactorStatus.NEUTRAL, "dollar-v1", "中性"
+                ),
+                "gold-multifactor-v2", "不构成投资建议"
+        );
+    }
+
+    private GoldResearchSnapshot snapshotWithGoldDate(LocalDate goldDate) {
+        OffsetDateTime now = OffsetDateTime.ofInstant(NOW, ZoneOffset.UTC);
+        return new GoldResearchSnapshot(
+                DATE, goldDate, DATE, DATE,
                 new GoldReturnMetrics(
                         new BigDecimal("2500"), BigDecimal.ZERO,
                         BigDecimal.ZERO, BigDecimal.ZERO, now

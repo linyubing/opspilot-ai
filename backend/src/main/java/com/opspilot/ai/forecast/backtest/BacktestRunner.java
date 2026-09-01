@@ -101,7 +101,7 @@ public class BacktestRunner {
     private BacktestCase runOne(BacktestTask task, LocalDate date) {
         UUID caseId = UUID.randomUUID();
         GoldResearchSnapshot snapshot = snapshotService.createSnapshot(date);
-        validateTimeConstraints(snapshot, date);
+        validateTimeConstraints(snapshot, date, task.priceBasis());
 
         GoldForecastPrompt prompt = buildPrompt(task, caseId, snapshot);
         GeneratedGoldForecast generated = gateway.generate(prompt);
@@ -156,7 +156,11 @@ public class BacktestRunner {
     }
 
     /** 验证快照时间约束，确保不会使用未来数据。 */
-    private void validateTimeConstraints(GoldResearchSnapshot snapshot, LocalDate caseDate) {
+    private void validateTimeConstraints(
+            GoldResearchSnapshot snapshot,
+            LocalDate caseDate,
+            BacktestPriceBasis priceBasis
+    ) {
         if (!snapshot.analysisDate().equals(caseDate)) {
             throw new BacktestDataInsufficientException(
                     "快照分析日期必须等于回测日期，analysisDate="
@@ -169,6 +173,15 @@ public class BacktestRunner {
                     "黄金数据日期不得晚于回测日期，latestGoldDate="
                             + snapshot.latestGoldDate() + "，caseDate=" + caseDate
             );
+        }
+        if (priceBasis == BacktestPriceBasis.OHLC_CLOSE) {
+            if (snapshot.latestGoldDate() == null
+                    || !snapshot.latestGoldDate().equals(caseDate)) {
+                throw new BacktestDataInsufficientException(
+                        "OHLC回测的黄金数据日期必须等于回测日期，latestGoldDate="
+                                + snapshot.latestGoldDate() + "，caseDate=" + caseDate
+                );
+            }
         }
         if (snapshot.latestRealRateDate() != null
                 && snapshot.latestRealRateDate().isAfter(caseDate)) {
