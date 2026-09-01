@@ -11,6 +11,7 @@ import java.util.Set;
  */
 public record GoldOhlcFeatures(Map<String, Double> values) {
 
+    public static final String VERSION = "gold-ohlc-v1";
     public static final Set<String> NAMES = Set.of(
             "return1", "return3", "return5", "return10", "return20",
             "overnightGap", "intradayReturn", "dailyRange", "closeLocation",

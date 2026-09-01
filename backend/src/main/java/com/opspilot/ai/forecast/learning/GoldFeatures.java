@@ -6,6 +6,7 @@ import java.util.Set;
 /** 保存预测日当时真实可用的固定数值特征。 */
 public record GoldFeatures(Map<String, Double> values) {
 
+    public static final String VERSION = "gold-features-v2";
     public static final Set<String> NAMES = Set.of(
             "gold_return_1",
             "gold_return_5",

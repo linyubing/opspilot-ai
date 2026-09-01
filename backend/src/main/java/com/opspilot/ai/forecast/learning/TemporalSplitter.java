@@ -11,6 +11,7 @@ import java.util.Objects;
 @Component
 public class TemporalSplitter {
 
+    public static final String VERSION = "gold-temporal-split-v1";
     private static final int TRAINING_MIN = 500;
     private static final int VALIDATION_SIZE = 240;
     private static final int HOLDOUT_SIZE = 240;
