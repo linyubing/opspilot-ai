@@ -58,6 +58,19 @@ class GoldDataStatusServiceTests {
     }
 
     @Test
+    @DisplayName("美元指数过期时只标记单项过期但不拖累整体可用性")
+    void ignoresStaleDollarIndexForOverallStatus() {
+        repository.add(snapshot(
+                dates("2026-08-26", "2026-08-26", "2026-08-25", "2026-08-10")
+        ));
+
+        GoldDataStatus status = service.latest();
+
+        assertThat(status.overall()).isEqualTo(DataState.FRESH);
+        assertThat(item(status, "dollarIndex").state()).isEqualTo(DataState.STALE);
+    }
+
+    @Test
     @DisplayName("缺少观测日期时标记为未知")
     void marksUnknownWhenDateMissing() {
         repository.add(new StoredGoldResearchSnapshot(
@@ -99,6 +112,18 @@ class GoldDataStatusServiceTests {
         return new LocalDate[]{
                 LocalDate.parse(analysis), LocalDate.parse(gold),
                 LocalDate.parse(rate), LocalDate.parse(rate)
+        };
+    }
+
+    private LocalDate[] dates(
+            String analysis,
+            String gold,
+            String rate,
+            String dollar
+    ) {
+        return new LocalDate[]{
+                LocalDate.parse(analysis), LocalDate.parse(gold),
+                LocalDate.parse(rate), LocalDate.parse(dollar)
         };
     }
 

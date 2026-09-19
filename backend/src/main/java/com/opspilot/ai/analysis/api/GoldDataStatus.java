@@ -34,9 +34,12 @@ public record GoldDataStatus(
                 item("realRate", "实际利率", snapshot.latestRealRateDate(), clock),
                 item("dollarIndex", "美元指数", snapshot.latestDollarIndexDate(), clock)
         );
-        DataState overall = items.stream()
+        List<GoldDataItemStatus> requiredItems = items.stream()
+                .filter(i -> !"dollarIndex".equals(i.code()))
+                .toList();
+        DataState overall = requiredItems.stream()
                 .allMatch(i -> i.state() == DataState.FRESH) ? DataState.FRESH
-                : items.stream().allMatch(i -> i.state() == DataState.UNKNOWN)
+                : requiredItems.stream().allMatch(i -> i.state() == DataState.UNKNOWN)
                 ? DataState.UNKNOWN : DataState.STALE;
         return new GoldDataStatus(
                 items,
