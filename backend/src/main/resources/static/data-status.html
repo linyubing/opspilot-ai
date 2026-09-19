@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>黄金数据新鲜度</title>
+    <link rel="stylesheet" href="/forecast.css?v=1">
+</head>
+<body>
+<main class="shell">
+    <header class="hero">
+        <div>
+            <p class="eyebrow">数据状态</p>
+            <h1>黄金数据新鲜度</h1>
+            <p>检查黄金价格、实际利率和美元指数的最新观测日期。</p>
+        </div>
+        <a class="pill" href="/forecast.html">返回黄金预测</a>
+    </header>
+
+    <p id="status" class="status">正在读取数据状态...</p>
+    <section id="errorBox" class="error" hidden></section>
+
+    <section class="panel">
+        <div class="heading">
+            <h2>整体状态</h2>
+            <span id="overall" class="pill">-</span>
+        </div>
+        <div class="source-grid">
+            <article><span>分析基准日</span><strong id="analysisDate">-</strong></article>
+            <article><span>生成时间</span><strong id="generatedAt">-</strong></article>
+            <article><span>说明</span><strong id="summary">-</strong></article>
+        </div>
+    </section>
+
+    <section class="panel">
+        <div class="heading">
+            <h2>数据源明细</h2>
+            <span>美元指数只作为辅助因子，过期不会拖累整体可用性</span>
+        </div>
+        <div id="items" class="source-grid"></div>
+    </section>
+</main>
+<script src="/data-status.js?v=1" defer></script>
+</body>
+</html>
