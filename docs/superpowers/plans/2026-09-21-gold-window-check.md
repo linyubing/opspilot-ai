@@ -42,8 +42,8 @@
 - [x] 保留原 `compare(profile, before, after, baseline)` 的行为；增加包含版本参数的重载，避免把标准化全历史错误标成旧原始模型。
 - [x] `POST /api/research/gold/model-experiments/scaling-check/windows` 返回完整结果；不改正式模型的配置。
 - [x] 测试固定 6 组结果（3 特征 × 2 窗口）、共享分区、模型版本、原有接口兼容。
-- [ ] 全量 Maven 回归通过后提交实现，再用真实接口运行一次并校验与上一批的数据指纹一致。
-- [ ] 原始 JSON 和如实结果表存档，报告弱点与未通过门槛，不宣称稳定获利或预测保证；提交并推送。
+- [x] 全量 Maven 回归通过后提交实现，再用真实接口运行一次并校验与上一批的数据指纹一致。
+- [x] 原始 JSON 和如实结果表存档，报告弱点与未通过门槛，不宣称稳定获利或预测保证；提交并推送。
 
 ## 执行记录
 
@@ -52,3 +52,5 @@
 - 任务 1 红灯：`WindowGoldTrainerTests` 两个行为断言失败，编译通过；原骨架错误地传入全部训练样本，且不拒绝不足/无序输入。日志 `backend/target/window-red.log`。
 - 任务 1 绿灯、任务 2 红灯：9 项定向测试中窗口测试通过，服务仅因空结果断言失败。日志 `backend/target/window-service-red.log`。
 - 两项代码完成：全量 `mvnw.cmd test` 627 项，0 失败、0 错误、2 跳过，日志 `backend/target/window-full-test.log`。只读复核未发现阻断问题。
+- 实现提交：`3a2491b`；真实实验 ID：`d8bb6abf-925a-435f-809b-48df191ba0a2`。数据指纹与标准化下一日实验完全一致，6 组完整历史对照的准确率/概率误差/信号指标复现一致。
+- 真实结论：252/504 六组全部退步，拒绝采用；本轮仅保留标准化的下一日改善作为开发证据，不晋级。原始响应和报告见 `docs/superpowers/specs/2026-09-21-gold-accuracy-improvement.md`。
