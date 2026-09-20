@@ -1,0 +1,2450 @@
+{
+  "runDate": "2026-09-20",
+  "codeCommit": "d7e0c2f2b050f9f84a5648bf40bf4cc61b06c93c",
+  "data": {
+    "goldLastDate": "2026-09-18",
+    "goldBars": 4864,
+    "realRateLastDate": "2026-09-17",
+    "broadDollarLastDate": "2026-09-11",
+    "dollarSeries": "DTWEXBGS",
+    "strictPointInTimeMacro": false
+  },
+  "comparisons": [
+    {
+      "comparisonId": "496b4763-598a-4ef1-bee4-745eb441ac4b",
+      "horizon": "NEXT_DAY",
+      "experiments": [
+        {
+          "id": "ab9181d7-c414-473d-a2b2-db512a513135",
+          "comparisonId": "496b4763-598a-4ef1-bee4-745eb441ac4b",
+          "horizon": "NEXT_DAY",
+          "status": "COMPLETED",
+          "datasetHash": "df1bbf53232378f18118e9763b5cba182a9d873729be7b79b62491d529234504",
+          "featureVersion": "gold-features-v2",
+          "labelVersion": "gold-next-session-direction-v1",
+          "splitVersion": "gold-temporal-split-v1",
+          "featureProfile": "BASE_16",
+          "parameters": {
+            "horizon": "NEXT_DAY",
+            "featureProfile": "BASE_16",
+            "featureCount": 16,
+            "refitEvery": 20,
+            "confidenceThreshold": 0.55,
+            "majorityTrainer": "MajorityGoldTrainer",
+            "logisticTrainer": "TribuoGoldTrainer",
+            "featureVersion": "gold-features-v2",
+            "labelVersion": "gold-next-session-direction-v1",
+            "splitVersion": "gold-temporal-split-v1",
+            "xgboostTrainer": {
+              "name": "tribuo-xgboost",
+              "numTrees": 200,
+              "eta": 0.03,
+              "gamma": 0,
+              "maxDepth": 3,
+              "minChildWeight": 5,
+              "subsample": 0.8,
+              "featureSubsample": 0.8,
+              "lambda": 1,
+              "alpha": 0,
+              "nThread": 1,
+              "seed": 20260901
+            }
+          },
+          "dataStart": "2008-02-12",
+          "dataEnd": "2026-09-17",
+          "trainStart": "2008-02-12",
+          "validationStart": "2024-11-11",
+          "validationEnd": "2025-10-15",
+          "holdoutStart": "2025-10-17",
+          "holdoutEnd": "2026-09-17",
+          "validationSamples": 240,
+          "holdoutSamples": 240,
+          "gitCommit": "d7e0c2f2b050f9f84a5648bf40bf4cc61b06c93c",
+          "failureMessage": null,
+          "createdAt": "2026-09-20T12:43:43.3256585Z",
+          "startedAt": "2026-09-20T12:43:43.3256585Z",
+          "completedAt": "2026-09-20T12:44:01.8505482Z",
+          "majority": {
+            "sampleCount": 240,
+            "coveredCount": 240,
+            "accuracy": 0.375,
+            "balancedAccuracy": 0.3333,
+            "coverage": 1,
+            "brierScore": 1.25,
+            "logLoss": 21.5867,
+            "recalls": {
+              "BULLISH": 0,
+              "NEUTRAL": 1,
+              "BEARISH": 0
+            },
+            "promotionReady": false
+          },
+          "logistic": {
+            "sampleCount": 240,
+            "coveredCount": 161,
+            "accuracy": 0.4224,
+            "balancedAccuracy": 0.3801,
+            "coverage": 0.6708,
+            "brierScore": 0.7708,
+            "logLoss": 1.2986,
+            "recalls": {
+              "BULLISH": 0.2097,
+              "NEUTRAL": 0.8226,
+              "BEARISH": 0.1081
+            },
+            "promotionReady": false
+          },
+          "xgboost": {
+            "sampleCount": 240,
+            "coveredCount": 15,
+            "accuracy": 0.5333,
+            "balancedAccuracy": 0.3333,
+            "coverage": 0.0625,
+            "brierScore": 0.6558,
+            "logLoss": 1.079,
+            "recalls": {
+              "BULLISH": 0,
+              "NEUTRAL": 1,
+              "BEARISH": 0
+            },
+            "promotionReady": false
+          }
+        },
+        {
+          "id": "543a13f9-a468-4aa5-822f-9450681b8932",
+          "comparisonId": "496b4763-598a-4ef1-bee4-745eb441ac4b",
+          "horizon": "NEXT_DAY",
+          "status": "COMPLETED",
+          "datasetHash": "df1bbf53232378f18118e9763b5cba182a9d873729be7b79b62491d529234504",
+          "featureVersion": "gold-features-v2",
+          "labelVersion": "gold-next-session-direction-v1",
+          "splitVersion": "gold-temporal-split-v1",
+          "featureProfile": "OHLC_20",
+          "parameters": {
+            "horizon": "NEXT_DAY",
+            "featureProfile": "OHLC_20",
+            "featureCount": 20,
+            "refitEvery": 20,
+            "confidenceThreshold": 0.55,
+            "majorityTrainer": "MajorityGoldTrainer",
+            "logisticTrainer": "TribuoGoldTrainer",
+            "featureVersion": "gold-features-v2",
+            "labelVersion": "gold-next-session-direction-v1",
+            "splitVersion": "gold-temporal-split-v1",
+            "xgboostTrainer": {
+              "name": "tribuo-xgboost",
+              "numTrees": 200,
+              "eta": 0.03,
+              "gamma": 0,
+              "maxDepth": 3,
+              "minChildWeight": 5,
+              "subsample": 0.8,
+              "featureSubsample": 0.8,
+              "lambda": 1,
+              "alpha": 0,
+              "nThread": 1,
+              "seed": 20260901
+            }
+          },
+          "dataStart": "2008-02-12",
+          "dataEnd": "2026-09-17",
+          "trainStart": "2008-02-12",
+          "validationStart": "2024-11-11",
+          "validationEnd": "2025-10-15",
+          "holdoutStart": "2025-10-17",
+          "holdoutEnd": "2026-09-17",
+          "validationSamples": 240,
+          "holdoutSamples": 240,
+          "gitCommit": "d7e0c2f2b050f9f84a5648bf40bf4cc61b06c93c",
+          "failureMessage": null,
+          "createdAt": "2026-09-20T12:43:43.3256585Z",
+          "startedAt": "2026-09-20T12:43:43.3256585Z",
+          "completedAt": "2026-09-20T12:44:24.652019Z",
+          "majority": {
+            "sampleCount": 240,
+            "coveredCount": 240,
+            "accuracy": 0.375,
+            "balancedAccuracy": 0.3333,
+            "coverage": 1,
+            "brierScore": 1.25,
+            "logLoss": 21.5867,
+            "recalls": {
+              "BULLISH": 0,
+              "NEUTRAL": 1,
+              "BEARISH": 0
+            },
+            "promotionReady": false
+          },
+          "logistic": {
+            "sampleCount": 240,
+            "coveredCount": 198,
+            "accuracy": 0.3687,
+            "balancedAccuracy": 0.358,
+            "coverage": 0.825,
+            "brierScore": 0.955,
+            "logLoss": 1.9549,
+            "recalls": {
+              "BULLISH": 0.2051,
+              "NEUTRAL": 0.6081,
+              "BEARISH": 0.2609
+            },
+            "promotionReady": false
+          },
+          "xgboost": {
+            "sampleCount": 240,
+            "coveredCount": 6,
+            "accuracy": 0.3333,
+            "balancedAccuracy": 0.3333,
+            "coverage": 0.025,
+            "brierScore": 0.6592,
+            "logLoss": 1.0841,
+            "recalls": {
+              "BULLISH": 0,
+              "NEUTRAL": 1,
+              "BEARISH": 0
+            },
+            "promotionReady": false
+          }
+        },
+        {
+          "id": "5538877c-df7d-4a91-b707-9cf5499c9d85",
+          "comparisonId": "496b4763-598a-4ef1-bee4-745eb441ac4b",
+          "horizon": "NEXT_DAY",
+          "status": "COMPLETED",
+          "datasetHash": "df1bbf53232378f18118e9763b5cba182a9d873729be7b79b62491d529234504",
+          "featureVersion": "gold-features-v2",
+          "labelVersion": "gold-next-session-direction-v1",
+          "splitVersion": "gold-temporal-split-v1",
+          "featureProfile": "ALL_36",
+          "parameters": {
+            "horizon": "NEXT_DAY",
+            "featureProfile": "ALL_36",
+            "featureCount": 36,
+            "refitEvery": 20,
+            "confidenceThreshold": 0.55,
+            "majorityTrainer": "MajorityGoldTrainer",
+            "logisticTrainer": "TribuoGoldTrainer",
+            "featureVersion": "gold-features-v2",
+            "labelVersion": "gold-next-session-direction-v1",
+            "splitVersion": "gold-temporal-split-v1",
+            "xgboostTrainer": {
+              "name": "tribuo-xgboost",
+              "numTrees": 200,
+              "eta": 0.03,
+              "gamma": 0,
+              "maxDepth": 3,
+              "minChildWeight": 5,
+              "subsample": 0.8,
+              "featureSubsample": 0.8,
+              "lambda": 1,
+              "alpha": 0,
+              "nThread": 1,
+              "seed": 20260901
+            }
+          },
+          "dataStart": "2008-02-12",
+          "dataEnd": "2026-09-17",
+          "trainStart": "2008-02-12",
+          "validationStart": "2024-11-11",
+          "validationEnd": "2025-10-15",
+          "holdoutStart": "2025-10-17",
+          "holdoutEnd": "2026-09-17",
+          "validationSamples": 240,
+          "holdoutSamples": 240,
+          "gitCommit": "d7e0c2f2b050f9f84a5648bf40bf4cc61b06c93c",
+          "failureMessage": null,
+          "createdAt": "2026-09-20T12:43:43.3256585Z",
+          "startedAt": "2026-09-20T12:43:43.3256585Z",
+          "completedAt": "2026-09-20T12:44:58.7030464Z",
+          "majority": {
+            "sampleCount": 240,
+            "coveredCount": 240,
+            "accuracy": 0.375,
+            "balancedAccuracy": 0.3333,
+            "coverage": 1,
+            "brierScore": 1.25,
+            "logLoss": 21.5867,
+            "recalls": {
+              "BULLISH": 0,
+              "NEUTRAL": 1,
+              "BEARISH": 0
+            },
+            "promotionReady": false
+          },
+          "logistic": {
+            "sampleCount": 240,
+            "coveredCount": 216,
+            "accuracy": 0.3565,
+            "balancedAccuracy": 0.3447,
+            "coverage": 0.9,
+            "brierScore": 1.0425,
+            "logLoss": 2.4297,
+            "recalls": {
+              "BULLISH": 0.241,
+              "NEUTRAL": 0.5432,
+              "BEARISH": 0.25
+            },
+            "promotionReady": false
+          },
+          "xgboost": {
+            "sampleCount": 240,
+            "coveredCount": 7,
+            "accuracy": 0.5714,
+            "balancedAccuracy": 0.3333,
+            "coverage": 0.0292,
+            "brierScore": 0.6572,
+            "logLoss": 1.0813,
+            "recalls": {
+              "BULLISH": 0,
+              "NEUTRAL": 1,
+              "BEARISH": 0
+            },
+            "promotionReady": false
+          }
+        }
+      ],
+      "stage8Candidate": false,
+      "candidateProfile": null,
+      "candidateReason": "平衡准确率未比Logistic高2个百分点（差值=-0.0468）；覆盖率(0.0625)低于30%；BULLISH方向召回率(0.0000)低于25%；BEARISH方向召回率(0.0000)低于25%"
+    },
+    {
+      "comparisonId": "f2b1f26f-e9f0-4701-be06-765998b2575e",
+      "horizon": "FIVE_DAYS",
+      "experiments": [
+        {
+          "id": "78379a97-46a8-4b1c-a70a-de639420aaee",
+          "comparisonId": "f2b1f26f-e9f0-4701-be06-765998b2575e",
+          "horizon": "FIVE_DAYS",
+          "status": "COMPLETED",
+          "datasetHash": "b6b119cffab51ef5843a41bdc389d5d49663f38b429c2383648832c00206b2e5",
+          "featureVersion": "gold-features-v2",
+          "labelVersion": "gold-next-session-direction-v1",
+          "splitVersion": "gold-temporal-split-v1",
+          "featureProfile": "BASE_16",
+          "parameters": {
+            "horizon": "FIVE_DAYS",
+            "featureProfile": "BASE_16",
+            "featureCount": 16,
+            "refitEvery": 20,
+            "confidenceThreshold": 0.55,
+            "majorityTrainer": "MajorityGoldTrainer",
+            "logisticTrainer": "TribuoGoldTrainer",
+            "featureVersion": "gold-features-v2",
+            "labelVersion": "gold-next-session-direction-v1",
+            "splitVersion": "gold-temporal-split-v1",
+            "xgboostTrainer": {
+              "name": "tribuo-xgboost",
+              "numTrees": 200,
+              "eta": 0.03,
+              "gamma": 0,
+              "maxDepth": 3,
+              "minChildWeight": 5,
+              "subsample": 0.8,
+              "featureSubsample": 0.8,
+              "lambda": 1,
+              "alpha": 0,
+              "nThread": 1,
+              "seed": 20260901
+            }
+          },
+          "dataStart": "2008-02-12",
+          "dataEnd": "2026-09-11",
+          "trainStart": "2008-02-12",
+          "validationStart": "2024-10-30",
+          "validationEnd": "2025-10-03",
+          "holdoutStart": "2025-10-13",
+          "holdoutEnd": "2026-09-11",
+          "validationSamples": 240,
+          "holdoutSamples": 240,
+          "gitCommit": "d7e0c2f2b050f9f84a5648bf40bf4cc61b06c93c",
+          "failureMessage": null,
+          "createdAt": "2026-09-20T12:45:19.0258081Z",
+          "startedAt": "2026-09-20T12:45:19.0258081Z",
+          "completedAt": "2026-09-20T12:45:36.9286203Z",
+          "majority": {
+            "sampleCount": 240,
+            "coveredCount": 240,
+            "accuracy": 0.5833,
+            "balancedAccuracy": 0.3333,
+            "coverage": 1,
+            "brierScore": 0.8333,
+            "logLoss": 14.3912,
+            "recalls": {
+              "BULLISH": 1,
+              "NEUTRAL": 0,
+              "BEARISH": 0
+            },
+            "promotionReady": false
+          },
+          "logistic": {
+            "sampleCount": 240,
+            "coveredCount": 152,
+            "accuracy": 0.6053,
+            "balancedAccuracy": 0.3961,
+            "coverage": 0.6333,
+            "brierScore": 0.585,
+            "logLoss": 1.0128,
+            "recalls": {
+              "BULLISH": 0.9091,
+              "NEUTRAL": 0,
+              "BEARISH": 0.2791
+            },
+            "promotionReady": false
+          },
+          "xgboost": {
+            "sampleCount": 240,
+            "coveredCount": 56,
+            "accuracy": 0.625,
+            "balancedAccuracy": 0.4259,
+            "coverage": 0.2333,
+            "brierScore": 0.5755,
+            "logLoss": 0.9653,
+            "recalls": {
+              "BULLISH": 1,
+              "NEUTRAL": 0,
+              "BEARISH": 0.2778
+            },
+            "promotionReady": false
+          }
+        },
+        {
+          "id": "535120fe-2533-4b4d-bafd-6b5c4161b63b",
+          "comparisonId": "f2b1f26f-e9f0-4701-be06-765998b2575e",
+          "horizon": "FIVE_DAYS",
+          "status": "COMPLETED",
+          "datasetHash": "b6b119cffab51ef5843a41bdc389d5d49663f38b429c2383648832c00206b2e5",
+          "featureVersion": "gold-features-v2",
+          "labelVersion": "gold-next-session-direction-v1",
+          "splitVersion": "gold-temporal-split-v1",
+          "featureProfile": "OHLC_20",
+          "parameters": {
+            "horizon": "FIVE_DAYS",
+            "featureProfile": "OHLC_20",
+            "featureCount": 20,
+            "refitEvery": 20,
+            "confidenceThreshold": 0.55,
+            "majorityTrainer": "MajorityGoldTrainer",
+            "logisticTrainer": "TribuoGoldTrainer",
+            "featureVersion": "gold-features-v2",
+            "labelVersion": "gold-next-session-direction-v1",
+            "splitVersion": "gold-temporal-split-v1",
+            "xgboostTrainer": {
+              "name": "tribuo-xgboost",
+              "numTrees": 200,
+              "eta": 0.03,
+              "gamma": 0,
+              "maxDepth": 3,
+              "minChildWeight": 5,
+              "subsample": 0.8,
+              "featureSubsample": 0.8,
+              "lambda": 1,
+              "alpha": 0,
+              "nThread": 1,
+              "seed": 20260901
+            }
+          },
+          "dataStart": "2008-02-12",
+          "dataEnd": "2026-09-11",
+          "trainStart": "2008-02-12",
+          "validationStart": "2024-10-30",
+          "validationEnd": "2025-10-03",
+          "holdoutStart": "2025-10-13",
+          "holdoutEnd": "2026-09-11",
+          "validationSamples": 240,
+          "holdoutSamples": 240,
+          "gitCommit": "d7e0c2f2b050f9f84a5648bf40bf4cc61b06c93c",
+          "failureMessage": null,
+          "createdAt": "2026-09-20T12:45:19.0258081Z",
+          "startedAt": "2026-09-20T12:45:19.0258081Z",
+          "completedAt": "2026-09-20T12:45:59.3504026Z",
+          "majority": {
+            "sampleCount": 240,
+            "coveredCount": 240,
+            "accuracy": 0.5833,
+            "balancedAccuracy": 0.3333,
+            "coverage": 1,
+            "brierScore": 0.8333,
+            "logLoss": 14.3912,
+            "recalls": {
+              "BULLISH": 1,
+              "NEUTRAL": 0,
+              "BEARISH": 0
+            },
+            "promotionReady": false
+          },
+          "logistic": {
+            "sampleCount": 240,
+            "coveredCount": 209,
+            "accuracy": 0.5407,
+            "balancedAccuracy": 0.4298,
+            "coverage": 0.8708,
+            "brierScore": 0.6942,
+            "logLoss": 1.4322,
+            "recalls": {
+              "BULLISH": 0.6364,
+              "NEUTRAL": 0.0667,
+              "BEARISH": 0.5862
+            },
+            "promotionReady": false
+          },
+          "xgboost": {
+            "sampleCount": 240,
+            "coveredCount": 5,
+            "accuracy": 0.6,
+            "balancedAccuracy": 0.5,
+            "coverage": 0.0208,
+            "brierScore": 0.6029,
+            "logLoss": 0.9997,
+            "recalls": {
+              "BULLISH": 0.5,
+              "NEUTRAL": 0,
+              "BEARISH": 1
+            },
+            "promotionReady": false
+          }
+        },
+        {
+          "id": "277dd895-dc38-4f8a-a1ce-29fb7e4935df",
+          "comparisonId": "f2b1f26f-e9f0-4701-be06-765998b2575e",
+          "horizon": "FIVE_DAYS",
+          "status": "COMPLETED",
+          "datasetHash": "b6b119cffab51ef5843a41bdc389d5d49663f38b429c2383648832c00206b2e5",
+          "featureVersion": "gold-features-v2",
+          "labelVersion": "gold-next-session-direction-v1",
+          "splitVersion": "gold-temporal-split-v1",
+          "featureProfile": "ALL_36",
+          "parameters": {
+            "horizon": "FIVE_DAYS",
+            "featureProfile": "ALL_36",
+            "featureCount": 36,
+            "refitEvery": 20,
+            "confidenceThreshold": 0.55,
+            "majorityTrainer": "MajorityGoldTrainer",
+            "logisticTrainer": "TribuoGoldTrainer",
+            "featureVersion": "gold-features-v2",
+            "labelVersion": "gold-next-session-direction-v1",
+            "splitVersion": "gold-temporal-split-v1",
+            "xgboostTrainer": {
+              "name": "tribuo-xgboost",
+              "numTrees": 200,
+              "eta": 0.03,
+              "gamma": 0,
+              "maxDepth": 3,
+              "minChildWeight": 5,
+              "subsample": 0.8,
+              "featureSubsample": 0.8,
+              "lambda": 1,
+              "alpha": 0,
+              "nThread": 1,
+              "seed": 20260901
+            }
+          },
+          "dataStart": "2008-02-12",
+          "dataEnd": "2026-09-11",
+          "trainStart": "2008-02-12",
+          "validationStart": "2024-10-30",
+          "validationEnd": "2025-10-03",
+          "holdoutStart": "2025-10-13",
+          "holdoutEnd": "2026-09-11",
+          "validationSamples": 240,
+          "holdoutSamples": 240,
+          "gitCommit": "d7e0c2f2b050f9f84a5648bf40bf4cc61b06c93c",
+          "failureMessage": null,
+          "createdAt": "2026-09-20T12:45:19.0258081Z",
+          "startedAt": "2026-09-20T12:45:19.0258081Z",
+          "completedAt": "2026-09-20T12:46:32.379183Z",
+          "majority": {
+            "sampleCount": 240,
+            "coveredCount": 240,
+            "accuracy": 0.5833,
+            "balancedAccuracy": 0.3333,
+            "coverage": 1,
+            "brierScore": 0.8333,
+            "logLoss": 14.3912,
+            "recalls": {
+              "BULLISH": 1,
+              "NEUTRAL": 0,
+              "BEARISH": 0
+            },
+            "promotionReady": false
+          },
+          "logistic": {
+            "sampleCount": 240,
+            "coveredCount": 224,
+            "accuracy": 0.5982,
+            "balancedAccuracy": 0.4694,
+            "coverage": 0.9333,
+            "brierScore": 0.6591,
+            "logLoss": 1.6462,
+            "recalls": {
+              "BULLISH": 0.7692,
+              "NEUTRAL": 0.1389,
+              "BEARISH": 0.5
+            },
+            "promotionReady": false
+          },
+          "xgboost": {
+            "sampleCount": 240,
+            "coveredCount": 27,
+            "accuracy": 0.5926,
+            "balancedAccuracy": 0.4222,
+            "coverage": 0.1125,
+            "brierScore": 0.5897,
+            "logLoss": 0.9827,
+            "recalls": {
+              "BULLISH": 0.9333,
+              "NEUTRAL": 0,
+              "BEARISH": 0.3333
+            },
+            "promotionReady": false
+          }
+        }
+      ],
+      "stage8Candidate": false,
+      "candidateProfile": null,
+      "candidateReason": "覆盖率(0.2333)低于30%；NEUTRAL方向召回率(0.0000)低于25%"
+    },
+    {
+      "comparisonId": "17ae9ebf-c613-42e4-a7d3-7f6c14b72c5b",
+      "horizon": "TWENTY_DAYS",
+      "experiments": [
+        {
+          "id": "140ee347-b6fb-49cb-848c-490f50fe4468",
+          "comparisonId": "17ae9ebf-c613-42e4-a7d3-7f6c14b72c5b",
+          "horizon": "TWENTY_DAYS",
+          "status": "COMPLETED",
+          "datasetHash": "f95f0e7d202bf4463734b71c33b1637d728b6355022fdad836f4a477d379c8c5",
+          "featureVersion": "gold-features-v2",
+          "labelVersion": "gold-next-session-direction-v1",
+          "splitVersion": "gold-temporal-split-v1",
+          "featureProfile": "BASE_16",
+          "parameters": {
+            "horizon": "TWENTY_DAYS",
+            "featureProfile": "BASE_16",
+            "featureCount": 16,
+            "refitEvery": 20,
+            "confidenceThreshold": 0.55,
+            "majorityTrainer": "MajorityGoldTrainer",
+            "logisticTrainer": "TribuoGoldTrainer",
+            "featureVersion": "gold-features-v2",
+            "labelVersion": "gold-next-session-direction-v1",
+            "splitVersion": "gold-temporal-split-v1",
+            "xgboostTrainer": {
+              "name": "tribuo-xgboost",
+              "numTrees": 200,
+              "eta": 0.03,
+              "gamma": 0,
+              "maxDepth": 3,
+              "minChildWeight": 5,
+              "subsample": 0.8,
+              "featureSubsample": 0.8,
+              "lambda": 1,
+              "alpha": 0,
+              "nThread": 1,
+              "seed": 20260901
+            }
+          },
+          "dataStart": "2008-02-12",
+          "dataEnd": "2026-08-21",
+          "trainStart": "2008-02-12",
+          "validationStart": "2024-09-18",
+          "validationEnd": "2025-08-22",
+          "holdoutStart": "2025-09-22",
+          "holdoutEnd": "2026-08-21",
+          "validationSamples": 240,
+          "holdoutSamples": 240,
+          "gitCommit": "d7e0c2f2b050f9f84a5648bf40bf4cc61b06c93c",
+          "failureMessage": null,
+          "createdAt": "2026-09-20T12:46:59.085292Z",
+          "startedAt": "2026-09-20T12:46:59.085292Z",
+          "completedAt": "2026-09-20T12:47:16.6643254Z",
+          "majority": {
+            "sampleCount": 240,
+            "coveredCount": 240,
+            "accuracy": 0.6583,
+            "balancedAccuracy": 0.3333,
+            "coverage": 1,
+            "brierScore": 0.6833,
+            "logLoss": 11.8007,
+            "recalls": {
+              "BULLISH": 1,
+              "NEUTRAL": 0,
+              "BEARISH": 0
+            },
+            "promotionReady": false
+          },
+          "logistic": {
+            "sampleCount": 240,
+            "coveredCount": 169,
+            "accuracy": 0.645,
+            "balancedAccuracy": 0.4316,
+            "coverage": 0.7042,
+            "brierScore": 0.5478,
+            "logLoss": 0.9845,
+            "recalls": {
+              "BULLISH": 0.7797,
+              "NEUTRAL": 0,
+              "BEARISH": 0.5152
+            },
+            "promotionReady": false
+          },
+          "xgboost": {
+            "sampleCount": 240,
+            "coveredCount": 219,
+            "accuracy": 0.7032,
+            "balancedAccuracy": 0.3364,
+            "coverage": 0.9125,
+            "brierScore": 0.4662,
+            "logLoss": 0.8151,
+            "recalls": {
+              "BULLISH": 0.9871,
+              "NEUTRAL": 0,
+              "BEARISH": 0.0222
+            },
+            "promotionReady": false
+          }
+        },
+        {
+          "id": "27569266-f686-4fc5-9b03-aa3f018c427d",
+          "comparisonId": "17ae9ebf-c613-42e4-a7d3-7f6c14b72c5b",
+          "horizon": "TWENTY_DAYS",
+          "status": "COMPLETED",
+          "datasetHash": "f95f0e7d202bf4463734b71c33b1637d728b6355022fdad836f4a477d379c8c5",
+          "featureVersion": "gold-features-v2",
+          "labelVersion": "gold-next-session-direction-v1",
+          "splitVersion": "gold-temporal-split-v1",
+          "featureProfile": "OHLC_20",
+          "parameters": {
+            "horizon": "TWENTY_DAYS",
+            "featureProfile": "OHLC_20",
+            "featureCount": 20,
+            "refitEvery": 20,
+            "confidenceThreshold": 0.55,
+            "majorityTrainer": "MajorityGoldTrainer",
+            "logisticTrainer": "TribuoGoldTrainer",
+            "featureVersion": "gold-features-v2",
+            "labelVersion": "gold-next-session-direction-v1",
+            "splitVersion": "gold-temporal-split-v1",
+            "xgboostTrainer": {
+              "name": "tribuo-xgboost",
+              "numTrees": 200,
+              "eta": 0.03,
+              "gamma": 0,
+              "maxDepth": 3,
+              "minChildWeight": 5,
+              "subsample": 0.8,
+              "featureSubsample": 0.8,
+              "lambda": 1,
+              "alpha": 0,
+              "nThread": 1,
+              "seed": 20260901
+            }
+          },
+          "dataStart": "2008-02-12",
+          "dataEnd": "2026-08-21",
+          "trainStart": "2008-02-12",
+          "validationStart": "2024-09-18",
+          "validationEnd": "2025-08-22",
+          "holdoutStart": "2025-09-22",
+          "holdoutEnd": "2026-08-21",
+          "validationSamples": 240,
+          "holdoutSamples": 240,
+          "gitCommit": "d7e0c2f2b050f9f84a5648bf40bf4cc61b06c93c",
+          "failureMessage": null,
+          "createdAt": "2026-09-20T12:46:59.085292Z",
+          "startedAt": "2026-09-20T12:46:59.085292Z",
+          "completedAt": "2026-09-20T12:47:38.6756195Z",
+          "majority": {
+            "sampleCount": 240,
+            "coveredCount": 240,
+            "accuracy": 0.6583,
+            "balancedAccuracy": 0.3333,
+            "coverage": 1,
+            "brierScore": 0.6833,
+            "logLoss": 11.8007,
+            "recalls": {
+              "BULLISH": 1,
+              "NEUTRAL": 0,
+              "BEARISH": 0
+            },
+            "promotionReady": false
+          },
+          "logistic": {
+            "sampleCount": 240,
+            "coveredCount": 197,
+            "accuracy": 0.3756,
+            "balancedAccuracy": 0.3206,
+            "coverage": 0.8208,
+            "brierScore": 0.9825,
+            "logLoss": 2.0929,
+            "recalls": {
+              "BULLISH": 0.3667,
+              "NEUTRAL": 0.0952,
+              "BEARISH": 0.5
+            },
+            "promotionReady": false
+          },
+          "xgboost": {
+            "sampleCount": 240,
+            "coveredCount": 76,
+            "accuracy": 0.6184,
+            "balancedAccuracy": 0.3264,
+            "coverage": 0.3167,
+            "brierScore": 0.5574,
+            "logLoss": 0.9257,
+            "recalls": {
+              "BULLISH": 0.9792,
+              "NEUTRAL": 0,
+              "BEARISH": 0
+            },
+            "promotionReady": false
+          }
+        },
+        {
+          "id": "28ccf9e8-9a3a-4283-b7d1-9b0353c90273",
+          "comparisonId": "17ae9ebf-c613-42e4-a7d3-7f6c14b72c5b",
+          "horizon": "TWENTY_DAYS",
+          "status": "COMPLETED",
+          "datasetHash": "f95f0e7d202bf4463734b71c33b1637d728b6355022fdad836f4a477d379c8c5",
+          "featureVersion": "gold-features-v2",
+          "labelVersion": "gold-next-session-direction-v1",
+          "splitVersion": "gold-temporal-split-v1",
+          "featureProfile": "ALL_36",
+          "parameters": {
+            "horizon": "TWENTY_DAYS",
+            "featureProfile": "ALL_36",
+            "featureCount": 36,
+            "refitEvery": 20,
+            "confidenceThreshold": 0.55,
+            "majorityTrainer": "MajorityGoldTrainer",
+            "logisticTrainer": "TribuoGoldTrainer",
+            "featureVersion": "gold-features-v2",
+            "labelVersion": "gold-next-session-direction-v1",
+            "splitVersion": "gold-temporal-split-v1",
+            "xgboostTrainer": {
+              "name": "tribuo-xgboost",
+              "numTrees": 200,
+              "eta": 0.03,
+              "gamma": 0,
+              "maxDepth": 3,
+              "minChildWeight": 5,
+              "subsample": 0.8,
+              "featureSubsample": 0.8,
+              "lambda": 1,
+              "alpha": 0,
+              "nThread": 1,
+              "seed": 20260901
+            }
+          },
+          "dataStart": "2008-02-12",
+          "dataEnd": "2026-08-21",
+          "trainStart": "2008-02-12",
+          "validationStart": "2024-09-18",
+          "validationEnd": "2025-08-22",
+          "holdoutStart": "2025-09-22",
+          "holdoutEnd": "2026-08-21",
+          "validationSamples": 240,
+          "holdoutSamples": 240,
+          "gitCommit": "d7e0c2f2b050f9f84a5648bf40bf4cc61b06c93c",
+          "failureMessage": null,
+          "createdAt": "2026-09-20T12:46:59.085292Z",
+          "startedAt": "2026-09-20T12:46:59.085292Z",
+          "completedAt": "2026-09-20T12:48:11.5005098Z",
+          "majority": {
+            "sampleCount": 240,
+            "coveredCount": 240,
+            "accuracy": 0.6583,
+            "balancedAccuracy": 0.3333,
+            "coverage": 1,
+            "brierScore": 0.6833,
+            "logLoss": 11.8007,
+            "recalls": {
+              "BULLISH": 1,
+              "NEUTRAL": 0,
+              "BEARISH": 0
+            },
+            "promotionReady": false
+          },
+          "logistic": {
+            "sampleCount": 240,
+            "coveredCount": 220,
+            "accuracy": 0.3864,
+            "balancedAccuracy": 0.296,
+            "coverage": 0.9167,
+            "brierScore": 0.9318,
+            "logLoss": 2.3891,
+            "recalls": {
+              "BULLISH": 0.45,
+              "NEUTRAL": 0.087,
+              "BEARISH": 0.3509
+            },
+            "promotionReady": false
+          },
+          "xgboost": {
+            "sampleCount": 240,
+            "coveredCount": 216,
+            "accuracy": 0.713,
+            "balancedAccuracy": 0.3488,
+            "coverage": 0.9,
+            "brierScore": 0.4849,
+            "logLoss": 0.8451,
+            "recalls": {
+              "BULLISH": 1,
+              "NEUTRAL": 0,
+              "BEARISH": 0.0465
+            },
+            "promotionReady": false
+          }
+        }
+      ],
+      "stage8Candidate": false,
+      "candidateProfile": null,
+      "candidateReason": "NEUTRAL方向召回率(0.0000)低于25%；BEARISH方向召回率(0.0465)低于25%"
+    }
+  ],
+  "persistedMetrics": [
+    {
+      "id": "5538877c-df7d-4a91-b707-9cf5499c9d85",
+      "comparison_id": "496b4763-598a-4ef1-bee4-745eb441ac4b",
+      "horizon": "NEXT_DAY",
+      "feature_profile": "ALL_36",
+      "model_type": "LOGISTIC",
+      "sample_count": 240,
+      "covered_count": 216,
+      "accuracy": 0.3565,
+      "balanced_accuracy": 0.3447,
+      "coverage": 0.9,
+      "brier_score": 1.0425,
+      "log_loss": 2.4297,
+      "recalls": {
+        "BEARISH": 0.25,
+        "BULLISH": 0.241,
+        "NEUTRAL": 0.5432
+      },
+      "confusion_matrix": {
+        "BEARISH": {
+          "BEARISH": 13,
+          "BULLISH": 22,
+          "NEUTRAL": 17
+        },
+        "BULLISH": {
+          "BEARISH": 26,
+          "BULLISH": 20,
+          "NEUTRAL": 37
+        },
+        "NEUTRAL": {
+          "BEARISH": 17,
+          "BULLISH": 20,
+          "NEUTRAL": 44
+        }
+      }
+    },
+    {
+      "id": "5538877c-df7d-4a91-b707-9cf5499c9d85",
+      "comparison_id": "496b4763-598a-4ef1-bee4-745eb441ac4b",
+      "horizon": "NEXT_DAY",
+      "feature_profile": "ALL_36",
+      "model_type": "MAJORITY",
+      "sample_count": 240,
+      "covered_count": 240,
+      "accuracy": 0.375,
+      "balanced_accuracy": 0.3333,
+      "coverage": 1,
+      "brier_score": 1.25,
+      "log_loss": 21.5867,
+      "recalls": {
+        "BEARISH": 0,
+        "BULLISH": 0,
+        "NEUTRAL": 1
+      },
+      "confusion_matrix": {
+        "BEARISH": {
+          "BEARISH": 0,
+          "BULLISH": 0,
+          "NEUTRAL": 57
+        },
+        "BULLISH": {
+          "BEARISH": 0,
+          "BULLISH": 0,
+          "NEUTRAL": 93
+        },
+        "NEUTRAL": {
+          "BEARISH": 0,
+          "BULLISH": 0,
+          "NEUTRAL": 90
+        }
+      }
+    },
+    {
+      "id": "5538877c-df7d-4a91-b707-9cf5499c9d85",
+      "comparison_id": "496b4763-598a-4ef1-bee4-745eb441ac4b",
+      "horizon": "NEXT_DAY",
+      "feature_profile": "ALL_36",
+      "model_type": "XGBOOST",
+      "sample_count": 240,
+      "covered_count": 7,
+      "accuracy": 0.5714,
+      "balanced_accuracy": 0.3333,
+      "coverage": 0.0292,
+      "brier_score": 0.6572,
+      "log_loss": 1.0813,
+      "recalls": {
+        "BEARISH": 0,
+        "BULLISH": 0,
+        "NEUTRAL": 1
+      },
+      "confusion_matrix": {
+        "BEARISH": {
+          "BEARISH": 0,
+          "BULLISH": 0,
+          "NEUTRAL": 1
+        },
+        "BULLISH": {
+          "BEARISH": 0,
+          "BULLISH": 0,
+          "NEUTRAL": 2
+        },
+        "NEUTRAL": {
+          "BEARISH": 0,
+          "BULLISH": 0,
+          "NEUTRAL": 4
+        }
+      }
+    },
+    {
+      "id": "ab9181d7-c414-473d-a2b2-db512a513135",
+      "comparison_id": "496b4763-598a-4ef1-bee4-745eb441ac4b",
+      "horizon": "NEXT_DAY",
+      "feature_profile": "BASE_16",
+      "model_type": "LOGISTIC",
+      "sample_count": 240,
+      "covered_count": 161,
+      "accuracy": 0.4224,
+      "balanced_accuracy": 0.3801,
+      "coverage": 0.6708,
+      "brier_score": 0.7708,
+      "log_loss": 1.2986,
+      "recalls": {
+        "BEARISH": 0.1081,
+        "BULLISH": 0.2097,
+        "NEUTRAL": 0.8226
+      },
+      "confusion_matrix": {
+        "BEARISH": {
+          "BEARISH": 4,
+          "BULLISH": 12,
+          "NEUTRAL": 21
+        },
+        "BULLISH": {
+          "BEARISH": 6,
+          "BULLISH": 13,
+          "NEUTRAL": 43
+        },
+        "NEUTRAL": {
+          "BEARISH": 2,
+          "BULLISH": 9,
+          "NEUTRAL": 51
+        }
+      }
+    },
+    {
+      "id": "ab9181d7-c414-473d-a2b2-db512a513135",
+      "comparison_id": "496b4763-598a-4ef1-bee4-745eb441ac4b",
+      "horizon": "NEXT_DAY",
+      "feature_profile": "BASE_16",
+      "model_type": "MAJORITY",
+      "sample_count": 240,
+      "covered_count": 240,
+      "accuracy": 0.375,
+      "balanced_accuracy": 0.3333,
+      "coverage": 1,
+      "brier_score": 1.25,
+      "log_loss": 21.5867,
+      "recalls": {
+        "BEARISH": 0,
+        "BULLISH": 0,
+        "NEUTRAL": 1
+      },
+      "confusion_matrix": {
+        "BEARISH": {
+          "BEARISH": 0,
+          "BULLISH": 0,
+          "NEUTRAL": 57
+        },
+        "BULLISH": {
+          "BEARISH": 0,
+          "BULLISH": 0,
+          "NEUTRAL": 93
+        },
+        "NEUTRAL": {
+          "BEARISH": 0,
+          "BULLISH": 0,
+          "NEUTRAL": 90
+        }
+      }
+    },
+    {
+      "id": "ab9181d7-c414-473d-a2b2-db512a513135",
+      "comparison_id": "496b4763-598a-4ef1-bee4-745eb441ac4b",
+      "horizon": "NEXT_DAY",
+      "feature_profile": "BASE_16",
+      "model_type": "XGBOOST",
+      "sample_count": 240,
+      "covered_count": 15,
+      "accuracy": 0.5333,
+      "balanced_accuracy": 0.3333,
+      "coverage": 0.0625,
+      "brier_score": 0.6558,
+      "log_loss": 1.079,
+      "recalls": {
+        "BEARISH": 0,
+        "BULLISH": 0,
+        "NEUTRAL": 1
+      },
+      "confusion_matrix": {
+        "BEARISH": {
+          "BEARISH": 0,
+          "BULLISH": 0,
+          "NEUTRAL": 1
+        },
+        "BULLISH": {
+          "BEARISH": 0,
+          "BULLISH": 0,
+          "NEUTRAL": 6
+        },
+        "NEUTRAL": {
+          "BEARISH": 0,
+          "BULLISH": 0,
+          "NEUTRAL": 8
+        }
+      }
+    },
+    {
+      "id": "543a13f9-a468-4aa5-822f-9450681b8932",
+      "comparison_id": "496b4763-598a-4ef1-bee4-745eb441ac4b",
+      "horizon": "NEXT_DAY",
+      "feature_profile": "OHLC_20",
+      "model_type": "LOGISTIC",
+      "sample_count": 240,
+      "covered_count": 198,
+      "accuracy": 0.3687,
+      "balanced_accuracy": 0.358,
+      "coverage": 0.825,
+      "brier_score": 0.955,
+      "log_loss": 1.9549,
+      "recalls": {
+        "BEARISH": 0.2609,
+        "BULLISH": 0.2051,
+        "NEUTRAL": 0.6081
+      },
+      "confusion_matrix": {
+        "BEARISH": {
+          "BEARISH": 12,
+          "BULLISH": 15,
+          "NEUTRAL": 19
+        },
+        "BULLISH": {
+          "BEARISH": 23,
+          "BULLISH": 16,
+          "NEUTRAL": 39
+        },
+        "NEUTRAL": {
+          "BEARISH": 12,
+          "BULLISH": 17,
+          "NEUTRAL": 45
+        }
+      }
+    },
+    {
+      "id": "543a13f9-a468-4aa5-822f-9450681b8932",
+      "comparison_id": "496b4763-598a-4ef1-bee4-745eb441ac4b",
+      "horizon": "NEXT_DAY",
+      "feature_profile": "OHLC_20",
+      "model_type": "MAJORITY",
+      "sample_count": 240,
+      "covered_count": 240,
+      "accuracy": 0.375,
+      "balanced_accuracy": 0.3333,
+      "coverage": 1,
+      "brier_score": 1.25,
+      "log_loss": 21.5867,
+      "recalls": {
+        "BEARISH": 0,
+        "BULLISH": 0,
+        "NEUTRAL": 1
+      },
+      "confusion_matrix": {
+        "BEARISH": {
+          "BEARISH": 0,
+          "BULLISH": 0,
+          "NEUTRAL": 57
+        },
+        "BULLISH": {
+          "BEARISH": 0,
+          "BULLISH": 0,
+          "NEUTRAL": 93
+        },
+        "NEUTRAL": {
+          "BEARISH": 0,
+          "BULLISH": 0,
+          "NEUTRAL": 90
+        }
+      }
+    },
+    {
+      "id": "543a13f9-a468-4aa5-822f-9450681b8932",
+      "comparison_id": "496b4763-598a-4ef1-bee4-745eb441ac4b",
+      "horizon": "NEXT_DAY",
+      "feature_profile": "OHLC_20",
+      "model_type": "XGBOOST",
+      "sample_count": 240,
+      "covered_count": 6,
+      "accuracy": 0.3333,
+      "balanced_accuracy": 0.3333,
+      "coverage": 0.025,
+      "brier_score": 0.6592,
+      "log_loss": 1.0841,
+      "recalls": {
+        "BEARISH": 0,
+        "BULLISH": 0,
+        "NEUTRAL": 1
+      },
+      "confusion_matrix": {
+        "BEARISH": {
+          "BEARISH": 0,
+          "BULLISH": 0,
+          "NEUTRAL": 1
+        },
+        "BULLISH": {
+          "BEARISH": 0,
+          "BULLISH": 0,
+          "NEUTRAL": 3
+        },
+        "NEUTRAL": {
+          "BEARISH": 0,
+          "BULLISH": 0,
+          "NEUTRAL": 2
+        }
+      }
+    },
+    {
+      "id": "277dd895-dc38-4f8a-a1ce-29fb7e4935df",
+      "comparison_id": "f2b1f26f-e9f0-4701-be06-765998b2575e",
+      "horizon": "FIVE_DAYS",
+      "feature_profile": "ALL_36",
+      "model_type": "LOGISTIC",
+      "sample_count": 240,
+      "covered_count": 224,
+      "accuracy": 0.5982,
+      "balanced_accuracy": 0.4694,
+      "coverage": 0.9333,
+      "brier_score": 0.6591,
+      "log_loss": 1.6462,
+      "recalls": {
+        "BEARISH": 0.5,
+        "BULLISH": 0.7692,
+        "NEUTRAL": 0.1389
+      },
+      "confusion_matrix": {
+        "BEARISH": {
+          "BEARISH": 29,
+          "BULLISH": 20,
+          "NEUTRAL": 9
+        },
+        "BULLISH": {
+          "BEARISH": 23,
+          "BULLISH": 100,
+          "NEUTRAL": 7
+        },
+        "NEUTRAL": {
+          "BEARISH": 13,
+          "BULLISH": 18,
+          "NEUTRAL": 5
+        }
+      }
+    },
+    {
+      "id": "277dd895-dc38-4f8a-a1ce-29fb7e4935df",
+      "comparison_id": "f2b1f26f-e9f0-4701-be06-765998b2575e",
+      "horizon": "FIVE_DAYS",
+      "feature_profile": "ALL_36",
+      "model_type": "MAJORITY",
+      "sample_count": 240,
+      "covered_count": 240,
+      "accuracy": 0.5833,
+      "balanced_accuracy": 0.3333,
+      "coverage": 1,
+      "brier_score": 0.8333,
+      "log_loss": 14.3912,
+      "recalls": {
+        "BEARISH": 0,
+        "BULLISH": 1,
+        "NEUTRAL": 0
+      },
+      "confusion_matrix": {
+        "BEARISH": {
+          "BEARISH": 0,
+          "BULLISH": 62,
+          "NEUTRAL": 0
+        },
+        "BULLISH": {
+          "BEARISH": 0,
+          "BULLISH": 140,
+          "NEUTRAL": 0
+        },
+        "NEUTRAL": {
+          "BEARISH": 0,
+          "BULLISH": 38,
+          "NEUTRAL": 0
+        }
+      }
+    },
+    {
+      "id": "277dd895-dc38-4f8a-a1ce-29fb7e4935df",
+      "comparison_id": "f2b1f26f-e9f0-4701-be06-765998b2575e",
+      "horizon": "FIVE_DAYS",
+      "feature_profile": "ALL_36",
+      "model_type": "XGBOOST",
+      "sample_count": 240,
+      "covered_count": 27,
+      "accuracy": 0.5926,
+      "balanced_accuracy": 0.4222,
+      "coverage": 0.1125,
+      "brier_score": 0.5897,
+      "log_loss": 0.9827,
+      "recalls": {
+        "BEARISH": 0.3333,
+        "BULLISH": 0.9333,
+        "NEUTRAL": 0
+      },
+      "confusion_matrix": {
+        "BEARISH": {
+          "BEARISH": 2,
+          "BULLISH": 4,
+          "NEUTRAL": 0
+        },
+        "BULLISH": {
+          "BEARISH": 1,
+          "BULLISH": 14,
+          "NEUTRAL": 0
+        },
+        "NEUTRAL": {
+          "BEARISH": 1,
+          "BULLISH": 5,
+          "NEUTRAL": 0
+        }
+      }
+    },
+    {
+      "id": "78379a97-46a8-4b1c-a70a-de639420aaee",
+      "comparison_id": "f2b1f26f-e9f0-4701-be06-765998b2575e",
+      "horizon": "FIVE_DAYS",
+      "feature_profile": "BASE_16",
+      "model_type": "LOGISTIC",
+      "sample_count": 240,
+      "covered_count": 152,
+      "accuracy": 0.6053,
+      "balanced_accuracy": 0.3961,
+      "coverage": 0.6333,
+      "brier_score": 0.585,
+      "log_loss": 1.0128,
+      "recalls": {
+        "BEARISH": 0.2791,
+        "BULLISH": 0.9091,
+        "NEUTRAL": 0
+      },
+      "confusion_matrix": {
+        "BEARISH": {
+          "BEARISH": 12,
+          "BULLISH": 31,
+          "NEUTRAL": 0
+        },
+        "BULLISH": {
+          "BEARISH": 8,
+          "BULLISH": 80,
+          "NEUTRAL": 0
+        },
+        "NEUTRAL": {
+          "BEARISH": 4,
+          "BULLISH": 17,
+          "NEUTRAL": 0
+        }
+      }
+    },
+    {
+      "id": "78379a97-46a8-4b1c-a70a-de639420aaee",
+      "comparison_id": "f2b1f26f-e9f0-4701-be06-765998b2575e",
+      "horizon": "FIVE_DAYS",
+      "feature_profile": "BASE_16",
+      "model_type": "MAJORITY",
+      "sample_count": 240,
+      "covered_count": 240,
+      "accuracy": 0.5833,
+      "balanced_accuracy": 0.3333,
+      "coverage": 1,
+      "brier_score": 0.8333,
+      "log_loss": 14.3912,
+      "recalls": {
+        "BEARISH": 0,
+        "BULLISH": 1,
+        "NEUTRAL": 0
+      },
+      "confusion_matrix": {
+        "BEARISH": {
+          "BEARISH": 0,
+          "BULLISH": 62,
+          "NEUTRAL": 0
+        },
+        "BULLISH": {
+          "BEARISH": 0,
+          "BULLISH": 140,
+          "NEUTRAL": 0
+        },
+        "NEUTRAL": {
+          "BEARISH": 0,
+          "BULLISH": 38,
+          "NEUTRAL": 0
+        }
+      }
+    },
+    {
+      "id": "78379a97-46a8-4b1c-a70a-de639420aaee",
+      "comparison_id": "f2b1f26f-e9f0-4701-be06-765998b2575e",
+      "horizon": "FIVE_DAYS",
+      "feature_profile": "BASE_16",
+      "model_type": "XGBOOST",
+      "sample_count": 240,
+      "covered_count": 56,
+      "accuracy": 0.625,
+      "balanced_accuracy": 0.4259,
+      "coverage": 0.2333,
+      "brier_score": 0.5755,
+      "log_loss": 0.9653,
+      "recalls": {
+        "BEARISH": 0.2778,
+        "BULLISH": 1,
+        "NEUTRAL": 0
+      },
+      "confusion_matrix": {
+        "BEARISH": {
+          "BEARISH": 5,
+          "BULLISH": 13,
+          "NEUTRAL": 0
+        },
+        "BULLISH": {
+          "BEARISH": 0,
+          "BULLISH": 30,
+          "NEUTRAL": 0
+        },
+        "NEUTRAL": {
+          "BEARISH": 0,
+          "BULLISH": 8,
+          "NEUTRAL": 0
+        }
+      }
+    },
+    {
+      "id": "535120fe-2533-4b4d-bafd-6b5c4161b63b",
+      "comparison_id": "f2b1f26f-e9f0-4701-be06-765998b2575e",
+      "horizon": "FIVE_DAYS",
+      "feature_profile": "OHLC_20",
+      "model_type": "LOGISTIC",
+      "sample_count": 240,
+      "covered_count": 209,
+      "accuracy": 0.5407,
+      "balanced_accuracy": 0.4298,
+      "coverage": 0.8708,
+      "brier_score": 0.6942,
+      "log_loss": 1.4322,
+      "recalls": {
+        "BEARISH": 0.5862,
+        "BULLISH": 0.6364,
+        "NEUTRAL": 0.0667
+      },
+      "confusion_matrix": {
+        "BEARISH": {
+          "BEARISH": 34,
+          "BULLISH": 14,
+          "NEUTRAL": 10
+        },
+        "BULLISH": {
+          "BEARISH": 35,
+          "BULLISH": 77,
+          "NEUTRAL": 9
+        },
+        "NEUTRAL": {
+          "BEARISH": 14,
+          "BULLISH": 14,
+          "NEUTRAL": 2
+        }
+      }
+    },
+    {
+      "id": "535120fe-2533-4b4d-bafd-6b5c4161b63b",
+      "comparison_id": "f2b1f26f-e9f0-4701-be06-765998b2575e",
+      "horizon": "FIVE_DAYS",
+      "feature_profile": "OHLC_20",
+      "model_type": "MAJORITY",
+      "sample_count": 240,
+      "covered_count": 240,
+      "accuracy": 0.5833,
+      "balanced_accuracy": 0.3333,
+      "coverage": 1,
+      "brier_score": 0.8333,
+      "log_loss": 14.3912,
+      "recalls": {
+        "BEARISH": 0,
+        "BULLISH": 1,
+        "NEUTRAL": 0
+      },
+      "confusion_matrix": {
+        "BEARISH": {
+          "BEARISH": 0,
+          "BULLISH": 62,
+          "NEUTRAL": 0
+        },
+        "BULLISH": {
+          "BEARISH": 0,
+          "BULLISH": 140,
+          "NEUTRAL": 0
+        },
+        "NEUTRAL": {
+          "BEARISH": 0,
+          "BULLISH": 38,
+          "NEUTRAL": 0
+        }
+      }
+    },
+    {
+      "id": "535120fe-2533-4b4d-bafd-6b5c4161b63b",
+      "comparison_id": "f2b1f26f-e9f0-4701-be06-765998b2575e",
+      "horizon": "FIVE_DAYS",
+      "feature_profile": "OHLC_20",
+      "model_type": "XGBOOST",
+      "sample_count": 240,
+      "covered_count": 5,
+      "accuracy": 0.6,
+      "balanced_accuracy": 0.5,
+      "coverage": 0.0208,
+      "brier_score": 0.6029,
+      "log_loss": 0.9997,
+      "recalls": {
+        "BEARISH": 1,
+        "BULLISH": 0.5,
+        "NEUTRAL": 0
+      },
+      "confusion_matrix": {
+        "BEARISH": {
+          "BEARISH": 2,
+          "BULLISH": 0,
+          "NEUTRAL": 0
+        },
+        "BULLISH": {
+          "BEARISH": 1,
+          "BULLISH": 1,
+          "NEUTRAL": 0
+        },
+        "NEUTRAL": {
+          "BEARISH": 1,
+          "BULLISH": 0,
+          "NEUTRAL": 0
+        }
+      }
+    },
+    {
+      "id": "28ccf9e8-9a3a-4283-b7d1-9b0353c90273",
+      "comparison_id": "17ae9ebf-c613-42e4-a7d3-7f6c14b72c5b",
+      "horizon": "TWENTY_DAYS",
+      "feature_profile": "ALL_36",
+      "model_type": "LOGISTIC",
+      "sample_count": 240,
+      "covered_count": 220,
+      "accuracy": 0.3864,
+      "balanced_accuracy": 0.296,
+      "coverage": 0.9167,
+      "brier_score": 0.9318,
+      "log_loss": 2.3891,
+      "recalls": {
+        "BEARISH": 0.3509,
+        "BULLISH": 0.45,
+        "NEUTRAL": 0.087
+      },
+      "confusion_matrix": {
+        "BEARISH": {
+          "BEARISH": 20,
+          "BULLISH": 23,
+          "NEUTRAL": 14
+        },
+        "BULLISH": {
+          "BEARISH": 42,
+          "BULLISH": 63,
+          "NEUTRAL": 35
+        },
+        "NEUTRAL": {
+          "BEARISH": 1,
+          "BULLISH": 20,
+          "NEUTRAL": 2
+        }
+      }
+    },
+    {
+      "id": "28ccf9e8-9a3a-4283-b7d1-9b0353c90273",
+      "comparison_id": "17ae9ebf-c613-42e4-a7d3-7f6c14b72c5b",
+      "horizon": "TWENTY_DAYS",
+      "feature_profile": "ALL_36",
+      "model_type": "MAJORITY",
+      "sample_count": 240,
+      "covered_count": 240,
+      "accuracy": 0.6583,
+      "balanced_accuracy": 0.3333,
+      "coverage": 1,
+      "brier_score": 0.6833,
+      "log_loss": 11.8007,
+      "recalls": {
+        "BEARISH": 0,
+        "BULLISH": 1,
+        "NEUTRAL": 0
+      },
+      "confusion_matrix": {
+        "BEARISH": {
+          "BEARISH": 0,
+          "BULLISH": 59,
+          "NEUTRAL": 0
+        },
+        "BULLISH": {
+          "BEARISH": 0,
+          "BULLISH": 158,
+          "NEUTRAL": 0
+        },
+        "NEUTRAL": {
+          "BEARISH": 0,
+          "BULLISH": 23,
+          "NEUTRAL": 0
+        }
+      }
+    },
+    {
+      "id": "28ccf9e8-9a3a-4283-b7d1-9b0353c90273",
+      "comparison_id": "17ae9ebf-c613-42e4-a7d3-7f6c14b72c5b",
+      "horizon": "TWENTY_DAYS",
+      "feature_profile": "ALL_36",
+      "model_type": "XGBOOST",
+      "sample_count": 240,
+      "covered_count": 216,
+      "accuracy": 0.713,
+      "balanced_accuracy": 0.3488,
+      "coverage": 0.9,
+      "brier_score": 0.4849,
+      "log_loss": 0.8451,
+      "recalls": {
+        "BEARISH": 0.0465,
+        "BULLISH": 1,
+        "NEUTRAL": 0
+      },
+      "confusion_matrix": {
+        "BEARISH": {
+          "BEARISH": 2,
+          "BULLISH": 41,
+          "NEUTRAL": 0
+        },
+        "BULLISH": {
+          "BEARISH": 0,
+          "BULLISH": 152,
+          "NEUTRAL": 0
+        },
+        "NEUTRAL": {
+          "BEARISH": 0,
+          "BULLISH": 21,
+          "NEUTRAL": 0
+        }
+      }
+    },
+    {
+      "id": "140ee347-b6fb-49cb-848c-490f50fe4468",
+      "comparison_id": "17ae9ebf-c613-42e4-a7d3-7f6c14b72c5b",
+      "horizon": "TWENTY_DAYS",
+      "feature_profile": "BASE_16",
+      "model_type": "LOGISTIC",
+      "sample_count": 240,
+      "covered_count": 169,
+      "accuracy": 0.645,
+      "balanced_accuracy": 0.4316,
+      "coverage": 0.7042,
+      "brier_score": 0.5478,
+      "log_loss": 0.9845,
+      "recalls": {
+        "BEARISH": 0.5152,
+        "BULLISH": 0.7797,
+        "NEUTRAL": 0
+      },
+      "confusion_matrix": {
+        "BEARISH": {
+          "BEARISH": 17,
+          "BULLISH": 16,
+          "NEUTRAL": 0
+        },
+        "BULLISH": {
+          "BEARISH": 26,
+          "BULLISH": 92,
+          "NEUTRAL": 0
+        },
+        "NEUTRAL": {
+          "BEARISH": 9,
+          "BULLISH": 9,
+          "NEUTRAL": 0
+        }
+      }
+    },
+    {
+      "id": "140ee347-b6fb-49cb-848c-490f50fe4468",
+      "comparison_id": "17ae9ebf-c613-42e4-a7d3-7f6c14b72c5b",
+      "horizon": "TWENTY_DAYS",
+      "feature_profile": "BASE_16",
+      "model_type": "MAJORITY",
+      "sample_count": 240,
+      "covered_count": 240,
+      "accuracy": 0.6583,
+      "balanced_accuracy": 0.3333,
+      "coverage": 1,
+      "brier_score": 0.6833,
+      "log_loss": 11.8007,
+      "recalls": {
+        "BEARISH": 0,
+        "BULLISH": 1,
+        "NEUTRAL": 0
+      },
+      "confusion_matrix": {
+        "BEARISH": {
+          "BEARISH": 0,
+          "BULLISH": 59,
+          "NEUTRAL": 0
+        },
+        "BULLISH": {
+          "BEARISH": 0,
+          "BULLISH": 158,
+          "NEUTRAL": 0
+        },
+        "NEUTRAL": {
+          "BEARISH": 0,
+          "BULLISH": 23,
+          "NEUTRAL": 0
+        }
+      }
+    },
+    {
+      "id": "140ee347-b6fb-49cb-848c-490f50fe4468",
+      "comparison_id": "17ae9ebf-c613-42e4-a7d3-7f6c14b72c5b",
+      "horizon": "TWENTY_DAYS",
+      "feature_profile": "BASE_16",
+      "model_type": "XGBOOST",
+      "sample_count": 240,
+      "covered_count": 219,
+      "accuracy": 0.7032,
+      "balanced_accuracy": 0.3364,
+      "coverage": 0.9125,
+      "brier_score": 0.4662,
+      "log_loss": 0.8151,
+      "recalls": {
+        "BEARISH": 0.0222,
+        "BULLISH": 0.9871,
+        "NEUTRAL": 0
+      },
+      "confusion_matrix": {
+        "BEARISH": {
+          "BEARISH": 1,
+          "BULLISH": 44,
+          "NEUTRAL": 0
+        },
+        "BULLISH": {
+          "BEARISH": 2,
+          "BULLISH": 153,
+          "NEUTRAL": 0
+        },
+        "NEUTRAL": {
+          "BEARISH": 0,
+          "BULLISH": 19,
+          "NEUTRAL": 0
+        }
+      }
+    },
+    {
+      "id": "27569266-f686-4fc5-9b03-aa3f018c427d",
+      "comparison_id": "17ae9ebf-c613-42e4-a7d3-7f6c14b72c5b",
+      "horizon": "TWENTY_DAYS",
+      "feature_profile": "OHLC_20",
+      "model_type": "LOGISTIC",
+      "sample_count": 240,
+      "covered_count": 197,
+      "accuracy": 0.3756,
+      "balanced_accuracy": 0.3206,
+      "coverage": 0.8208,
+      "brier_score": 0.9825,
+      "log_loss": 2.0929,
+      "recalls": {
+        "BEARISH": 0.5,
+        "BULLISH": 0.3667,
+        "NEUTRAL": 0.0952
+      },
+      "confusion_matrix": {
+        "BEARISH": {
+          "BEARISH": 28,
+          "BULLISH": 15,
+          "NEUTRAL": 13
+        },
+        "BULLISH": {
+          "BEARISH": 59,
+          "BULLISH": 44,
+          "NEUTRAL": 17
+        },
+        "NEUTRAL": {
+          "BEARISH": 6,
+          "BULLISH": 13,
+          "NEUTRAL": 2
+        }
+      }
+    },
+    {
+      "id": "27569266-f686-4fc5-9b03-aa3f018c427d",
+      "comparison_id": "17ae9ebf-c613-42e4-a7d3-7f6c14b72c5b",
+      "horizon": "TWENTY_DAYS",
+      "feature_profile": "OHLC_20",
+      "model_type": "MAJORITY",
+      "sample_count": 240,
+      "covered_count": 240,
+      "accuracy": 0.6583,
+      "balanced_accuracy": 0.3333,
+      "coverage": 1,
+      "brier_score": 0.6833,
+      "log_loss": 11.8007,
+      "recalls": {
+        "BEARISH": 0,
+        "BULLISH": 1,
+        "NEUTRAL": 0
+      },
+      "confusion_matrix": {
+        "BEARISH": {
+          "BEARISH": 0,
+          "BULLISH": 59,
+          "NEUTRAL": 0
+        },
+        "BULLISH": {
+          "BEARISH": 0,
+          "BULLISH": 158,
+          "NEUTRAL": 0
+        },
+        "NEUTRAL": {
+          "BEARISH": 0,
+          "BULLISH": 23,
+          "NEUTRAL": 0
+        }
+      }
+    },
+    {
+      "id": "27569266-f686-4fc5-9b03-aa3f018c427d",
+      "comparison_id": "17ae9ebf-c613-42e4-a7d3-7f6c14b72c5b",
+      "horizon": "TWENTY_DAYS",
+      "feature_profile": "OHLC_20",
+      "model_type": "XGBOOST",
+      "sample_count": 240,
+      "covered_count": 76,
+      "accuracy": 0.6184,
+      "balanced_accuracy": 0.3264,
+      "coverage": 0.3167,
+      "brier_score": 0.5574,
+      "log_loss": 0.9257,
+      "recalls": {
+        "BEARISH": 0,
+        "BULLISH": 0.9792,
+        "NEUTRAL": 0
+      },
+      "confusion_matrix": {
+        "BEARISH": {
+          "BEARISH": 0,
+          "BULLISH": 12,
+          "NEUTRAL": 0
+        },
+        "BULLISH": {
+          "BEARISH": 1,
+          "BULLISH": 47,
+          "NEUTRAL": 0
+        },
+        "NEUTRAL": {
+          "BEARISH": 0,
+          "BULLISH": 16,
+          "NEUTRAL": 0
+        }
+      }
+    }
+  ],
+  "matchedDateBaselines": [
+    {
+      "horizon": "NEXT_DAY",
+      "profile": "ALL_36",
+      "model": "LOGISTIC",
+      "covered": 216,
+      "correct": 77,
+      "baselineDirection": "NEUTRAL",
+      "baselineCorrect": 81,
+      "accuracy": 0.35648148148148145,
+      "matchedBaselineAccuracy": 0.375
+    },
+    {
+      "horizon": "NEXT_DAY",
+      "profile": "ALL_36",
+      "model": "XGBOOST",
+      "covered": 7,
+      "correct": 4,
+      "baselineDirection": "NEUTRAL",
+      "baselineCorrect": 4,
+      "accuracy": 0.5714285714285714,
+      "matchedBaselineAccuracy": 0.5714285714285714
+    },
+    {
+      "horizon": "NEXT_DAY",
+      "profile": "BASE_16",
+      "model": "LOGISTIC",
+      "covered": 161,
+      "correct": 68,
+      "baselineDirection": "NEUTRAL",
+      "baselineCorrect": 62,
+      "accuracy": 0.422360248447205,
+      "matchedBaselineAccuracy": 0.38509316770186336
+    },
+    {
+      "horizon": "NEXT_DAY",
+      "profile": "BASE_16",
+      "model": "XGBOOST",
+      "covered": 15,
+      "correct": 8,
+      "baselineDirection": "NEUTRAL",
+      "baselineCorrect": 8,
+      "accuracy": 0.5333333333333333,
+      "matchedBaselineAccuracy": 0.5333333333333333
+    },
+    {
+      "horizon": "NEXT_DAY",
+      "profile": "OHLC_20",
+      "model": "LOGISTIC",
+      "covered": 198,
+      "correct": 73,
+      "baselineDirection": "NEUTRAL",
+      "baselineCorrect": 74,
+      "accuracy": 0.3686868686868687,
+      "matchedBaselineAccuracy": 0.37373737373737376
+    },
+    {
+      "horizon": "NEXT_DAY",
+      "profile": "OHLC_20",
+      "model": "XGBOOST",
+      "covered": 6,
+      "correct": 2,
+      "baselineDirection": "NEUTRAL",
+      "baselineCorrect": 2,
+      "accuracy": 0.3333333333333333,
+      "matchedBaselineAccuracy": 0.3333333333333333
+    },
+    {
+      "horizon": "FIVE_DAYS",
+      "profile": "ALL_36",
+      "model": "LOGISTIC",
+      "covered": 224,
+      "correct": 134,
+      "baselineDirection": "BULLISH",
+      "baselineCorrect": 130,
+      "accuracy": 0.5982142857142857,
+      "matchedBaselineAccuracy": 0.5803571428571429
+    },
+    {
+      "horizon": "FIVE_DAYS",
+      "profile": "ALL_36",
+      "model": "XGBOOST",
+      "covered": 27,
+      "correct": 16,
+      "baselineDirection": "BULLISH",
+      "baselineCorrect": 15,
+      "accuracy": 0.5925925925925926,
+      "matchedBaselineAccuracy": 0.5555555555555556
+    },
+    {
+      "horizon": "FIVE_DAYS",
+      "profile": "BASE_16",
+      "model": "LOGISTIC",
+      "covered": 152,
+      "correct": 92,
+      "baselineDirection": "BULLISH",
+      "baselineCorrect": 88,
+      "accuracy": 0.6052631578947368,
+      "matchedBaselineAccuracy": 0.5789473684210527
+    },
+    {
+      "horizon": "FIVE_DAYS",
+      "profile": "BASE_16",
+      "model": "XGBOOST",
+      "covered": 56,
+      "correct": 35,
+      "baselineDirection": "BULLISH",
+      "baselineCorrect": 30,
+      "accuracy": 0.625,
+      "matchedBaselineAccuracy": 0.5357142857142857
+    },
+    {
+      "horizon": "FIVE_DAYS",
+      "profile": "OHLC_20",
+      "model": "LOGISTIC",
+      "covered": 209,
+      "correct": 113,
+      "baselineDirection": "BULLISH",
+      "baselineCorrect": 121,
+      "accuracy": 0.5406698564593302,
+      "matchedBaselineAccuracy": 0.5789473684210527
+    },
+    {
+      "horizon": "FIVE_DAYS",
+      "profile": "OHLC_20",
+      "model": "XGBOOST",
+      "covered": 5,
+      "correct": 3,
+      "baselineDirection": "BULLISH",
+      "baselineCorrect": 2,
+      "accuracy": 0.6,
+      "matchedBaselineAccuracy": 0.4
+    },
+    {
+      "horizon": "TWENTY_DAYS",
+      "profile": "ALL_36",
+      "model": "LOGISTIC",
+      "covered": 220,
+      "correct": 85,
+      "baselineDirection": "BULLISH",
+      "baselineCorrect": 140,
+      "accuracy": 0.38636363636363635,
+      "matchedBaselineAccuracy": 0.6363636363636364
+    },
+    {
+      "horizon": "TWENTY_DAYS",
+      "profile": "ALL_36",
+      "model": "XGBOOST",
+      "covered": 216,
+      "correct": 154,
+      "baselineDirection": "BULLISH",
+      "baselineCorrect": 152,
+      "accuracy": 0.7129629629629629,
+      "matchedBaselineAccuracy": 0.7037037037037037
+    },
+    {
+      "horizon": "TWENTY_DAYS",
+      "profile": "BASE_16",
+      "model": "LOGISTIC",
+      "covered": 169,
+      "correct": 109,
+      "baselineDirection": "BULLISH",
+      "baselineCorrect": 118,
+      "accuracy": 0.6449704142011834,
+      "matchedBaselineAccuracy": 0.6982248520710059
+    },
+    {
+      "horizon": "TWENTY_DAYS",
+      "profile": "BASE_16",
+      "model": "XGBOOST",
+      "covered": 219,
+      "correct": 154,
+      "baselineDirection": "BULLISH",
+      "baselineCorrect": 155,
+      "accuracy": 0.7031963470319634,
+      "matchedBaselineAccuracy": 0.7077625570776256
+    },
+    {
+      "horizon": "TWENTY_DAYS",
+      "profile": "OHLC_20",
+      "model": "LOGISTIC",
+      "covered": 197,
+      "correct": 74,
+      "baselineDirection": "BULLISH",
+      "baselineCorrect": 120,
+      "accuracy": 0.3756345177664975,
+      "matchedBaselineAccuracy": 0.6091370558375635
+    },
+    {
+      "horizon": "TWENTY_DAYS",
+      "profile": "OHLC_20",
+      "model": "XGBOOST",
+      "covered": 76,
+      "correct": 47,
+      "baselineDirection": "BULLISH",
+      "baselineCorrect": 48,
+      "accuracy": 0.618421052631579,
+      "matchedBaselineAccuracy": 0.631578947368421
+    }
+  ],
+  "previousBase16Metrics": [
+    {
+      "id": "d611b3f7-7c88-4cb0-ab72-a675701034b7",
+      "comparison_id": "afb3c53d-b93a-43a3-b679-87df1417f0af",
+      "horizon": "NEXT_DAY",
+      "feature_profile": "BASE_16",
+      "dataset_hash": "d767744ae82bbb98d1859c14450b7a091823b570d5b5687371e430ce1e12acf1",
+      "git_commit": "aa47b954010317a83a5601de21493858f116cba6",
+      "validation_start": "2024-10-22",
+      "validation_end": "2025-09-25",
+      "created_at": "2026-09-01T19:13:51.47197+08:00",
+      "model_type": "LOGISTIC",
+      "sample_count": 240,
+      "covered_count": 116,
+      "accuracy": 0.3793,
+      "balanced_accuracy": 0.3652,
+      "coverage": 0.4833,
+      "brier_score": 0.7548,
+      "log_loss": 1.2359,
+      "recalls": {
+        "BEARISH": 0.2903,
+        "BULLISH": 0.1463,
+        "NEUTRAL": 0.6591
+      },
+      "confusion_matrix": {
+        "BEARISH": {
+          "BEARISH": 9,
+          "BULLISH": 4,
+          "NEUTRAL": 18
+        },
+        "BULLISH": {
+          "BEARISH": 8,
+          "BULLISH": 6,
+          "NEUTRAL": 27
+        },
+        "NEUTRAL": {
+          "BEARISH": 4,
+          "BULLISH": 11,
+          "NEUTRAL": 29
+        }
+      }
+    },
+    {
+      "id": "d611b3f7-7c88-4cb0-ab72-a675701034b7",
+      "comparison_id": "afb3c53d-b93a-43a3-b679-87df1417f0af",
+      "horizon": "NEXT_DAY",
+      "feature_profile": "BASE_16",
+      "dataset_hash": "d767744ae82bbb98d1859c14450b7a091823b570d5b5687371e430ce1e12acf1",
+      "git_commit": "aa47b954010317a83a5601de21493858f116cba6",
+      "validation_start": "2024-10-22",
+      "validation_end": "2025-09-25",
+      "created_at": "2026-09-01T19:13:51.47197+08:00",
+      "model_type": "MAJORITY",
+      "sample_count": 240,
+      "covered_count": 240,
+      "accuracy": 0.3917,
+      "balanced_accuracy": 0.3333,
+      "coverage": 1,
+      "brier_score": 1.2167,
+      "log_loss": 21.0111,
+      "recalls": {
+        "BEARISH": 0,
+        "BULLISH": 0,
+        "NEUTRAL": 1
+      },
+      "confusion_matrix": {
+        "BEARISH": {
+          "BEARISH": 0,
+          "BULLISH": 0,
+          "NEUTRAL": 60
+        },
+        "BULLISH": {
+          "BEARISH": 0,
+          "BULLISH": 0,
+          "NEUTRAL": 86
+        },
+        "NEUTRAL": {
+          "BEARISH": 0,
+          "BULLISH": 0,
+          "NEUTRAL": 94
+        }
+      }
+    },
+    {
+      "id": "d611b3f7-7c88-4cb0-ab72-a675701034b7",
+      "comparison_id": "afb3c53d-b93a-43a3-b679-87df1417f0af",
+      "horizon": "NEXT_DAY",
+      "feature_profile": "BASE_16",
+      "dataset_hash": "d767744ae82bbb98d1859c14450b7a091823b570d5b5687371e430ce1e12acf1",
+      "git_commit": "aa47b954010317a83a5601de21493858f116cba6",
+      "validation_start": "2024-10-22",
+      "validation_end": "2025-09-25",
+      "created_at": "2026-09-01T19:13:51.47197+08:00",
+      "model_type": "XGBOOST",
+      "sample_count": 240,
+      "covered_count": 16,
+      "accuracy": 0.5625,
+      "balanced_accuracy": 0.3333,
+      "coverage": 0.0667,
+      "brier_score": 0.6575,
+      "log_loss": 1.0826,
+      "recalls": {
+        "BEARISH": 0,
+        "BULLISH": 0,
+        "NEUTRAL": 1
+      },
+      "confusion_matrix": {
+        "BEARISH": {
+          "BEARISH": 0,
+          "BULLISH": 0,
+          "NEUTRAL": 3
+        },
+        "BULLISH": {
+          "BEARISH": 0,
+          "BULLISH": 0,
+          "NEUTRAL": 4
+        },
+        "NEUTRAL": {
+          "BEARISH": 0,
+          "BULLISH": 0,
+          "NEUTRAL": 9
+        }
+      }
+    },
+    {
+      "id": "40c797ba-df6b-417f-a9c5-aa9c0cb79770",
+      "comparison_id": "69608766-0469-4d93-8a26-4087c23be089",
+      "horizon": "TWENTY_DAYS",
+      "feature_profile": "BASE_16",
+      "dataset_hash": "986e24b2ac45b42737b35b80fca5a02e86c609166ad7eef6de2838d5b6110af3",
+      "git_commit": "aa47b954010317a83a5601de21493858f116cba6",
+      "validation_start": "2024-08-29",
+      "validation_end": "2025-08-04",
+      "created_at": "2026-09-01T19:16:38.6726+08:00",
+      "model_type": "LOGISTIC",
+      "sample_count": 240,
+      "covered_count": 194,
+      "accuracy": 0.7371,
+      "balanced_accuracy": 0.4277,
+      "coverage": 0.8083,
+      "brier_score": 0.4576,
+      "log_loss": 0.844,
+      "recalls": {
+        "BEARISH": 0.3415,
+        "BULLISH": 0.9416,
+        "NEUTRAL": 0
+      },
+      "confusion_matrix": {
+        "BEARISH": {
+          "BEARISH": 14,
+          "BULLISH": 27,
+          "NEUTRAL": 0
+        },
+        "BULLISH": {
+          "BEARISH": 8,
+          "BULLISH": 129,
+          "NEUTRAL": 0
+        },
+        "NEUTRAL": {
+          "BEARISH": 1,
+          "BULLISH": 15,
+          "NEUTRAL": 0
+        }
+      }
+    },
+    {
+      "id": "40c797ba-df6b-417f-a9c5-aa9c0cb79770",
+      "comparison_id": "69608766-0469-4d93-8a26-4087c23be089",
+      "horizon": "TWENTY_DAYS",
+      "feature_profile": "BASE_16",
+      "dataset_hash": "986e24b2ac45b42737b35b80fca5a02e86c609166ad7eef6de2838d5b6110af3",
+      "git_commit": "aa47b954010317a83a5601de21493858f116cba6",
+      "validation_start": "2024-08-29",
+      "validation_end": "2025-08-04",
+      "created_at": "2026-09-01T19:16:38.6726+08:00",
+      "model_type": "MAJORITY",
+      "sample_count": 240,
+      "covered_count": 240,
+      "accuracy": 0.6583,
+      "balanced_accuracy": 0.3333,
+      "coverage": 1,
+      "brier_score": 0.6833,
+      "log_loss": 11.8007,
+      "recalls": {
+        "BEARISH": 0,
+        "BULLISH": 1,
+        "NEUTRAL": 0
+      },
+      "confusion_matrix": {
+        "BEARISH": {
+          "BEARISH": 0,
+          "BULLISH": 59,
+          "NEUTRAL": 0
+        },
+        "BULLISH": {
+          "BEARISH": 0,
+          "BULLISH": 158,
+          "NEUTRAL": 0
+        },
+        "NEUTRAL": {
+          "BEARISH": 0,
+          "BULLISH": 23,
+          "NEUTRAL": 0
+        }
+      }
+    },
+    {
+      "id": "40c797ba-df6b-417f-a9c5-aa9c0cb79770",
+      "comparison_id": "69608766-0469-4d93-8a26-4087c23be089",
+      "horizon": "TWENTY_DAYS",
+      "feature_profile": "BASE_16",
+      "dataset_hash": "986e24b2ac45b42737b35b80fca5a02e86c609166ad7eef6de2838d5b6110af3",
+      "git_commit": "aa47b954010317a83a5601de21493858f116cba6",
+      "validation_start": "2024-08-29",
+      "validation_end": "2025-08-04",
+      "created_at": "2026-09-01T19:16:38.6726+08:00",
+      "model_type": "XGBOOST",
+      "sample_count": 240,
+      "covered_count": 222,
+      "accuracy": 0.6892,
+      "balanced_accuracy": 0.3358,
+      "coverage": 0.925,
+      "brier_score": 0.4737,
+      "log_loss": 0.8245,
+      "recalls": {
+        "BEARISH": 0.0204,
+        "BULLISH": 0.987,
+        "NEUTRAL": 0
+      },
+      "confusion_matrix": {
+        "BEARISH": {
+          "BEARISH": 1,
+          "BULLISH": 48,
+          "NEUTRAL": 0
+        },
+        "BULLISH": {
+          "BEARISH": 2,
+          "BULLISH": 152,
+          "NEUTRAL": 0
+        },
+        "NEUTRAL": {
+          "BEARISH": 0,
+          "BULLISH": 19,
+          "NEUTRAL": 0
+        }
+      }
+    },
+    {
+      "id": "ecddb25e-ac9e-47e3-a0a0-35a98b160f37",
+      "comparison_id": "407ec7ac-46f7-4e86-a487-518a9e236722",
+      "horizon": "FIVE_DAYS",
+      "feature_profile": "BASE_16",
+      "dataset_hash": "b6b119cffab51ef5843a41bdc389d5d49663f38b429c2383648832c00206b2e5",
+      "git_commit": "9925f2e8174d1845ea78f691c3f2662c361a8ce5",
+      "validation_start": "2024-10-30",
+      "validation_end": "2025-10-03",
+      "created_at": "2026-09-20T01:14:09.415823+08:00",
+      "model_type": "LOGISTIC",
+      "sample_count": 240,
+      "covered_count": 152,
+      "accuracy": 0.6053,
+      "balanced_accuracy": 0.3961,
+      "coverage": 0.6333,
+      "brier_score": 0.585,
+      "log_loss": 1.0128,
+      "recalls": {
+        "BEARISH": 0.2791,
+        "BULLISH": 0.9091,
+        "NEUTRAL": 0
+      },
+      "confusion_matrix": {
+        "BEARISH": {
+          "BEARISH": 12,
+          "BULLISH": 31,
+          "NEUTRAL": 0
+        },
+        "BULLISH": {
+          "BEARISH": 8,
+          "BULLISH": 80,
+          "NEUTRAL": 0
+        },
+        "NEUTRAL": {
+          "BEARISH": 4,
+          "BULLISH": 17,
+          "NEUTRAL": 0
+        }
+      }
+    },
+    {
+      "id": "ecddb25e-ac9e-47e3-a0a0-35a98b160f37",
+      "comparison_id": "407ec7ac-46f7-4e86-a487-518a9e236722",
+      "horizon": "FIVE_DAYS",
+      "feature_profile": "BASE_16",
+      "dataset_hash": "b6b119cffab51ef5843a41bdc389d5d49663f38b429c2383648832c00206b2e5",
+      "git_commit": "9925f2e8174d1845ea78f691c3f2662c361a8ce5",
+      "validation_start": "2024-10-30",
+      "validation_end": "2025-10-03",
+      "created_at": "2026-09-20T01:14:09.415823+08:00",
+      "model_type": "MAJORITY",
+      "sample_count": 240,
+      "covered_count": 240,
+      "accuracy": 0.5833,
+      "balanced_accuracy": 0.3333,
+      "coverage": 1,
+      "brier_score": 0.8333,
+      "log_loss": 14.3912,
+      "recalls": {
+        "BEARISH": 0,
+        "BULLISH": 1,
+        "NEUTRAL": 0
+      },
+      "confusion_matrix": {
+        "BEARISH": {
+          "BEARISH": 0,
+          "BULLISH": 62,
+          "NEUTRAL": 0
+        },
+        "BULLISH": {
+          "BEARISH": 0,
+          "BULLISH": 140,
+          "NEUTRAL": 0
+        },
+        "NEUTRAL": {
+          "BEARISH": 0,
+          "BULLISH": 38,
+          "NEUTRAL": 0
+        }
+      }
+    },
+    {
+      "id": "ecddb25e-ac9e-47e3-a0a0-35a98b160f37",
+      "comparison_id": "407ec7ac-46f7-4e86-a487-518a9e236722",
+      "horizon": "FIVE_DAYS",
+      "feature_profile": "BASE_16",
+      "dataset_hash": "b6b119cffab51ef5843a41bdc389d5d49663f38b429c2383648832c00206b2e5",
+      "git_commit": "9925f2e8174d1845ea78f691c3f2662c361a8ce5",
+      "validation_start": "2024-10-30",
+      "validation_end": "2025-10-03",
+      "created_at": "2026-09-20T01:14:09.415823+08:00",
+      "model_type": "XGBOOST",
+      "sample_count": 240,
+      "covered_count": 56,
+      "accuracy": 0.625,
+      "balanced_accuracy": 0.4259,
+      "coverage": 0.2333,
+      "brier_score": 0.5755,
+      "log_loss": 0.9653,
+      "recalls": {
+        "BEARISH": 0.2778,
+        "BULLISH": 1,
+        "NEUTRAL": 0
+      },
+      "confusion_matrix": {
+        "BEARISH": {
+          "BEARISH": 5,
+          "BULLISH": 13,
+          "NEUTRAL": 0
+        },
+        "BULLISH": {
+          "BEARISH": 0,
+          "BULLISH": 30,
+          "NEUTRAL": 0
+        },
+        "NEUTRAL": {
+          "BEARISH": 0,
+          "BULLISH": 8,
+          "NEUTRAL": 0
+        }
+      }
+    }
+  ]
+}
