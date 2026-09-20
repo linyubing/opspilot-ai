@@ -4,6 +4,7 @@ import com.opspilot.ai.chat.api.ApiError;
 import com.opspilot.ai.forecast.learning.ForecastHorizon;
 import com.opspilot.ai.forecast.learning.ScalingCheckService;
 import com.opspilot.ai.forecast.learning.ScalingReport;
+import com.opspilot.ai.forecast.learning.WindowReport;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,6 +24,9 @@ public class ScalingCheckController {
     public ScalingReport run(@RequestParam(defaultValue = "NEXT_DAY") ForecastHorizon horizon) {
         return service.run(horizon);
     }
+
+    @PostMapping("/windows")
+    public WindowReport windows() { return service.windows(); }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ApiError> invalid(IllegalArgumentException error) {

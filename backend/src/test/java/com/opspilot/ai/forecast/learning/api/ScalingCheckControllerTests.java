@@ -39,4 +39,11 @@ class ScalingCheckControllerTests {
         mvc.perform(post(PATH).param("horizon", "UNKNOWN")).andExpect(status().isBadRequest());
         verifyNoInteractions(service);
     }
+
+    @Test
+    void runsFixedWindowsWithoutChoosingParameters() throws Exception {
+        mvc.perform(post(PATH + "/windows")).andExpect(status().isOk());
+        verify(service).windows();
+        verifyNoMoreInteractions(service);
+    }
 }

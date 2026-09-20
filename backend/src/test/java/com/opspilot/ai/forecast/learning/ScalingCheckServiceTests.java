@@ -60,6 +60,21 @@ class ScalingCheckServiceTests {
         assertThat(report.datasetHash()).isEqualTo("dataset-hash");
         assertThat(report.skippedCount()).isEqualTo(3);
         assertThat(report.createdAt().toInstant()).isEqualTo(clock.instant());
+
+        clearInvocations(builder, splitter, walk);
+        var windows = new ScalingCheckService(builder, splitter, fingerprint, walk, git, clock,
+                new ForecastEvaluator()).windows();
+        assertThat(windows).isNotNull();
+        verify(builder, times(1)).build(ForecastHorizon.NEXT_DAY);
+        verify(splitter, times(1)).split(data.samples(), ForecastHorizon.NEXT_DAY);
+        verify(walk, times(12)).predict(same(split), any(FeatureProfile.class), any(GoldTrainer.class));
+        assertThat(windows.results()).hasSize(6);
+        assertThat(windows.results()).extracting(WindowReport.Result::trainSize)
+                .containsExactly(252, 504, 252, 504, 252, 504);
+        assertThat(windows.results()).allSatisfy(result -> {
+            assertThat(result.full().version()).isEqualTo(TribuoGoldTrainer.VERSION);
+            assertThat(result.recent().version()).isEqualTo(TribuoGoldTrainer.VERSION + "-window-" + result.trainSize());
+        });
     }
 
     @Test

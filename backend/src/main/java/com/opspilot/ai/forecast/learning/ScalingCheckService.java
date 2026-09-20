@@ -55,6 +55,12 @@ public class ScalingCheckService {
 
     ScalingReport.Result compare(FeatureProfile profile, List<SettledPrediction> raw,
             List<SettledPrediction> scaled, List<SettledPrediction> majority) {
+        return compare(profile, raw, scaled, majority, "logistic-v1", TribuoGoldTrainer.VERSION);
+    }
+
+    private ScalingReport.Result compare(FeatureProfile profile, List<SettledPrediction> raw,
+            List<SettledPrediction> scaled, List<SettledPrediction> majority,
+            String beforeVersion, String afterVersion) {
         if (raw.isEmpty() || raw.size() != scaled.size() || raw.size() != majority.size()) {
             throw new IllegalArgumentException("对照实验必须使用相同的非空样本集合");
         }
@@ -94,12 +100,37 @@ public class ScalingCheckService {
                     hits(majorityAll.subList(start, end))));
         }
         return new ScalingReport.Result(profile,
-                score("logistic-v1", rawAll, raw),
-                score(TribuoGoldTrainer.VERSION, scaledAll, scaled),
+                score(beforeVersion, rawAll, raw),
+                score(afterVersion, scaledAll, scaled),
                 score("majority-v1", majorityAll, majority),
                 rawBase.isEmpty() ? null : evaluator.evaluate(rawBase),
                 scaledBase.isEmpty() ? null : evaluator.evaluate(scaledBase),
                 new ScalingReport.Pair(common, rawHits, scaledHits, scaledOnly, rawOnly), blocks);
+    }
+
+    /** 窗口在看本轮结果前固定为 252/504 条；只检验下一交易日，不扩展调参网格。 */
+    public WindowReport windows() {
+        String commit = git.getRequired();
+        ForecastHorizon horizon = ForecastHorizon.NEXT_DAY;
+        GoldDataset dataset = builder.build(horizon);
+        TemporalDataset split = splitter.split(dataset.samples(), horizon);
+        List<WindowReport.Result> rows = new ArrayList<>();
+        for (FeatureProfile profile : FeatureProfile.values()) {
+            GoldTrainer fullTrainer = new TribuoGoldTrainer(true);
+            List<SettledPrediction> full = walkForward.predict(split, profile, fullTrainer);
+            List<SettledPrediction> baseline = walkForward.predict(split, profile, new MajorityGoldTrainer());
+            for (int size : List.of(252, 504)) {
+                GoldTrainer recentTrainer = new WindowGoldTrainer(new TribuoGoldTrainer(true), size);
+                List<SettledPrediction> recent = walkForward.predict(split, profile, recentTrainer);
+                rows.add(WindowReport.Result.from(size, compare(profile, full, recent, baseline,
+                        fullTrainer.name(), recentTrainer.name())));
+            }
+        }
+        return new WindowReport(UUID.randomUUID(), OffsetDateTime.now(clock), commit,
+                fingerprint.hash(dataset), horizon,
+                split.validation().getFirst().asOfDate(), split.validation().getLast().asOfDate(),
+                split.finalHoldout().getFirst().asOfDate(), split.finalHoldout().getLast().asOfDate(),
+                split.validation().size(), dataset.skippedCount(), WalkForwardService.CONFIDENCE, rows);
     }
 
     private ScalingReport.Score score(String version, List<SettledPrediction> all,
