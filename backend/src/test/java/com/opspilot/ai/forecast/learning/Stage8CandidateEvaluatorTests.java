@@ -20,6 +20,29 @@ class Stage8CandidateEvaluatorTests {
     private final Stage8CandidateEvaluator evaluator = new Stage8CandidateEvaluator();
 
     @Test
+    void missingBalancedScoreRejectsCandidate() {
+        // 部分类别没有已覆盖样本时，不能算平衡准确率；应拒绝候选而非使整批实验崩溃。
+        ModelExperimentResult exp = createExperiment(FeatureProfile.BASE_16,
+                null, new BigDecimal("0.50"), new BigDecimal("0.80"),
+                new BigDecimal("0.70"), new BigDecimal("0.20"), new BigDecimal("0.30"),
+                new BigDecimal("0.40"), new BigDecimal("0.50"), new BigDecimal("0.30"));
+        Stage8Candidate result = evaluator.evaluate(List.of(exp));
+        assertThat(result.passed()).isFalse();
+        assertThat(result.reason()).contains("平衡准确率", "不足");
+    }
+
+    @Test
+    void missingLogisticScoreDoesNotImplyImprovement() {
+        ModelExperimentResult exp = createExperiment(FeatureProfile.BASE_16,
+                new BigDecimal("0.60"), null, new BigDecimal("0.80"),
+                new BigDecimal("0.70"), new BigDecimal("0.20"), new BigDecimal("0.30"),
+                new BigDecimal("0.40"), new BigDecimal("0.50"), new BigDecimal("0.30"));
+        Stage8Candidate result = evaluator.evaluate(List.of(exp));
+        assertThat(result.passed()).isFalse();
+        assertThat(result.reason()).contains("平衡准确率", "不足");
+    }
+
+    @Test
     void allThresholdsPassed() {
         List<ModelExperimentResult> experiments = List.of(
                 createExperiment(FeatureProfile.BASE_16,

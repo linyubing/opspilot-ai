@@ -340,6 +340,7 @@ public class ModelExperimentService {
         params.put("confidenceThreshold", CONFIDENCE_THRESHOLD);
         params.put("majorityTrainer", "MajorityGoldTrainer");
         params.put("logisticTrainer", "TribuoGoldTrainer");
+        params.put("logisticVersion", walkForward.logisticVersion());
         params.put("featureVersion", GoldFeatures.VERSION);
         params.put("labelVersion", GoldForecastRule.RULE_VERSION);
         params.put("splitVersion", TemporalSplitter.VERSION);

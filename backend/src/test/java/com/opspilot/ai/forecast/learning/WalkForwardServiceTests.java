@@ -24,6 +24,23 @@ class WalkForwardServiceTests {
     private WalkForwardService service;
     private TemporalDataset dataset;
 
+    @Test
+    void pairedChecksUseSameDatesAndSettledTraining() {
+        // 对照入口必须复用开发验证样本，并且不可让留出集标签进入训练。
+        List<SettledPrediction> rows = service.predict(dataset, FeatureProfile.BASE_16, logistic);
+        assertThat(rows).extracting(SettledPrediction::asOfDate)
+                .containsExactlyElementsOf(dataset.validation().stream().map(GoldSample::asOfDate).toList());
+        assertThat(logistic.trainingSets).hasSize(12);
+        for (int block = 0; block < 12; block++) {
+            LocalDate cutoff = dataset.validation().get(block * 20).asOfDate();
+            assertThat(logistic.trainingSets.get(block))
+                    .allSatisfy(sample -> assertThat(sample.targetDate()).isBefore(cutoff))
+                    .doesNotContainAnyElementsOf(dataset.finalHoldout());
+        }
+        assertThat(majority.trainingSets).isEmpty();
+        assertThat(xgboost.trainingSets).isEmpty();
+    }
+
     @BeforeEach
     void setUp() {
         builder = mock(GoldDatasetBuilder.class);

@@ -10,6 +10,8 @@ import org.tribuo.classification.sgd.linear.LogisticRegressionTrainer;
 import org.tribuo.impl.ArrayExample;
 import org.tribuo.provenance.SimpleDataSourceProvenance;
 import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.List;
 import java.util.Map;
@@ -18,10 +20,21 @@ import java.util.Set;
 /** 使用 Tribuo 训练可解释的黄金三分类逻辑回归模型。 */
 @Component("tribuoGoldTrainer")
 public class TribuoGoldTrainer implements GoldTrainer {
+    public static final String VERSION = "logistic-scaled-v2";
+    private final boolean standardize;
+
+    public TribuoGoldTrainer() {
+        this(true);
+    }
+
+    @Autowired
+    public TribuoGoldTrainer(@Value("${opspilot.forecast.gold.logistic.standardize:false}") boolean standardize) {
+        this.standardize = standardize;
+    }
 
     @Override
     public String name() {
-        return "logistic-v1";
+        return standardize ? VERSION : "logistic-v1";
     }
 
     @Override
@@ -29,8 +42,13 @@ public class TribuoGoldTrainer implements GoldTrainer {
         if (samples == null || samples.isEmpty()) {
             throw new IllegalArgumentException("训练样本不能为空");
         }
+        if (featureNames == null || featureNames.isEmpty() || !GoldFeatures.NAMES.containsAll(featureNames)) {
+            throw new IllegalArgumentException("模型特征不能为空且必须来自黄金特征集合");
+        }
         List<String> sorted = featureNames.stream().sorted().toList();
         String[] names = sorted.toArray(String[]::new);
+        // 每次滚动重训独立拟合；验证样本与留出样本不得参与统计。
+        FeatureScaler scaler = standardize ? FeatureScaler.fit(samples, sorted) : null;
 
         LabelFactory factory = new LabelFactory();
         MutableDataset<Label> dataset = new MutableDataset<>(
@@ -38,12 +56,12 @@ public class TribuoGoldTrainer implements GoldTrainer {
                 factory
         );
         for (GoldSample sample : samples) {
-            dataset.add(example(new Label(sample.label().name()), sample.features(), names, sorted));
+            dataset.add(example(new Label(sample.label().name()), sample.features(), names, sorted, scaler));
         }
 
         Model<Label> model = new LogisticRegressionTrainer().train(dataset);
         return features -> probabilities(model.predict(
-                example(LabelFactory.UNKNOWN_LABEL, features, names, sorted)
+                example(LabelFactory.UNKNOWN_LABEL, features, names, sorted, scaler)
         ));
     }
 
@@ -51,9 +69,10 @@ public class TribuoGoldTrainer implements GoldTrainer {
             Label label,
             GoldFeatures features,
             String[] names,
-            List<String> sorted
+            List<String> sorted,
+            FeatureScaler scaler
     ) {
-        double[] values = sorted.stream()
+        double[] values = scaler != null ? scaler.values(features) : sorted.stream()
                 .mapToDouble(name -> features.values().get(name))
                 .toArray();
         return new ArrayExample<>(label, names, values);

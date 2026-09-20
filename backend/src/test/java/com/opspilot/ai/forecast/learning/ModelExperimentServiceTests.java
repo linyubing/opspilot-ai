@@ -51,6 +51,7 @@ class ModelExperimentServiceTests {
         clock = Clock.fixed(Instant.parse("2026-09-01T12:00:00Z"), ZoneOffset.UTC);
         when(candidateEvaluator.evaluate(any())).thenReturn(new Stage8Candidate(false, null, "测试默认值"));
         when(gitCommitProvider.getRequired()).thenReturn("7e57c99");
+        when(walkForward.logisticVersion()).thenReturn("logistic-v1");
         service = new ModelExperimentService(
                 datasetBuilder, walkForward, fingerprint, repo,
                 gitCommitProvider, xgboostProperties, null, splitter,
@@ -76,6 +77,7 @@ class ModelExperimentServiceTests {
         verify(splitter, org.mockito.Mockito.times(1)).split(dataset.samples(), horizon);
         verify(walkForward, org.mockito.Mockito.times(1)).run(split, horizon, FeatureProfile.ALL_36);
         assertThat(result.experiment().status()).isEqualTo(ModelExperimentStatus.COMPLETED);
+        assertThat(result.experiment().parameters()).containsEntry("logisticVersion", "logistic-v1");
     }
 
     @Test

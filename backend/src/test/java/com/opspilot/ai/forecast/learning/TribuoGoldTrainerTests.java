@@ -16,6 +16,30 @@ import static org.assertj.core.api.Assertions.assertThat;
 class TribuoGoldTrainerTests {
 
     @Test
+    void unitsDoNotChangeProbabilities() {
+        // 同一信号仅换单位、加基准值，不应让模型学出完全不同的方向概率。
+        List<GoldSample> original = samples(240);
+        List<GoldSample> changed = original.stream().map(sample -> new GoldSample(
+                sample.asOfDate(), sample.targetDate(), sample.horizon(),
+                units(sample.features()), sample.label())).toList();
+        GoldClassifier first = new TribuoGoldTrainer().train(original, FeatureProfile.BASE_16.featureNames());
+        GoldClassifier second = new TribuoGoldTrainer().train(changed, FeatureProfile.BASE_16.featureNames());
+        for (double value : new double[]{-10, 0, 10}) {
+            DirectionProbabilities a = first.predict(features(value));
+            DirectionProbabilities b = second.predict(units(features(value)));
+            assertThat(b.bullish()).isCloseTo(a.bullish(), org.assertj.core.data.Offset.offset(0.000001));
+            assertThat(b.neutral()).isCloseTo(a.neutral(), org.assertj.core.data.Offset.offset(0.000001));
+            assertThat(b.bearish()).isCloseTo(a.bearish(), org.assertj.core.data.Offset.offset(0.000001));
+        }
+    }
+
+    private GoldFeatures units(GoldFeatures source) {
+        Map<String, Double> values = new HashMap<>(source.values());
+        values.put("gold_return_5", values.get("gold_return_5") * 100 + 1_000_000);
+        return new GoldFeatures(values);
+    }
+
+    @Test
     void learnsKnownThreeClassPattern() {
         List<GoldSample> samples = samples(300);
         GoldClassifier classifier = new TribuoGoldTrainer().train(samples.subList(0, 240), GoldFeatures.NAMES);

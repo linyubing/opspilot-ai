@@ -14,8 +14,8 @@ import java.util.Set;
 @Service
 public class WalkForwardService {
 
-    private static final int REFIT_EVERY = 20;
-    private static final double CONFIDENCE = 0.55;
+    static final int REFIT_EVERY = 20;
+    static final double CONFIDENCE = 0.55;
 
     private final GoldDatasetBuilder builder;
     private final TemporalSplitter splitter;
@@ -65,13 +65,19 @@ public class WalkForwardService {
     }
 
     public WalkForwardReport run(TemporalDataset data, ForecastHorizon horizon, FeatureProfile profile) {
-        Set<String> featureNames = profile.featureNames();
         Map<ModelType, List<SettledPrediction>> predictions = new EnumMap<>(ModelType.class);
-        for (ModelType type : ModelType.values()) {
-            predictions.put(type, new ArrayList<>());
-        }
+        predictions.put(ModelType.MAJORITY, predict(data, profile, majorityTrainer));
+        predictions.put(ModelType.LOGISTIC, predict(data, profile, logisticTrainer));
+        predictions.put(ModelType.XGBOOST, predict(data, profile, xgboostTrainer));
+        int refits = (data.validation().size() + REFIT_EVERY - 1) / REFIT_EVERY;
+        return report(horizon, data, predictions, refits);
+    }
+
+    /** 对照实验复用同一滚动流程，返回逐日结果，不接触最终留出集。 */
+    public List<SettledPrediction> predict(TemporalDataset data, FeatureProfile profile, GoldTrainer trainer) {
+        Set<String> featureNames = profile.featureNames();
+        List<SettledPrediction> predictions = new ArrayList<>();
         List<GoldSample> validation = data.validation();
-        int refits = 0;
 
         for (int start = 0; start < validation.size(); start += REFIT_EVERY) {
             int end = Math.min(start + REFIT_EVERY, validation.size());
@@ -81,19 +87,19 @@ public class WalkForwardService {
                     validation.subList(0, start),
                     block.getFirst().asOfDate()
             );
-            GoldClassifier majority = majorityTrainer.train(training, featureNames);
-            GoldClassifier logistic = logisticTrainer.train(training, featureNames);
-            GoldClassifier xgboost = xgboostTrainer.train(training, featureNames);
-            refits++;
+            GoldClassifier classifier = trainer.train(training, featureNames);
 
             for (GoldSample sample : block) {
-                predictions.get(ModelType.MAJORITY).add(settle(sample, majority));
-                predictions.get(ModelType.LOGISTIC).add(settle(sample, logistic));
-                predictions.get(ModelType.XGBOOST).add(settle(sample, xgboost));
+                predictions.add(settle(sample, classifier));
             }
         }
 
-        return report(horizon, data, predictions, refits);
+        return List.copyOf(predictions);
+    }
+
+    /** 记录实际注入的逻辑回归版本，区分原始量纲与标准化实验。 */
+    public String logisticVersion() {
+        return logisticTrainer.name();
     }
 
     private List<GoldSample> trainingData(

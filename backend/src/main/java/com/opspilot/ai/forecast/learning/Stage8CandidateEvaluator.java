@@ -36,9 +36,13 @@ public class Stage8CandidateEvaluator {
 
             List<String> failed = new ArrayList<>();
 
-            BigDecimal balancedDelta = xgb.balancedAccuracy().subtract(log.balancedAccuracy());
-            if (balancedDelta.compareTo(BALANCED_ACCURACY_DELTA) < 0) {
-                failed.add("平衡准确率未比Logistic高2个百分点（差值=" + balancedDelta.setScale(4, RoundingMode.HALF_UP) + "）");
+            if (xgb.balancedAccuracy() == null || log.balancedAccuracy() == null) {
+                failed.add("部分类别样本不足，无法比较平衡准确率");
+            } else {
+                BigDecimal balancedDelta = xgb.balancedAccuracy().subtract(log.balancedAccuracy());
+                if (balancedDelta.compareTo(BALANCED_ACCURACY_DELTA) < 0) {
+                    failed.add("平衡准确率未比Logistic高2个百分点（差值=" + balancedDelta.setScale(4, RoundingMode.HALF_UP) + "）");
+                }
             }
 
             if (xgb.accuracy().compareTo(maj.accuracy()) <= 0) {
