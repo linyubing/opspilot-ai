@@ -1,0 +1,1427 @@
+{
+  "id": "591c6dc2-ce6e-4e54-956b-a3410e01454c",
+  "createdAt": "2026-09-29T07:28:57.0298647Z",
+  "gitCommit": "5af62d416a272000da26a5980c077245ad62bcf6",
+  "datasetHash": "df1bbf53232378f18118e9763b5cba182a9d873729be7b79b62491d529234504",
+  "horizon": "NEXT_DAY",
+  "validationStart": "2024-11-11",
+  "validationEnd": "2025-10-15",
+  "holdoutStart": "2025-10-17",
+  "holdoutEnd": "2026-09-17",
+  "sampleCount": 240,
+  "skippedCount": 0,
+  "confidence": 0.55,
+  "initialCounts": {
+    "NEUTRAL": 2088,
+    "BULLISH": 1197,
+    "BEARISH": 1076
+  },
+  "validationCounts": {
+    "NEUTRAL": 90,
+    "BULLISH": 93,
+    "BEARISH": 57
+  },
+  "results": [
+    {
+      "profile": "BASE_16",
+      "baseline": {
+        "version": "logistic-scaled-v2",
+        "all": {
+          "sampleCount": 240,
+          "coveredCount": 240,
+          "coverage": 1,
+          "accuracy": 0.4292,
+          "balancedAccuracy": 0.4012,
+          "brierScore": 0.6896,
+          "logLoss": 1.1337,
+          "recalls": {
+            "BULLISH": 0.1505,
+            "NEUTRAL": 0.8778,
+            "BEARISH": 0.1754
+          },
+          "confusionMatrix": {
+            "NEUTRAL": {
+              "BULLISH": 7,
+              "NEUTRAL": 79,
+              "BEARISH": 4
+            },
+            "BULLISH": {
+              "BULLISH": 14,
+              "NEUTRAL": 68,
+              "BEARISH": 11
+            },
+            "BEARISH": {
+              "BULLISH": 9,
+              "NEUTRAL": 38,
+              "BEARISH": 10
+            }
+          },
+          "promotionReady": true
+        },
+        "signals": {
+          "sampleCount": 240,
+          "coveredCount": 80,
+          "coverage": 0.3333,
+          "accuracy": 0.3875,
+          "balancedAccuracy": 0.3452,
+          "brierScore": 0.6896,
+          "logLoss": 1.1337,
+          "recalls": {
+            "BULLISH": 0,
+            "NEUTRAL": 0.9355,
+            "BEARISH": 0.1
+          },
+          "confusionMatrix": {
+            "NEUTRAL": {
+              "BULLISH": 1,
+              "NEUTRAL": 29,
+              "BEARISH": 1
+            },
+            "BULLISH": {
+              "BULLISH": 0,
+              "NEUTRAL": 27,
+              "BEARISH": 2
+            },
+            "BEARISH": {
+              "BULLISH": 1,
+              "NEUTRAL": 17,
+              "BEARISH": 2
+            }
+          },
+          "promotionReady": true
+        },
+        "selectedDates": {
+          "sampleCount": 80,
+          "coveredCount": 80,
+          "coverage": 1,
+          "accuracy": 0.3875,
+          "balancedAccuracy": 0.3452,
+          "brierScore": 0.7502,
+          "logLoss": 1.2186,
+          "recalls": {
+            "BULLISH": 0,
+            "NEUTRAL": 0.9355,
+            "BEARISH": 0.1
+          },
+          "confusionMatrix": {
+            "NEUTRAL": {
+              "BULLISH": 1,
+              "NEUTRAL": 29,
+              "BEARISH": 1
+            },
+            "BULLISH": {
+              "BULLISH": 0,
+              "NEUTRAL": 27,
+              "BEARISH": 2
+            },
+            "BEARISH": {
+              "BULLISH": 1,
+              "NEUTRAL": 17,
+              "BEARISH": 2
+            }
+          },
+          "promotionReady": true
+        }
+      },
+      "balanced": {
+        "version": "logistic-balanced-v1",
+        "all": {
+          "sampleCount": 240,
+          "coveredCount": 240,
+          "coverage": 1,
+          "accuracy": 0.35,
+          "balancedAccuracy": 0.3378,
+          "brierScore": 0.688,
+          "logLoss": 1.129,
+          "recalls": {
+            "BULLISH": 0.3011,
+            "NEUTRAL": 0.4667,
+            "BEARISH": 0.2456
+          },
+          "confusionMatrix": {
+            "NEUTRAL": {
+              "BULLISH": 28,
+              "NEUTRAL": 42,
+              "BEARISH": 20
+            },
+            "BULLISH": {
+              "BULLISH": 28,
+              "NEUTRAL": 36,
+              "BEARISH": 29
+            },
+            "BEARISH": {
+              "BULLISH": 19,
+              "NEUTRAL": 24,
+              "BEARISH": 14
+            }
+          },
+          "promotionReady": true
+        },
+        "signals": {
+          "sampleCount": 240,
+          "coveredCount": 19,
+          "coverage": 0.0792,
+          "accuracy": 0.2105,
+          "balancedAccuracy": 0.2095,
+          "brierScore": 0.688,
+          "logLoss": 1.129,
+          "recalls": {
+            "BULLISH": 0,
+            "NEUTRAL": 0.2,
+            "BEARISH": 0.4286
+          },
+          "confusionMatrix": {
+            "NEUTRAL": {
+              "BULLISH": 1,
+              "NEUTRAL": 1,
+              "BEARISH": 3
+            },
+            "BULLISH": {
+              "BULLISH": 0,
+              "NEUTRAL": 0,
+              "BEARISH": 7
+            },
+            "BEARISH": {
+              "BULLISH": 3,
+              "NEUTRAL": 1,
+              "BEARISH": 3
+            }
+          },
+          "promotionReady": true
+        },
+        "selectedDates": {
+          "sampleCount": 19,
+          "coveredCount": 19,
+          "coverage": 1,
+          "accuracy": 0.2105,
+          "balancedAccuracy": 0.2095,
+          "brierScore": 0.9109,
+          "logLoss": 1.454,
+          "recalls": {
+            "BULLISH": 0,
+            "NEUTRAL": 0.2,
+            "BEARISH": 0.4286
+          },
+          "confusionMatrix": {
+            "NEUTRAL": {
+              "BULLISH": 1,
+              "NEUTRAL": 1,
+              "BEARISH": 3
+            },
+            "BULLISH": {
+              "BULLISH": 0,
+              "NEUTRAL": 0,
+              "BEARISH": 7
+            },
+            "BEARISH": {
+              "BULLISH": 3,
+              "NEUTRAL": 1,
+              "BEARISH": 3
+            }
+          },
+          "promotionReady": true
+        }
+      },
+      "majority": {
+        "version": "majority-v1",
+        "all": {
+          "sampleCount": 240,
+          "coveredCount": 240,
+          "coverage": 1,
+          "accuracy": 0.375,
+          "balancedAccuracy": 0.3333,
+          "brierScore": 1.25,
+          "logLoss": 21.5867,
+          "recalls": {
+            "BULLISH": 0,
+            "NEUTRAL": 1,
+            "BEARISH": 0
+          },
+          "confusionMatrix": {
+            "NEUTRAL": {
+              "BULLISH": 0,
+              "NEUTRAL": 90,
+              "BEARISH": 0
+            },
+            "BULLISH": {
+              "BULLISH": 0,
+              "NEUTRAL": 93,
+              "BEARISH": 0
+            },
+            "BEARISH": {
+              "BULLISH": 0,
+              "NEUTRAL": 57,
+              "BEARISH": 0
+            }
+          },
+          "promotionReady": true
+        },
+        "signals": {
+          "sampleCount": 240,
+          "coveredCount": 240,
+          "coverage": 1,
+          "accuracy": 0.375,
+          "balancedAccuracy": 0.3333,
+          "brierScore": 1.25,
+          "logLoss": 21.5867,
+          "recalls": {
+            "BULLISH": 0,
+            "NEUTRAL": 1,
+            "BEARISH": 0
+          },
+          "confusionMatrix": {
+            "NEUTRAL": {
+              "BULLISH": 0,
+              "NEUTRAL": 90,
+              "BEARISH": 0
+            },
+            "BULLISH": {
+              "BULLISH": 0,
+              "NEUTRAL": 93,
+              "BEARISH": 0
+            },
+            "BEARISH": {
+              "BULLISH": 0,
+              "NEUTRAL": 57,
+              "BEARISH": 0
+            }
+          },
+          "promotionReady": true
+        },
+        "selectedDates": {
+          "sampleCount": 240,
+          "coveredCount": 240,
+          "coverage": 1,
+          "accuracy": 0.375,
+          "balancedAccuracy": 0.3333,
+          "brierScore": 1.25,
+          "logLoss": 21.5867,
+          "recalls": {
+            "BULLISH": 0,
+            "NEUTRAL": 1,
+            "BEARISH": 0
+          },
+          "confusionMatrix": {
+            "NEUTRAL": {
+              "BULLISH": 0,
+              "NEUTRAL": 90,
+              "BEARISH": 0
+            },
+            "BULLISH": {
+              "BULLISH": 0,
+              "NEUTRAL": 93,
+              "BEARISH": 0
+            },
+            "BEARISH": {
+              "BULLISH": 0,
+              "NEUTRAL": 57,
+              "BEARISH": 0
+            }
+          },
+          "promotionReady": true
+        }
+      },
+      "baselineDateBaseline": {
+        "sampleCount": 80,
+        "coveredCount": 80,
+        "coverage": 1,
+        "accuracy": 0.3875,
+        "balancedAccuracy": 0.3333,
+        "brierScore": 1.225,
+        "logLoss": 21.155,
+        "recalls": {
+          "BULLISH": 0,
+          "NEUTRAL": 1,
+          "BEARISH": 0
+        },
+        "confusionMatrix": {
+          "NEUTRAL": {
+            "BULLISH": 0,
+            "NEUTRAL": 31,
+            "BEARISH": 0
+          },
+          "BULLISH": {
+            "BULLISH": 0,
+            "NEUTRAL": 29,
+            "BEARISH": 0
+          },
+          "BEARISH": {
+            "BULLISH": 0,
+            "NEUTRAL": 20,
+            "BEARISH": 0
+          }
+        },
+        "promotionReady": true
+      },
+      "balancedDateBaseline": {
+        "sampleCount": 19,
+        "coveredCount": 19,
+        "coverage": 1,
+        "accuracy": 0.2632,
+        "balancedAccuracy": 0.3333,
+        "brierScore": 1.4737,
+        "logLoss": 25.4496,
+        "recalls": {
+          "BULLISH": 0,
+          "NEUTRAL": 1,
+          "BEARISH": 0
+        },
+        "confusionMatrix": {
+          "NEUTRAL": {
+            "BULLISH": 0,
+            "NEUTRAL": 5,
+            "BEARISH": 0
+          },
+          "BULLISH": {
+            "BULLISH": 0,
+            "NEUTRAL": 7,
+            "BEARISH": 0
+          },
+          "BEARISH": {
+            "BULLISH": 0,
+            "NEUTRAL": 7,
+            "BEARISH": 0
+          }
+        },
+        "promotionReady": true
+      },
+      "commonSignals": 9,
+      "baselineSignalHits": 3,
+      "balancedSignalHits": 3,
+      "balancedOnlyHits": 20,
+      "baselineOnlyHits": 39,
+      "blocks": [
+        {
+          "start": "2024-11-11",
+          "end": "2024-12-06",
+          "samples": 20,
+          "baselineHits": 11,
+          "balancedHits": 6,
+          "majorityHits": 10
+        },
+        {
+          "start": "2024-12-09",
+          "end": "2025-01-06",
+          "samples": 20,
+          "baselineHits": 6,
+          "balancedHits": 5,
+          "majorityHits": 6
+        },
+        {
+          "start": "2025-01-07",
+          "end": "2025-02-03",
+          "samples": 20,
+          "baselineHits": 8,
+          "balancedHits": 7,
+          "majorityHits": 8
+        },
+        {
+          "start": "2025-02-04",
+          "end": "2025-03-03",
+          "samples": 20,
+          "baselineHits": 8,
+          "balancedHits": 8,
+          "majorityHits": 8
+        },
+        {
+          "start": "2025-03-04",
+          "end": "2025-03-31",
+          "samples": 20,
+          "baselineHits": 11,
+          "balancedHits": 8,
+          "majorityHits": 11
+        },
+        {
+          "start": "2025-04-01",
+          "end": "2025-04-30",
+          "samples": 20,
+          "baselineHits": 8,
+          "balancedHits": 7,
+          "majorityHits": 4
+        },
+        {
+          "start": "2025-05-01",
+          "end": "2025-05-28",
+          "samples": 20,
+          "baselineHits": 11,
+          "balancedHits": 10,
+          "majorityHits": 4
+        },
+        {
+          "start": "2025-05-29",
+          "end": "2025-06-25",
+          "samples": 20,
+          "baselineHits": 9,
+          "balancedHits": 6,
+          "majorityHits": 8
+        },
+        {
+          "start": "2025-06-26",
+          "end": "2025-07-23",
+          "samples": 20,
+          "baselineHits": 8,
+          "balancedHits": 6,
+          "majorityHits": 8
+        },
+        {
+          "start": "2025-07-24",
+          "end": "2025-08-20",
+          "samples": 20,
+          "baselineHits": 10,
+          "balancedHits": 9,
+          "majorityHits": 10
+        },
+        {
+          "start": "2025-08-21",
+          "end": "2025-09-17",
+          "samples": 20,
+          "baselineHits": 8,
+          "balancedHits": 8,
+          "majorityHits": 8
+        },
+        {
+          "start": "2025-09-18",
+          "end": "2025-10-15",
+          "samples": 20,
+          "baselineHits": 5,
+          "balancedHits": 4,
+          "majorityHits": 5
+        }
+      ]
+    },
+    {
+      "profile": "OHLC_20",
+      "baseline": {
+        "version": "logistic-scaled-v2",
+        "all": {
+          "sampleCount": 240,
+          "coveredCount": 240,
+          "coverage": 1,
+          "accuracy": 0.4292,
+          "balancedAccuracy": 0.3952,
+          "brierScore": 0.6797,
+          "logLoss": 1.1188,
+          "recalls": {
+            "BULLISH": 0.3118,
+            "NEUTRAL": 0.7333,
+            "BEARISH": 0.1404
+          },
+          "confusionMatrix": {
+            "NEUTRAL": {
+              "BULLISH": 19,
+              "NEUTRAL": 66,
+              "BEARISH": 5
+            },
+            "BULLISH": {
+              "BULLISH": 29,
+              "NEUTRAL": 53,
+              "BEARISH": 11
+            },
+            "BEARISH": {
+              "BULLISH": 14,
+              "NEUTRAL": 35,
+              "BEARISH": 8
+            }
+          },
+          "promotionReady": true
+        },
+        "signals": {
+          "sampleCount": 240,
+          "coveredCount": 105,
+          "coverage": 0.4375,
+          "accuracy": 0.4476,
+          "balancedAccuracy": 0.4192,
+          "brierScore": 0.6797,
+          "logLoss": 1.1188,
+          "recalls": {
+            "BULLISH": 0.2432,
+            "NEUTRAL": 0.8,
+            "BEARISH": 0.2143
+          },
+          "confusionMatrix": {
+            "NEUTRAL": {
+              "BULLISH": 7,
+              "NEUTRAL": 32,
+              "BEARISH": 1
+            },
+            "BULLISH": {
+              "BULLISH": 9,
+              "NEUTRAL": 23,
+              "BEARISH": 5
+            },
+            "BEARISH": {
+              "BULLISH": 9,
+              "NEUTRAL": 13,
+              "BEARISH": 6
+            }
+          },
+          "promotionReady": true
+        },
+        "selectedDates": {
+          "sampleCount": 105,
+          "coveredCount": 105,
+          "coverage": 1,
+          "accuracy": 0.4476,
+          "balancedAccuracy": 0.4192,
+          "brierScore": 0.7039,
+          "logLoss": 1.1465,
+          "recalls": {
+            "BULLISH": 0.2432,
+            "NEUTRAL": 0.8,
+            "BEARISH": 0.2143
+          },
+          "confusionMatrix": {
+            "NEUTRAL": {
+              "BULLISH": 7,
+              "NEUTRAL": 32,
+              "BEARISH": 1
+            },
+            "BULLISH": {
+              "BULLISH": 9,
+              "NEUTRAL": 23,
+              "BEARISH": 5
+            },
+            "BEARISH": {
+              "BULLISH": 9,
+              "NEUTRAL": 13,
+              "BEARISH": 6
+            }
+          },
+          "promotionReady": true
+        }
+      },
+      "balanced": {
+        "version": "logistic-balanced-v1",
+        "all": {
+          "sampleCount": 240,
+          "coveredCount": 240,
+          "coverage": 1,
+          "accuracy": 0.3792,
+          "balancedAccuracy": 0.3713,
+          "brierScore": 0.6892,
+          "logLoss": 1.1341,
+          "recalls": {
+            "BULLISH": 0.3871,
+            "NEUTRAL": 0.4111,
+            "BEARISH": 0.3158
+          },
+          "confusionMatrix": {
+            "NEUTRAL": {
+              "BULLISH": 35,
+              "NEUTRAL": 37,
+              "BEARISH": 18
+            },
+            "BULLISH": {
+              "BULLISH": 36,
+              "NEUTRAL": 28,
+              "BEARISH": 29
+            },
+            "BEARISH": {
+              "BULLISH": 20,
+              "NEUTRAL": 19,
+              "BEARISH": 18
+            }
+          },
+          "promotionReady": true
+        },
+        "signals": {
+          "sampleCount": 240,
+          "coveredCount": 53,
+          "coverage": 0.2208,
+          "accuracy": 0.3962,
+          "balancedAccuracy": 0.3598,
+          "brierScore": 0.6892,
+          "logLoss": 1.1341,
+          "recalls": {
+            "BULLISH": 0.619,
+            "NEUTRAL": 0.0714,
+            "BEARISH": 0.3889
+          },
+          "confusionMatrix": {
+            "NEUTRAL": {
+              "BULLISH": 12,
+              "NEUTRAL": 1,
+              "BEARISH": 1
+            },
+            "BULLISH": {
+              "BULLISH": 13,
+              "NEUTRAL": 0,
+              "BEARISH": 8
+            },
+            "BEARISH": {
+              "BULLISH": 10,
+              "NEUTRAL": 1,
+              "BEARISH": 7
+            }
+          },
+          "promotionReady": true
+        },
+        "selectedDates": {
+          "sampleCount": 53,
+          "coveredCount": 53,
+          "coverage": 1,
+          "accuracy": 0.3962,
+          "balancedAccuracy": 0.3598,
+          "brierScore": 0.7914,
+          "logLoss": 1.294,
+          "recalls": {
+            "BULLISH": 0.619,
+            "NEUTRAL": 0.0714,
+            "BEARISH": 0.3889
+          },
+          "confusionMatrix": {
+            "NEUTRAL": {
+              "BULLISH": 12,
+              "NEUTRAL": 1,
+              "BEARISH": 1
+            },
+            "BULLISH": {
+              "BULLISH": 13,
+              "NEUTRAL": 0,
+              "BEARISH": 8
+            },
+            "BEARISH": {
+              "BULLISH": 10,
+              "NEUTRAL": 1,
+              "BEARISH": 7
+            }
+          },
+          "promotionReady": true
+        }
+      },
+      "majority": {
+        "version": "majority-v1",
+        "all": {
+          "sampleCount": 240,
+          "coveredCount": 240,
+          "coverage": 1,
+          "accuracy": 0.375,
+          "balancedAccuracy": 0.3333,
+          "brierScore": 1.25,
+          "logLoss": 21.5867,
+          "recalls": {
+            "BULLISH": 0,
+            "NEUTRAL": 1,
+            "BEARISH": 0
+          },
+          "confusionMatrix": {
+            "NEUTRAL": {
+              "BULLISH": 0,
+              "NEUTRAL": 90,
+              "BEARISH": 0
+            },
+            "BULLISH": {
+              "BULLISH": 0,
+              "NEUTRAL": 93,
+              "BEARISH": 0
+            },
+            "BEARISH": {
+              "BULLISH": 0,
+              "NEUTRAL": 57,
+              "BEARISH": 0
+            }
+          },
+          "promotionReady": true
+        },
+        "signals": {
+          "sampleCount": 240,
+          "coveredCount": 240,
+          "coverage": 1,
+          "accuracy": 0.375,
+          "balancedAccuracy": 0.3333,
+          "brierScore": 1.25,
+          "logLoss": 21.5867,
+          "recalls": {
+            "BULLISH": 0,
+            "NEUTRAL": 1,
+            "BEARISH": 0
+          },
+          "confusionMatrix": {
+            "NEUTRAL": {
+              "BULLISH": 0,
+              "NEUTRAL": 90,
+              "BEARISH": 0
+            },
+            "BULLISH": {
+              "BULLISH": 0,
+              "NEUTRAL": 93,
+              "BEARISH": 0
+            },
+            "BEARISH": {
+              "BULLISH": 0,
+              "NEUTRAL": 57,
+              "BEARISH": 0
+            }
+          },
+          "promotionReady": true
+        },
+        "selectedDates": {
+          "sampleCount": 240,
+          "coveredCount": 240,
+          "coverage": 1,
+          "accuracy": 0.375,
+          "balancedAccuracy": 0.3333,
+          "brierScore": 1.25,
+          "logLoss": 21.5867,
+          "recalls": {
+            "BULLISH": 0,
+            "NEUTRAL": 1,
+            "BEARISH": 0
+          },
+          "confusionMatrix": {
+            "NEUTRAL": {
+              "BULLISH": 0,
+              "NEUTRAL": 90,
+              "BEARISH": 0
+            },
+            "BULLISH": {
+              "BULLISH": 0,
+              "NEUTRAL": 93,
+              "BEARISH": 0
+            },
+            "BEARISH": {
+              "BULLISH": 0,
+              "NEUTRAL": 57,
+              "BEARISH": 0
+            }
+          },
+          "promotionReady": true
+        }
+      },
+      "baselineDateBaseline": {
+        "sampleCount": 105,
+        "coveredCount": 105,
+        "coverage": 1,
+        "accuracy": 0.381,
+        "balancedAccuracy": 0.3333,
+        "brierScore": 1.2381,
+        "logLoss": 21.3811,
+        "recalls": {
+          "BULLISH": 0,
+          "NEUTRAL": 1,
+          "BEARISH": 0
+        },
+        "confusionMatrix": {
+          "NEUTRAL": {
+            "BULLISH": 0,
+            "NEUTRAL": 40,
+            "BEARISH": 0
+          },
+          "BULLISH": {
+            "BULLISH": 0,
+            "NEUTRAL": 37,
+            "BEARISH": 0
+          },
+          "BEARISH": {
+            "BULLISH": 0,
+            "NEUTRAL": 28,
+            "BEARISH": 0
+          }
+        },
+        "promotionReady": true
+      },
+      "balancedDateBaseline": {
+        "sampleCount": 53,
+        "coveredCount": 53,
+        "coverage": 1,
+        "accuracy": 0.2642,
+        "balancedAccuracy": 0.3333,
+        "brierScore": 1.4717,
+        "logLoss": 25.4153,
+        "recalls": {
+          "BULLISH": 0,
+          "NEUTRAL": 1,
+          "BEARISH": 0
+        },
+        "confusionMatrix": {
+          "NEUTRAL": {
+            "BULLISH": 0,
+            "NEUTRAL": 14,
+            "BEARISH": 0
+          },
+          "BULLISH": {
+            "BULLISH": 0,
+            "NEUTRAL": 21,
+            "BEARISH": 0
+          },
+          "BEARISH": {
+            "BULLISH": 0,
+            "NEUTRAL": 18,
+            "BEARISH": 0
+          }
+        },
+        "promotionReady": true
+      },
+      "commonSignals": 39,
+      "baselineSignalHits": 16,
+      "balancedSignalHits": 16,
+      "balancedOnlyHits": 19,
+      "baselineOnlyHits": 31,
+      "blocks": [
+        {
+          "start": "2024-11-11",
+          "end": "2024-12-06",
+          "samples": 20,
+          "baselineHits": 10,
+          "balancedHits": 10,
+          "majorityHits": 10
+        },
+        {
+          "start": "2024-12-09",
+          "end": "2025-01-06",
+          "samples": 20,
+          "baselineHits": 6,
+          "balancedHits": 7,
+          "majorityHits": 6
+        },
+        {
+          "start": "2025-01-07",
+          "end": "2025-02-03",
+          "samples": 20,
+          "baselineHits": 9,
+          "balancedHits": 6,
+          "majorityHits": 8
+        },
+        {
+          "start": "2025-02-04",
+          "end": "2025-03-03",
+          "samples": 20,
+          "baselineHits": 8,
+          "balancedHits": 10,
+          "majorityHits": 8
+        },
+        {
+          "start": "2025-03-04",
+          "end": "2025-03-31",
+          "samples": 20,
+          "baselineHits": 11,
+          "balancedHits": 4,
+          "majorityHits": 11
+        },
+        {
+          "start": "2025-04-01",
+          "end": "2025-04-30",
+          "samples": 20,
+          "baselineHits": 8,
+          "balancedHits": 8,
+          "majorityHits": 4
+        },
+        {
+          "start": "2025-05-01",
+          "end": "2025-05-28",
+          "samples": 20,
+          "baselineHits": 8,
+          "balancedHits": 8,
+          "majorityHits": 4
+        },
+        {
+          "start": "2025-05-29",
+          "end": "2025-06-25",
+          "samples": 20,
+          "baselineHits": 7,
+          "balancedHits": 7,
+          "majorityHits": 8
+        },
+        {
+          "start": "2025-06-26",
+          "end": "2025-07-23",
+          "samples": 20,
+          "baselineHits": 8,
+          "balancedHits": 6,
+          "majorityHits": 8
+        },
+        {
+          "start": "2025-07-24",
+          "end": "2025-08-20",
+          "samples": 20,
+          "baselineHits": 10,
+          "balancedHits": 10,
+          "majorityHits": 10
+        },
+        {
+          "start": "2025-08-21",
+          "end": "2025-09-17",
+          "samples": 20,
+          "baselineHits": 9,
+          "balancedHits": 8,
+          "majorityHits": 8
+        },
+        {
+          "start": "2025-09-18",
+          "end": "2025-10-15",
+          "samples": 20,
+          "baselineHits": 9,
+          "balancedHits": 7,
+          "majorityHits": 5
+        }
+      ]
+    },
+    {
+      "profile": "ALL_36",
+      "baseline": {
+        "version": "logistic-scaled-v2",
+        "all": {
+          "sampleCount": 240,
+          "coveredCount": 240,
+          "coverage": 1,
+          "accuracy": 0.3917,
+          "balancedAccuracy": 0.3625,
+          "brierScore": 0.7137,
+          "logLoss": 1.185,
+          "recalls": {
+            "BULLISH": 0.2581,
+            "NEUTRAL": 0.6889,
+            "BEARISH": 0.1404
+          },
+          "confusionMatrix": {
+            "NEUTRAL": {
+              "BULLISH": 25,
+              "NEUTRAL": 62,
+              "BEARISH": 3
+            },
+            "BULLISH": {
+              "BULLISH": 24,
+              "NEUTRAL": 56,
+              "BEARISH": 13
+            },
+            "BEARISH": {
+              "BULLISH": 16,
+              "NEUTRAL": 33,
+              "BEARISH": 8
+            }
+          },
+          "promotionReady": true
+        },
+        "signals": {
+          "sampleCount": 240,
+          "coveredCount": 111,
+          "coverage": 0.4625,
+          "accuracy": 0.4234,
+          "balancedAccuracy": 0.4125,
+          "brierScore": 0.7137,
+          "logLoss": 1.185,
+          "recalls": {
+            "BULLISH": 0.2368,
+            "NEUTRAL": 0.7949,
+            "BEARISH": 0.2059
+          },
+          "confusionMatrix": {
+            "NEUTRAL": {
+              "BULLISH": 7,
+              "NEUTRAL": 31,
+              "BEARISH": 1
+            },
+            "BULLISH": {
+              "BULLISH": 9,
+              "NEUTRAL": 23,
+              "BEARISH": 6
+            },
+            "BEARISH": {
+              "BULLISH": 12,
+              "NEUTRAL": 15,
+              "BEARISH": 7
+            }
+          },
+          "promotionReady": true
+        },
+        "selectedDates": {
+          "sampleCount": 111,
+          "coveredCount": 111,
+          "coverage": 1,
+          "accuracy": 0.4234,
+          "balancedAccuracy": 0.4125,
+          "brierScore": 0.7538,
+          "logLoss": 1.2428,
+          "recalls": {
+            "BULLISH": 0.2368,
+            "NEUTRAL": 0.7949,
+            "BEARISH": 0.2059
+          },
+          "confusionMatrix": {
+            "NEUTRAL": {
+              "BULLISH": 7,
+              "NEUTRAL": 31,
+              "BEARISH": 1
+            },
+            "BULLISH": {
+              "BULLISH": 9,
+              "NEUTRAL": 23,
+              "BEARISH": 6
+            },
+            "BEARISH": {
+              "BULLISH": 12,
+              "NEUTRAL": 15,
+              "BEARISH": 7
+            }
+          },
+          "promotionReady": true
+        }
+      },
+      "balanced": {
+        "version": "logistic-balanced-v1",
+        "all": {
+          "sampleCount": 240,
+          "coveredCount": 240,
+          "coverage": 1,
+          "accuracy": 0.375,
+          "balancedAccuracy": 0.3675,
+          "brierScore": 0.7217,
+          "logLoss": 1.1963,
+          "recalls": {
+            "BULLISH": 0.3978,
+            "NEUTRAL": 0.3889,
+            "BEARISH": 0.3158
+          },
+          "confusionMatrix": {
+            "NEUTRAL": {
+              "BULLISH": 43,
+              "NEUTRAL": 35,
+              "BEARISH": 12
+            },
+            "BULLISH": {
+              "BULLISH": 37,
+              "NEUTRAL": 25,
+              "BEARISH": 31
+            },
+            "BEARISH": {
+              "BULLISH": 22,
+              "NEUTRAL": 17,
+              "BEARISH": 18
+            }
+          },
+          "promotionReady": true
+        },
+        "signals": {
+          "sampleCount": 240,
+          "coveredCount": 73,
+          "coverage": 0.3042,
+          "accuracy": 0.3562,
+          "balancedAccuracy": 0.3394,
+          "brierScore": 0.7217,
+          "logLoss": 1.1963,
+          "recalls": {
+            "BULLISH": 0.5,
+            "NEUTRAL": 0.2105,
+            "BEARISH": 0.3077
+          },
+          "confusionMatrix": {
+            "NEUTRAL": {
+              "BULLISH": 13,
+              "NEUTRAL": 4,
+              "BEARISH": 2
+            },
+            "BULLISH": {
+              "BULLISH": 14,
+              "NEUTRAL": 3,
+              "BEARISH": 11
+            },
+            "BEARISH": {
+              "BULLISH": 15,
+              "NEUTRAL": 3,
+              "BEARISH": 8
+            }
+          },
+          "promotionReady": true
+        },
+        "selectedDates": {
+          "sampleCount": 73,
+          "coveredCount": 73,
+          "coverage": 1,
+          "accuracy": 0.3562,
+          "balancedAccuracy": 0.3394,
+          "brierScore": 0.8455,
+          "logLoss": 1.4144,
+          "recalls": {
+            "BULLISH": 0.5,
+            "NEUTRAL": 0.2105,
+            "BEARISH": 0.3077
+          },
+          "confusionMatrix": {
+            "NEUTRAL": {
+              "BULLISH": 13,
+              "NEUTRAL": 4,
+              "BEARISH": 2
+            },
+            "BULLISH": {
+              "BULLISH": 14,
+              "NEUTRAL": 3,
+              "BEARISH": 11
+            },
+            "BEARISH": {
+              "BULLISH": 15,
+              "NEUTRAL": 3,
+              "BEARISH": 8
+            }
+          },
+          "promotionReady": true
+        }
+      },
+      "majority": {
+        "version": "majority-v1",
+        "all": {
+          "sampleCount": 240,
+          "coveredCount": 240,
+          "coverage": 1,
+          "accuracy": 0.375,
+          "balancedAccuracy": 0.3333,
+          "brierScore": 1.25,
+          "logLoss": 21.5867,
+          "recalls": {
+            "BULLISH": 0,
+            "NEUTRAL": 1,
+            "BEARISH": 0
+          },
+          "confusionMatrix": {
+            "NEUTRAL": {
+              "BULLISH": 0,
+              "NEUTRAL": 90,
+              "BEARISH": 0
+            },
+            "BULLISH": {
+              "BULLISH": 0,
+              "NEUTRAL": 93,
+              "BEARISH": 0
+            },
+            "BEARISH": {
+              "BULLISH": 0,
+              "NEUTRAL": 57,
+              "BEARISH": 0
+            }
+          },
+          "promotionReady": true
+        },
+        "signals": {
+          "sampleCount": 240,
+          "coveredCount": 240,
+          "coverage": 1,
+          "accuracy": 0.375,
+          "balancedAccuracy": 0.3333,
+          "brierScore": 1.25,
+          "logLoss": 21.5867,
+          "recalls": {
+            "BULLISH": 0,
+            "NEUTRAL": 1,
+            "BEARISH": 0
+          },
+          "confusionMatrix": {
+            "NEUTRAL": {
+              "BULLISH": 0,
+              "NEUTRAL": 90,
+              "BEARISH": 0
+            },
+            "BULLISH": {
+              "BULLISH": 0,
+              "NEUTRAL": 93,
+              "BEARISH": 0
+            },
+            "BEARISH": {
+              "BULLISH": 0,
+              "NEUTRAL": 57,
+              "BEARISH": 0
+            }
+          },
+          "promotionReady": true
+        },
+        "selectedDates": {
+          "sampleCount": 240,
+          "coveredCount": 240,
+          "coverage": 1,
+          "accuracy": 0.375,
+          "balancedAccuracy": 0.3333,
+          "brierScore": 1.25,
+          "logLoss": 21.5867,
+          "recalls": {
+            "BULLISH": 0,
+            "NEUTRAL": 1,
+            "BEARISH": 0
+          },
+          "confusionMatrix": {
+            "NEUTRAL": {
+              "BULLISH": 0,
+              "NEUTRAL": 90,
+              "BEARISH": 0
+            },
+            "BULLISH": {
+              "BULLISH": 0,
+              "NEUTRAL": 93,
+              "BEARISH": 0
+            },
+            "BEARISH": {
+              "BULLISH": 0,
+              "NEUTRAL": 57,
+              "BEARISH": 0
+            }
+          },
+          "promotionReady": true
+        }
+      },
+      "baselineDateBaseline": {
+        "sampleCount": 111,
+        "coveredCount": 111,
+        "coverage": 1,
+        "accuracy": 0.3514,
+        "balancedAccuracy": 0.3333,
+        "brierScore": 1.2973,
+        "logLoss": 22.4035,
+        "recalls": {
+          "BULLISH": 0,
+          "NEUTRAL": 1,
+          "BEARISH": 0
+        },
+        "confusionMatrix": {
+          "NEUTRAL": {
+            "BULLISH": 0,
+            "NEUTRAL": 39,
+            "BEARISH": 0
+          },
+          "BULLISH": {
+            "BULLISH": 0,
+            "NEUTRAL": 38,
+            "BEARISH": 0
+          },
+          "BEARISH": {
+            "BULLISH": 0,
+            "NEUTRAL": 34,
+            "BEARISH": 0
+          }
+        },
+        "promotionReady": true
+      },
+      "balancedDateBaseline": {
+        "sampleCount": 73,
+        "coveredCount": 73,
+        "coverage": 1,
+        "accuracy": 0.2603,
+        "balancedAccuracy": 0.3333,
+        "brierScore": 1.4795,
+        "logLoss": 25.5492,
+        "recalls": {
+          "BULLISH": 0,
+          "NEUTRAL": 1,
+          "BEARISH": 0
+        },
+        "confusionMatrix": {
+          "NEUTRAL": {
+            "BULLISH": 0,
+            "NEUTRAL": 19,
+            "BEARISH": 0
+          },
+          "BULLISH": {
+            "BULLISH": 0,
+            "NEUTRAL": 28,
+            "BEARISH": 0
+          },
+          "BEARISH": {
+            "BULLISH": 0,
+            "NEUTRAL": 26,
+            "BEARISH": 0
+          }
+        },
+        "promotionReady": true
+      },
+      "commonSignals": 52,
+      "baselineSignalHits": 20,
+      "balancedSignalHits": 20,
+      "balancedOnlyHits": 23,
+      "baselineOnlyHits": 27,
+      "blocks": [
+        {
+          "start": "2024-11-11",
+          "end": "2024-12-06",
+          "samples": 20,
+          "baselineHits": 10,
+          "balancedHits": 7,
+          "majorityHits": 10
+        },
+        {
+          "start": "2024-12-09",
+          "end": "2025-01-06",
+          "samples": 20,
+          "baselineHits": 5,
+          "balancedHits": 6,
+          "majorityHits": 6
+        },
+        {
+          "start": "2025-01-07",
+          "end": "2025-02-03",
+          "samples": 20,
+          "baselineHits": 5,
+          "balancedHits": 8,
+          "majorityHits": 8
+        },
+        {
+          "start": "2025-02-04",
+          "end": "2025-03-03",
+          "samples": 20,
+          "baselineHits": 8,
+          "balancedHits": 9,
+          "majorityHits": 8
+        },
+        {
+          "start": "2025-03-04",
+          "end": "2025-03-31",
+          "samples": 20,
+          "baselineHits": 12,
+          "balancedHits": 6,
+          "majorityHits": 11
+        },
+        {
+          "start": "2025-04-01",
+          "end": "2025-04-30",
+          "samples": 20,
+          "baselineHits": 8,
+          "balancedHits": 7,
+          "majorityHits": 4
+        },
+        {
+          "start": "2025-05-01",
+          "end": "2025-05-28",
+          "samples": 20,
+          "baselineHits": 8,
+          "balancedHits": 8,
+          "majorityHits": 4
+        },
+        {
+          "start": "2025-05-29",
+          "end": "2025-06-25",
+          "samples": 20,
+          "baselineHits": 8,
+          "balancedHits": 7,
+          "majorityHits": 8
+        },
+        {
+          "start": "2025-06-26",
+          "end": "2025-07-23",
+          "samples": 20,
+          "baselineHits": 8,
+          "balancedHits": 8,
+          "majorityHits": 8
+        },
+        {
+          "start": "2025-07-24",
+          "end": "2025-08-20",
+          "samples": 20,
+          "baselineHits": 10,
+          "balancedHits": 10,
+          "majorityHits": 10
+        },
+        {
+          "start": "2025-08-21",
+          "end": "2025-09-17",
+          "samples": 20,
+          "baselineHits": 8,
+          "balancedHits": 8,
+          "majorityHits": 8
+        },
+        {
+          "start": "2025-09-18",
+          "end": "2025-10-15",
+          "samples": 20,
+          "baselineHits": 4,
+          "balancedHits": 6,
+          "majorityHits": 5
+        }
+      ]
+    }
+  ]
+}
