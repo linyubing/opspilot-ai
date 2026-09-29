@@ -16,6 +16,27 @@ import static org.assertj.core.api.Assertions.assertThat;
 class TribuoGoldTrainerTests {
 
     @Test
+    void balancedTrainingChangesMinorityLossWithoutChangingSamples() {
+        // 无可用特征信号时，普通模型跟随 7:2:1 的样本占比；加权模型应提高少数类贡献。
+        List<GoldSample> rows = new ArrayList<>();
+        LocalDate start = LocalDate.of(2020, 1, 1);
+        for (int i = 0; i < 600; i++) {
+            ForecastDirection label = i % 10 < 7 ? ForecastDirection.NEUTRAL
+                    : i % 10 < 9 ? ForecastDirection.BULLISH : ForecastDirection.BEARISH;
+            rows.add(new GoldSample(start.plusDays(i), start.plusDays(i + 1),
+                    ForecastHorizon.NEXT_DAY, features(0), label));
+        }
+        var ordinary = new TribuoGoldTrainer(true, false).train(rows).predict(features(0));
+        var weighted = new TribuoGoldTrainer(true, true).train(rows).predict(features(0));
+        assertThat(weighted.bearish()).isGreaterThan(ordinary.bearish() + .10);
+        assertThat(weighted.neutral()).isLessThan(ordinary.neutral() - .10);
+        assertThat(weighted.bullish() + weighted.neutral() + weighted.bearish())
+                .isCloseTo(1.0, org.assertj.core.data.Offset.offset(0.000001));
+        assertThat(rows).hasSize(600);
+        assertThat(rows.stream().filter(s -> s.label() == ForecastDirection.BEARISH).count()).isEqualTo(60);
+    }
+
+    @Test
     void unitsDoNotChangeProbabilities() {
         // 同一信号仅换单位、加基准值，不应让模型学出完全不同的方向概率。
         List<GoldSample> original = samples(240);

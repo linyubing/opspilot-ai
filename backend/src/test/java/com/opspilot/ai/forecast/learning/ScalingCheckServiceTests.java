@@ -75,6 +75,21 @@ class ScalingCheckServiceTests {
             assertThat(result.full().version()).isEqualTo(TribuoGoldTrainer.VERSION);
             assertThat(result.recent().version()).isEqualTo(TribuoGoldTrainer.VERSION + "-window-" + result.trainSize());
         });
+
+        clearInvocations(builder, splitter, walk);
+        var balance = new ScalingCheckService(builder, splitter, fingerprint, walk, git, clock,
+                new ForecastEvaluator()).balanced();
+        assertThat(balance).isNotNull();
+        verify(builder, times(1)).build(ForecastHorizon.NEXT_DAY);
+        verify(splitter, times(1)).split(data.samples(), ForecastHorizon.NEXT_DAY);
+        verify(walk, times(9)).predict(same(split), any(FeatureProfile.class), any(GoldTrainer.class));
+        assertThat(balance.results()).hasSize(3).allSatisfy(result -> {
+            assertThat(result.baseline().version()).isEqualTo(TribuoGoldTrainer.VERSION);
+            assertThat(result.balanced().version()).isEqualTo(TribuoGoldTrainer.BALANCED_VERSION);
+        });
+        assertThat(balance.initialCounts().get(ForecastDirection.BULLISH)).isEqualTo(1);
+        assertThat(balance.initialCounts().get(ForecastDirection.BEARISH)).isZero();
+        assertThat(balance.validationCounts()).isEqualTo(balance.initialCounts());
     }
 
     @Test

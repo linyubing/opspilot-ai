@@ -6,7 +6,9 @@ import org.springframework.stereotype.Service;
 import java.time.Clock;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /** 在一次固定时间分区中比较原始量纲和标准化逻辑回归，不调整阈值或正式模型。 */
@@ -51,6 +53,37 @@ public class ScalingCheckService {
                 split.validation().getFirst().asOfDate(), split.validation().getLast().asOfDate(),
                 split.finalHoldout().getFirst().asOfDate(), split.finalHoldout().getLast().asOfDate(),
                 split.validation().size(), dataset.skippedCount(), WalkForwardService.CONFIDENCE, rows);
+    }
+
+    /** 固定下一交易日、三种特征组合，检验类别加权，不修改正式模型。 */
+    public BalanceReport balanced() {
+        String commit = git.getRequired();
+        ForecastHorizon horizon = ForecastHorizon.NEXT_DAY;
+        GoldDataset dataset = builder.build(horizon);
+        TemporalDataset split = splitter.split(dataset.samples(), horizon);
+        List<BalanceReport.Result> rows = new ArrayList<>();
+        for (FeatureProfile profile : FeatureProfile.values()) {
+            GoldTrainer baseline = new TribuoGoldTrainer(true, false);
+            GoldTrainer balanced = new TribuoGoldTrainer(true, true);
+            List<SettledPrediction> before = walkForward.predict(split, profile, baseline);
+            List<SettledPrediction> after = walkForward.predict(split, profile, balanced);
+            List<SettledPrediction> majority = walkForward.predict(split, profile, new MajorityGoldTrainer());
+            rows.add(BalanceReport.Result.from(compare(profile, before, after, majority,
+                    baseline.name(), balanced.name())));
+        }
+        return new BalanceReport(UUID.randomUUID(), OffsetDateTime.now(clock), commit,
+                fingerprint.hash(dataset), horizon,
+                split.validation().getFirst().asOfDate(), split.validation().getLast().asOfDate(),
+                split.finalHoldout().getFirst().asOfDate(), split.finalHoldout().getLast().asOfDate(),
+                split.validation().size(), dataset.skippedCount(), WalkForwardService.CONFIDENCE,
+                counts(split.training()), counts(split.validation()), rows);
+    }
+
+    private Map<ForecastDirection, Integer> counts(List<GoldSample> samples) {
+        Map<ForecastDirection, Integer> counts = new EnumMap<>(ForecastDirection.class);
+        for (ForecastDirection direction : ForecastDirection.values()) counts.put(direction, 0);
+        for (GoldSample sample : samples) counts.merge(sample.label(), 1, Integer::sum);
+        return counts;
     }
 
     ScalingReport.Result compare(FeatureProfile profile, List<SettledPrediction> raw,

@@ -1,6 +1,7 @@
 package com.opspilot.ai.forecast.learning.api;
 
 import com.opspilot.ai.chat.api.ApiError;
+import com.opspilot.ai.forecast.learning.BalanceReport;
 import com.opspilot.ai.forecast.learning.ForecastHorizon;
 import com.opspilot.ai.forecast.learning.ScalingCheckService;
 import com.opspilot.ai.forecast.learning.ScalingReport;
@@ -27,6 +28,9 @@ public class ScalingCheckController {
 
     @PostMapping("/windows")
     public WindowReport windows() { return service.windows(); }
+
+    @PostMapping("/balanced")
+    public BalanceReport balanced() { return service.balanced(); }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ApiError> invalid(IllegalArgumentException error) {

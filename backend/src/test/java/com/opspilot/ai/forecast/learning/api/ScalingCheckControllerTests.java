@@ -46,4 +46,11 @@ class ScalingCheckControllerTests {
         verify(service).windows();
         verifyNoMoreInteractions(service);
     }
+
+    @Test
+    void runsFixedClassWeightComparison() throws Exception {
+        mvc.perform(post(PATH + "/balanced")).andExpect(status().isOk());
+        verify(service).balanced();
+        verifyNoMoreInteractions(service);
+    }
 }

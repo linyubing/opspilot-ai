@@ -21,7 +21,9 @@ import java.util.Set;
 @Component("tribuoGoldTrainer")
 public class TribuoGoldTrainer implements GoldTrainer {
     public static final String VERSION = "logistic-scaled-v2";
+    public static final String BALANCED_VERSION = "logistic-balanced-v1";
     private final boolean standardize;
+    private final boolean balanced;
 
     public TribuoGoldTrainer() {
         this(true);
@@ -29,11 +31,20 @@ public class TribuoGoldTrainer implements GoldTrainer {
 
     @Autowired
     public TribuoGoldTrainer(@Value("${opspilot.forecast.gold.logistic.standardize:false}") boolean standardize) {
+        this(standardize, false);
+    }
+
+    public TribuoGoldTrainer(boolean standardize, boolean balanced) {
+        if (balanced && !standardize) {
+            throw new IllegalArgumentException("类别加权实验必须在标准化基线上运行");
+        }
         this.standardize = standardize;
+        this.balanced = balanced;
     }
 
     @Override
     public String name() {
+        if (balanced) return BALANCED_VERSION;
         return standardize ? VERSION : "logistic-v1";
     }
 
@@ -49,6 +60,7 @@ public class TribuoGoldTrainer implements GoldTrainer {
         String[] names = sorted.toArray(String[]::new);
         // 每次滚动重训独立拟合；验证样本与留出样本不得参与统计。
         FeatureScaler scaler = standardize ? FeatureScaler.fit(samples, sorted) : null;
+        Map<ForecastDirection, Float> weights = balanced ? ClassWeights.fit(samples) : Map.of();
 
         LabelFactory factory = new LabelFactory();
         MutableDataset<Label> dataset = new MutableDataset<>(
@@ -56,7 +68,10 @@ public class TribuoGoldTrainer implements GoldTrainer {
                 factory
         );
         for (GoldSample sample : samples) {
-            dataset.add(example(new Label(sample.label().name()), sample.features(), names, sorted, scaler));
+            ArrayExample<Label> row = example(new Label(sample.label().name()), sample.features(), names, sorted, scaler);
+            // 只改变当前训练集的损失贡献；原行情、标签、验证样本数量完全不变。
+            row.setWeight(weights.getOrDefault(sample.label(), 1f));
+            dataset.add(row);
         }
 
         Model<Label> model = new LogisticRegressionTrainer().train(dataset);
