@@ -1,6 +1,6 @@
 # 训练体检研究探针
 
-这两个探针属于一次性诊断，不是生产模型、正式模型选型器或自动交易代码。保存源码只是为了复核报告；没有 Spring Bean、对外接口或数据库写入。真实数据不足时停止，不补造价格或宏观特征。
+这些探针属于一次性诊断，不是生产模型、正式模型选型器或自动交易代码。保存源码只是为了复核报告；没有 Spring Bean、对外接口或数据库写入。真实数据不足时停止，不补造价格或宏观特征。
 
 ## 固定问题与方法
 
@@ -46,3 +46,24 @@ cd D:\workFile\demo-ai
 - 不证明 80 轮已经收敛；没有比较独立收敛求解器，也没有评价正则化。
 - 日线是当前数据库保存的真实历史价格，不是带历史修订版本和日内公布时刻的逐时快照。
 - `promotionReady` 是旧指标类型的类别完整性字段，不代表本诊断批准晋级。
+
+## 2026-09-30 历史版本和收敛参照
+
+`fred-history.ps1` 下载不晚于 2024-11-08 的 FRED 历史版本区间，只保存到 `backend/target/fred-history`。缺少早期版本时不回填，缓存存在时验证范围后复用。`verify-vintage.ps1` 使用官方单日接口做十个时点核验。
+
+已有原始缓存的归档在 `docs/research/2026-09-30-fred-history.zip`。首次复核时可用 `Expand-Archive` 解压到空的 `backend/target/fred-history`，随后核对报告中的 SHA-256；不要覆盖已有不同指纹的数据。
+
+`VintageProbe.java` 用只读内存适配器复用产品的 36 特征计算链，配对旧最新值和历史版本值，两侧训练日期完全一致。`ConvergenceProbe.java` 只比较求解充分性，未收敛时不计算参照模型验证分数。两者均属于研究探针，尚未接入产品。
+
+```powershell
+cd D:\workFile\demo-ai\backend
+$probeCp = 'target/probe-classes;target/classes;' + (Get-Content target/probe-classpath.txt -Raw).Trim()
+javac -encoding UTF-8 -cp $probeCp -d target/probe-classes ../docs/research/probes/TrainingProbe.java ../docs/research/probes/VintageProbe.java ../docs/research/probes/ConvergenceProbe.java
+$probeCommit = (git rev-parse HEAD).Trim()
+java -cp $probeCp com.opspilot.ai.forecast.learning.VintageProbe target/vintage-repeat.json $probeCommit
+java -cp $probeCp com.opspilot.ai.forecast.learning.ConvergenceProbe target/convergence-repeat.json $probeCommit
+cd ..
+.\docs\research\probes\verify-vintage-results.ps1
+```
+
+三个脚本拒绝覆盖已有归档核验结果。复跑应使用新的 `target` 输出文件；源码以 LF 保存以维持字节指纹。参照优化过程中的 `NOT_CONVERGED` 是本次真实失败结果，脚本完成不代表收敛成功。

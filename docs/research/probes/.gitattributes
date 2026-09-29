@@ -1,2 +1,4 @@
 # 保持诊断源码字节指纹可跨 Windows Git 检出复核。
 TrainingProbe.java text eol=lf
+VintageProbe.java text eol=lf
+ConvergenceProbe.java text eol=lf

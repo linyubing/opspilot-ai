@@ -1,0 +1,92 @@
+[
+    {
+        "series":  "DFII10",
+        "asOf":  "2019-02-05",
+        "cutoff":  "2019-02-04",
+        "matched":  21,
+        "latestDate":  "2019-02-01",
+        "latestValue":  "0.82",
+        "sourceSha256":  "bd42d31d8e4a0884a07c22b15c750c29768525e4b1641879c0a4d3990e09344e"
+    },
+    {
+        "series":  "DFII10",
+        "asOf":  "2022-11-01",
+        "cutoff":  "2022-10-31",
+        "matched":  21,
+        "latestDate":  "2022-10-28",
+        "latestValue":  "1.51",
+        "sourceSha256":  "bd42d31d8e4a0884a07c22b15c750c29768525e4b1641879c0a4d3990e09344e"
+    },
+    {
+        "series":  "DFII10",
+        "asOf":  "2022-11-02",
+        "cutoff":  "2022-11-01",
+        "matched":  21,
+        "latestDate":  "2022-10-31",
+        "latestValue":  "1.58",
+        "sourceSha256":  "bd42d31d8e4a0884a07c22b15c750c29768525e4b1641879c0a4d3990e09344e"
+    },
+    {
+        "series":  "DFII10",
+        "asOf":  "2024-11-02",
+        "cutoff":  "2024-11-01",
+        "matched":  21,
+        "latestDate":  "2024-10-31",
+        "latestValue":  "1.95",
+        "sourceSha256":  "bd42d31d8e4a0884a07c22b15c750c29768525e4b1641879c0a4d3990e09344e"
+    },
+    {
+        "series":  "DFII10",
+        "asOf":  "2024-11-05",
+        "cutoff":  "2024-11-04",
+        "matched":  21,
+        "latestDate":  "2024-11-01",
+        "latestValue":  "2.04",
+        "sourceSha256":  "bd42d31d8e4a0884a07c22b15c750c29768525e4b1641879c0a4d3990e09344e"
+    },
+    {
+        "series":  "DTWEXBGS",
+        "asOf":  "2019-02-05",
+        "cutoff":  "2019-02-04",
+        "matched":  21,
+        "latestDate":  "2019-02-01",
+        "latestValue":  "112.1594",
+        "sourceSha256":  "1b9590fd26f9601a987552251f9cc4b2445998b7d41df725d5748fb37d993638"
+    },
+    {
+        "series":  "DTWEXBGS",
+        "asOf":  "2022-11-01",
+        "cutoff":  "2022-10-31",
+        "matched":  21,
+        "latestDate":  "2022-10-28",
+        "latestValue":  "127.3892",
+        "sourceSha256":  "1b9590fd26f9601a987552251f9cc4b2445998b7d41df725d5748fb37d993638"
+    },
+    {
+        "series":  "DTWEXBGS",
+        "asOf":  "2022-11-02",
+        "cutoff":  "2022-11-01",
+        "matched":  21,
+        "latestDate":  "2022-10-28",
+        "latestValue":  "127.3892",
+        "sourceSha256":  "1b9590fd26f9601a987552251f9cc4b2445998b7d41df725d5748fb37d993638"
+    },
+    {
+        "series":  "DTWEXBGS",
+        "asOf":  "2024-11-02",
+        "cutoff":  "2024-11-01",
+        "matched":  21,
+        "latestDate":  "2024-10-25",
+        "latestValue":  "124.8418",
+        "sourceSha256":  "1b9590fd26f9601a987552251f9cc4b2445998b7d41df725d5748fb37d993638"
+    },
+    {
+        "series":  "DTWEXBGS",
+        "asOf":  "2024-11-05",
+        "cutoff":  "2024-11-04",
+        "matched":  21,
+        "latestDate":  "2024-11-01",
+        "latestValue":  "125.0403",
+        "sourceSha256":  "1b9590fd26f9601a987552251f9cc4b2445998b7d41df725d5748fb37d993638"
+    }
+]
