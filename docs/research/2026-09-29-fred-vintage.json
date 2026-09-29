@@ -1,0 +1,115 @@
+[
+    {
+        "series":  "DFII10",
+        "vintage":  "2024-11-01",
+        "count":  4,
+        "observations":  [
+                             {
+                                 "date":  "2024-10-28",
+                                 "value":  "1.99",
+                                 "realtime_start":  "2024-11-01",
+                                 "realtime_end":  "2024-11-01"
+                             },
+                             {
+                                 "date":  "2024-10-29",
+                                 "value":  "1.98",
+                                 "realtime_start":  "2024-11-01",
+                                 "realtime_end":  "2024-11-01"
+                             },
+                             {
+                                 "date":  "2024-10-30",
+                                 "value":  "1.95",
+                                 "realtime_start":  "2024-11-01",
+                                 "realtime_end":  "2024-11-01"
+                             },
+                             {
+                                 "date":  "2024-10-31",
+                                 "value":  "1.95",
+                                 "realtime_start":  "2024-11-01",
+                                 "realtime_end":  "2024-11-01"
+                             }
+                         ]
+    },
+    {
+        "series":  "DFII10",
+        "vintage":  "2024-11-08",
+        "count":  5,
+        "observations":  [
+                             {
+                                 "date":  "2024-10-28",
+                                 "value":  "1.99",
+                                 "realtime_start":  "2024-11-08",
+                                 "realtime_end":  "2024-11-08"
+                             },
+                             {
+                                 "date":  "2024-10-29",
+                                 "value":  "1.98",
+                                 "realtime_start":  "2024-11-08",
+                                 "realtime_end":  "2024-11-08"
+                             },
+                             {
+                                 "date":  "2024-10-30",
+                                 "value":  "1.95",
+                                 "realtime_start":  "2024-11-08",
+                                 "realtime_end":  "2024-11-08"
+                             },
+                             {
+                                 "date":  "2024-10-31",
+                                 "value":  "1.95",
+                                 "realtime_start":  "2024-11-08",
+                                 "realtime_end":  "2024-11-08"
+                             },
+                             {
+                                 "date":  "2024-11-01",
+                                 "value":  "2.04",
+                                 "realtime_start":  "2024-11-08",
+                                 "realtime_end":  "2024-11-08"
+                             }
+                         ]
+    },
+    {
+        "series":  "DTWEXBGS",
+        "vintage":  "2024-11-01",
+        "count":  0,
+        "observations":  [
+
+                         ]
+    },
+    {
+        "series":  "DTWEXBGS",
+        "vintage":  "2024-11-08",
+        "count":  5,
+        "observations":  [
+                             {
+                                 "date":  "2024-10-28",
+                                 "value":  "125.0385",
+                                 "realtime_start":  "2024-11-08",
+                                 "realtime_end":  "2024-11-08"
+                             },
+                             {
+                                 "date":  "2024-10-29",
+                                 "value":  "125.0952",
+                                 "realtime_start":  "2024-11-08",
+                                 "realtime_end":  "2024-11-08"
+                             },
+                             {
+                                 "date":  "2024-10-30",
+                                 "value":  "125.0444",
+                                 "realtime_start":  "2024-11-08",
+                                 "realtime_end":  "2024-11-08"
+                             },
+                             {
+                                 "date":  "2024-10-31",
+                                 "value":  "125.0247",
+                                 "realtime_start":  "2024-11-08",
+                                 "realtime_end":  "2024-11-08"
+                             },
+                             {
+                                 "date":  "2024-11-01",
+                                 "value":  "125.0403",
+                                 "realtime_start":  "2024-11-08",
+                                 "realtime_end":  "2024-11-08"
+                             }
+                         ]
+    }
+]
