@@ -209,3 +209,31 @@ node docs/research/probes/HistoryVerifierChecks.cjs
 ```
 
 第二条命令只生成`backend/target`中的故意损坏副本，不是新行情或实验数据。新轮若修改研究算法或协议，必须新增探针，不改写已有源码摘要对应的归档。
+
+## 2026-10-02 ATR相对价格表达对照
+
+`AtrScale/AtrChecks/AtrRun`只将ATR除以基准日真实收盘再乘100，其余19项特征不变。数学测试不是行情，实验不写数据库/不读最终留出。见[固定协议](../2026-10-02-atr-protocol.md)及[失败分析](../2026-10-02-atr-check.md)。
+
+```powershell
+cd D:\workFile\demo-ai\backend
+.\mvnw.cmd -q -DskipTests compile dependency:build-classpath '-Dmdep.outputFile=target/probe-classpath.txt'
+$probeCp = 'target/classes;' + (Get-Content -Raw target/probe-classpath.txt).Trim()
+New-Item -ItemType Directory -Force target/atr-classes | Out-Null
+javac -encoding UTF-8 -cp $probeCp -d target/atr-classes ../docs/research/probes/TrainingProbe.java ../docs/research/probes/SoftmaxFit.java ../docs/research/probes/RidgeFit.java ../docs/research/probes/HistorySlice.java ../docs/research/probes/HistoryChecks.java ../docs/research/probes/HistoryRun.java ../docs/research/probes/AtrScale.java ../docs/research/probes/AtrChecks.java ../docs/research/probes/AtrRun.java
+$probeCp = 'target/atr-classes;' + $probeCp
+java '-Dfile.encoding=UTF-8' '-Dstdout.encoding=UTF-8' '-Dstderr.encoding=UTF-8' -cp $probeCp com.opspilot.ai.forecast.learning.AtrChecks
+java '-Dfile.encoding=UTF-8' '-Dstdout.encoding=UTF-8' '-Dstderr.encoding=UTF-8' -cp $probeCp com.opspilot.ai.forecast.learning.AtrRun target/atr-local.json (git rev-parse HEAD)
+node ../docs/research/probes/verify-atr.cjs target/atr-local.json
+```
+
+输出必须不存在，日线和原20维输入摘要不匹配时停止。含原始十进制日线的完整JSON仅本地保存并由`docs/research/.gitignore`排除，不能作为公开行情再分发。已有本地归档时，独立复核不需要数据库连接：
+
+```powershell
+cd D:\workFile\demo-ai
+node docs/research/probes/verify-atr.cjs docs/research/2026-10-02-atr-check.json
+node docs/research/probes/AtrVerifierChecks.cjs
+# 可选：已有完整本地归档时，逐值比较重建结果。
+node docs/research/probes/verify-atr.cjs backend/target/atr-local.json docs/research/2026-10-02-atr-check.json
+```
+
+损坏测试仅写`backend/target`，不把故意损坏的副本作为真实行情。从新检出中没有完整归档时，用有权使用的本地数据库先生成`target/atr-local.json`，再核验该文件；损坏测试可从项目根传入该路径，例如`node docs/research/probes/AtrVerifierChecks.cjs backend/target/atr-local.json`。不能编造缺失归档。
