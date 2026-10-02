@@ -20,6 +20,11 @@ public class GoldDatasetFingerprint {
             throw new IllegalStateException("SHA-256不可用", e);
         }
 
+        // 数值相同不代表证据相同；历史版本策略和原始文件也进入指纹。
+        for (String key : dataset.macroInput().keySet().stream().sorted().toList()) {
+            update(digest, key);
+            update(digest, dataset.macroInput().get(key));
+        }
         List<GoldSample> sorted = dataset.samples().stream()
                 .sorted((a, b) -> a.asOfDate().compareTo(b.asOfDate()))
                 .toList();

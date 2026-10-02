@@ -32,4 +32,10 @@ public record ModelExperiment(
         OffsetDateTime startedAt,
         OffsetDateTime completedAt
 ) {
+    /** 无来源字段的旧记录仍是旧口径，不能因升级程序就声称已修正。 */
+    public String dataPolicy() {
+        if (parameters != null && parameters.get("macroInput") instanceof Map<?, ?> input
+                && input.get("policy") instanceof String policy && !policy.isBlank()) return policy;
+        return "legacy-latest-version";
+    }
 }

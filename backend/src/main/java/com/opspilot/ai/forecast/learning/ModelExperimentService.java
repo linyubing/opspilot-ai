@@ -93,7 +93,7 @@ public class ModelExperimentService {
                     TemporalSplitter.VERSION,
                     datasetHash,
                     profile,
-                    buildParameters(horizon, profile),
+                    buildParameters(horizon, profile, dataset),
                     dataset.samples().getFirst().asOfDate(),
                     dataset.samples().getLast().asOfDate(),
                     split.training().getFirst().asOfDate(),
@@ -202,7 +202,7 @@ public class ModelExperimentService {
                 TemporalSplitter.VERSION,
                 datasetHash,
                 profile,
-                buildParameters(horizon, profile),
+                buildParameters(horizon, profile, dataset),
                 dataset.samples().getFirst().asOfDate(),
                 dataset.samples().getLast().asOfDate(),
                 split.training().getFirst().asOfDate(),
@@ -331,9 +331,10 @@ public class ModelExperimentService {
         return result;
     }
 
-    private Map<String, Object> buildParameters(ForecastHorizon horizon, FeatureProfile profile) {
+    private Map<String, Object> buildParameters(ForecastHorizon horizon, FeatureProfile profile, GoldDataset dataset) {
         Map<String, Object> params = new LinkedHashMap<>();
         params.put("horizon", horizon.name());
+        params.put("macroInput", dataset.macroInput());
         params.put("featureProfile", profile.name());
         params.put("featureCount", profile.featureNames().size());
         params.put("refitEvery", REFIT_EVERY);

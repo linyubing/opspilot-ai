@@ -15,6 +15,18 @@ class GoldDatasetFingerprintTests {
     private final GoldDatasetFingerprint fingerprint = new GoldDatasetFingerprint();
 
     @Test
+    @DisplayName("相同数值但历史来源不同不能共用实验指纹")
+    void includesSourcePolicy() {
+        var old = sampleDataset();
+        var current = new GoldDataset(old.samples(), old.skippedCount(), Map.of(
+                "policy", "fred-known-before-day-v1", "DFII10.sha256", "source-a"));
+        var changed = new GoldDataset(old.samples(), old.skippedCount(), Map.of(
+                "policy", "fred-known-before-day-v1", "DFII10.sha256", "source-b"));
+        assertThat(fingerprint.hash(current)).isNotEqualTo(fingerprint.hash(old));
+        assertThat(fingerprint.hash(current)).isNotEqualTo(fingerprint.hash(changed));
+    }
+
+    @Test
     @DisplayName("相同数据集产生相同哈希")
     void sameDatasetProducesSameHash() {
         GoldDataset dataset = sampleDataset();

@@ -78,6 +78,7 @@ class ModelExperimentServiceTests {
         verify(walkForward, org.mockito.Mockito.times(1)).run(split, horizon, FeatureProfile.ALL_36);
         assertThat(result.experiment().status()).isEqualTo(ModelExperimentStatus.COMPLETED);
         assertThat(result.experiment().parameters()).containsEntry("logisticVersion", "logistic-v1");
+        assertThat(result.experiment().parameters()).containsEntry("macroInput", dataset.macroInput());
     }
 
     @Test
@@ -163,7 +164,8 @@ class ModelExperimentServiceTests {
     @Test
     void compareRunsThreeProfiles() {
         ForecastHorizon horizon = ForecastHorizon.NEXT_DAY;
-        GoldDataset dataset = createSampleDataset();
+        GoldDataset dataset = new GoldDataset(createSampleDataset().samples(), 0,
+                Map.of("policy", "fred-known-before-day-v1", "DFII10.sha256", "archive-hash"));
         TemporalDataset split = createSampleSplit();
 
         when(datasetBuilder.build(horizon)).thenReturn(dataset);
@@ -177,6 +179,10 @@ class ModelExperimentServiceTests {
         ModelComparisonResult result = service.compare(horizon);
 
         assertThat(result.experiments()).hasSize(3);
+        assertThat(result.experiments()).allSatisfy(item -> {
+            assertThat(item.experiment().parameters()).containsEntry("macroInput", dataset.macroInput());
+            assertThat(item.experiment().dataPolicy()).isEqualTo("fred-known-before-day-v1");
+        });
         assertThat(result.experiments().get(0).experiment().featureProfile()).isEqualTo(FeatureProfile.BASE_16);
         assertThat(result.experiments().get(1).experiment().featureProfile()).isEqualTo(FeatureProfile.OHLC_20);
         assertThat(result.experiments().get(2).experiment().featureProfile()).isEqualTo(FeatureProfile.ALL_36);

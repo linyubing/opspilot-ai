@@ -6,6 +6,7 @@ import com.opspilot.ai.analysis.InsufficientResearchDataException;
 import com.opspilot.ai.forecast.GoldForecastRule;
 import com.opspilot.ai.marketdata.GoldDailyBar;
 import com.opspilot.ai.marketdata.GoldDailyBarRepository;
+import com.opspilot.ai.macrodata.FredHistoryStore;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -32,21 +33,26 @@ public class GoldDatasetBuilder {
     private final GoldResearchSnapshotService snapshots;
     private final GoldForecastRule rule;
     private final GoldFeatureCalculator calculator;
+    private final FredHistoryStore history;
 
     public GoldDatasetBuilder(
             GoldDailyBarRepository repository,
             GoldResearchSnapshotService snapshots,
             GoldForecastRule rule,
-            GoldFeatureCalculator calculator
+            GoldFeatureCalculator calculator,
+            FredHistoryStore history
     ) {
         this.repository = repository;
         this.snapshots = snapshots;
         this.rule = rule;
         this.calculator = calculator;
+        this.history = history;
     }
 
     public GoldDataset build(ForecastHorizon horizon) {
         Objects.requireNonNull(horizon, "预测周期不能为空");
+        // 每次实验只读一次归档。禁止中途切换文件，更不能缺失时回退最新值。
+        FredHistoryStore.Batch batch = history.load();
         // 一次查询全部日线，避免每个样本重复查询
         List<GoldDailyBar> allBars = repository.findAll(SYMBOL, PROVIDER).stream()
                 .sorted(Comparator.comparing(GoldDailyBar::priceDate))
@@ -58,7 +64,9 @@ public class GoldDatasetBuilder {
             GoldDailyBar base = allBars.get(i);
             GoldDailyBar target = allBars.get(i + horizon.sessions());
             try {
-                GoldResearchSnapshot snapshot = snapshots.createSnapshot(base.priceDate());
+                GoldResearchSnapshot snapshot = snapshots.createSnapshot(base.priceDate(),
+                        batch.recent("DFII10", base.priceDate(), 120),
+                        batch.recent("DTWEXBGS", base.priceDate(), 120));
                 validateDates(snapshot);
 
                 // 计算 OHLC 特征
@@ -82,7 +90,7 @@ public class GoldDatasetBuilder {
                 skipped++;
             }
         }
-        return new GoldDataset(samples, skipped);
+        return new GoldDataset(samples, skipped, batch.metadata());
     }
 
     private GoldFeatures features(

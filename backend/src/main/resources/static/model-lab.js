@@ -20,6 +20,13 @@ const percent = value => value == null ? "无法计算" : `${(Number(value) * 10
 const number = value => value == null ? "无法计算" : Number(value).toFixed(4);
 const improvement = value => value == null ? "无数据" : `${(Number(value) * 100).toFixed(2)}%`;
 
+// 未认识的策略不能推定为已修正；历史输入可信也不代表模型已经预测准确。
+function policyName(policy) {
+    if (policy === "fred-known-before-day-v1") return "历史版本：前一日已知";
+    if (policy === "legacy-latest-version") return "旧口径：未证明当时可得";
+    return "口径未知：不可直接比较";
+}
+
 function fillRecalls(id, values = {}) {
     document.querySelector(id).innerHTML = [
         ["上涨召回率", values.BULLISH],
@@ -193,6 +200,7 @@ async function loadHistory() {
                     <span class="exp-horizon">${horizonNames[exp.horizon] || exp.horizon}</span>
                     <span class="exp-profile">${exp.featureProfile || "ALL_36"}</span>
                     <span class="exp-status">${exp.status}</span>
+                    <span class="exp-policy">${policyName(exp.dataPolicy)}</span>
                     <span class="exp-metrics">
                         准确率 ${percent(exp.logisticAccuracy)}
                         | 平衡准确率 ${percent(exp.balancedAccuracy)}
@@ -224,6 +232,7 @@ async function showDetail(id) {
         document.querySelector("#detailId").textContent = data.id;
         document.querySelector("#detailStatus").textContent = data.status;
         document.querySelector("#detailFeatureProfile").textContent = data.featureProfile || "ALL_36";
+        document.querySelector("#detailDataPolicy").textContent = policyName(data.dataPolicy);
         document.querySelector("#detailHash").textContent = data.datasetHash;
         document.querySelector("#detailFeatureVersion").textContent = data.featureVersion;
         document.querySelector("#detailLabelVersion").textContent = data.labelVersion;

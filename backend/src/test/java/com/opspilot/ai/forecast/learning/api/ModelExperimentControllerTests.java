@@ -123,6 +123,7 @@ class ModelExperimentControllerTests {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.status").value("COMPLETED"))
+                .andExpect(jsonPath("$.dataPolicy").value("legacy-latest-version"))
                 .andExpect(jsonPath("$.featureProfile").value("ALL_36"))
                 .andExpect(jsonPath("$.majority.sampleCount").value(240))
                 .andExpect(jsonPath("$.majority.accuracy").value(0.6000))
@@ -207,6 +208,7 @@ class ModelExperimentControllerTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(experiment.id().toString()))
                 .andExpect(jsonPath("$[0].featureProfile").value("ALL_36"))
+                .andExpect(jsonPath("$[0].dataPolicy").value("legacy-latest-version"))
                 .andExpect(jsonPath("$[0].majorityAccuracy").value(0.6000))
                 .andExpect(jsonPath("$[0].logisticAccuracy").value(0.6000))
                 .andExpect(jsonPath("$[0].xgboostAccuracy").value(0.6000));

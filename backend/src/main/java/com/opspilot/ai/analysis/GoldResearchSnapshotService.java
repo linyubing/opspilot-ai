@@ -108,7 +108,7 @@ public class GoldResearchSnapshotService {
     }
 
     /**
-     * 按指定历史日期重建快照，避免回测读取未来数据。
+     * 旧历史快照：只限制观测日期，不保证值是当时公布版本；模型实验不得使用此入口。
      */
     public GoldResearchSnapshot createSnapshot(LocalDate asOf) {
         Objects.requireNonNull(asOf, "回测日期不能为空");
@@ -131,6 +131,14 @@ public class GoldResearchSnapshotService {
                         QUERY_LIMIT
                 )
         );
+    }
+
+    /** 使用调用方冻结的历史可得宏观观测，复用快照公式，不读取最新修订值。 */
+    public GoldResearchSnapshot createSnapshot(LocalDate asOf,
+            List<MacroObservation> realRates, List<MacroObservation> dollarIndexes) {
+        Objects.requireNonNull(asOf, "回测日期不能为空");
+        return calculate(goldRepository.findRecent(GOLD_SYMBOL, GOLD_PROVIDER, asOf, QUERY_LIMIT),
+                realRates, dollarIndexes);
     }
 
     private GoldResearchSnapshot calculate(

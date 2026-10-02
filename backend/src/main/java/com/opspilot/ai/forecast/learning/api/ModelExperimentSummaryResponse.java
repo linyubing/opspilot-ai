@@ -34,7 +34,8 @@ public record ModelExperimentSummaryResponse(
         BigDecimal logLoss,
         BigDecimal majorityBalancedAccuracy,
         BigDecimal relativeMajorityImprovement,
-        BigDecimal relativeBase16Improvement
+        BigDecimal relativeBase16Improvement,
+        String dataPolicy
 ) {
     public static ModelExperimentSummaryResponse from(
             ModelExperiment experiment,
@@ -75,7 +76,8 @@ public record ModelExperimentSummaryResponse(
                 logLogLoss,
                 majBalanced,
                 relMajority,
-                null
+                null,
+                experiment.dataPolicy()
         );
     }
 
@@ -109,7 +111,8 @@ public record ModelExperimentSummaryResponse(
                         s.brierScore(), s.logLoss(),
                         s.majorityBalancedAccuracy(),
                         s.relativeMajorityImprovement(),
-                        improvement
+                        improvement,
+                        s.dataPolicy()
                 ));
             } else {
                 result.add(s);
