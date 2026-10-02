@@ -237,3 +237,25 @@ node docs/research/probes/verify-atr.cjs backend/target/atr-local.json docs/rese
 ```
 
 损坏测试仅写`backend/target`，不把故意损坏的副本作为真实行情。从新检出中没有完整归档时，用有权使用的本地数据库先生成`target/atr-local.json`，再核验该文件；损坏测试可从项目根传入该路径，例如`node docs/research/probes/AtrVerifierChecks.cjs backend/target/atr-local.json`。不能编造缺失归档。
+
+## 2026-10-03 完整历史固定XGBoost对照
+
+`TreeFit/TreeChecks/TreeRun`使用原始20维OHLC、训练折内缩放和已固定200轮树配置，不填宏观、不改变ATR。数学夹具仅验证适配；真实结果完整JSON仅本地留存。见[协议](../2026-10-03-tree-protocol.md)和[结果分析](../2026-10-03-tree-check.md)。
+
+```powershell
+cd D:\workFile\demo-ai\backend
+.\mvnw.cmd -q -DskipTests compile dependency:build-classpath '-Dmdep.outputFile=target/probe-classpath.txt'
+$probeCp = 'target/classes;' + (Get-Content -Raw target/probe-classpath.txt).Trim()
+New-Item -ItemType Directory -Force target/tree-classes | Out-Null
+javac -encoding UTF-8 -cp $probeCp -d target/tree-classes ../docs/research/probes/TrainingProbe.java ../docs/research/probes/SoftmaxFit.java ../docs/research/probes/RidgeFit.java ../docs/research/probes/HistorySlice.java ../docs/research/probes/HistoryChecks.java ../docs/research/probes/HistoryRun.java ../docs/research/probes/TreeFit.java ../docs/research/probes/TreeChecks.java ../docs/research/probes/TreeRun.java
+$probeCp = 'target/tree-classes;' + $probeCp
+java '-Dfile.encoding=UTF-8' '-Dstdout.encoding=UTF-8' '-Dstderr.encoding=UTF-8' -cp $probeCp com.opspilot.ai.forecast.learning.TreeChecks
+node ../docs/research/probes/TreeMathChecks.cjs
+java '-Dfile.encoding=UTF-8' '-Dstdout.encoding=UTF-8' '-Dstderr.encoding=UTF-8' -cp $probeCp com.opspilot.ai.forecast.learning.TreeRun target/tree-local.json (git rev-parse HEAD)
+node ../docs/research/probes/verify-tree.cjs target/tree-local.json
+node ../docs/research/probes/TreeVerifierChecks.cjs target/tree-local.json
+```
+
+输出必须是不存在的新文件。查询只读本地PostgreSQL，需要已有`OPSPILOT_DB_PASSWORD`，不要把密码写入归档。缺少真实日线或指纹变化时停止；新检出也须使用有权使用的本地数据库，不能补假值。核验器独立遍历保存的600棵原生树、映射特征/类别ID、复核原生概率与所有指标；不依赖数据库，不调用Java预测。`TreeMathChecks`的人工树、四象限数学夹具与故意损坏副本都不是市场行情。
+
+已有完整本地归档时，可从项目根运行`node docs/research/probes/verify-tree.cjs docs/research/2026-10-03-tree-check.json`；比较重复运行可另加`backend/target/tree-local.json`作为第三个参数。完整JSON被忽略，不公开再分发行情。
