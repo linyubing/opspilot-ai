@@ -137,3 +137,26 @@ node ../docs/research/probes/verify-ridge.cjs target/ridge-repeat.json ../docs/r
 cd D:\workFile\demo-ai
 node docs/research/probes/verify-ridge.cjs docs/research/2026-10-02-ridge-check.json
 ```
+
+## 2026-10-02 类别成本对照
+
+`WeightFit/WeightChecks/WeightRun` 仅为离线研究；不注册正式训练器，不写数据库。数学夹具不是市场数据。固定lambda=0.01、两种训练权重和同样的三折，原始概率与训练权重逆变换同时评分。见[协议](../2026-10-02-weight-protocol.md)和[失败分析](../2026-10-02-weight-check.md)。
+
+```powershell
+cd D:\workFile\demo-ai\backend
+.\mvnw.cmd -q -DskipTests compile dependency:build-classpath '-Dmdep.outputFile=target/probe-classpath.txt'
+$probeCp = 'target/classes;' + (Get-Content -Raw target/probe-classpath.txt).Trim()
+New-Item -ItemType Directory -Force target/weight-classes | Out-Null
+javac -encoding UTF-8 -cp $probeCp -d target/weight-classes ../docs/research/probes/TrainingProbe.java ../docs/research/probes/NewtonProbe.java ../docs/research/probes/SoftmaxFit.java ../docs/research/probes/SoftmaxChecks.java ../docs/research/probes/MacroModelProbe.java ../docs/research/probes/RidgeFit.java ../docs/research/probes/WeightFit.java ../docs/research/probes/WeightChecks.java ../docs/research/probes/WeightRun.java
+$probeCp = 'target/weight-classes;' + $probeCp
+$env:FRED_HISTORY_DIR = [Environment]::GetEnvironmentVariable('FRED_HISTORY_DIR','User')
+java '-Dfile.encoding=UTF-8' '-Dstdout.encoding=UTF-8' '-Dstderr.encoding=UTF-8' -cp $probeCp com.opspilot.ai.forecast.learning.WeightRun target/weight-local.json (git rev-parse HEAD)
+node ../docs/research/probes/verify-weight.cjs target/weight-local.json ../docs/research/2026-10-02-weight-check.json
+```
+
+输出路径必须不存在，真实输入指纹不一致时停止。只复算归档、不访问数据库：
+
+```powershell
+cd D:\workFile\demo-ai
+node docs/research/probes/verify-weight.cjs docs/research/2026-10-02-weight-check.json
+```

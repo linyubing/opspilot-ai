@@ -15,3 +15,7 @@ RidgeFit.java text eol=lf
 RidgeChecks.java text eol=lf
 RidgeRun.java text eol=lf
 verify-ridge.cjs text eol=lf
+WeightFit.java text eol=lf
+WeightChecks.java text eol=lf
+WeightRun.java text eol=lf
+verify-weight.cjs text eol=lf
