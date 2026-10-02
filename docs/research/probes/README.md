@@ -160,3 +160,26 @@ node ../docs/research/probes/verify-weight.cjs target/weight-local.json ../docs/
 cd D:\workFile\demo-ai
 node docs/research/probes/verify-weight.cjs docs/research/2026-10-02-weight-check.json
 ```
+
+## 2026-10-02 固定状态错误审计
+
+`StateCuts/StateChecks/StateRun` 冻结OHLC、lambda=0.01参照，训练内定义状态分界，并比较固定状态频率控制。不注册模型、不写数据库、不把局部状态胜率直接作为预测规则。见[协议](../2026-10-02-state-protocol.md)和[失败分析](../2026-10-02-state-check.md)。
+
+```powershell
+cd D:\workFile\demo-ai\backend
+.\mvnw.cmd -q -DskipTests compile dependency:build-classpath '-Dmdep.outputFile=target/probe-classpath.txt'
+$probeCp = 'target/classes;' + (Get-Content -Raw target/probe-classpath.txt).Trim()
+New-Item -ItemType Directory -Force target/state-classes | Out-Null
+javac -encoding UTF-8 -cp $probeCp -d target/state-classes ../docs/research/probes/TrainingProbe.java ../docs/research/probes/NewtonProbe.java ../docs/research/probes/SoftmaxFit.java ../docs/research/probes/SoftmaxChecks.java ../docs/research/probes/MacroModelProbe.java ../docs/research/probes/StateCuts.java ../docs/research/probes/StateChecks.java ../docs/research/probes/StateRun.java
+$probeCp = 'target/state-classes;' + $probeCp
+$env:FRED_HISTORY_DIR = [Environment]::GetEnvironmentVariable('FRED_HISTORY_DIR','User')
+java '-Dfile.encoding=UTF-8' '-Dstdout.encoding=UTF-8' '-Dstderr.encoding=UTF-8' -cp $probeCp com.opspilot.ai.forecast.learning.StateRun target/state-local.json (git rev-parse HEAD)
+node ../docs/research/probes/verify-state.cjs target/state-local.json ../docs/research/2026-10-02-state-check.json
+```
+
+输出文件必须不存在；输入摘要不一致就停止。归档含训练状态输入，可只复算而不访问数据库：
+
+```powershell
+cd D:\workFile\demo-ai
+node docs/research/probes/verify-state.cjs docs/research/2026-10-02-state-check.json
+```

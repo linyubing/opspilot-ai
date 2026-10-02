@@ -19,3 +19,7 @@ WeightFit.java text eol=lf
 WeightChecks.java text eol=lf
 WeightRun.java text eol=lf
 verify-weight.cjs text eol=lf
+StateCuts.java text eol=lf
+StateChecks.java text eol=lf
+StateRun.java text eol=lf
+verify-state.cjs text eol=lf
