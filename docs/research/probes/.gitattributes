@@ -2,3 +2,8 @@
 TrainingProbe.java text eol=lf
 VintageProbe.java text eol=lf
 ConvergenceProbe.java text eol=lf
+NewtonProbe.java text eol=lf
+NewtonProbeChecks.java text eol=lf
+NewtonRun.java text eol=lf
+NewtonDenseChecks.java text eol=lf
+verify-newton.cjs text eol=lf

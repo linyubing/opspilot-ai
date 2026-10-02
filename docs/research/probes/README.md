@@ -67,3 +67,25 @@ cd ..
 ```
 
 三个脚本拒绝覆盖已有归档核验结果。复跑应使用新的 `target` 输出文件；源码以 LF 保存以维持字节指纹。参照优化过程中的 `NOT_CONVERGED` 是本次真实失败结果，脚本完成不代表收敛成功。
+
+上述旧探针绑定当时提交 `f1b27fd`；历史版本输入产品接入后，旧 `VintageProbe` 构造器不再兼容当前 API。复核旧结果时使用其原提交，不要为适配新代码而改写已经记录摘要的探针。
+
+## 2026-10-02 充分求解参照
+
+`NewtonProbe` 和 `NewtonRun` 是离线诊断，不是新增产品模型。使用与训练体检相同的真实数据、目标函数和三个内层区间，不使用验证指标停止训练。数学测试在 `NewtonProbeChecks`，含解析梯度/Hessian 的差分校验。详细限制和结果见 [诊断报告](../2026-10-02-newton-check.md)。
+
+```powershell
+cd D:\workFile\demo-ai\backend
+.\mvnw.cmd -q -DskipTests compile dependency:build-classpath '-Dmdep.outputFile=target/probe-classpath.txt'
+$probeCp = 'target/classes;' + (Get-Content target/probe-classpath.txt -Raw).Trim()
+New-Item -ItemType Directory -Force target/newton-classes | Out-Null
+javac -encoding UTF-8 -cp $probeCp -d target/newton-classes ../docs/research/probes/TrainingProbe.java ../docs/research/probes/NewtonProbe.java ../docs/research/probes/NewtonProbeChecks.java ../docs/research/probes/NewtonRun.java
+javac -encoding UTF-8 -cp ('target/newton-classes;' + $probeCp) -d target/newton-classes ../docs/research/probes/NewtonDenseChecks.java
+$probeCp = 'target/newton-classes;' + $probeCp
+java '-Dfile.encoding=UTF-8' -cp $probeCp com.opspilot.ai.forecast.learning.NewtonProbeChecks
+java '-Dfile.encoding=UTF-8' -cp $probeCp com.opspilot.ai.forecast.learning.NewtonDenseChecks
+java '-Dfile.encoding=UTF-8' -cp $probeCp com.opspilot.ai.forecast.learning.NewtonRun target/newton-local.json (git rev-parse HEAD)
+node ../docs/research/probes/verify-newton.cjs target/newton-local.json
+```
+
+输出路径必须尚不存在。真实日线若不再匹配报告指纹会停止。可再用另一个输出名重复运行，并把两个 JSON 路径作为 Node 脚本的第二、第三个命令行参数，检查全部折内结果逐值相同。
