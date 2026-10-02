@@ -89,3 +89,28 @@ node ../docs/research/probes/verify-newton.cjs target/newton-local.json
 ```
 
 输出路径必须尚不存在。真实日线若不再匹配报告指纹会停止。可再用另一个输出名重复运行，并把两个 JSON 路径作为 Node 脚本的第二、第三个命令行参数，检查全部折内结果逐值相同。
+
+## 2026-10-02 历史宏观＋固定树模型对照
+
+`SoftmaxFit` 扩展至 16/20/36 维，`SoftmaxChecks` 检验数学夹具（非行情）、解析梯度与 Hessian、20 维旧参照对齐。`MacroModelProbe` 使用当前产品历史版本数据构建器和固定 XGBoost 训练器。不会写数据库、读取最终留出价格或修改正式模型。见 [固定协议](../2026-10-02-macro-model-protocol.md) 和 [结果报告](../2026-10-02-macro-model-check.md)。
+
+需要 `FRED_HISTORY_DIR` 指向报告摘要匹配的真实 FRED 归档；可先从用户级环境变量读取到当前进程。不打印 API Key 或数据库密码。若改用其他数据批次而摘要不匹配，会停止，不把不同来源分数直接比较。
+
+```powershell
+cd D:\workFile\demo-ai\backend
+.\mvnw.cmd -q -DskipTests compile dependency:build-classpath '-Dmdep.outputFile=target/probe-classpath.txt'
+$probeCp = 'target/classes;' + (Get-Content -Raw target/probe-classpath.txt).Trim()
+New-Item -ItemType Directory -Force target/macro-probe-classes | Out-Null
+javac -encoding UTF-8 -cp $probeCp -d target/macro-probe-classes ../docs/research/probes/TrainingProbe.java ../docs/research/probes/NewtonProbe.java ../docs/research/probes/SoftmaxFit.java ../docs/research/probes/SoftmaxChecks.java ../docs/research/probes/MacroModelProbe.java
+$probeCp = 'target/macro-probe-classes;' + $probeCp
+$env:FRED_HISTORY_DIR = [Environment]::GetEnvironmentVariable('FRED_HISTORY_DIR','User')
+java '-Dfile.encoding=UTF-8' -cp $probeCp com.opspilot.ai.forecast.learning.MacroModelProbe target/macro-local.json (git rev-parse HEAD)
+node ../docs/research/probes/verify-macro-model.cjs target/macro-local.json ../docs/research/2026-10-02-macro-model-check.json
+```
+
+两个结果的 Git 提交和生成时间可不同，源码、协议、真实输入指纹以及全部折内训练/预测结果必须一致。没有相同来源数据时不能声称复现成功。原始结果可独立复算：
+
+```powershell
+cd D:\workFile\demo-ai
+node docs/research/probes/verify-macro-model.cjs docs/research/2026-10-02-macro-model-check.json
+```
