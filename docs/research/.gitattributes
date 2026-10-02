@@ -1,3 +1,5 @@
 # 固定本轮协议和结果字节，保证重新检出后仍可核验摘要。
 2026-10-02-macro-model-protocol.md text eol=lf
 2026-10-02-macro-model-check.json text eol=lf
+2026-10-02-ridge-protocol.md text eol=lf
+2026-10-02-ridge-check.json text eol=lf

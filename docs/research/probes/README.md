@@ -114,3 +114,26 @@ node ../docs/research/probes/verify-macro-model.cjs target/macro-local.json ../d
 cd D:\workFile\demo-ai
 node docs/research/probes/verify-macro-model.cjs docs/research/2026-10-02-macro-model-check.json
 ```
+
+## 2026-10-02 固定正则化对照
+
+`RidgeFit/RidgeChecks/RidgeRun` 是离线研究，不注册为生产训练器。对称中心化 L2 不惩罚截距，数学夹具不是行情；真实样本摘要或前轮参照无法对齐时停止。见 [固定口径](../2026-10-02-ridge-protocol.md) 和 [结果](../2026-10-02-ridge-check.md)。
+
+```powershell
+cd D:\workFile\demo-ai\backend
+.\mvnw.cmd -q -DskipTests compile dependency:build-classpath '-Dmdep.outputFile=target/probe-classpath.txt'
+$probeCp = 'target/classes;' + (Get-Content -Raw target/probe-classpath.txt).Trim()
+New-Item -ItemType Directory -Force target/ridge-classes | Out-Null
+javac -encoding UTF-8 -cp $probeCp -d target/ridge-classes ../docs/research/probes/TrainingProbe.java ../docs/research/probes/NewtonProbe.java ../docs/research/probes/SoftmaxFit.java ../docs/research/probes/SoftmaxChecks.java ../docs/research/probes/MacroModelProbe.java ../docs/research/probes/RidgeFit.java ../docs/research/probes/RidgeChecks.java ../docs/research/probes/RidgeRun.java
+$probeCp = 'target/ridge-classes;' + $probeCp
+$env:FRED_HISTORY_DIR = [Environment]::GetEnvironmentVariable('FRED_HISTORY_DIR','User')
+java '-Dfile.encoding=UTF-8' '-Dstdout.encoding=UTF-8' '-Dstderr.encoding=UTF-8' -cp $probeCp com.opspilot.ai.forecast.learning.RidgeRun target/ridge-repeat.json (git rev-parse HEAD)
+node ../docs/research/probes/verify-ridge.cjs target/ridge-repeat.json ../docs/research/2026-10-02-ridge-check.json
+```
+
+输出文件必须不存在。只复算归档：
+
+```powershell
+cd D:\workFile\demo-ai
+node docs/research/probes/verify-ridge.cjs docs/research/2026-10-02-ridge-check.json
+```

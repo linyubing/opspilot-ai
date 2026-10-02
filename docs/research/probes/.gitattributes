@@ -11,3 +11,7 @@ SoftmaxFit.java text eol=lf
 SoftmaxChecks.java text eol=lf
 MacroModelProbe.java text eol=lf
 verify-macro-model.cjs text eol=lf
+RidgeFit.java text eol=lf
+RidgeChecks.java text eol=lf
+RidgeRun.java text eol=lf
+verify-ridge.cjs text eol=lf
