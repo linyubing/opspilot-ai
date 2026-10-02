@@ -183,3 +183,29 @@ node ../docs/research/probes/verify-state.cjs target/state-local.json ../docs/re
 cd D:\workFile\demo-ai
 node docs/research/probes/verify-state.cjs docs/research/2026-10-02-state-check.json
 ```
+
+## 2026-10-02 完整OHLC训练历史对照
+
+`HistorySlice/HistoryChecks/HistoryRun`只改变真实OHLC训练历史范围，固定lambda=0.01、标签和验证日期。不使用宏观特征，不创建不完整36维对象，不填假值。见[固定协议](../2026-10-02-history-protocol.md)和[失败分析](../2026-10-02-history-check.md)。
+
+```powershell
+cd D:\workFile\demo-ai\backend
+.\mvnw.cmd -q -DskipTests compile dependency:build-classpath '-Dmdep.outputFile=target/probe-classpath.txt'
+$probeCp = 'target/classes;' + (Get-Content -Raw target/probe-classpath.txt).Trim()
+New-Item -ItemType Directory -Force target/history-classes | Out-Null
+javac -encoding UTF-8 -cp $probeCp -d target/history-classes ../docs/research/probes/TrainingProbe.java ../docs/research/probes/SoftmaxFit.java ../docs/research/probes/RidgeFit.java ../docs/research/probes/HistorySlice.java ../docs/research/probes/HistoryChecks.java ../docs/research/probes/HistoryRun.java
+$probeCp = 'target/history-classes;' + $probeCp
+java '-Dfile.encoding=UTF-8' '-Dstdout.encoding=UTF-8' '-Dstderr.encoding=UTF-8' -cp $probeCp com.opspilot.ai.forecast.learning.HistoryChecks
+java '-Dfile.encoding=UTF-8' '-Dstdout.encoding=UTF-8' '-Dstderr.encoding=UTF-8' -cp $probeCp com.opspilot.ai.forecast.learning.HistoryRun target/history-local.json (git rev-parse HEAD)
+node ../docs/research/probes/verify-history.cjs target/history-local.json ../docs/research/2026-10-02-history-check.json
+```
+
+输出必须不存在；数据库密码取环境变量，不打印。归档保留完整4361条20维输入，核验器可不连接数据库重建训练缩放、所有概率、梯度和指标；另外验证损坏的归档副本会被拒绝：
+
+```powershell
+cd D:\workFile\demo-ai
+node docs/research/probes/verify-history.cjs docs/research/2026-10-02-history-check.json
+node docs/research/probes/HistoryVerifierChecks.cjs
+```
+
+第二条命令只生成`backend/target`中的故意损坏副本，不是新行情或实验数据。新轮若修改研究算法或协议，必须新增探针，不改写已有源码摘要对应的归档。
