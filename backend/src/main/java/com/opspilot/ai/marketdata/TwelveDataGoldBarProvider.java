@@ -15,6 +15,10 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.HexFormat;
 
 /** 获取黄金日线，并以供应商闭市日报价校验可同步边界；不负责持久化。 */
 @Component
@@ -140,7 +144,27 @@ public class TwelveDataGoldBarProvider {
                 || anchor.low().compareTo(low) != 0 || anchor.close().compareTo(close) != 0) {
             throw new MarketDataUnavailableException("Twelve Data 确认日 OHLC 与日线不一致");
         }
-        return bars.stream().filter(bar -> !bar.priceDate().isAfter(closedDay)).toList();
+        GoldBarConfirmation proof = new GoldBarConfirmation(GoldBarConfirmation.SOURCE,
+                closedDay, checkedAt, receiptHash(closedDay, open, high, low, close));
+        return bars.stream().filter(bar -> !bar.priceDate().isAfter(closedDay))
+                .map(bar -> new GoldDailyBar(bar.symbol(), bar.priceDate(), bar.open(), bar.high(),
+                        bar.low(), bar.close(), bar.currency(), bar.unit(), bar.provider(),
+                        bar.collectedAt(), proof))
+                .toList();
+    }
+
+    /** 指纹仅包含合同、日期和规范化十进制报价，不包含凭据或传输 URL。 */
+    private String receiptHash(LocalDate day, BigDecimal open, BigDecimal high,
+            BigDecimal low, BigDecimal close) {
+        String text = String.join("\n", GoldBarConfirmation.SOURCE, day.toString(),
+                open.stripTrailingZeros().toPlainString(), high.stripTrailingZeros().toPlainString(),
+                low.stripTrailingZeros().toPlainString(), close.stripTrailingZeros().toPlainString());
+        try {
+            return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256")
+                    .digest(text.getBytes(StandardCharsets.UTF_8)));
+        } catch (NoSuchAlgorithmException exception) {
+            throw new IllegalStateException("运行环境缺少 SHA-256", exception);
+        }
     }
 
     private LocalDate date(JsonNode node) {

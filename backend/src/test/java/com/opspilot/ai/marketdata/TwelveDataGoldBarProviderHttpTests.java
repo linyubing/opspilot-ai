@@ -73,6 +73,16 @@ class TwelveDataGoldBarProviderHttpTests {
                 .contains("outputsize=5000")
                 .contains("apikey=test-key");
         assertThat(quoteQuery).contains("symbol=XAU/USD", "eod=true", "apikey=test-key");
+        assertThat(bars).allSatisfy(bar -> {
+            assertThat(bar.confirmation()).isNotNull();
+            assertThat(bar.confirmation().source()).isEqualTo(GoldBarConfirmation.SOURCE);
+            assertThat(bar.confirmation().closedDay()).hasToString("2026-08-28");
+            assertThat(bar.confirmation().checkedAt()).hasToString("2026-08-31T00:15Z");
+            assertThat(bar.confirmation().receiptHash()).matches("[0-9a-f]{64}");
+            assertThat(bar.confirmation().receiptHash()).isEqualTo(
+                    "137f27f6670cd9009362312d6ca5a1e5928773b0525daad7a8369f9b2f4b03ed");
+            assertThat(bar.isConfirmedAt(bar.collectedAt())).isTrue();
+        });
     }
 
     @ParameterizedTest
