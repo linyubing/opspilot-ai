@@ -1,6 +1,7 @@
 package com.opspilot.ai.forecast;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -74,7 +75,7 @@ class GoldForecastEvaluationServiceTests {
     }
 
     @Test
-    void rollingAccuracyUsesTwentyMostRecentlyResolvedRecords() {
+    void rollingAccuracyUsesRecentMarketDates() {
         List<StoredGoldDirectionForecast> records = new ArrayList<>();
 
         // 最旧的一条未命中；其余 20 条较新记录全部命中。
@@ -92,6 +93,55 @@ class GoldForecastEvaluationServiceTests {
 
         assertThat(result.overallAccuracy()).isEqualByComparingTo("0.9524");
         assertThat(result.rolling20Accuracy()).isEqualByComparingTo("1.0000");
+    }
+
+    @Test
+    @DisplayName("补结算旧预测不应挤掉最近20条按行情日期排序的预测")
+    void lateSettlementKeepsWindow() {
+        List<StoredGoldDirectionForecast> records = new ArrayList<>();
+        var old = resolved(ForecastDirection.BEARISH, ForecastDirection.BULLISH,
+                false, "glm-4.7", "prompt-v1", "rule-v1", 0);
+        // 只移动结算时刻；旧预测的基准日期、目标日期和命中结果都不变。
+        records.add(copy(old, old.id(), OffsetDateTime.parse("2026-09-01T00:00:00Z")));
+        for (int day = 1; day <= 20; day++) {
+            records.add(resolved(ForecastDirection.BULLISH, ForecastDirection.BULLISH,
+                    true, "glm-4.7", "prompt-v1", "rule-v1", day));
+        }
+        when(forecastRepository.findAllForEvaluation()).thenReturn(records);
+
+        var result = service.evaluate();
+
+        assertThat(result.resolvedCount()).isEqualTo(21);
+        assertThat(result.overallAccuracy()).isEqualByComparingTo("0.9524");
+        assertThat(result.rolling20Accuracy()).isEqualByComparingTo("1.0000");
+    }
+
+    @Test
+    @DisplayName("同日期的20条窗口以固定编号稳定选择，不受查询顺序影响")
+    void tiedDatesKeepWindow() {
+        List<StoredGoldDirectionForecast> records = new ArrayList<>();
+        for (int index = 20; index >= 0; index--) {
+            boolean hit = index < 20;
+            // 每个模型一条预测，避免制造违反数据库幂等键的测试记录。
+            var value = resolved(hit ? ForecastDirection.NEUTRAL : ForecastDirection.BEARISH,
+                    ForecastDirection.NEUTRAL, hit, "model-" + index, "prompt-v1", "rule-v1", 0);
+            records.add(copy(value, new UUID(0, index + 1), value.resolvedAt()));
+        }
+        when(forecastRepository.findAllForEvaluation()).thenReturn(records);
+        assertThat(service.evaluate().rolling20Accuracy()).isEqualByComparingTo("1.0000");
+        java.util.Collections.reverse(records);
+        assertThat(service.evaluate().rolling20Accuracy()).isEqualByComparingTo("1.0000");
+    }
+
+    /** 只改变测试记录编号或结算时刻，不伪装成新行情日期。 */
+    private StoredGoldDirectionForecast copy(
+            StoredGoldDirectionForecast value, UUID id, OffsetDateTime time) {
+        return new StoredGoldDirectionForecast(id, value.snapshotId(),
+                value.baseDate(), value.basePrice(), value.predictedDirection(),
+                value.reasoning(), value.invalidationConditions(), value.modelName(),
+                value.promptVersion(), value.promptHash(), value.forecastRuleVersion(),
+                value.rawResponse(), value.status(), value.targetDate(), value.targetPrice(),
+                value.actualReturn(), value.actualDirection(), value.hit(), time, value.createdAt());
     }
 
     @Test
@@ -181,17 +231,19 @@ class GoldForecastEvaluationServiceTests {
             OffsetDateTime resolvedAt
     ) {
         boolean resolved = status == ForecastStatus.RESOLVED;
+        LocalDate targetDay = resolved ? resolvedAt.toLocalDate() : null;
+        LocalDate baseDay = resolved ? targetDay.minusDays(1) : LocalDate.parse("2026-07-31");
         return new StoredGoldDirectionForecast(
                 UUID.randomUUID(), GoldForecastTestFixtures.SNAPSHOT_ID,
-                LocalDate.parse("2026-07-31"), new BigDecimal("2500.000000"),
+                baseDay, new BigDecimal("2500.000000"),
                 predicted, "固定测试依据", List.of("固定测试失效条件"),
                 modelName, promptVersion, "a".repeat(64), ruleVersion,
                 "固定测试响应", status,
-                resolved ? LocalDate.parse("2026-08-01") : null,
+                targetDay,
                 resolved ? new BigDecimal("2510.000000") : null,
                 resolved ? new BigDecimal("0.400000") : null,
                 actual, hit, resolvedAt,
-                OffsetDateTime.parse("2026-07-31T01:00:00Z")
+                baseDay.atTime(1, 0).atOffset(java.time.ZoneOffset.UTC)
         );
     }
 }

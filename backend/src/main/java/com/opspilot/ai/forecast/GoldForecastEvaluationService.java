@@ -124,15 +124,18 @@ public class GoldForecastEvaluationService {
     }
 
     /**
-     * 最近 20 条必须根据实际解析时间排序，
-     * 不能依赖仓储当前返回顺序。
+     * 最近20条按行情日期排序，补结算旧预测不能改变最近行情窗口。
+     * 相同日期以基准日和固定编号排序，不依赖仓储返回顺序。
      */
     private BigDecimal calculateRolling20Accuracy(List<StoredGoldDirectionForecast> resolvedForecasts) {
         List<StoredGoldDirectionForecast> latestForecasts =
                 resolvedForecasts.stream()
                         .sorted(Comparator.comparing(
-                                StoredGoldDirectionForecast::resolvedAt
-                        ).reversed())
+                                StoredGoldDirectionForecast::targetDate,
+                                Comparator.nullsLast(Comparator.reverseOrder()))
+                                .thenComparing(StoredGoldDirectionForecast::baseDate,
+                                        Comparator.nullsLast(Comparator.reverseOrder()))
+                                .thenComparing(StoredGoldDirectionForecast::id))
                         .limit(ROLLING_WINDOW_SIZE)
                         .toList();
 
