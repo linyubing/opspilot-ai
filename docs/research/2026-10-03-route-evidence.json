@@ -1,0 +1,594 @@
+{
+  "scope": "repeated development dates 2022-02-02 to 2024-11-07, not independent trials or new blind data",
+  "samples": 720,
+  "studyCount": 9,
+  "variantCountIncludingSgdControl": 34,
+  "majorityCorrect": 347,
+  "promotionAllowed": false,
+  "rounds": [
+    {
+      "study": "newton",
+      "report": "2026-10-02-newton-check.md",
+      "reportHash": "569e3c2695c4e9aa2fac0b6c172e66e4dd8c56e5db6c55e9c8a55cde32c94acb",
+      "inputHash": "2eb97c0ec594376ab9f2d539dc1dcaddf061aec3443452386730713a92bac974",
+      "verifier": "verify-newton.cjs",
+      "verifierHash": "0b28b6d6201293ea584857075698c3d240de6a5bdf0b4ea7fd2e1da6f558e0c3",
+      "verified": true,
+      "promotionAllowed": false,
+      "variants": [
+        {
+          "name": "SGD_CONTROL",
+          "count": 720,
+          "correct": 329,
+          "accuracy": 0.45694444444444443,
+          "balancedAccuracy": 0.3599538707371921,
+          "recalls": [
+            0.06030150753768844,
+            0.8069164265129684,
+            0.21264367816091953
+          ],
+          "brierScore": 0.6503321714859762,
+          "logLoss": 1.0804336330247273
+        },
+        {
+          "name": "CONVERGED",
+          "count": 720,
+          "correct": 343,
+          "accuracy": 0.47638888888888886,
+          "balancedAccuracy": 0.34117752186906464,
+          "recalls": [
+            0.035175879396984924,
+            0.9481268011527377,
+            0.040229885057471264
+          ],
+          "brierScore": 0.6275379230800532,
+          "logLoss": 1.042920931495931
+        }
+      ]
+    },
+    {
+      "study": "macro-model",
+      "report": "2026-10-02-macro-model-check.md",
+      "reportHash": "e4a8cd4d42726441e7efc836abeb9cf60a18c06e2f29c0bd213445fc3753bd12",
+      "inputHash": "4b81f57517243007be79a941b5ea8a7b403e730910a5cc09c54095ef34196236",
+      "verifier": "verify-macro-model.cjs",
+      "verifierHash": "a31551a2fd02dd9d7260bc0ff4d766dc7d71205dcd4d1a178770a2f54b20d26d",
+      "verified": true,
+      "promotionAllowed": false,
+      "variants": [
+        {
+          "name": "BASE_16:LINEAR",
+          "count": 720,
+          "correct": 345,
+          "accuracy": 0.4791666666666667,
+          "balancedAccuracy": 0.3426098438575112,
+          "recalls": [
+            0.06532663316582915,
+            0.9510086455331412,
+            0.011494252873563218
+          ],
+          "brierScore": 0.6389126548726334,
+          "logLoss": 1.0631539569840345
+        },
+        {
+          "name": "BASE_16:TREE",
+          "count": 720,
+          "correct": 333,
+          "accuracy": 0.4625,
+          "balancedAccuracy": 0.3365799372385018,
+          "recalls": [
+            0.05025125628140704,
+            0.9020172910662824,
+            0.05747126436781609
+          ],
+          "brierScore": 0.6495593674083983,
+          "logLoss": 1.0787439658411215
+        },
+        {
+          "name": "OHLC_20:LINEAR",
+          "count": 720,
+          "correct": 334,
+          "accuracy": 0.4638888888888889,
+          "balancedAccuracy": 0.3382701265666724,
+          "recalls": [
+            0.01507537688442211,
+            0.9077809798270894,
+            0.09195402298850575
+          ],
+          "brierScore": 0.6410017391226214,
+          "logLoss": 1.0644034741271715
+        },
+        {
+          "name": "OHLC_20:TREE",
+          "count": 720,
+          "correct": 338,
+          "accuracy": 0.46944444444444444,
+          "balancedAccuracy": 0.3483017625475418,
+          "recalls": [
+            0.06532663316582915,
+            0.8933717579250721,
+            0.08620689655172414
+          ],
+          "brierScore": 0.6428160469577207,
+          "logLoss": 1.0693904198799518
+        },
+        {
+          "name": "ALL_36:LINEAR",
+          "count": 720,
+          "correct": 313,
+          "accuracy": 0.43472222222222223,
+          "balancedAccuracy": 0.36557338127696126,
+          "recalls": [
+            0.12060301507537688,
+            0.6887608069164265,
+            0.28735632183908044
+          ],
+          "brierScore": 0.6625854294128308,
+          "logLoss": 1.100746213362303
+        },
+        {
+          "name": "ALL_36:TREE",
+          "count": 720,
+          "correct": 336,
+          "accuracy": 0.4666666666666667,
+          "balancedAccuracy": 0.3432745839680143,
+          "recalls": [
+            0.07035175879396985,
+            0.8962536023054755,
+            0.06321839080459771
+          ],
+          "brierScore": 0.6428628760701334,
+          "logLoss": 1.0674039150477967
+        }
+      ]
+    },
+    {
+      "study": "ridge",
+      "report": "2026-10-02-ridge-check.md",
+      "reportHash": "2ac8e9992698c24e700a9826682a24a4c7ec218ea2e56bdc75fac852c5cec07e",
+      "inputHash": "51f1175cfb5f829d2dbdcdd47cc85f71df85f416cf718b2eafd36cf472b64d36",
+      "verifier": "verify-ridge.cjs",
+      "verifierHash": "067898cc2f068635781e3881e0191769584befefc47391e3766d4686135b87eb",
+      "verified": true,
+      "promotionAllowed": false,
+      "variants": [
+        {
+          "name": "BASE_16:0.01",
+          "count": 720,
+          "correct": 346,
+          "accuracy": 0.48055555555555557,
+          "balancedAccuracy": 0.3421416044858208,
+          "recalls": [
+            0.05527638190954774,
+            0.9596541786743515,
+            0.011494252873563218
+          ],
+          "brierScore": 0.6369368997311695,
+          "logLoss": 1.059684587844032
+        },
+        {
+          "name": "BASE_16:0.1",
+          "count": 720,
+          "correct": 347,
+          "accuracy": 0.48194444444444445,
+          "balancedAccuracy": 0.3364317085998633,
+          "recalls": [
+            0.01507537688442211,
+            0.9884726224783862,
+            0.005747126436781609
+          ],
+          "brierScore": 0.6333848305214098,
+          "logLoss": 1.053753346501925
+        },
+        {
+          "name": "BASE_16:1",
+          "count": 720,
+          "correct": 347,
+          "accuracy": 0.48194444444444445,
+          "balancedAccuracy": 0.3333333333333333,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "brierScore": 0.6327968836838949,
+          "logLoss": 1.051330826197297
+        },
+        {
+          "name": "OHLC_20:0.01",
+          "count": 720,
+          "correct": 352,
+          "accuracy": 0.4888888888888889,
+          "balancedAccuracy": 0.3579375673069822,
+          "recalls": [
+            0.04522613065326633,
+            0.9481268011527377,
+            0.08045977011494253
+          ],
+          "brierScore": 0.6366376579763903,
+          "logLoss": 1.0575485865731526
+        },
+        {
+          "name": "OHLC_20:0.1",
+          "count": 720,
+          "correct": 349,
+          "accuracy": 0.4847222222222222,
+          "balancedAccuracy": 0.34145131345332896,
+          "recalls": [
+            0.03015075376884422,
+            0.9827089337175793,
+            0.011494252873563218
+          ],
+          "brierScore": 0.6310703977404443,
+          "logLoss": 1.0492412514834204
+        },
+        {
+          "name": "OHLC_20:1",
+          "count": 720,
+          "correct": 347,
+          "accuracy": 0.48194444444444445,
+          "balancedAccuracy": 0.3333333333333333,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "brierScore": 0.6298478488862286,
+          "logLoss": 1.0470410572773985
+        },
+        {
+          "name": "ALL_36:0.01",
+          "count": 720,
+          "correct": 322,
+          "accuracy": 0.44722222222222224,
+          "balancedAccuracy": 0.34438548035150746,
+          "recalls": [
+            0.08542713567839195,
+            0.8097982708933718,
+            0.13793103448275862
+          ],
+          "brierScore": 0.6481410150373891,
+          "logLoss": 1.0754732155901485
+        },
+        {
+          "name": "ALL_36:0.1",
+          "count": 720,
+          "correct": 346,
+          "accuracy": 0.48055555555555557,
+          "balancedAccuracy": 0.3433373654408272,
+          "recalls": [
+            0.05025125628140704,
+            0.9567723342939481,
+            0.022988505747126436
+          ],
+          "brierScore": 0.6355416405858572,
+          "logLoss": 1.0567906396116742
+        },
+        {
+          "name": "ALL_36:1",
+          "count": 720,
+          "correct": 347,
+          "accuracy": 0.48194444444444445,
+          "balancedAccuracy": 0.3333333333333333,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "brierScore": 0.630399353861484,
+          "logLoss": 1.0482593204584525
+        }
+      ]
+    },
+    {
+      "study": "weight",
+      "report": "2026-10-02-weight-check.md",
+      "reportHash": "8b7c892b2d7ec761cbe3b9b0f5d1d145be4033e86e9bfad0c99c39391b81b68c",
+      "inputHash": "79083f93c4a67423804960ffff599a422aceea99be244368d3a1d6fd74334447",
+      "verifier": "verify-weight.cjs",
+      "verifierHash": "c2595334611e8cc181bf20fc14ce3d8e819052c5692c87a213228ed03ec57238",
+      "verified": true,
+      "promotionAllowed": false,
+      "variants": [
+        {
+          "name": "BASE_16:SQRT:raw",
+          "count": 720,
+          "correct": 326,
+          "accuracy": 0.4527777777777778,
+          "balancedAccuracy": 0.3627647218392358,
+          "recalls": [
+            0.16080402010050251,
+            0.7665706051873199,
+            0.16091954022988506
+          ],
+          "brierScore": 0.6464540268552869,
+          "logLoss": 1.0716178895892572
+        },
+        {
+          "name": "BASE_16:SQRT:corrected",
+          "count": 720,
+          "correct": 346,
+          "accuracy": 0.48055555555555557,
+          "balancedAccuracy": 0.3421416044858208,
+          "recalls": [
+            0.05527638190954774,
+            0.9596541786743515,
+            0.011494252873563218
+          ],
+          "brierScore": 0.6374285892860746,
+          "logLoss": 1.060429756892154
+        },
+        {
+          "name": "BASE_16:BALANCED:raw",
+          "count": 720,
+          "correct": 269,
+          "accuracy": 0.3736111111111111,
+          "balancedAccuracy": 0.36741315863049945,
+          "recalls": [
+            0.2964824120603015,
+            0.4034582132564842,
+            0.40229885057471265
+          ],
+          "brierScore": 0.6765712355676585,
+          "logLoss": 1.1151765144123333
+        },
+        {
+          "name": "BASE_16:BALANCED:corrected",
+          "count": 720,
+          "correct": 346,
+          "accuracy": 0.48055555555555557,
+          "balancedAccuracy": 0.3421416044858208,
+          "recalls": [
+            0.05527638190954774,
+            0.9596541786743515,
+            0.011494252873563218
+          ],
+          "brierScore": 0.6378988782303563,
+          "logLoss": 1.0611461663969874
+        },
+        {
+          "name": "OHLC_20:SQRT:raw",
+          "count": 720,
+          "correct": 303,
+          "accuracy": 0.42083333333333334,
+          "balancedAccuracy": 0.3383093545837106,
+          "recalls": [
+            0.09045226130653267,
+            0.7175792507204611,
+            0.20689655172413793
+          ],
+          "brierScore": 0.6492550185272923,
+          "logLoss": 1.0738451685599486
+        },
+        {
+          "name": "OHLC_20:SQRT:corrected",
+          "count": 720,
+          "correct": 352,
+          "accuracy": 0.4888888888888889,
+          "balancedAccuracy": 0.35913332826198857,
+          "recalls": [
+            0.04020100502512563,
+            0.9452449567723343,
+            0.09195402298850575
+          ],
+          "brierScore": 0.6367546044649247,
+          "logLoss": 1.057809995442823
+        },
+        {
+          "name": "OHLC_20:BALANCED:raw",
+          "count": 720,
+          "correct": 250,
+          "accuracy": 0.3472222222222222,
+          "balancedAccuracy": 0.35016201392977453,
+          "recalls": [
+            0.17587939698492464,
+            0.3631123919308357,
+            0.5114942528735632
+          ],
+          "brierScore": 0.6817616857928367,
+          "logLoss": 1.1212035360924077
+        },
+        {
+          "name": "OHLC_20:BALANCED:corrected",
+          "count": 720,
+          "correct": 349,
+          "accuracy": 0.4847222222222222,
+          "balancedAccuracy": 0.3557777237352197,
+          "recalls": [
+            0.03015075376884422,
+            0.9394812680115274,
+            0.09770114942528736
+          ],
+          "brierScore": 0.6368115261819169,
+          "logLoss": 1.0579870736454116
+        },
+        {
+          "name": "ALL_36:SQRT:raw",
+          "count": 720,
+          "correct": 270,
+          "accuracy": 0.375,
+          "balancedAccuracy": 0.34766296175523576,
+          "recalls": [
+            0.1306532663316583,
+            0.49279538904899134,
+            0.41954022988505746
+          ],
+          "brierScore": 0.6716088588654235,
+          "logLoss": 1.1081394815934862
+        },
+        {
+          "name": "ALL_36:SQRT:corrected",
+          "count": 720,
+          "correct": 323,
+          "accuracy": 0.4486111111111111,
+          "balancedAccuracy": 0.34725628318256074,
+          "recalls": [
+            0.08542713567839195,
+            0.8069164265129684,
+            0.14942528735632185
+          ],
+          "brierScore": 0.6486235329082066,
+          "logLoss": 1.076296003404858
+        },
+        {
+          "name": "ALL_36:BALANCED:raw",
+          "count": 720,
+          "correct": 211,
+          "accuracy": 0.29305555555555557,
+          "balancedAccuracy": 0.34470504720317835,
+          "recalls": [
+            0.1457286432160804,
+            0.1585014409221902,
+            0.7298850574712644
+          ],
+          "brierScore": 0.712834429857613,
+          "logLoss": 1.1708331200120285
+        },
+        {
+          "name": "ALL_36:BALANCED:corrected",
+          "count": 720,
+          "correct": 325,
+          "accuracy": 0.4513888888888889,
+          "balancedAccuracy": 0.3491775127694963,
+          "recalls": [
+            0.08542713567839195,
+            0.8126801152737753,
+            0.14942528735632185
+          ],
+          "brierScore": 0.6489723620268469,
+          "logLoss": 1.076951739349225
+        }
+      ]
+    },
+    {
+      "study": "history",
+      "report": "2026-10-02-history-check.md",
+      "reportHash": "0d9144e24bc1cca6de30adf0242eaa919dd6e2fc23bacd7aceabb97f325f06f2",
+      "inputHash": "51ef1b79a24b249d51e1b2ca78b809434a1115dd69fc79beaaee01f133d7a537",
+      "verifier": "verify-history.cjs",
+      "verifierHash": "a41f03a27578421f05ea376f8d0da270f1345e3f63295e80860c1805276582ad",
+      "verified": true,
+      "promotionAllowed": false,
+      "variants": [
+        {
+          "name": "HISTORY",
+          "count": 720,
+          "correct": 350,
+          "accuracy": 0.4861111111111111,
+          "balancedAccuracy": 0.34980443973486297,
+          "recalls": [
+            0.05527638190954774,
+            0.9596541786743515,
+            0.034482758620689655
+          ],
+          "brierScore": 0.6275459635610438,
+          "logLoss": 1.0429471931743959
+        }
+      ]
+    },
+    {
+      "study": "atr",
+      "report": "2026-10-02-atr-check.md",
+      "reportHash": "b8fe2c46d25c2ddfa1982567cc1dc1f63f1decfeb78993b60fe039392e64c40f",
+      "inputHash": "48533414ae43e5e5c26fe5b6f2da926642f965fc14845853e35180605c7a7529",
+      "verifier": "verify-atr.cjs",
+      "verifierHash": "8aa878228567b7eea082c5b8ae4cec6b2af0e22d8e441e744c07c9d00430a315",
+      "verified": true,
+      "promotionAllowed": false,
+      "variants": [
+        {
+          "name": "ATR",
+          "count": 720,
+          "correct": 352,
+          "accuracy": 0.4888888888888889,
+          "balancedAccuracy": 0.3471984398901105,
+          "recalls": [
+            0.03015075376884422,
+            0.9827089337175793,
+            0.028735632183908046
+          ],
+          "brierScore": 0.6278308282471514,
+          "logLoss": 1.0431707796402958
+        }
+      ]
+    },
+    {
+      "study": "tree",
+      "report": "2026-10-03-tree-check.md",
+      "reportHash": "78e8ae9749e8f81f4c6c963d661c6bf1004fb12ff3e0b3b56d48edb25ddf2dcc",
+      "inputHash": "0e61b655c77bf6ead23df4b70217246c29951ef375b3cc71a0300303c5e9832d",
+      "verifier": "verify-tree.cjs",
+      "verifierHash": "4e78fdca95a76407a5f387f07887e1fadba45ec0805522bdf76b8f8c830ae1db",
+      "verified": true,
+      "promotionAllowed": false,
+      "variants": [
+        {
+          "name": "TREE",
+          "count": 720,
+          "correct": 350,
+          "accuracy": 0.4861111111111111,
+          "balancedAccuracy": 0.3531510556636684,
+          "recalls": [
+            0.04522613065326633,
+            0.9510086455331412,
+            0.06321839080459771
+          ],
+          "brierScore": 0.631075970328532,
+          "logLoss": 1.0491626309187971
+        }
+      ]
+    },
+    {
+      "study": "fusion",
+      "report": "2026-10-03-fusion-check.md",
+      "reportHash": "6039e9c5d84e53fb37f6f6bdec672650b80301f3724fb46c943ccd17928529dc",
+      "inputHash": "9a91a6292ee3c9e95b2d37d6130515a9a2bcf9d3ac2d28a62df1cf22ef5edd73",
+      "verifier": "verify-fusion.cjs",
+      "verifierHash": "60a7424133701b7ee7e3263396a3642399ba90c626f28026b39b32c3bde7527c",
+      "verified": true,
+      "promotionAllowed": false,
+      "variants": [
+        {
+          "name": "FUSION",
+          "count": 720,
+          "correct": 349,
+          "accuracy": 0.4847222222222222,
+          "balancedAccuracy": 0.33668341708542715,
+          "recalls": [
+            0.010050251256281407,
+            1,
+            0
+          ],
+          "brierScore": 0.6306670554684912,
+          "logLoss": 1.048574003769618
+        }
+      ]
+    },
+    {
+      "study": "hierarchy",
+      "report": "2026-10-03-hierarchy-check.md",
+      "reportHash": "3dabeb0c0d5561b67dd623b39d108ce44073a35926ec82458fd9e66d5285456c",
+      "inputHash": "b506227873bfec57db5b64044d770370dd13118bdc0daab9a92bef7dfef3d2b3",
+      "verifier": "verify-hierarchy.cjs",
+      "verifierHash": "80f9b9eda5eb22b7fffb56ffd88d852c2a354a13ed6a864d9a529b2a343c8621",
+      "verified": true,
+      "promotionAllowed": false,
+      "variants": [
+        {
+          "name": "HIERARCHY",
+          "count": 720,
+          "correct": 351,
+          "accuracy": 0.4875,
+          "balancedAccuracy": 0.3514794816109099,
+          "recalls": [
+            0.06030150753768844,
+            0.9596541786743515,
+            0.034482758620689655
+          ],
+          "brierScore": 0.6273850636548457,
+          "logLoss": 1.042665565615713
+        }
+      ]
+    }
+  ]
+}
