@@ -1,0 +1,35 @@
+{
+  "count": 4361,
+  "complete": 3636,
+  "missing": 725,
+  "validationCount": 720,
+  "training": [
+    {
+      "start": "2022-02-02",
+      "count": 2915
+    },
+    {
+      "start": "2023-01-04",
+      "count": 3155
+    },
+    {
+      "start": "2023-12-07",
+      "count": 3395
+    }
+  ],
+  "promotionAllowed": false,
+  "resultHash": "3b5b7b3023ada3b5f5f2035f5e8dd95923dc8108347e3c165955fdc20c43c077",
+  "sourceHash": "ea703773449991e367efefe5e6b2087fea194f31bb5c3bdf04c0218eafb0b139",
+  "treeHash": "0e61b655c77bf6ead23df4b70217246c29951ef375b3cc71a0300303c5e9832d",
+  "protocolHash": "e699a717f35b57e2e967d8ec27b05efd7c6a93d632e7e8f13d3ded0cf8e8c10f",
+  "codeHashes": {
+    "RiskVectors.java": "94a0377d549410f2c9f3abdc5c22a482113788cc4a62e0a49175ad53bcd7c172",
+    "VixFeatures.java": "c9f07ff45d78b770f1f4698a03828aec2aa55661f4e525944a264c4feece9ed1",
+    "VixFeatureChecks.java": "914370d43a02ffa5af0fb3c48f41dcff6573d30afc8cd5756c355eabb914e45c",
+    "FredHistory.java": "6f33c6f1c04b4ff2589fc47cdebc12a0d464d1e97b9677c98a4245a86eb61efc",
+    "VixAudit.cjs": "a6875d8604663fb9f7395080be3c0af6b90bb3755366321f4a069cc57e7c4455",
+    "VixAuditChecks.cjs": "ffd9b429eaca2604f2e5e8c05c687aae109246acceee7e861e43d963be905c80",
+    "verify-vix-vectors.cjs": "4fa184fc38f8ca51cece99fc6d101147129bfbf9ae3cbb44f07cb85ea4074bcc",
+    "InfoMath.cjs": "16a929d4340a5c1f3000443b65c4218e94defa5b0f2df953bfd5d8b8f7d3e60b"
+  }
+}
