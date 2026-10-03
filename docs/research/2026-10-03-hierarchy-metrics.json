@@ -1,0 +1,8888 @@
+{
+  "count": 720,
+  "promotionAllowed": false,
+  "scope": "repeated old development dates; no final holdout or production promotion",
+  "scores": {
+    "candidate": {
+      "count": 720,
+      "correct": 351,
+      "errors": 369,
+      "accuracy": 0.4875,
+      "balancedAccuracy": 0.3514794816109099,
+      "brierScore": 0.6273850636548457,
+      "logLoss": 1.042665565615713,
+      "recalls": [
+        0.06030150753768844,
+        0.9596541786743515,
+        0.034482758620689655
+      ],
+      "matrix": [
+        [
+          12,
+          181,
+          6
+        ],
+        [
+          10,
+          333,
+          4
+        ],
+        [
+          11,
+          157,
+          6
+        ]
+      ]
+    },
+    "price": {
+      "count": 720,
+      "correct": 350,
+      "errors": 370,
+      "accuracy": 0.4861111111111111,
+      "balancedAccuracy": 0.34980443973486297,
+      "brierScore": 0.6275459635610438,
+      "logLoss": 1.0429471931743959,
+      "recalls": [
+        0.05527638190954774,
+        0.9596541786743515,
+        0.034482758620689655
+      ],
+      "matrix": [
+        [
+          11,
+          182,
+          6
+        ],
+        [
+          10,
+          333,
+          4
+        ],
+        [
+          10,
+          158,
+          6
+        ]
+      ]
+    },
+    "pitReference": {
+      "count": 720,
+      "correct": 352,
+      "errors": 368,
+      "accuracy": 0.4888888888888889,
+      "balancedAccuracy": 0.3579375673069822,
+      "brierScore": 0.6366376579763903,
+      "logLoss": 1.0575485865731526,
+      "recalls": [
+        0.04522613065326633,
+        0.9481268011527377,
+        0.08045977011494253
+      ],
+      "matrix": [
+        [
+          9,
+          177,
+          13
+        ],
+        [
+          8,
+          329,
+          10
+        ],
+        [
+          8,
+          152,
+          14
+        ]
+      ]
+    },
+    "prior": {
+      "count": 720,
+      "correct": 347,
+      "errors": 373,
+      "accuracy": 0.48194444444444445,
+      "balancedAccuracy": 0.3333333333333333,
+      "brierScore": 0.6332450357864404,
+      "logLoss": 1.0508869574671549,
+      "recalls": [
+        0,
+        1,
+        0
+      ],
+      "matrix": [
+        [
+          0,
+          199,
+          0
+        ],
+        [
+          0,
+          347,
+          0
+        ],
+        [
+          0,
+          174,
+          0
+        ]
+      ]
+    }
+  },
+  "heads": {
+    "moveCount": 720,
+    "sideCount": 373,
+    "moveAuc": 0.5633967133067039,
+    "sideAuc": 0.5266851498873679,
+    "moveMatrix": [
+      [
+        158,
+        189
+      ],
+      [
+        152,
+        221
+      ]
+    ],
+    "sideMatrix": [
+      [
+        48,
+        126
+      ],
+      [
+        51,
+        148
+      ]
+    ],
+    "byActual": [
+      {
+        "actual": "BULLISH",
+        "count": 199,
+        "meanMove": 0.5258068212581571,
+        "meanSide": 0.5204266798094482
+      },
+      {
+        "actual": "NEUTRAL",
+        "count": 347,
+        "meanMove": 0.5087672900615133,
+        "meanSide": 0.5205266362805093
+      },
+      {
+        "actual": "BEARISH",
+        "count": 174,
+        "meanMove": 0.5323352085098975,
+        "meanSide": 0.518276332801378
+      }
+    ]
+  },
+  "gates": {
+    "accuracy": false,
+    "balancedGain": false,
+    "recalls": false,
+    "brier": true,
+    "logLoss": true
+  },
+  "signalGates": {
+    "coverage": false,
+    "sameDateBaseline": false,
+    "recalls": false
+  },
+  "signals": {
+    "count": 151,
+    "coverage": 0.20972222222222223,
+    "scores": {
+      "candidate": {
+        "count": 151,
+        "correct": 89,
+        "errors": 62,
+        "accuracy": 0.5894039735099338,
+        "balancedAccuracy": 0.3333333333333333,
+        "brierScore": 0.5666798995832794,
+        "logLoss": 0.9581575065617612,
+        "recalls": [
+          0,
+          1,
+          0
+        ],
+        "matrix": [
+          [
+            0,
+            33,
+            0
+          ],
+          [
+            0,
+            89,
+            0
+          ],
+          [
+            0,
+            29,
+            0
+          ]
+        ]
+      },
+      "price": {
+        "count": 151,
+        "correct": 89,
+        "errors": 62,
+        "accuracy": 0.5894039735099338,
+        "balancedAccuracy": 0.3333333333333333,
+        "brierScore": 0.5667227122969472,
+        "logLoss": 0.9582972128806936,
+        "recalls": [
+          0,
+          1,
+          0
+        ],
+        "matrix": [
+          [
+            0,
+            33,
+            0
+          ],
+          [
+            0,
+            89,
+            0
+          ],
+          [
+            0,
+            29,
+            0
+          ]
+        ]
+      },
+      "pitReference": {
+        "count": 151,
+        "correct": 89,
+        "errors": 62,
+        "accuracy": 0.5894039735099338,
+        "balancedAccuracy": 0.3333333333333333,
+        "brierScore": 0.5791597706012103,
+        "logLoss": 0.9771628851723307,
+        "recalls": [
+          0,
+          1,
+          0
+        ],
+        "matrix": [
+          [
+            0,
+            33,
+            0
+          ],
+          [
+            0,
+            89,
+            0
+          ],
+          [
+            0,
+            29,
+            0
+          ]
+        ]
+      },
+      "prior": {
+        "count": 151,
+        "correct": 89,
+        "errors": 62,
+        "accuracy": 0.5894039735099338,
+        "balancedAccuracy": 0.3333333333333333,
+        "brierScore": 0.5870142005070569,
+        "logLoss": 0.9864203852700252,
+        "recalls": [
+          0,
+          1,
+          0
+        ],
+        "matrix": [
+          [
+            0,
+            33,
+            0
+          ],
+          [
+            0,
+            89,
+            0
+          ],
+          [
+            0,
+            29,
+            0
+          ]
+        ]
+      }
+    }
+  },
+  "againstPrice": {
+    "wins": 2,
+    "losses": 1,
+    "net": 1,
+    "byActual": [
+      {
+        "actual": "BULLISH",
+        "wins": 1,
+        "losses": 0
+      },
+      {
+        "actual": "NEUTRAL",
+        "wins": 0,
+        "losses": 0
+      },
+      {
+        "actual": "BEARISH",
+        "wins": 1,
+        "losses": 1
+      }
+    ]
+  },
+  "folds": [
+    {
+      "start": "2022-02-02",
+      "end": "2023-01-03",
+      "count": 240,
+      "move": {
+        "count": 3640,
+        "loss": 0.6640255977703645,
+        "gradient": 5.632520491682946e-12,
+        "steps": 4
+      },
+      "side": {
+        "count": 1900,
+        "loss": 0.6879212031798064,
+        "gradient": 6.138559335427138e-7,
+        "steps": 2
+      },
+      "scores": {
+        "candidate": {
+          "count": 240,
+          "correct": 108,
+          "errors": 132,
+          "accuracy": 0.45,
+          "balancedAccuracy": 0.35442381641049786,
+          "brierScore": 0.656663925871538,
+          "logLoss": 1.084449108323452,
+          "recalls": [
+            0.07575757575757576,
+            0.9433962264150944,
+            0.04411764705882353
+          ],
+          "matrix": [
+            [
+              5,
+              59,
+              2
+            ],
+            [
+              4,
+              100,
+              2
+            ],
+            [
+              7,
+              58,
+              3
+            ]
+          ]
+        },
+        "price": {
+          "count": 240,
+          "correct": 106,
+          "errors": 134,
+          "accuracy": 0.44166666666666665,
+          "balancedAccuracy": 0.34447135057567907,
+          "brierScore": 0.656723137089331,
+          "logLoss": 1.0845841631293096,
+          "recalls": [
+            0.06060606060606061,
+            0.9433962264150944,
+            0.029411764705882353
+          ],
+          "matrix": [
+            [
+              4,
+              60,
+              2
+            ],
+            [
+              4,
+              100,
+              2
+            ],
+            [
+              7,
+              59,
+              2
+            ]
+          ]
+        },
+        "pitReference": {
+          "count": 240,
+          "correct": 108,
+          "errors": 132,
+          "accuracy": 0.45,
+          "balancedAccuracy": 0.3525179654480432,
+          "brierScore": 0.6625753081769813,
+          "logLoss": 1.0950832093026779,
+          "recalls": [
+            0.06060606060606061,
+            0.9528301886792453,
+            0.04411764705882353
+          ],
+          "matrix": [
+            [
+              4,
+              60,
+              2
+            ],
+            [
+              2,
+              101,
+              3
+            ],
+            [
+              4,
+              61,
+              3
+            ]
+          ]
+        },
+        "prior": {
+          "count": 240,
+          "correct": 106,
+          "errors": 134,
+          "accuracy": 0.44166666666666665,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6516126272994397,
+          "logLoss": 1.0771248557352713,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              66,
+              0
+            ],
+            [
+              0,
+              106,
+              0
+            ],
+            [
+              0,
+              68,
+              0
+            ]
+          ]
+        }
+      },
+      "heads": {
+        "moveCount": 240,
+        "sideCount": 134,
+        "moveAuc": 0.486060264714165,
+        "sideAuc": 0.4859625668449198,
+        "moveMatrix": [
+          [
+            46,
+            60
+          ],
+          [
+            65,
+            69
+          ]
+        ],
+        "sideMatrix": [
+          [
+            15,
+            53
+          ],
+          [
+            16,
+            50
+          ]
+        ],
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "count": 66,
+            "meanMove": 0.524554984868904,
+            "meanSide": 0.5164335266571719
+          },
+          {
+            "actual": "NEUTRAL",
+            "count": 106,
+            "meanMove": 0.5206840105541638,
+            "meanSide": 0.5180451204182597
+          },
+          {
+            "actual": "BEARISH",
+            "count": 68,
+            "meanMove": 0.5290720521299318,
+            "meanSide": 0.5207578117185286
+          }
+        ]
+      },
+      "againstPrice": {
+        "wins": 2,
+        "losses": 0,
+        "net": 2,
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "wins": 1,
+            "losses": 0
+          },
+          {
+            "actual": "NEUTRAL",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "BEARISH",
+            "wins": 1,
+            "losses": 0
+          }
+        ]
+      }
+    },
+    {
+      "start": "2023-01-04",
+      "end": "2023-12-06",
+      "count": 240,
+      "move": {
+        "count": 3880,
+        "loss": 0.6656720793067046,
+        "gradient": 8.331748549156998e-7,
+        "steps": 3
+      },
+      "side": {
+        "count": 2033,
+        "loss": 0.6886009947138447,
+        "gradient": 4.126715124617205e-7,
+        "steps": 2
+      },
+      "scores": {
+        "candidate": {
+          "count": 240,
+          "correct": 136,
+          "errors": 104,
+          "accuracy": 0.5666666666666667,
+          "balancedAccuracy": 0.3687978687978688,
+          "brierScore": 0.5875202591401851,
+          "logLoss": 0.9863156564715221,
+          "recalls": [
+            0.07142857142857142,
+            0.9772727272727273,
+            0.057692307692307696
+          ],
+          "matrix": [
+            [
+              4,
+              49,
+              3
+            ],
+            [
+              2,
+              129,
+              1
+            ],
+            [
+              2,
+              47,
+              3
+            ]
+          ]
+        },
+        "price": {
+          "count": 240,
+          "correct": 137,
+          "errors": 103,
+          "accuracy": 0.5708333333333333,
+          "balancedAccuracy": 0.3752081252081252,
+          "brierScore": 0.5877002877869735,
+          "logLoss": 0.9865877881037697,
+          "recalls": [
+            0.07142857142857142,
+            0.9772727272727273,
+            0.07692307692307693
+          ],
+          "matrix": [
+            [
+              4,
+              49,
+              3
+            ],
+            [
+              2,
+              129,
+              1
+            ],
+            [
+              1,
+              47,
+              4
+            ]
+          ]
+        },
+        "pitReference": {
+          "count": 240,
+          "correct": 135,
+          "errors": 105,
+          "accuracy": 0.5625,
+          "balancedAccuracy": 0.36627261627261626,
+          "brierScore": 0.6050552270556815,
+          "logLoss": 1.0125421073493215,
+          "recalls": [
+            0.07142857142857142,
+            0.9696969696969697,
+            0.057692307692307696
+          ],
+          "matrix": [
+            [
+              4,
+              52,
+              0
+            ],
+            [
+              3,
+              128,
+              1
+            ],
+            [
+              3,
+              46,
+              3
+            ]
+          ]
+        },
+        "prior": {
+          "count": 240,
+          "correct": 132,
+          "errors": 108,
+          "accuracy": 0.55,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6043449091295582,
+          "logLoss": 1.0107196397368452,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              56,
+              0
+            ],
+            [
+              0,
+              132,
+              0
+            ],
+            [
+              0,
+              52,
+              0
+            ]
+          ]
+        }
+      },
+      "heads": {
+        "moveCount": 240,
+        "sideCount": 108,
+        "moveAuc": 0.5715488215488216,
+        "sideAuc": 0.6054258241758241,
+        "moveMatrix": [
+          [
+            75,
+            57
+          ],
+          [
+            56,
+            52
+          ]
+        ],
+        "sideMatrix": [
+          [
+            23,
+            29
+          ],
+          [
+            17,
+            39
+          ]
+        ],
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "count": 56,
+            "meanMove": 0.5043599864977577,
+            "meanSide": 0.5196897009662081
+          },
+          {
+            "actual": "NEUTRAL",
+            "count": 132,
+            "meanMove": 0.4825046400629968,
+            "meanSide": 0.5170420558322405
+          },
+          {
+            "actual": "BEARISH",
+            "count": 52,
+            "meanMove": 0.516767319395247,
+            "meanSide": 0.5081622571180424
+          }
+        ]
+      },
+      "againstPrice": {
+        "wins": 0,
+        "losses": 1,
+        "net": -1,
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "NEUTRAL",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "BEARISH",
+            "wins": 0,
+            "losses": 1
+          }
+        ]
+      }
+    },
+    {
+      "start": "2023-12-07",
+      "end": "2024-11-07",
+      "count": 240,
+      "move": {
+        "count": 4120,
+        "loss": 0.6663421115553677,
+        "gradient": 8.07602347019723e-7,
+        "steps": 3
+      },
+      "side": {
+        "count": 2142,
+        "loss": 0.6882086634721544,
+        "gradient": 5.228188125283931e-7,
+        "steps": 2
+      },
+      "scores": {
+        "candidate": {
+          "count": 240,
+          "correct": 107,
+          "errors": 133,
+          "accuracy": 0.44583333333333336,
+          "balancedAccuracy": 0.3310298264426705,
+          "brierScore": 0.6379710059528124,
+          "logLoss": 1.0572319320521661,
+          "recalls": [
+            0.03896103896103896,
+            0.9541284403669725,
+            0
+          ],
+          "matrix": [
+            [
+              3,
+              73,
+              1
+            ],
+            [
+              4,
+              104,
+              1
+            ],
+            [
+              2,
+              52,
+              0
+            ]
+          ]
+        },
+        "price": {
+          "count": 240,
+          "correct": 107,
+          "errors": 133,
+          "accuracy": 0.44583333333333336,
+          "balancedAccuracy": 0.3310298264426705,
+          "brierScore": 0.6382144658068268,
+          "logLoss": 1.0576696282901077,
+          "recalls": [
+            0.03896103896103896,
+            0.9541284403669725,
+            0
+          ],
+          "matrix": [
+            [
+              3,
+              73,
+              1
+            ],
+            [
+              4,
+              104,
+              1
+            ],
+            [
+              2,
+              52,
+              0
+            ]
+          ]
+        },
+        "pitReference": {
+          "count": 240,
+          "correct": 109,
+          "errors": 131,
+          "accuracy": 0.45416666666666666,
+          "balancedAccuracy": 0.3595221179319039,
+          "brierScore": 0.6422824386965114,
+          "logLoss": 1.0650204430674555,
+          "recalls": [
+            0.012987012987012988,
+            0.9174311926605505,
+            0.14814814814814814
+          ],
+          "matrix": [
+            [
+              1,
+              65,
+              11
+            ],
+            [
+              3,
+              100,
+              6
+            ],
+            [
+              1,
+              45,
+              8
+            ]
+          ]
+        },
+        "prior": {
+          "count": 240,
+          "correct": 109,
+          "errors": 131,
+          "accuracy": 0.45416666666666666,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6437775709303435,
+          "logLoss": 1.0648163769293377,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              77,
+              0
+            ],
+            [
+              0,
+              109,
+              0
+            ],
+            [
+              0,
+              54,
+              0
+            ]
+          ]
+        }
+      },
+      "heads": {
+        "moveCount": 240,
+        "sideCount": 131,
+        "moveAuc": 0.5769311576440928,
+        "sideAuc": 0.4983164983164983,
+        "moveMatrix": [
+          [
+            37,
+            72
+          ],
+          [
+            31,
+            100
+          ]
+        ],
+        "sideMatrix": [
+          [
+            10,
+            44
+          ],
+          [
+            18,
+            59
+          ]
+        ],
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "count": 77,
+            "meanMove": 0.5424775218850801,
+            "meanSide": 0.524385367124665
+          },
+          {
+            "actual": "NEUTRAL",
+            "count": 109,
+            "meanMove": 0.5289828627916336,
+            "meanSide": 0.5271597124325281
+          },
+          {
+            "actual": "BEARISH",
+            "count": 54,
+            "meanMove": 0.5514356690247025,
+            "meanSide": 0.5248909877859557
+          }
+        ]
+      },
+      "againstPrice": {
+        "wins": 0,
+        "losses": 0,
+        "net": 0,
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "NEUTRAL",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "BEARISH",
+            "wins": 0,
+            "losses": 0
+          }
+        ]
+      }
+    }
+  ],
+  "groups": [
+    {
+      "group": "WITHIN_0_5",
+      "count": 347,
+      "scores": {
+        "candidate": {
+          "count": 347,
+          "correct": 333,
+          "errors": 14,
+          "accuracy": 0.9596541786743515,
+          "balancedAccuracy": null,
+          "brierScore": 0.39723620375309804,
+          "logLoss": 0.723404336117491,
+          "recalls": [
+            null,
+            0.9596541786743515,
+            null
+          ],
+          "matrix": [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              10,
+              333,
+              4
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ]
+        },
+        "price": {
+          "count": 347,
+          "correct": 333,
+          "errors": 14,
+          "accuracy": 0.9596541786743515,
+          "balancedAccuracy": null,
+          "brierScore": 0.39801949808977716,
+          "logLoss": 0.7245046948947443,
+          "recalls": [
+            null,
+            0.9596541786743515,
+            null
+          ],
+          "matrix": [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              10,
+              333,
+              4
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ]
+        },
+        "pitReference": {
+          "count": 347,
+          "correct": 329,
+          "errors": 18,
+          "accuracy": 0.9481268011527377,
+          "balancedAccuracy": null,
+          "brierScore": 0.40463868112008183,
+          "logLoss": 0.7302936403652172,
+          "recalls": [
+            null,
+            0.9481268011527377,
+            null
+          ],
+          "matrix": [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              8,
+              329,
+              10
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ]
+        },
+        "prior": {
+          "count": 347,
+          "correct": 347,
+          "errors": 0,
+          "accuracy": 1,
+          "balancedAccuracy": null,
+          "brierScore": 0.40916556219599637,
+          "logLoss": 0.7383256696238614,
+          "recalls": [
+            null,
+            1,
+            null
+          ],
+          "matrix": [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              347,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ]
+        }
+      },
+      "againstPrice": {
+        "wins": 0,
+        "losses": 0,
+        "net": 0,
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "NEUTRAL",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "BEARISH",
+            "wins": 0,
+            "losses": 0
+          }
+        ]
+      }
+    },
+    {
+      "group": "EDGE_0_5_0_6",
+      "count": 61,
+      "scores": {
+        "candidate": {
+          "count": 61,
+          "correct": 2,
+          "errors": 59,
+          "accuracy": 0.03278688524590164,
+          "balancedAccuracy": null,
+          "brierScore": 0.8587260259461895,
+          "logLoss": 1.359950907869672,
+          "recalls": [
+            0.0625,
+            null,
+            0
+          ],
+          "matrix": [
+            [
+              2,
+              30,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              1,
+              28,
+              0
+            ]
+          ]
+        },
+        "price": {
+          "count": 61,
+          "correct": 2,
+          "errors": 59,
+          "accuracy": 0.03278688524590164,
+          "balancedAccuracy": null,
+          "brierScore": 0.858108475797451,
+          "logLoss": 1.3593417044489944,
+          "recalls": [
+            0.0625,
+            null,
+            0
+          ],
+          "matrix": [
+            [
+              2,
+              30,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              1,
+              28,
+              0
+            ]
+          ]
+        },
+        "pitReference": {
+          "count": 61,
+          "correct": 3,
+          "errors": 58,
+          "accuracy": 0.04918032786885246,
+          "balancedAccuracy": null,
+          "brierScore": 0.8585031267331834,
+          "logLoss": 1.3687862658779724,
+          "recalls": [
+            0.0625,
+            null,
+            0.034482758620689655
+          ],
+          "matrix": [
+            [
+              2,
+              27,
+              3
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              1,
+              27,
+              1
+            ]
+          ]
+        },
+        "prior": {
+          "count": 61,
+          "correct": 0,
+          "errors": 61,
+          "accuracy": 0,
+          "balancedAccuracy": null,
+          "brierScore": 0.8419015251986984,
+          "logLoss": 1.342131352512845,
+          "recalls": [
+            0,
+            null,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              32,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              29,
+              0
+            ]
+          ]
+        }
+      },
+      "againstPrice": {
+        "wins": 0,
+        "losses": 0,
+        "net": 0,
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "NEUTRAL",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "BEARISH",
+            "wins": 0,
+            "losses": 0
+          }
+        ]
+      }
+    },
+    {
+      "group": "MID_0_6_1",
+      "count": 147,
+      "scores": {
+        "candidate": {
+          "count": 147,
+          "correct": 11,
+          "errors": 136,
+          "accuracy": 0.07482993197278912,
+          "balancedAccuracy": null,
+          "brierScore": 0.8396898068511244,
+          "logLoss": 1.3386303621347893,
+          "recalls": [
+            0.0958904109589041,
+            null,
+            0.05405405405405406
+          ],
+          "matrix": [
+            [
+              7,
+              64,
+              2
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              5,
+              65,
+              4
+            ]
+          ]
+        },
+        "price": {
+          "count": 147,
+          "correct": 11,
+          "errors": 136,
+          "accuracy": 0.07482993197278912,
+          "balancedAccuracy": null,
+          "brierScore": 0.838821984323276,
+          "logLoss": 1.337233986453691,
+          "recalls": [
+            0.0958904109589041,
+            null,
+            0.05405405405405406
+          ],
+          "matrix": [
+            [
+              7,
+              64,
+              2
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              66,
+              4
+            ]
+          ]
+        },
+        "pitReference": {
+          "count": 147,
+          "correct": 10,
+          "errors": 137,
+          "accuracy": 0.06802721088435375,
+          "balancedAccuracy": null,
+          "brierScore": 0.8513567715632555,
+          "logLoss": 1.3614925881174167,
+          "recalls": [
+            0.0821917808219178,
+            null,
+            0.05405405405405406
+          ],
+          "matrix": [
+            [
+              6,
+              65,
+              2
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              5,
+              65,
+              4
+            ]
+          ]
+        },
+        "prior": {
+          "count": 147,
+          "correct": 0,
+          "errors": 147,
+          "accuracy": 0,
+          "balancedAccuracy": null,
+          "brierScore": 0.8434106772337194,
+          "logLoss": 1.3449637591583186,
+          "recalls": [
+            0,
+            null,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              73,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              74,
+              0
+            ]
+          ]
+        }
+      },
+      "againstPrice": {
+        "wins": 1,
+        "losses": 1,
+        "net": 0,
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "NEUTRAL",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "BEARISH",
+            "wins": 1,
+            "losses": 1
+          }
+        ]
+      }
+    },
+    {
+      "group": "LARGE_1_2",
+      "count": 145,
+      "scores": {
+        "candidate": {
+          "count": 145,
+          "correct": 4,
+          "errors": 141,
+          "accuracy": 0.027586206896551724,
+          "balancedAccuracy": null,
+          "brierScore": 0.8389177926001641,
+          "logLoss": 1.33646037234932,
+          "recalls": [
+            0.03614457831325301,
+            null,
+            0.016129032258064516
+          ],
+          "matrix": [
+            [
+              3,
+              76,
+              4
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              57,
+              1
+            ]
+          ]
+        },
+        "price": {
+          "count": 145,
+          "correct": 3,
+          "errors": 142,
+          "accuracy": 0.020689655172413793,
+          "balancedAccuracy": null,
+          "brierScore": 0.8390937215238611,
+          "logLoss": 1.337026920952196,
+          "recalls": [
+            0.024096385542168676,
+            null,
+            0.016129032258064516
+          ],
+          "matrix": [
+            [
+              2,
+              77,
+              4
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              57,
+              1
+            ]
+          ]
+        },
+        "pitReference": {
+          "count": 145,
+          "correct": 8,
+          "errors": 137,
+          "accuracy": 0.05517241379310345,
+          "balancedAccuracy": null,
+          "brierScore": 0.8578701136223215,
+          "logLoss": 1.3705765724125667,
+          "recalls": [
+            0.012048192771084338,
+            null,
+            0.11290322580645161
+          ],
+          "matrix": [
+            [
+              1,
+              75,
+              7
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              1,
+              54,
+              7
+            ]
+          ]
+        },
+        "prior": {
+          "count": 145,
+          "correct": 0,
+          "errors": 145,
+          "accuracy": 0,
+          "balancedAccuracy": null,
+          "brierScore": 0.8400271020031771,
+          "logLoss": 1.3383714019433333,
+          "recalls": [
+            0,
+            null,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              83,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              62,
+              0
+            ]
+          ]
+        }
+      },
+      "againstPrice": {
+        "wins": 1,
+        "losses": 0,
+        "net": 1,
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "wins": 1,
+            "losses": 0
+          },
+          {
+            "actual": "NEUTRAL",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "BEARISH",
+            "wins": 0,
+            "losses": 0
+          }
+        ]
+      }
+    },
+    {
+      "group": "OVER_2",
+      "count": 20,
+      "scores": {
+        "candidate": {
+          "count": 20,
+          "correct": 1,
+          "errors": 19,
+          "accuracy": 0.05,
+          "balancedAccuracy": null,
+          "brierScore": 0.8208257006153413,
+          "logLoss": 1.3087740003014479,
+          "recalls": [
+            0,
+            null,
+            0.1111111111111111
+          ],
+          "matrix": [
+            [
+              0,
+              11,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              1,
+              7,
+              1
+            ]
+          ]
+        },
+        "price": {
+          "count": 20,
+          "correct": 1,
+          "errors": 19,
+          "accuracy": 0.05,
+          "balancedAccuracy": null,
+          "brierScore": 0.8200144793336495,
+          "logLoss": 1.307835321946948,
+          "recalls": [
+            0,
+            null,
+            0.1111111111111111
+          ],
+          "matrix": [
+            [
+              0,
+              11,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              1,
+              7,
+              1
+            ]
+          ]
+        },
+        "pitReference": {
+          "count": 20,
+          "correct": 2,
+          "errors": 18,
+          "accuracy": 0.1,
+          "balancedAccuracy": null,
+          "brierScore": 0.8030094384286969,
+          "logLoss": 1.2827056727149972,
+          "recalls": [
+            0,
+            null,
+            0.2222222222222222
+          ],
+          "matrix": [
+            [
+              0,
+              10,
+              1
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              1,
+              6,
+              2
+            ]
+          ]
+        },
+        "prior": {
+          "count": 20,
+          "correct": 0,
+          "errors": 20,
+          "accuracy": 0,
+          "balancedAccuracy": null,
+          "brierScore": 0.8407341651646547,
+          "logLoss": 1.3398031817765432,
+          "recalls": [
+            0,
+            null,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              11,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              9,
+              0
+            ]
+          ]
+        }
+      },
+      "againstPrice": {
+        "wins": 0,
+        "losses": 0,
+        "net": 0,
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "NEUTRAL",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "BEARISH",
+            "wins": 0,
+            "losses": 0
+          }
+        ]
+      }
+    }
+  ],
+  "sourceHashes": {
+    "HierarchyRun.java": "902e6dc951d49ea12fc6f8144e1652d2b54b298891d42b813e292be6964b3c07",
+    "HierarchyModel.java": "1657746fa5e2a3b5280e00dacfc3a0ba99f47e09f2f814446fb0362a7411388b",
+    "HierarchyChecks.java": "bd317f0704c3f969376a9016ce49af6af0072b51f9fdc7ee8d602817ea541ff5",
+    "BinaryFit.java": "55c0651d93ffb475c81bfe040c23a3749c9ac8a6c798979ae88cb8b72e17d31d",
+    "HistorySlice.java": "91367f304cd6c16b27910fb9b5852e14da1fb96cd8901984e3080abecbac1e73",
+    "FusionScale.java": "98e4e93c07fe9fa723d23874a66133db6551c05cc4394598dfcd17df9436fbbe",
+    "TrainingProbe.java": "4663a0c1a453aab8b1057afc62821f6b64b8f6738da3f0fc2930513c4e68d824",
+    "HierarchyMath.cjs": "55e86e9ca670a80d060b3ffcc2b49244a17604a1ec89fa47936089c4b8076c4a",
+    "HierarchyAudit.cjs": "fd998cbf9595cf7eed60689076f5db0547391a52b9c50597cde4229066de5aaf",
+    "HierarchyAuditChecks.cjs": "fb8e05a2d7c3e39454d69feb64a8ba533573b65b2e59aeed61a2678ced09e3a5",
+    "verify-hierarchy.cjs": "80f9b9eda5eb22b7fffb56ffd88d852c2a354a13ed6a864d9a529b2a343c8621",
+    "InfoMath.cjs": "16a929d4340a5c1f3000443b65c4218e94defa5b0f2df953bfd5d8b8f7d3e60b",
+    "DirectionMath.cjs": "2456bbaa0289a64b00b0f00b16b78ca0de9688a68bfd748941cf6c1bd70f186f"
+  },
+  "protocolHash": "e10473eefa0bb2a91b8fab5fc39151204b9d02a769d0d1a4d21e2b32031208d6",
+  "inputHashes": {
+    "tree": "0e61b655c77bf6ead23df4b70217246c29951ef375b3cc71a0300303c5e9832d",
+    "result": "b506227873bfec57db5b64044d770370dd13118bdc0daab9a92bef7dfef3d2b3"
+  },
+  "blocks": [
+    {
+      "start": "2022-02-02",
+      "end": "2022-03-01",
+      "scores": {
+        "candidate": {
+          "count": 20,
+          "correct": 10,
+          "errors": 10,
+          "accuracy": 0.5,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6073928927521413,
+          "logLoss": 1.015491997029964,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              6,
+              1
+            ],
+            [
+              0,
+              10,
+              0
+            ],
+            [
+              0,
+              3,
+              0
+            ]
+          ]
+        },
+        "price": {
+          "count": 20,
+          "correct": 10,
+          "errors": 10,
+          "accuracy": 0.5,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6098927268131906,
+          "logLoss": 1.0195152639697809,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              6,
+              1
+            ],
+            [
+              0,
+              10,
+              0
+            ],
+            [
+              0,
+              3,
+              0
+            ]
+          ]
+        },
+        "pitReference": {
+          "count": 20,
+          "correct": 10,
+          "errors": 10,
+          "accuracy": 0.5,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.5740082266874392,
+          "logLoss": 0.9712824292351815,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              6,
+              1
+            ],
+            [
+              0,
+              10,
+              0
+            ],
+            [
+              1,
+              2,
+              0
+            ]
+          ]
+        },
+        "prior": {
+          "count": 20,
+          "correct": 10,
+          "errors": 10,
+          "accuracy": 0.5,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6207976089844224,
+          "logLoss": 1.0312129398080963,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              7,
+              0
+            ],
+            [
+              0,
+              10,
+              0
+            ],
+            [
+              0,
+              3,
+              0
+            ]
+          ]
+        }
+      },
+      "heads": {
+        "moveCount": 20,
+        "sideCount": 10,
+        "moveAuc": 0.67,
+        "sideAuc": 0.6666666666666666,
+        "moveMatrix": [
+          [
+            7,
+            3
+          ],
+          [
+            6,
+            4
+          ]
+        ],
+        "sideMatrix": [
+          [
+            1,
+            2
+          ],
+          [
+            3,
+            4
+          ]
+        ],
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "count": 7,
+            "meanMove": 0.5054657351667149,
+            "meanSide": 0.49259700734159045
+          },
+          {
+            "actual": "NEUTRAL",
+            "count": 10,
+            "meanMove": 0.4758905161414949,
+            "meanSide": 0.5437164489932659
+          },
+          {
+            "actual": "BEARISH",
+            "count": 3,
+            "meanMove": 0.5511979090952173,
+            "meanSide": 0.5031746816811458
+          }
+        ]
+      },
+      "againstPrice": {
+        "wins": 0,
+        "losses": 0,
+        "net": 0,
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "NEUTRAL",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "BEARISH",
+            "wins": 0,
+            "losses": 0
+          }
+        ]
+      }
+    },
+    {
+      "start": "2022-03-02",
+      "end": "2022-03-29",
+      "scores": {
+        "candidate": {
+          "count": 20,
+          "correct": 6,
+          "errors": 14,
+          "accuracy": 0.3,
+          "balancedAccuracy": 0.27910052910052907,
+          "brierScore": 0.6655645243950874,
+          "logLoss": 1.0953046305517549,
+          "recalls": [
+            0.4444444444444444,
+            0.25,
+            0.14285714285714285
+          ],
+          "matrix": [
+            [
+              4,
+              4,
+              1
+            ],
+            [
+              2,
+              1,
+              1
+            ],
+            [
+              6,
+              0,
+              1
+            ]
+          ]
+        },
+        "price": {
+          "count": 20,
+          "correct": 6,
+          "errors": 14,
+          "accuracy": 0.3,
+          "balancedAccuracy": 0.27910052910052907,
+          "brierScore": 0.6651495740894324,
+          "logLoss": 1.0949175836566774,
+          "recalls": [
+            0.4444444444444444,
+            0.25,
+            0.14285714285714285
+          ],
+          "matrix": [
+            [
+              4,
+              4,
+              1
+            ],
+            [
+              2,
+              1,
+              1
+            ],
+            [
+              6,
+              0,
+              1
+            ]
+          ]
+        },
+        "pitReference": {
+          "count": 20,
+          "correct": 7,
+          "errors": 13,
+          "accuracy": 0.35,
+          "balancedAccuracy": 0.373015873015873,
+          "brierScore": 0.6864202593413298,
+          "logLoss": 1.122322947716913,
+          "recalls": [
+            0.3333333333333333,
+            0.5,
+            0.2857142857142857
+          ],
+          "matrix": [
+            [
+              3,
+              5,
+              1
+            ],
+            [
+              0,
+              2,
+              2
+            ],
+            [
+              2,
+              3,
+              2
+            ]
+          ]
+        },
+        "prior": {
+          "count": 20,
+          "correct": 4,
+          "errors": 16,
+          "accuracy": 0.2,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.7536547518415648,
+          "logLoss": 1.2182068258269976,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              9,
+              0
+            ],
+            [
+              0,
+              4,
+              0
+            ],
+            [
+              0,
+              7,
+              0
+            ]
+          ]
+        }
+      },
+      "heads": {
+        "moveCount": 20,
+        "sideCount": 16,
+        "moveAuc": 0.515625,
+        "sideAuc": 0.5079365079365079,
+        "moveMatrix": [
+          [
+            0,
+            4
+          ],
+          [
+            0,
+            16
+          ]
+        ],
+        "sideMatrix": [
+          [
+            1,
+            6
+          ],
+          [
+            2,
+            7
+          ]
+        ],
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "count": 9,
+            "meanMove": 0.6652401435150483,
+            "meanSide": 0.5307842030559796
+          },
+          {
+            "actual": "NEUTRAL",
+            "count": 4,
+            "meanMove": 0.6783778737176659,
+            "meanSide": 0.4989986234066077
+          },
+          {
+            "actual": "BEARISH",
+            "count": 7,
+            "meanMove": 0.6899462898883364,
+            "meanSide": 0.5308795523072894
+          }
+        ]
+      },
+      "againstPrice": {
+        "wins": 0,
+        "losses": 0,
+        "net": 0,
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "NEUTRAL",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "BEARISH",
+            "wins": 0,
+            "losses": 0
+          }
+        ]
+      }
+    },
+    {
+      "start": "2022-03-30",
+      "end": "2022-04-26",
+      "scores": {
+        "candidate": {
+          "count": 20,
+          "correct": 13,
+          "errors": 7,
+          "accuracy": 0.65,
+          "balancedAccuracy": 0.39999999999999997,
+          "brierScore": 0.6179403981940699,
+          "logLoss": 1.0363390567562119,
+          "recalls": [
+            0,
+            1,
+            0.2
+          ],
+          "matrix": [
+            [
+              0,
+              3,
+              0
+            ],
+            [
+              0,
+              12,
+              0
+            ],
+            [
+              0,
+              4,
+              1
+            ]
+          ]
+        },
+        "price": {
+          "count": 20,
+          "correct": 12,
+          "errors": 8,
+          "accuracy": 0.6,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6170217149589197,
+          "logLoss": 1.0348986888862792,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              3,
+              0
+            ],
+            [
+              0,
+              12,
+              0
+            ],
+            [
+              0,
+              5,
+              0
+            ]
+          ]
+        },
+        "pitReference": {
+          "count": 20,
+          "correct": 12,
+          "errors": 8,
+          "accuracy": 0.6,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.5878595077699341,
+          "logLoss": 1.005170457651509,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              3,
+              0
+            ],
+            [
+              0,
+              12,
+              0
+            ],
+            [
+              0,
+              5,
+              0
+            ]
+          ]
+        },
+        "prior": {
+          "count": 20,
+          "correct": 12,
+          "errors": 8,
+          "accuracy": 0.6,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.585303103489917,
+          "logLoss": 0.9857381038432695,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              3,
+              0
+            ],
+            [
+              0,
+              12,
+              0
+            ],
+            [
+              0,
+              5,
+              0
+            ]
+          ]
+        }
+      },
+      "heads": {
+        "moveCount": 20,
+        "sideCount": 8,
+        "moveAuc": 0.2604166666666667,
+        "sideAuc": 0.26666666666666666,
+        "moveMatrix": [
+          [
+            7,
+            5
+          ],
+          [
+            7,
+            1
+          ]
+        ],
+        "sideMatrix": [
+          [
+            1,
+            4
+          ],
+          [
+            1,
+            2
+          ]
+        ],
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "count": 3,
+            "meanMove": 0.4918618754789432,
+            "meanSide": 0.5068466675782094
+          },
+          {
+            "actual": "NEUTRAL",
+            "count": 12,
+            "meanMove": 0.5288118644034563,
+            "meanSide": 0.523025966831561
+          },
+          {
+            "actual": "BEARISH",
+            "count": 5,
+            "meanMove": 0.49972928267263905,
+            "meanSide": 0.5392766215488776
+          }
+        ]
+      },
+      "againstPrice": {
+        "wins": 1,
+        "losses": 0,
+        "net": 1,
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "NEUTRAL",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "BEARISH",
+            "wins": 1,
+            "losses": 0
+          }
+        ]
+      }
+    },
+    {
+      "start": "2022-04-27",
+      "end": "2022-05-24",
+      "scores": {
+        "candidate": {
+          "count": 20,
+          "correct": 8,
+          "errors": 12,
+          "accuracy": 0.4,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6774437609990566,
+          "logLoss": 1.114659436509522,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              5,
+              0
+            ],
+            [
+              0,
+              8,
+              0
+            ],
+            [
+              0,
+              7,
+              0
+            ]
+          ]
+        },
+        "price": {
+          "count": 20,
+          "correct": 8,
+          "errors": 12,
+          "accuracy": 0.4,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6773713429398119,
+          "logLoss": 1.1146710243722604,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              5,
+              0
+            ],
+            [
+              0,
+              8,
+              0
+            ],
+            [
+              0,
+              7,
+              0
+            ]
+          ]
+        },
+        "pitReference": {
+          "count": 20,
+          "correct": 8,
+          "errors": 12,
+          "accuracy": 0.4,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.7221546153590742,
+          "logLoss": 1.1750406079334432,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              5,
+              0
+            ],
+            [
+              0,
+              8,
+              0
+            ],
+            [
+              0,
+              7,
+              0
+            ]
+          ]
+        },
+        "prior": {
+          "count": 20,
+          "correct": 8,
+          "errors": 12,
+          "accuracy": 0.4,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6721162903031036,
+          "logLoss": 1.1070294026475758,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              5,
+              0
+            ],
+            [
+              0,
+              8,
+              0
+            ],
+            [
+              0,
+              7,
+              0
+            ]
+          ]
+        }
+      },
+      "heads": {
+        "moveCount": 20,
+        "sideCount": 12,
+        "moveAuc": 0.5416666666666666,
+        "sideAuc": 0.4857142857142857,
+        "moveMatrix": [
+          [
+            4,
+            4
+          ],
+          [
+            4,
+            8
+          ]
+        ],
+        "sideMatrix": [
+          [
+            1,
+            6
+          ],
+          [
+            1,
+            4
+          ]
+        ],
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "count": 5,
+            "meanMove": 0.5025213318126217,
+            "meanSide": 0.5201791116442793
+          },
+          {
+            "actual": "NEUTRAL",
+            "count": 8,
+            "meanMove": 0.4999537014827654,
+            "meanSide": 0.5258172485840757
+          },
+          {
+            "actual": "BEARISH",
+            "count": 7,
+            "meanMove": 0.5021726732704815,
+            "meanSide": 0.5241464181860218
+          }
+        ]
+      },
+      "againstPrice": {
+        "wins": 0,
+        "losses": 0,
+        "net": 0,
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "NEUTRAL",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "BEARISH",
+            "wins": 0,
+            "losses": 0
+          }
+        ]
+      }
+    },
+    {
+      "start": "2022-05-25",
+      "end": "2022-06-21",
+      "scores": {
+        "candidate": {
+          "count": 20,
+          "correct": 9,
+          "errors": 11,
+          "accuracy": 0.45,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6495554207993856,
+          "logLoss": 1.0734327919340372,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              5,
+              0
+            ],
+            [
+              0,
+              9,
+              0
+            ],
+            [
+              0,
+              6,
+              0
+            ]
+          ]
+        },
+        "price": {
+          "count": 20,
+          "correct": 9,
+          "errors": 11,
+          "accuracy": 0.45,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6492936018777862,
+          "logLoss": 1.072861065241068,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              5,
+              0
+            ],
+            [
+              0,
+              9,
+              0
+            ],
+            [
+              0,
+              6,
+              0
+            ]
+          ]
+        },
+        "pitReference": {
+          "count": 20,
+          "correct": 9,
+          "errors": 11,
+          "accuracy": 0.45,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6350946022850369,
+          "logLoss": 1.063068027248145,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              5,
+              0
+            ],
+            [
+              0,
+              9,
+              0
+            ],
+            [
+              0,
+              6,
+              0
+            ]
+          ]
+        },
+        "prior": {
+          "count": 20,
+          "correct": 9,
+          "errors": 11,
+          "accuracy": 0.45,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6490943122811256,
+          "logLoss": 1.0741781090402782,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              5,
+              0
+            ],
+            [
+              0,
+              9,
+              0
+            ],
+            [
+              0,
+              6,
+              0
+            ]
+          ]
+        }
+      },
+      "heads": {
+        "moveCount": 20,
+        "sideCount": 11,
+        "moveAuc": 0.5353535353535354,
+        "sideAuc": 0.6333333333333333,
+        "moveMatrix": [
+          [
+            6,
+            3
+          ],
+          [
+            9,
+            2
+          ]
+        ],
+        "sideMatrix": [
+          [
+            0,
+            6
+          ],
+          [
+            0,
+            5
+          ]
+        ],
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "count": 5,
+            "meanMove": 0.4753118784288612,
+            "meanSide": 0.5419445380652895
+          },
+          {
+            "actual": "NEUTRAL",
+            "count": 9,
+            "meanMove": 0.48071480380108433,
+            "meanSide": 0.5288885364221872
+          },
+          {
+            "actual": "BEARISH",
+            "count": 6,
+            "meanMove": 0.4950858389518734,
+            "meanSide": 0.5306940137001558
+          }
+        ]
+      },
+      "againstPrice": {
+        "wins": 0,
+        "losses": 0,
+        "net": 0,
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "NEUTRAL",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "BEARISH",
+            "wins": 0,
+            "losses": 0
+          }
+        ]
+      }
+    },
+    {
+      "start": "2022-06-22",
+      "end": "2022-07-19",
+      "scores": {
+        "candidate": {
+          "count": 20,
+          "correct": 13,
+          "errors": 7,
+          "accuracy": 0.65,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.5527588615327432,
+          "logLoss": 0.9414799500159221,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              13,
+              0
+            ],
+            [
+              0,
+              6,
+              0
+            ]
+          ]
+        },
+        "price": {
+          "count": 20,
+          "correct": 13,
+          "errors": 7,
+          "accuracy": 0.65,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.554250792385598,
+          "logLoss": 0.9434344686608295,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              13,
+              0
+            ],
+            [
+              0,
+              6,
+              0
+            ]
+          ]
+        },
+        "pitReference": {
+          "count": 20,
+          "correct": 12,
+          "errors": 8,
+          "accuracy": 0.6,
+          "balancedAccuracy": 0.3076923076923077,
+          "brierScore": 0.555718767557764,
+          "logLoss": 0.9482567598229086,
+          "recalls": [
+            0,
+            0.9230769230769231,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              12,
+              1
+            ],
+            [
+              0,
+              6,
+              0
+            ]
+          ]
+        },
+        "prior": {
+          "count": 20,
+          "correct": 13,
+          "errors": 7,
+          "accuracy": 0.65,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.5675558507426642,
+          "logLoss": 0.963000685860856,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              13,
+              0
+            ],
+            [
+              0,
+              6,
+              0
+            ]
+          ]
+        }
+      },
+      "heads": {
+        "moveCount": 20,
+        "sideCount": 7,
+        "moveAuc": 0.37362637362637363,
+        "sideAuc": 0,
+        "moveMatrix": [
+          [
+            5,
+            8
+          ],
+          [
+            4,
+            3
+          ]
+        ],
+        "sideMatrix": [
+          [
+            1,
+            5
+          ],
+          [
+            1,
+            0
+          ]
+        ],
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "count": 1,
+            "meanMove": 0.4895836781124986,
+            "meanSide": 0.47029370427217215
+          },
+          {
+            "actual": "NEUTRAL",
+            "count": 13,
+            "meanMove": 0.49356336934244216,
+            "meanSide": 0.4886466488387784
+          },
+          {
+            "actual": "BEARISH",
+            "count": 6,
+            "meanMove": 0.492694024055644,
+            "meanSide": 0.5073538856865413
+          }
+        ]
+      },
+      "againstPrice": {
+        "wins": 0,
+        "losses": 0,
+        "net": 0,
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "NEUTRAL",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "BEARISH",
+            "wins": 0,
+            "losses": 0
+          }
+        ]
+      }
+    },
+    {
+      "start": "2022-07-20",
+      "end": "2022-08-16",
+      "scores": {
+        "candidate": {
+          "count": 20,
+          "correct": 9,
+          "errors": 11,
+          "accuracy": 0.45,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6563502106615774,
+          "logLoss": 1.083922718924577,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              7,
+              0
+            ],
+            [
+              0,
+              9,
+              0
+            ],
+            [
+              0,
+              4,
+              0
+            ]
+          ]
+        },
+        "price": {
+          "count": 20,
+          "correct": 9,
+          "errors": 11,
+          "accuracy": 0.45,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6555491099833477,
+          "logLoss": 1.0823380645231704,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              7,
+              0
+            ],
+            [
+              0,
+              9,
+              0
+            ],
+            [
+              0,
+              4,
+              0
+            ]
+          ]
+        },
+        "pitReference": {
+          "count": 20,
+          "correct": 9,
+          "errors": 11,
+          "accuracy": 0.45,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6879252667515503,
+          "logLoss": 1.1269348426054544,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              7,
+              0
+            ],
+            [
+              0,
+              9,
+              0
+            ],
+            [
+              0,
+              4,
+              0
+            ]
+          ]
+        },
+        "prior": {
+          "count": 20,
+          "correct": 9,
+          "errors": 11,
+          "accuracy": 0.45,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6438195870064003,
+          "logLoss": 1.0640642334153942,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              7,
+              0
+            ],
+            [
+              0,
+              9,
+              0
+            ],
+            [
+              0,
+              4,
+              0
+            ]
+          ]
+        }
+      },
+      "heads": {
+        "moveCount": 20,
+        "sideCount": 11,
+        "moveAuc": 0.47474747474747475,
+        "sideAuc": 0.17857142857142858,
+        "moveMatrix": [
+          [
+            5,
+            4
+          ],
+          [
+            5,
+            6
+          ]
+        ],
+        "sideMatrix": [
+          [
+            0,
+            4
+          ],
+          [
+            1,
+            6
+          ]
+        ],
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "count": 7,
+            "meanMove": 0.4845032164536252,
+            "meanSide": 0.5215356020457641
+          },
+          {
+            "actual": "NEUTRAL",
+            "count": 9,
+            "meanMove": 0.4971935250933257,
+            "meanSide": 0.5200792099786998
+          },
+          {
+            "actual": "BEARISH",
+            "count": 4,
+            "meanMove": 0.5112015545253855,
+            "meanSide": 0.5447353184955046
+          }
+        ]
+      },
+      "againstPrice": {
+        "wins": 0,
+        "losses": 0,
+        "net": 0,
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "NEUTRAL",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "BEARISH",
+            "wins": 0,
+            "losses": 0
+          }
+        ]
+      }
+    },
+    {
+      "start": "2022-08-17",
+      "end": "2022-09-13",
+      "scores": {
+        "candidate": {
+          "count": 20,
+          "correct": 7,
+          "errors": 13,
+          "accuracy": 0.35,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.7361513990344988,
+          "logLoss": 1.1960133297224484,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              4,
+              0
+            ],
+            [
+              0,
+              7,
+              0
+            ],
+            [
+              0,
+              9,
+              0
+            ]
+          ]
+        },
+        "price": {
+          "count": 20,
+          "correct": 7,
+          "errors": 13,
+          "accuracy": 0.35,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.7348029032947397,
+          "logLoss": 1.1939718820126237,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              4,
+              0
+            ],
+            [
+              0,
+              7,
+              0
+            ],
+            [
+              0,
+              9,
+              0
+            ]
+          ]
+        },
+        "pitReference": {
+          "count": 20,
+          "correct": 7,
+          "errors": 13,
+          "accuracy": 0.35,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.7738887748043937,
+          "logLoss": 1.2665981497068317,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              4,
+              0
+            ],
+            [
+              0,
+              7,
+              0
+            ],
+            [
+              0,
+              9,
+              0
+            ]
+          ]
+        },
+        "prior": {
+          "count": 20,
+          "correct": 7,
+          "errors": 13,
+          "accuracy": 0.35,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6977756309624441,
+          "logLoss": 1.1449376340673152,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              4,
+              0
+            ],
+            [
+              0,
+              7,
+              0
+            ],
+            [
+              0,
+              9,
+              0
+            ]
+          ]
+        }
+      },
+      "heads": {
+        "moveCount": 20,
+        "sideCount": 13,
+        "moveAuc": 0.43956043956043955,
+        "sideAuc": 0.4444444444444444,
+        "moveMatrix": [
+          [
+            5,
+            2
+          ],
+          [
+            11,
+            2
+          ]
+        ],
+        "sideMatrix": [
+          [
+            3,
+            6
+          ],
+          [
+            2,
+            2
+          ]
+        ],
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "count": 4,
+            "meanMove": 0.450676908470702,
+            "meanSide": 0.5036612901921572
+          },
+          {
+            "actual": "NEUTRAL",
+            "count": 7,
+            "meanMove": 0.4676475026392641,
+            "meanSide": 0.5147136305287312
+          },
+          {
+            "actual": "BEARISH",
+            "count": 9,
+            "meanMove": 0.4547441437905956,
+            "meanSide": 0.5102083868160047
+          }
+        ]
+      },
+      "againstPrice": {
+        "wins": 0,
+        "losses": 0,
+        "net": 0,
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "NEUTRAL",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "BEARISH",
+            "wins": 0,
+            "losses": 0
+          }
+        ]
+      }
+    },
+    {
+      "start": "2022-09-14",
+      "end": "2022-10-11",
+      "scores": {
+        "candidate": {
+          "count": 20,
+          "correct": 8,
+          "errors": 12,
+          "accuracy": 0.4,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.7129445461648611,
+          "logLoss": 1.1631010661654524,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              5,
+              0
+            ],
+            [
+              0,
+              8,
+              0
+            ],
+            [
+              0,
+              7,
+              0
+            ]
+          ]
+        },
+        "price": {
+          "count": 20,
+          "correct": 8,
+          "errors": 12,
+          "accuracy": 0.4,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.7119786112623536,
+          "logLoss": 1.1617053313941885,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              5,
+              0
+            ],
+            [
+              0,
+              8,
+              0
+            ],
+            [
+              0,
+              7,
+              0
+            ]
+          ]
+        },
+        "pitReference": {
+          "count": 20,
+          "correct": 8,
+          "errors": 12,
+          "accuracy": 0.4,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.7176094267281625,
+          "logLoss": 1.160386643973551,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              5,
+              0
+            ],
+            [
+              0,
+              8,
+              0
+            ],
+            [
+              0,
+              7,
+              0
+            ]
+          ]
+        },
+        "prior": {
+          "count": 20,
+          "correct": 8,
+          "errors": 12,
+          "accuracy": 0.4,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6721162903031035,
+          "logLoss": 1.107029402647576,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              5,
+              0
+            ],
+            [
+              0,
+              8,
+              0
+            ],
+            [
+              0,
+              7,
+              0
+            ]
+          ]
+        }
+      },
+      "heads": {
+        "moveCount": 20,
+        "sideCount": 12,
+        "moveAuc": 0.2604166666666667,
+        "sideAuc": 0.4,
+        "moveMatrix": [
+          [
+            3,
+            5
+          ],
+          [
+            8,
+            4
+          ]
+        ],
+        "sideMatrix": [
+          [
+            1,
+            6
+          ],
+          [
+            1,
+            4
+          ]
+        ],
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "count": 5,
+            "meanMove": 0.47393955643942265,
+            "meanSide": 0.5191001291605734
+          },
+          {
+            "actual": "NEUTRAL",
+            "count": 8,
+            "meanMove": 0.5218282226502388,
+            "meanSide": 0.5233249956654619
+          },
+          {
+            "actual": "BEARISH",
+            "count": 7,
+            "meanMove": 0.48785331239460333,
+            "meanSide": 0.5275111501214275
+          }
+        ]
+      },
+      "againstPrice": {
+        "wins": 0,
+        "losses": 0,
+        "net": 0,
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "NEUTRAL",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "BEARISH",
+            "wins": 0,
+            "losses": 0
+          }
+        ]
+      }
+    },
+    {
+      "start": "2022-10-12",
+      "end": "2022-11-08",
+      "scores": {
+        "candidate": {
+          "count": 20,
+          "correct": 10,
+          "errors": 10,
+          "accuracy": 0.5,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6396024676127372,
+          "logLoss": 1.0606774287078387,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              5,
+              0
+            ],
+            [
+              0,
+              10,
+              0
+            ],
+            [
+              0,
+              5,
+              0
+            ]
+          ]
+        },
+        "price": {
+          "count": 20,
+          "correct": 10,
+          "errors": 10,
+          "accuracy": 0.5,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6399681723286512,
+          "logLoss": 1.06125148485511,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              5,
+              0
+            ],
+            [
+              0,
+              10,
+              0
+            ],
+            [
+              0,
+              5,
+              0
+            ]
+          ]
+        },
+        "pitReference": {
+          "count": 20,
+          "correct": 10,
+          "errors": 10,
+          "accuracy": 0.5,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6734827596562007,
+          "logLoss": 1.1062216434333183,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              5,
+              0
+            ],
+            [
+              0,
+              10,
+              0
+            ],
+            [
+              0,
+              5,
+              0
+            ]
+          ]
+        },
+        "prior": {
+          "count": 20,
+          "correct": 10,
+          "errors": 10,
+          "accuracy": 0.5,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6260723342591475,
+          "logLoss": 1.0413268154329807,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              5,
+              0
+            ],
+            [
+              0,
+              10,
+              0
+            ],
+            [
+              0,
+              5,
+              0
+            ]
+          ]
+        }
+      },
+      "heads": {
+        "moveCount": 20,
+        "sideCount": 10,
+        "moveAuc": 0.43,
+        "sideAuc": 0.36,
+        "moveMatrix": [
+          [
+            2,
+            8
+          ],
+          [
+            2,
+            8
+          ]
+        ],
+        "sideMatrix": [
+          [
+            2,
+            3
+          ],
+          [
+            1,
+            4
+          ]
+        ],
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "count": 5,
+            "meanMove": 0.5233432891360685,
+            "meanSide": 0.5087651087856465
+          },
+          {
+            "actual": "NEUTRAL",
+            "count": 10,
+            "meanMove": 0.5415754892091629,
+            "meanSide": 0.5036262841332316
+          },
+          {
+            "actual": "BEARISH",
+            "count": 5,
+            "meanMove": 0.5403586568097152,
+            "meanSide": 0.5182130132387629
+          }
+        ]
+      },
+      "againstPrice": {
+        "wins": 0,
+        "losses": 0,
+        "net": 0,
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "NEUTRAL",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "BEARISH",
+            "wins": 0,
+            "losses": 0
+          }
+        ]
+      }
+    },
+    {
+      "start": "2022-11-09",
+      "end": "2022-12-06",
+      "scores": {
+        "candidate": {
+          "count": 20,
+          "correct": 7,
+          "errors": 13,
+          "accuracy": 0.35,
+          "balancedAccuracy": 0.3226190476190476,
+          "brierScore": 0.678854860790461,
+          "logLoss": 1.1123117664636772,
+          "recalls": [
+            0.14285714285714285,
+            0.625,
+            0.2
+          ],
+          "matrix": [
+            [
+              1,
+              6,
+              0
+            ],
+            [
+              2,
+              5,
+              1
+            ],
+            [
+              1,
+              3,
+              1
+            ]
+          ]
+        },
+        "price": {
+          "count": 20,
+          "correct": 6,
+          "errors": 14,
+          "accuracy": 0.3,
+          "balancedAccuracy": 0.27499999999999997,
+          "brierScore": 0.6793794837359748,
+          "logLoss": 1.1133492412808963,
+          "recalls": [
+            0,
+            0.625,
+            0.2
+          ],
+          "matrix": [
+            [
+              0,
+              7,
+              0
+            ],
+            [
+              2,
+              5,
+              1
+            ],
+            [
+              1,
+              3,
+              1
+            ]
+          ]
+        },
+        "pitReference": {
+          "count": 20,
+          "correct": 8,
+          "errors": 12,
+          "accuracy": 0.4,
+          "balancedAccuracy": 0.36428571428571427,
+          "brierScore": 0.6551737890032074,
+          "logLoss": 1.0720349183445532,
+          "recalls": [
+            0.14285714285714285,
+            0.75,
+            0.2
+          ],
+          "matrix": [
+            [
+              1,
+              6,
+              0
+            ],
+            [
+              2,
+              6,
+              0
+            ],
+            [
+              0,
+              4,
+              1
+            ]
+          ]
+        },
+        "prior": {
+          "count": 20,
+          "correct": 8,
+          "errors": 12,
+          "accuracy": 0.4,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6668415650283783,
+          "logLoss": 1.0969155270226914,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              7,
+              0
+            ],
+            [
+              0,
+              8,
+              0
+            ],
+            [
+              0,
+              5,
+              0
+            ]
+          ]
+        }
+      },
+      "heads": {
+        "moveCount": 20,
+        "sideCount": 12,
+        "moveAuc": 0.4166666666666667,
+        "sideAuc": 0.8,
+        "moveMatrix": [
+          [
+            0,
+            8
+          ],
+          [
+            1,
+            11
+          ]
+        ],
+        "sideMatrix": [
+          [
+            2,
+            3
+          ],
+          [
+            1,
+            6
+          ]
+        ],
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "count": 7,
+            "meanMove": 0.5900385402252001,
+            "meanSide": 0.5220286132914934
+          },
+          {
+            "actual": "NEUTRAL",
+            "count": 8,
+            "meanMove": 0.6464443141727688,
+            "meanSide": 0.5045266828517849
+          },
+          {
+            "actual": "BEARISH",
+            "count": 5,
+            "meanMove": 0.6536561226972897,
+            "meanSide": 0.5011709589822124
+          }
+        ]
+      },
+      "againstPrice": {
+        "wins": 1,
+        "losses": 0,
+        "net": 1,
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "wins": 1,
+            "losses": 0
+          },
+          {
+            "actual": "NEUTRAL",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "BEARISH",
+            "wins": 0,
+            "losses": 0
+          }
+        ]
+      }
+    },
+    {
+      "start": "2022-12-07",
+      "end": "2023-01-03",
+      "scores": {
+        "candidate": {
+          "count": 20,
+          "correct": 8,
+          "errors": 12,
+          "accuracy": 0.4,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6854077675218323,
+          "logLoss": 1.1206551271000222,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              8,
+              0
+            ],
+            [
+              0,
+              8,
+              0
+            ],
+            [
+              0,
+              4,
+              0
+            ]
+          ]
+        },
+        "price": {
+          "count": 20,
+          "correct": 8,
+          "errors": 12,
+          "accuracy": 0.4,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6860196114021698,
+          "logLoss": 1.1220958586988317,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              8,
+              0
+            ],
+            [
+              0,
+              8,
+              0
+            ],
+            [
+              0,
+              4,
+              0
+            ]
+          ]
+        },
+        "pitReference": {
+          "count": 20,
+          "correct": 8,
+          "errors": 12,
+          "accuracy": 0.4,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6815677021796784,
+          "logLoss": 1.123681083960328,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              8,
+              0
+            ],
+            [
+              0,
+              8,
+              0
+            ],
+            [
+              1,
+              3,
+              0
+            ]
+          ]
+        },
+        "prior": {
+          "count": 20,
+          "correct": 8,
+          "errors": 12,
+          "accuracy": 0.4,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6642042023910155,
+          "logLoss": 1.0918585892102493,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              8,
+              0
+            ],
+            [
+              0,
+              8,
+              0
+            ],
+            [
+              0,
+              4,
+              0
+            ]
+          ]
+        }
+      },
+      "heads": {
+        "moveCount": 20,
+        "sideCount": 12,
+        "moveAuc": 0.2916666666666667,
+        "sideAuc": 0.5,
+        "moveMatrix": [
+          [
+            2,
+            6
+          ],
+          [
+            8,
+            4
+          ]
+        ],
+        "sideMatrix": [
+          [
+            2,
+            2
+          ],
+          [
+            2,
+            6
+          ]
+        ],
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "count": 8,
+            "meanMove": 0.49124475615955304,
+            "meanSide": 0.5123753833829049
+          },
+          {
+            "actual": "NEUTRAL",
+            "count": 8,
+            "meanMove": 0.5152187513875244,
+            "meanSide": 0.5426982943051969
+          },
+          {
+            "actual": "BEARISH",
+            "count": 4,
+            "meanMove": 0.5076492218788867,
+            "meanSide": 0.507960046754457
+          }
+        ]
+      },
+      "againstPrice": {
+        "wins": 0,
+        "losses": 0,
+        "net": 0,
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "NEUTRAL",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "BEARISH",
+            "wins": 0,
+            "losses": 0
+          }
+        ]
+      }
+    },
+    {
+      "start": "2023-01-04",
+      "end": "2023-01-31",
+      "scores": {
+        "candidate": {
+          "count": 20,
+          "correct": 12,
+          "errors": 8,
+          "accuracy": 0.6,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.5942779923379538,
+          "logLoss": 0.9937045113638996,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              5,
+              0
+            ],
+            [
+              0,
+              12,
+              0
+            ],
+            [
+              0,
+              3,
+              0
+            ]
+          ]
+        },
+        "price": {
+          "count": 20,
+          "correct": 12,
+          "errors": 8,
+          "accuracy": 0.6,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.5944311667840448,
+          "logLoss": 0.9939495254563994,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              5,
+              0
+            ],
+            [
+              0,
+              12,
+              0
+            ],
+            [
+              0,
+              3,
+              0
+            ]
+          ]
+        },
+        "pitReference": {
+          "count": 20,
+          "correct": 12,
+          "errors": 8,
+          "accuracy": 0.6,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.592093951596083,
+          "logLoss": 0.9879003408221493,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              5,
+              0
+            ],
+            [
+              0,
+              12,
+              0
+            ],
+            [
+              0,
+              3,
+              0
+            ]
+          ]
+        },
+        "prior": {
+          "count": 20,
+          "correct": 12,
+          "errors": 8,
+          "accuracy": 0.6,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.580942847273887,
+          "logLoss": 0.9769926391876773,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              5,
+              0
+            ],
+            [
+              0,
+              12,
+              0
+            ],
+            [
+              0,
+              3,
+              0
+            ]
+          ]
+        }
+      },
+      "heads": {
+        "moveCount": 20,
+        "sideCount": 8,
+        "moveAuc": 0.3958333333333333,
+        "sideAuc": 0.6,
+        "moveMatrix": [
+          [
+            0,
+            12
+          ],
+          [
+            1,
+            7
+          ]
+        ],
+        "sideMatrix": [
+          [
+            0,
+            3
+          ],
+          [
+            0,
+            5
+          ]
+        ],
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "count": 5,
+            "meanMove": 0.5238851216364702,
+            "meanSide": 0.5428388981310759
+          },
+          {
+            "actual": "NEUTRAL",
+            "count": 12,
+            "meanMove": 0.5419674054661492,
+            "meanSide": 0.5337741758040014
+          },
+          {
+            "actual": "BEARISH",
+            "count": 3,
+            "meanMove": 0.5406750783240842,
+            "meanSide": 0.5409649992268011
+          }
+        ]
+      },
+      "againstPrice": {
+        "wins": 0,
+        "losses": 0,
+        "net": 0,
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "NEUTRAL",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "BEARISH",
+            "wins": 0,
+            "losses": 0
+          }
+        ]
+      }
+    },
+    {
+      "start": "2023-02-01",
+      "end": "2023-02-28",
+      "scores": {
+        "candidate": {
+          "count": 20,
+          "correct": 11,
+          "errors": 9,
+          "accuracy": 0.55,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.601276480546788,
+          "logLoss": 1.0065989585953419,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              2,
+              0
+            ],
+            [
+              0,
+              11,
+              0
+            ],
+            [
+              0,
+              7,
+              0
+            ]
+          ]
+        },
+        "price": {
+          "count": 20,
+          "correct": 11,
+          "errors": 9,
+          "accuracy": 0.55,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6014017617566422,
+          "logLoss": 1.0065988672832615,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              2,
+              0
+            ],
+            [
+              0,
+              11,
+              0
+            ],
+            [
+              0,
+              7,
+              0
+            ]
+          ]
+        },
+        "pitReference": {
+          "count": 20,
+          "correct": 11,
+          "errors": 9,
+          "accuracy": 0.55,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6439867755011729,
+          "logLoss": 1.0694966143038307,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              2,
+              0
+            ],
+            [
+              0,
+              11,
+              0
+            ],
+            [
+              0,
+              7,
+              0
+            ]
+          ]
+        },
+        "prior": {
+          "count": 20,
+          "correct": 11,
+          "errors": 9,
+          "accuracy": 0.55,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6107366617068766,
+          "logLoss": 1.0229268806494456,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              2,
+              0
+            ],
+            [
+              0,
+              11,
+              0
+            ],
+            [
+              0,
+              7,
+              0
+            ]
+          ]
+        }
+      },
+      "heads": {
+        "moveCount": 20,
+        "sideCount": 9,
+        "moveAuc": 0.5050505050505051,
+        "sideAuc": 0.14285714285714285,
+        "moveMatrix": [
+          [
+            3,
+            8
+          ],
+          [
+            4,
+            5
+          ]
+        ],
+        "sideMatrix": [
+          [
+            4,
+            3
+          ],
+          [
+            2,
+            0
+          ]
+        ],
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "count": 2,
+            "meanMove": 0.49231315259773667,
+            "meanSide": 0.47898831647491913
+          },
+          {
+            "actual": "NEUTRAL",
+            "count": 11,
+            "meanMove": 0.5108510970533826,
+            "meanSide": 0.5119321390384501
+          },
+          {
+            "actual": "BEARISH",
+            "count": 7,
+            "meanMove": 0.5225559775090415,
+            "meanSide": 0.495942845933418
+          }
+        ]
+      },
+      "againstPrice": {
+        "wins": 0,
+        "losses": 0,
+        "net": 0,
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "NEUTRAL",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "BEARISH",
+            "wins": 0,
+            "losses": 0
+          }
+        ]
+      }
+    },
+    {
+      "start": "2023-03-01",
+      "end": "2023-03-28",
+      "scores": {
+        "candidate": {
+          "count": 20,
+          "correct": 8,
+          "errors": 12,
+          "accuracy": 0.4,
+          "balancedAccuracy": 0.4185185185185185,
+          "brierScore": 0.6906500227177874,
+          "logLoss": 1.1243598174202867,
+          "recalls": [
+            0.2222222222222222,
+            0.8333333333333334,
+            0.2
+          ],
+          "matrix": [
+            [
+              2,
+              6,
+              1
+            ],
+            [
+              1,
+              5,
+              0
+            ],
+            [
+              1,
+              3,
+              1
+            ]
+          ]
+        },
+        "price": {
+          "count": 20,
+          "correct": 8,
+          "errors": 12,
+          "accuracy": 0.4,
+          "balancedAccuracy": 0.4185185185185185,
+          "brierScore": 0.6900270176543202,
+          "logLoss": 1.1234143132717251,
+          "recalls": [
+            0.2222222222222222,
+            0.8333333333333334,
+            0.2
+          ],
+          "matrix": [
+            [
+              2,
+              6,
+              1
+            ],
+            [
+              1,
+              5,
+              0
+            ],
+            [
+              1,
+              3,
+              1
+            ]
+          ]
+        },
+        "pitReference": {
+          "count": 20,
+          "correct": 8,
+          "errors": 12,
+          "accuracy": 0.4,
+          "balancedAccuracy": 0.4481481481481482,
+          "brierScore": 0.7060934640128698,
+          "logLoss": 1.1444345388839712,
+          "recalls": [
+            0.1111111111111111,
+            0.8333333333333334,
+            0.4
+          ],
+          "matrix": [
+            [
+              1,
+              8,
+              0
+            ],
+            [
+              1,
+              5,
+              0
+            ],
+            [
+              0,
+              3,
+              2
+            ]
+          ]
+        },
+        "prior": {
+          "count": 20,
+          "correct": 6,
+          "errors": 14,
+          "accuracy": 0.3,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.7069737751089381,
+          "logLoss": 1.1518883504293167,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              9,
+              0
+            ],
+            [
+              0,
+              6,
+              0
+            ],
+            [
+              0,
+              5,
+              0
+            ]
+          ]
+        }
+      },
+      "heads": {
+        "moveCount": 20,
+        "sideCount": 14,
+        "moveAuc": 0.5476190476190477,
+        "sideAuc": 0.7777777777777778,
+        "moveMatrix": [
+          [
+            3,
+            3
+          ],
+          [
+            7,
+            7
+          ]
+        ],
+        "sideMatrix": [
+          [
+            3,
+            2
+          ],
+          [
+            2,
+            7
+          ]
+        ],
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "count": 9,
+            "meanMove": 0.5293708710867564,
+            "meanSide": 0.5182515962286164
+          },
+          {
+            "actual": "NEUTRAL",
+            "count": 6,
+            "meanMove": 0.515572703103463,
+            "meanSide": 0.5163275243745402
+          },
+          {
+            "actual": "BEARISH",
+            "count": 5,
+            "meanMove": 0.579448187084146,
+            "meanSide": 0.48058104995264694
+          }
+        ]
+      },
+      "againstPrice": {
+        "wins": 0,
+        "losses": 0,
+        "net": 0,
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "NEUTRAL",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "BEARISH",
+            "wins": 0,
+            "losses": 0
+          }
+        ]
+      }
+    },
+    {
+      "start": "2023-03-29",
+      "end": "2023-04-26",
+      "scores": {
+        "candidate": {
+          "count": 20,
+          "correct": 9,
+          "errors": 11,
+          "accuracy": 0.45,
+          "balancedAccuracy": 0.47222222222222227,
+          "brierScore": 0.6346905137864349,
+          "logLoss": 1.052182570361991,
+          "recalls": [
+            0.25,
+            0.8333333333333334,
+            0.3333333333333333
+          ],
+          "matrix": [
+            [
+              2,
+              4,
+              2
+            ],
+            [
+              0,
+              5,
+              1
+            ],
+            [
+              1,
+              3,
+              2
+            ]
+          ]
+        },
+        "price": {
+          "count": 20,
+          "correct": 10,
+          "errors": 10,
+          "accuracy": 0.5,
+          "balancedAccuracy": 0.5277777777777778,
+          "brierScore": 0.6355303128908306,
+          "logLoss": 1.053421138537062,
+          "recalls": [
+            0.25,
+            0.8333333333333334,
+            0.5
+          ],
+          "matrix": [
+            [
+              2,
+              4,
+              2
+            ],
+            [
+              0,
+              5,
+              1
+            ],
+            [
+              0,
+              3,
+              3
+            ]
+          ]
+        },
+        "pitReference": {
+          "count": 20,
+          "correct": 8,
+          "errors": 12,
+          "accuracy": 0.4,
+          "balancedAccuracy": 0.40277777777777785,
+          "brierScore": 0.6743235075668284,
+          "logLoss": 1.1113629680859798,
+          "recalls": [
+            0.375,
+            0.8333333333333334,
+            0
+          ],
+          "matrix": [
+            [
+              3,
+              5,
+              0
+            ],
+            [
+              1,
+              5,
+              0
+            ],
+            [
+              2,
+              4,
+              0
+            ]
+          ]
+        },
+        "prior": {
+          "count": 20,
+          "correct": 6,
+          "errors": 14,
+          "accuracy": 0.3,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.709370682325433,
+          "logLoss": 1.1564660657715424,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              8,
+              0
+            ],
+            [
+              0,
+              6,
+              0
+            ],
+            [
+              0,
+              6,
+              0
+            ]
+          ]
+        }
+      },
+      "heads": {
+        "moveCount": 20,
+        "sideCount": 14,
+        "moveAuc": 0.7142857142857143,
+        "sideAuc": 0.6458333333333334,
+        "moveMatrix": [
+          [
+            0,
+            6
+          ],
+          [
+            0,
+            14
+          ]
+        ],
+        "sideMatrix": [
+          [
+            3,
+            3
+          ],
+          [
+            3,
+            5
+          ]
+        ],
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "count": 8,
+            "meanMove": 0.6471550852284337,
+            "meanSide": 0.5218233513565922
+          },
+          {
+            "actual": "NEUTRAL",
+            "count": 6,
+            "meanMove": 0.5889641946755977,
+            "meanSide": 0.5080093575024998
+          },
+          {
+            "actual": "BEARISH",
+            "count": 6,
+            "meanMove": 0.6541065261775535,
+            "meanSide": 0.5064516365931372
+          }
+        ]
+      },
+      "againstPrice": {
+        "wins": 0,
+        "losses": 1,
+        "net": -1,
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "NEUTRAL",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "BEARISH",
+            "wins": 0,
+            "losses": 1
+          }
+        ]
+      }
+    },
+    {
+      "start": "2023-04-27",
+      "end": "2023-05-24",
+      "scores": {
+        "candidate": {
+          "count": 20,
+          "correct": 10,
+          "errors": 10,
+          "accuracy": 0.5,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6322292681439904,
+          "logLoss": 1.0483026781038216,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              4,
+              0
+            ],
+            [
+              0,
+              10,
+              0
+            ],
+            [
+              0,
+              6,
+              0
+            ]
+          ]
+        },
+        "price": {
+          "count": 20,
+          "correct": 10,
+          "errors": 10,
+          "accuracy": 0.5,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6343314961936163,
+          "logLoss": 1.0517873096668986,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              4,
+              0
+            ],
+            [
+              0,
+              10,
+              0
+            ],
+            [
+              0,
+              6,
+              0
+            ]
+          ]
+        },
+        "pitReference": {
+          "count": 20,
+          "correct": 9,
+          "errors": 11,
+          "accuracy": 0.45,
+          "balancedAccuracy": 0.3,
+          "brierScore": 0.6564866213307087,
+          "logLoss": 1.0835657067727862,
+          "recalls": [
+            0,
+            0.9,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              4,
+              0
+            ],
+            [
+              0,
+              9,
+              1
+            ],
+            [
+              0,
+              6,
+              0
+            ]
+          ]
+        },
+        "prior": {
+          "count": 20,
+          "correct": 10,
+          "errors": 10,
+          "accuracy": 0.5,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6285459400573918,
+          "logLoss": 1.0459725454000843,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              4,
+              0
+            ],
+            [
+              0,
+              10,
+              0
+            ],
+            [
+              0,
+              6,
+              0
+            ]
+          ]
+        }
+      },
+      "heads": {
+        "moveCount": 20,
+        "sideCount": 10,
+        "moveAuc": 0.39,
+        "sideAuc": 0.6666666666666666,
+        "moveMatrix": [
+          [
+            0,
+            10
+          ],
+          [
+            2,
+            8
+          ]
+        ],
+        "sideMatrix": [
+          [
+            3,
+            3
+          ],
+          [
+            1,
+            3
+          ]
+        ],
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "count": 4,
+            "meanMove": 0.5198111057283492,
+            "meanSide": 0.5311575766795666
+          },
+          {
+            "actual": "NEUTRAL",
+            "count": 10,
+            "meanMove": 0.5290059220478045,
+            "meanSide": 0.5126302964863771
+          },
+          {
+            "actual": "BEARISH",
+            "count": 6,
+            "meanMove": 0.5215104350856198,
+            "meanSide": 0.5158027858821949
+          }
+        ]
+      },
+      "againstPrice": {
+        "wins": 0,
+        "losses": 0,
+        "net": 0,
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "NEUTRAL",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "BEARISH",
+            "wins": 0,
+            "losses": 0
+          }
+        ]
+      }
+    },
+    {
+      "start": "2023-05-25",
+      "end": "2023-06-21",
+      "scores": {
+        "candidate": {
+          "count": 20,
+          "correct": 10,
+          "errors": 10,
+          "accuracy": 0.5,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6412841555329198,
+          "logLoss": 1.062789013373342,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              5,
+              0
+            ],
+            [
+              0,
+              10,
+              0
+            ],
+            [
+              0,
+              5,
+              0
+            ]
+          ]
+        },
+        "price": {
+          "count": 20,
+          "correct": 10,
+          "errors": 10,
+          "accuracy": 0.5,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6407943780655305,
+          "logLoss": 1.0620587483140604,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              5,
+              0
+            ],
+            [
+              0,
+              10,
+              0
+            ],
+            [
+              0,
+              5,
+              0
+            ]
+          ]
+        },
+        "pitReference": {
+          "count": 20,
+          "correct": 10,
+          "errors": 10,
+          "accuracy": 0.5,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6379208073194094,
+          "logLoss": 1.0532517090807416,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              5,
+              0
+            ],
+            [
+              0,
+              10,
+              0
+            ],
+            [
+              0,
+              5,
+              0
+            ]
+          ]
+        },
+        "prior": {
+          "count": 20,
+          "correct": 10,
+          "errors": 10,
+          "accuracy": 0.5,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6261490328408972,
+          "logLoss": 1.0413948300578584,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              5,
+              0
+            ],
+            [
+              0,
+              10,
+              0
+            ],
+            [
+              0,
+              5,
+              0
+            ]
+          ]
+        }
+      },
+      "heads": {
+        "moveCount": 20,
+        "sideCount": 10,
+        "moveAuc": 0.38,
+        "sideAuc": 0.36,
+        "moveMatrix": [
+          [
+            7,
+            3
+          ],
+          [
+            9,
+            1
+          ]
+        ],
+        "sideMatrix": [
+          [
+            2,
+            3
+          ],
+          [
+            2,
+            3
+          ]
+        ],
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "count": 5,
+            "meanMove": 0.4638239282778069,
+            "meanSide": 0.5083519133035177
+          },
+          {
+            "actual": "NEUTRAL",
+            "count": 10,
+            "meanMove": 0.4742985545967019,
+            "meanSide": 0.5171237617755472
+          },
+          {
+            "actual": "BEARISH",
+            "count": 5,
+            "meanMove": 0.4539172532637305,
+            "meanSide": 0.5143011410147427
+          }
+        ]
+      },
+      "againstPrice": {
+        "wins": 0,
+        "losses": 0,
+        "net": 0,
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "NEUTRAL",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "BEARISH",
+            "wins": 0,
+            "losses": 0
+          }
+        ]
+      }
+    },
+    {
+      "start": "2023-06-22",
+      "end": "2023-07-19",
+      "scores": {
+        "candidate": {
+          "count": 20,
+          "correct": 16,
+          "errors": 4,
+          "accuracy": 0.8,
+          "balancedAccuracy": null,
+          "brierScore": 0.42544756243116044,
+          "logLoss": 0.7621043333241734,
+          "recalls": [
+            0,
+            1,
+            null
+          ],
+          "matrix": [
+            [
+              0,
+              4,
+              0
+            ],
+            [
+              0,
+              16,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ]
+        },
+        "price": {
+          "count": 20,
+          "correct": 16,
+          "errors": 4,
+          "accuracy": 0.8,
+          "balancedAccuracy": null,
+          "brierScore": 0.4258244984882344,
+          "logLoss": 0.7625756811454898,
+          "recalls": [
+            0,
+            1,
+            null
+          ],
+          "matrix": [
+            [
+              0,
+              4,
+              0
+            ],
+            [
+              0,
+              16,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ]
+        },
+        "pitReference": {
+          "count": 20,
+          "correct": 16,
+          "errors": 4,
+          "accuracy": 0.8,
+          "balancedAccuracy": null,
+          "brierScore": 0.46588245819997953,
+          "logLoss": 0.8195396932082067,
+          "recalls": [
+            0,
+            1,
+            null
+          ],
+          "matrix": [
+            [
+              0,
+              4,
+              0
+            ],
+            [
+              0,
+              16,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ]
+        },
+        "prior": {
+          "count": 20,
+          "correct": 16,
+          "errors": 4,
+          "accuracy": 0.8,
+          "balancedAccuracy": null,
+          "brierScore": 0.4929273833563614,
+          "logLoss": 0.8527659727895409,
+          "recalls": [
+            0,
+            1,
+            null
+          ],
+          "matrix": [
+            [
+              0,
+              4,
+              0
+            ],
+            [
+              0,
+              16,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ]
+        }
+      },
+      "heads": {
+        "moveCount": 20,
+        "sideCount": 4,
+        "moveAuc": 0.21875,
+        "sideAuc": null,
+        "moveMatrix": [
+          [
+            16,
+            0
+          ],
+          [
+            4,
+            0
+          ]
+        ],
+        "sideMatrix": [
+          [
+            0,
+            0
+          ],
+          [
+            2,
+            2
+          ]
+        ],
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "count": 4,
+            "meanMove": 0.4037569825071198,
+            "meanSide": 0.5173985539441239
+          },
+          {
+            "actual": "NEUTRAL",
+            "count": 16,
+            "meanMove": 0.4285406635623761,
+            "meanSide": 0.5138750952319856
+          },
+          {
+            "actual": "BEARISH",
+            "count": 0,
+            "meanMove": null,
+            "meanSide": null
+          }
+        ]
+      },
+      "againstPrice": {
+        "wins": 0,
+        "losses": 0,
+        "net": 0,
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "NEUTRAL",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "BEARISH",
+            "wins": 0,
+            "losses": 0
+          }
+        ]
+      }
+    },
+    {
+      "start": "2023-07-20",
+      "end": "2023-08-16",
+      "scores": {
+        "candidate": {
+          "count": 20,
+          "correct": 12,
+          "errors": 8,
+          "accuracy": 0.6,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.5565803578665484,
+          "logLoss": 0.9458845950629777,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              2,
+              0
+            ],
+            [
+              0,
+              12,
+              0
+            ],
+            [
+              0,
+              6,
+              0
+            ]
+          ]
+        },
+        "price": {
+          "count": 20,
+          "correct": 12,
+          "errors": 8,
+          "accuracy": 0.6,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.55671914872424,
+          "logLoss": 0.9462701389608295,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              2,
+              0
+            ],
+            [
+              0,
+              12,
+              0
+            ],
+            [
+              0,
+              6,
+              0
+            ]
+          ]
+        },
+        "pitReference": {
+          "count": 20,
+          "correct": 12,
+          "errors": 8,
+          "accuracy": 0.6,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.5754879190537137,
+          "logLoss": 0.9778338500015031,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              2,
+              0
+            ],
+            [
+              0,
+              12,
+              0
+            ],
+            [
+              0,
+              6,
+              0
+            ]
+          ]
+        },
+        "prior": {
+          "count": 20,
+          "correct": 12,
+          "errors": 8,
+          "accuracy": 0.6,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.5881335689233714,
+          "logLoss": 0.9907257852143552,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              2,
+              0
+            ],
+            [
+              0,
+              12,
+              0
+            ],
+            [
+              0,
+              6,
+              0
+            ]
+          ]
+        }
+      },
+      "heads": {
+        "moveCount": 20,
+        "sideCount": 8,
+        "moveAuc": 0.6041666666666666,
+        "sideAuc": 0.6666666666666666,
+        "moveMatrix": [
+          [
+            12,
+            0
+          ],
+          [
+            8,
+            0
+          ]
+        ],
+        "sideMatrix": [
+          [
+            3,
+            3
+          ],
+          [
+            0,
+            2
+          ]
+        ],
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "count": 2,
+            "meanMove": 0.4444330669885194,
+            "meanSide": 0.5250221933043052
+          },
+          {
+            "actual": "NEUTRAL",
+            "count": 12,
+            "meanMove": 0.43252454784807454,
+            "meanSide": 0.5183931149636904
+          },
+          {
+            "actual": "BEARISH",
+            "count": 6,
+            "meanMove": 0.44133118352589645,
+            "meanSide": 0.5088755405153473
+          }
+        ]
+      },
+      "againstPrice": {
+        "wins": 0,
+        "losses": 0,
+        "net": 0,
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "NEUTRAL",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "BEARISH",
+            "wins": 0,
+            "losses": 0
+          }
+        ]
+      }
+    },
+    {
+      "start": "2023-08-17",
+      "end": "2023-09-13",
+      "scores": {
+        "candidate": {
+          "count": 20,
+          "correct": 17,
+          "errors": 3,
+          "accuracy": 0.85,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.36108165380557844,
+          "logLoss": 0.6805904040187248,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              2,
+              0
+            ],
+            [
+              0,
+              17,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ]
+          ]
+        },
+        "price": {
+          "count": 20,
+          "correct": 17,
+          "errors": 3,
+          "accuracy": 0.85,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.36161823525766823,
+          "logLoss": 0.6807446843630912,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              2,
+              0
+            ],
+            [
+              0,
+              17,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ]
+          ]
+        },
+        "pitReference": {
+          "count": 20,
+          "correct": 17,
+          "errors": 3,
+          "accuracy": 0.85,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.41625240418330156,
+          "logLoss": 0.7536273827680808,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              2,
+              0
+            ],
+            [
+              0,
+              17,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ]
+          ]
+        },
+        "prior": {
+          "count": 20,
+          "correct": 17,
+          "errors": 3,
+          "accuracy": 0.85,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.47511810500584606,
+          "logLoss": 0.8297203080389026,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              2,
+              0
+            ],
+            [
+              0,
+              17,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ]
+          ]
+        }
+      },
+      "heads": {
+        "moveCount": 20,
+        "sideCount": 3,
+        "moveAuc": 0.3137254901960784,
+        "sideAuc": 0,
+        "moveMatrix": [
+          [
+            17,
+            0
+          ],
+          [
+            3,
+            0
+          ]
+        ],
+        "sideMatrix": [
+          [
+            0,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ],
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "count": 2,
+            "meanMove": 0.38791137821176924,
+            "meanSide": 0.48820233761580256
+          },
+          {
+            "actual": "NEUTRAL",
+            "count": 17,
+            "meanMove": 0.39289302484323957,
+            "meanSide": 0.5112279705400055
+          },
+          {
+            "actual": "BEARISH",
+            "count": 1,
+            "meanMove": 0.3735611141555202,
+            "meanSide": 0.5548931303073793
+          }
+        ]
+      },
+      "againstPrice": {
+        "wins": 0,
+        "losses": 0,
+        "net": 0,
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "NEUTRAL",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "BEARISH",
+            "wins": 0,
+            "losses": 0
+          }
+        ]
+      }
+    },
+    {
+      "start": "2023-09-14",
+      "end": "2023-10-11",
+      "scores": {
+        "candidate": {
+          "count": 20,
+          "correct": 10,
+          "errors": 10,
+          "accuracy": 0.5,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6455693907748291,
+          "logLoss": 1.064809557151672,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              4,
+              0
+            ],
+            [
+              0,
+              10,
+              0
+            ],
+            [
+              0,
+              6,
+              0
+            ]
+          ]
+        },
+        "price": {
+          "count": 20,
+          "correct": 10,
+          "errors": 10,
+          "accuracy": 0.5,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6447735629053313,
+          "logLoss": 1.063636709819161,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              4,
+              0
+            ],
+            [
+              0,
+              10,
+              0
+            ],
+            [
+              0,
+              6,
+              0
+            ]
+          ]
+        },
+        "pitReference": {
+          "count": 20,
+          "correct": 10,
+          "errors": 10,
+          "accuracy": 0.5,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6233668140177631,
+          "logLoss": 1.034534497933651,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              4,
+              0
+            ],
+            [
+              0,
+              10,
+              0
+            ],
+            [
+              0,
+              6,
+              0
+            ]
+          ]
+        },
+        "prior": {
+          "count": 20,
+          "correct": 10,
+          "errors": 10,
+          "accuracy": 0.5,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6285459400573921,
+          "logLoss": 1.0459725454000846,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              4,
+              0
+            ],
+            [
+              0,
+              10,
+              0
+            ],
+            [
+              0,
+              6,
+              0
+            ]
+          ]
+        }
+      },
+      "heads": {
+        "moveCount": 20,
+        "sideCount": 10,
+        "moveAuc": 0.36,
+        "sideAuc": 0.7083333333333334,
+        "moveMatrix": [
+          [
+            10,
+            0
+          ],
+          [
+            10,
+            0
+          ]
+        ],
+        "sideMatrix": [
+          [
+            4,
+            2
+          ],
+          [
+            2,
+            2
+          ]
+        ],
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "count": 4,
+            "meanMove": 0.435741747757474,
+            "meanSide": 0.5090302111476737
+          },
+          {
+            "actual": "NEUTRAL",
+            "count": 10,
+            "meanMove": 0.4185499476863312,
+            "meanSide": 0.511020150211289
+          },
+          {
+            "actual": "BEARISH",
+            "count": 6,
+            "meanMove": 0.3847434979778338,
+            "meanSide": 0.49382153888702207
+          }
+        ]
+      },
+      "againstPrice": {
+        "wins": 0,
+        "losses": 0,
+        "net": 0,
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "NEUTRAL",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "BEARISH",
+            "wins": 0,
+            "losses": 0
+          }
+        ]
+      }
+    },
+    {
+      "start": "2023-10-12",
+      "end": "2023-11-08",
+      "scores": {
+        "candidate": {
+          "count": 20,
+          "correct": 11,
+          "errors": 9,
+          "accuracy": 0.55,
+          "balancedAccuracy": 0.3055555555555555,
+          "brierScore": 0.6413387348266301,
+          "logLoss": 1.0592166194548553,
+          "recalls": [
+            0,
+            0.9166666666666666,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              4,
+              0
+            ],
+            [
+              1,
+              11,
+              0
+            ],
+            [
+              0,
+              4,
+              0
+            ]
+          ]
+        },
+        "price": {
+          "count": 20,
+          "correct": 11,
+          "errors": 9,
+          "accuracy": 0.55,
+          "balancedAccuracy": 0.3055555555555555,
+          "brierScore": 0.6406234630002617,
+          "logLoss": 1.058169977936958,
+          "recalls": [
+            0,
+            0.9166666666666666,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              4,
+              0
+            ],
+            [
+              1,
+              11,
+              0
+            ],
+            [
+              0,
+              4,
+              0
+            ]
+          ]
+        },
+        "pitReference": {
+          "count": 20,
+          "correct": 11,
+          "errors": 9,
+          "accuracy": 0.55,
+          "balancedAccuracy": 0.3055555555555555,
+          "brierScore": 0.6240391881904815,
+          "logLoss": 1.046552308889512,
+          "recalls": [
+            0,
+            0.9166666666666666,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              4,
+              0
+            ],
+            [
+              1,
+              11,
+              0
+            ],
+            [
+              1,
+              3,
+              0
+            ]
+          ]
+        },
+        "prior": {
+          "count": 20,
+          "correct": 12,
+          "errors": 8,
+          "accuracy": 0.6,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.5833397544903817,
+          "logLoss": 0.9815703545299034,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              4,
+              0
+            ],
+            [
+              0,
+              12,
+              0
+            ],
+            [
+              0,
+              4,
+              0
+            ]
+          ]
+        }
+      },
+      "heads": {
+        "moveCount": 20,
+        "sideCount": 8,
+        "moveAuc": 0.4270833333333333,
+        "sideAuc": 0.4375,
+        "moveMatrix": [
+          [
+            0,
+            12
+          ],
+          [
+            1,
+            7
+          ]
+        ],
+        "sideMatrix": [
+          [
+            0,
+            4
+          ],
+          [
+            2,
+            2
+          ]
+        ],
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "count": 4,
+            "meanMove": 0.5253759747461688,
+            "meanSide": 0.5152868675594454
+          },
+          {
+            "actual": "NEUTRAL",
+            "count": 12,
+            "meanMove": 0.5967745820143666,
+            "meanSide": 0.5248925859638778
+          },
+          {
+            "actual": "BEARISH",
+            "count": 4,
+            "meanMove": 0.6033116743597176,
+            "meanSide": 0.5176165391502949
+          }
+        ]
+      },
+      "againstPrice": {
+        "wins": 0,
+        "losses": 0,
+        "net": 0,
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "NEUTRAL",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "BEARISH",
+            "wins": 0,
+            "losses": 0
+          }
+        ]
+      }
+    },
+    {
+      "start": "2023-11-09",
+      "end": "2023-12-06",
+      "scores": {
+        "candidate": {
+          "count": 20,
+          "correct": 10,
+          "errors": 10,
+          "accuracy": 0.5,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6258169769116021,
+          "logLoss": 1.0352448194271782,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              7,
+              0
+            ],
+            [
+              0,
+              10,
+              0
+            ],
+            [
+              0,
+              3,
+              0
+            ]
+          ]
+        },
+        "price": {
+          "count": 20,
+          "correct": 10,
+          "errors": 10,
+          "accuracy": 0.5,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6263284117229669,
+          "logLoss": 1.036426362490301,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              7,
+              0
+            ],
+            [
+              0,
+              10,
+              0
+            ],
+            [
+              0,
+              3,
+              0
+            ]
+          ]
+        },
+        "pitReference": {
+          "count": 20,
+          "correct": 11,
+          "errors": 9,
+          "accuracy": 0.55,
+          "balancedAccuracy": 0.4444444444444444,
+          "brierScore": 0.6447288136958688,
+          "logLoss": 1.0684056774414472,
+          "recalls": [
+            0,
+            1,
+            0.3333333333333333
+          ],
+          "matrix": [
+            [
+              0,
+              7,
+              0
+            ],
+            [
+              0,
+              10,
+              0
+            ],
+            [
+              0,
+              2,
+              1
+            ]
+          ]
+        },
+        "prior": {
+          "count": 20,
+          "correct": 10,
+          "errors": 10,
+          "accuracy": 0.5,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6213552184079074,
+          "logLoss": 1.0322393993734065,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              7,
+              0
+            ],
+            [
+              0,
+              10,
+              0
+            ],
+            [
+              0,
+              3,
+              0
+            ]
+          ]
+        }
+      },
+      "heads": {
+        "moveCount": 20,
+        "sideCount": 10,
+        "moveAuc": 0.47,
+        "sideAuc": 0.5714285714285714,
+        "moveMatrix": [
+          [
+            7,
+            3
+          ],
+          [
+            7,
+            3
+          ]
+        ],
+        "sideMatrix": [
+          [
+            1,
+            2
+          ],
+          [
+            0,
+            7
+          ]
+        ],
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "count": 7,
+            "meanMove": 0.45371100487746857,
+            "meanSide": 0.5331284982730168
+          },
+          {
+            "actual": "NEUTRAL",
+            "count": 10,
+            "meanMove": 0.48344543274694834,
+            "meanSide": 0.5226938920767731
+          },
+          {
+            "actual": "BEARISH",
+            "count": 3,
+            "meanMove": 0.5427328870273724,
+            "meanSide": 0.5268210659707193
+          }
+        ]
+      },
+      "againstPrice": {
+        "wins": 0,
+        "losses": 0,
+        "net": 0,
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "NEUTRAL",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "BEARISH",
+            "wins": 0,
+            "losses": 0
+          }
+        ]
+      }
+    },
+    {
+      "start": "2023-12-07",
+      "end": "2024-01-03",
+      "scores": {
+        "candidate": {
+          "count": 20,
+          "correct": 10,
+          "errors": 10,
+          "accuracy": 0.5,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.628069060910049,
+          "logLoss": 1.0454716263740327,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              4,
+              0
+            ],
+            [
+              0,
+              10,
+              0
+            ],
+            [
+              0,
+              6,
+              0
+            ]
+          ]
+        },
+        "price": {
+          "count": 20,
+          "correct": 10,
+          "errors": 10,
+          "accuracy": 0.5,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6280231316169944,
+          "logLoss": 1.045434170573555,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              4,
+              0
+            ],
+            [
+              0,
+              10,
+              0
+            ],
+            [
+              0,
+              6,
+              0
+            ]
+          ]
+        },
+        "pitReference": {
+          "count": 20,
+          "correct": 9,
+          "errors": 11,
+          "accuracy": 0.45,
+          "balancedAccuracy": 0.3,
+          "brierScore": 0.6278491353994426,
+          "logLoss": 1.048547009126257,
+          "recalls": [
+            0,
+            0.9,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              4,
+              0
+            ],
+            [
+              1,
+              9,
+              0
+            ],
+            [
+              0,
+              6,
+              0
+            ]
+          ]
+        },
+        "prior": {
+          "count": 20,
+          "correct": 10,
+          "errors": 10,
+          "accuracy": 0.5,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6282557262701477,
+          "logLoss": 1.045615862165295,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              4,
+              0
+            ],
+            [
+              0,
+              10,
+              0
+            ],
+            [
+              0,
+              6,
+              0
+            ]
+          ]
+        }
+      },
+      "heads": {
+        "moveCount": 20,
+        "sideCount": 10,
+        "moveAuc": 0.53,
+        "sideAuc": 0.4166666666666667,
+        "moveMatrix": [
+          [
+            1,
+            9
+          ],
+          [
+            1,
+            9
+          ]
+        ],
+        "sideMatrix": [
+          [
+            2,
+            4
+          ],
+          [
+            2,
+            2
+          ]
+        ],
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "count": 4,
+            "meanMove": 0.5664067814224854,
+            "meanSide": 0.5160232655168863
+          },
+          {
+            "actual": "NEUTRAL",
+            "count": 10,
+            "meanMove": 0.5537372618130573,
+            "meanSide": 0.5099576707219946
+          },
+          {
+            "actual": "BEARISH",
+            "count": 6,
+            "meanMove": 0.5607255653923328,
+            "meanSide": 0.5170907466529067
+          }
+        ]
+      },
+      "againstPrice": {
+        "wins": 0,
+        "losses": 0,
+        "net": 0,
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "NEUTRAL",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "BEARISH",
+            "wins": 0,
+            "losses": 0
+          }
+        ]
+      }
+    },
+    {
+      "start": "2024-01-04",
+      "end": "2024-01-31",
+      "scores": {
+        "candidate": {
+          "count": 20,
+          "correct": 12,
+          "errors": 8,
+          "accuracy": 0.6,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.5735830002595953,
+          "logLoss": 0.9685898819196203,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              4,
+              0
+            ],
+            [
+              0,
+              12,
+              0
+            ],
+            [
+              0,
+              4,
+              0
+            ]
+          ]
+        },
+        "price": {
+          "count": 20,
+          "correct": 12,
+          "errors": 8,
+          "accuracy": 0.6,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.5733909153734544,
+          "logLoss": 0.9683171359842463,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              4,
+              0
+            ],
+            [
+              0,
+              12,
+              0
+            ],
+            [
+              0,
+              4,
+              0
+            ]
+          ]
+        },
+        "pitReference": {
+          "count": 20,
+          "correct": 12,
+          "errors": 8,
+          "accuracy": 0.6,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.5607423097362559,
+          "logLoss": 0.9518172320865327,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              4,
+              0
+            ],
+            [
+              0,
+              12,
+              0
+            ],
+            [
+              0,
+              4,
+              0
+            ]
+          ]
+        },
+        "prior": {
+          "count": 20,
+          "correct": 12,
+          "errors": 8,
+          "accuracy": 0.6,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.5818479592798543,
+          "logLoss": 0.9795833880233931,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              4,
+              0
+            ],
+            [
+              0,
+              12,
+              0
+            ],
+            [
+              0,
+              4,
+              0
+            ]
+          ]
+        }
+      },
+      "heads": {
+        "moveCount": 20,
+        "sideCount": 8,
+        "moveAuc": 0.375,
+        "sideAuc": 0.5,
+        "moveMatrix": [
+          [
+            11,
+            1
+          ],
+          [
+            7,
+            1
+          ]
+        ],
+        "sideMatrix": [
+          [
+            1,
+            3
+          ],
+          [
+            2,
+            2
+          ]
+        ],
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "count": 4,
+            "meanMove": 0.41758600980497596,
+            "meanSide": 0.5068706911212848
+          },
+          {
+            "actual": "NEUTRAL",
+            "count": 12,
+            "meanMove": 0.44455933331783576,
+            "meanSide": 0.5162473264991616
+          },
+          {
+            "actual": "BEARISH",
+            "count": 4,
+            "meanMove": 0.44590291052304165,
+            "meanSide": 0.5080332548237775
+          }
+        ]
+      },
+      "againstPrice": {
+        "wins": 0,
+        "losses": 0,
+        "net": 0,
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "NEUTRAL",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "BEARISH",
+            "wins": 0,
+            "losses": 0
+          }
+        ]
+      }
+    },
+    {
+      "start": "2024-02-01",
+      "end": "2024-02-28",
+      "scores": {
+        "candidate": {
+          "count": 20,
+          "correct": 14,
+          "errors": 6,
+          "accuracy": 0.7,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.48490484644665727,
+          "logLoss": 0.8451715211686273,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              3,
+              0
+            ],
+            [
+              0,
+              14,
+              0
+            ],
+            [
+              0,
+              3,
+              0
+            ]
+          ]
+        },
+        "price": {
+          "count": 20,
+          "correct": 14,
+          "errors": 6,
+          "accuracy": 0.7,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.48552216699445044,
+          "logLoss": 0.8461580358977214,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              3,
+              0
+            ],
+            [
+              0,
+              14,
+              0
+            ],
+            [
+              0,
+              3,
+              0
+            ]
+          ]
+        },
+        "pitReference": {
+          "count": 20,
+          "correct": 14,
+          "errors": 6,
+          "accuracy": 0.7,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.4822514348887065,
+          "logLoss": 0.8407331618060315,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              3,
+              0
+            ],
+            [
+              0,
+              14,
+              0
+            ],
+            [
+              0,
+              3,
+              0
+            ]
+          ]
+        },
+        "prior": {
+          "count": 20,
+          "correct": 14,
+          "errors": 6,
+          "accuracy": 0.7,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.5378188330662601,
+          "logLoss": 0.9181292735577655,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              3,
+              0
+            ],
+            [
+              0,
+              14,
+              0
+            ],
+            [
+              0,
+              3,
+              0
+            ]
+          ]
+        }
+      },
+      "heads": {
+        "moveCount": 20,
+        "sideCount": 6,
+        "moveAuc": 0.5595238095238095,
+        "sideAuc": 0.6666666666666666,
+        "moveMatrix": [
+          [
+            14,
+            0
+          ],
+          [
+            6,
+            0
+          ]
+        ],
+        "sideMatrix": [
+          [
+            2,
+            1
+          ],
+          [
+            1,
+            2
+          ]
+        ],
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "count": 3,
+            "meanMove": 0.4263281629590795,
+            "meanSide": 0.5217718160942661
+          },
+          {
+            "actual": "NEUTRAL",
+            "count": 14,
+            "meanMove": 0.42168132817706616,
+            "meanSide": 0.5201391549060822
+          },
+          {
+            "actual": "BEARISH",
+            "count": 3,
+            "meanMove": 0.4193231398870031,
+            "meanSide": 0.505200753659309
+          }
+        ]
+      },
+      "againstPrice": {
+        "wins": 0,
+        "losses": 0,
+        "net": 0,
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "NEUTRAL",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "BEARISH",
+            "wins": 0,
+            "losses": 0
+          }
+        ]
+      }
+    },
+    {
+      "start": "2024-02-29",
+      "end": "2024-03-27",
+      "scores": {
+        "candidate": {
+          "count": 20,
+          "correct": 7,
+          "errors": 13,
+          "accuracy": 0.35,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.701844096556988,
+          "logLoss": 1.1341763558112699,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              10,
+              0
+            ],
+            [
+              0,
+              7,
+              0
+            ],
+            [
+              0,
+              3,
+              0
+            ]
+          ]
+        },
+        "price": {
+          "count": 20,
+          "correct": 7,
+          "errors": 13,
+          "accuracy": 0.35,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.703199057200004,
+          "logLoss": 1.1371517185319533,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              10,
+              0
+            ],
+            [
+              0,
+              7,
+              0
+            ],
+            [
+              0,
+              3,
+              0
+            ]
+          ]
+        },
+        "pitReference": {
+          "count": 20,
+          "correct": 7,
+          "errors": 13,
+          "accuracy": 0.35,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.7040369217158381,
+          "logLoss": 1.1326233565527501,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              10,
+              0
+            ],
+            [
+              0,
+              7,
+              0
+            ],
+            [
+              0,
+              3,
+              0
+            ]
+          ]
+        },
+        "prior": {
+          "count": 20,
+          "correct": 7,
+          "errors": 13,
+          "accuracy": 0.35,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.683595532095393,
+          "logLoss": 1.1171944153205002,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              10,
+              0
+            ],
+            [
+              0,
+              7,
+              0
+            ],
+            [
+              0,
+              3,
+              0
+            ]
+          ]
+        }
+      },
+      "heads": {
+        "moveCount": 20,
+        "sideCount": 13,
+        "moveAuc": 0.31868131868131866,
+        "sideAuc": 0.7333333333333333,
+        "moveMatrix": [
+          [
+            0,
+            7
+          ],
+          [
+            6,
+            7
+          ]
+        ],
+        "sideMatrix": [
+          [
+            1,
+            2
+          ],
+          [
+            0,
+            10
+          ]
+        ],
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "count": 10,
+            "meanMove": 0.5088478336540784,
+            "meanSide": 0.5447091806772054
+          },
+          {
+            "actual": "NEUTRAL",
+            "count": 7,
+            "meanMove": 0.5668506953564594,
+            "meanSide": 0.5289052978193806
+          },
+          {
+            "actual": "BEARISH",
+            "count": 3,
+            "meanMove": 0.5723699849974402,
+            "meanSide": 0.5219210166986328
+          }
+        ]
+      },
+      "againstPrice": {
+        "wins": 0,
+        "losses": 0,
+        "net": 0,
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "NEUTRAL",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "BEARISH",
+            "wins": 0,
+            "losses": 0
+          }
+        ]
+      }
+    },
+    {
+      "start": "2024-03-28",
+      "end": "2024-04-25",
+      "scores": {
+        "candidate": {
+          "count": 20,
+          "correct": 5,
+          "errors": 15,
+          "accuracy": 0.25,
+          "balancedAccuracy": 0.2111111111111111,
+          "brierScore": 0.6953692673410692,
+          "logLoss": 1.141534445151385,
+          "recalls": [
+            0.3,
+            0.3333333333333333,
+            0
+          ],
+          "matrix": [
+            [
+              3,
+              6,
+              1
+            ],
+            [
+              4,
+              2,
+              0
+            ],
+            [
+              2,
+              2,
+              0
+            ]
+          ]
+        },
+        "price": {
+          "count": 20,
+          "correct": 5,
+          "errors": 15,
+          "accuracy": 0.25,
+          "balancedAccuracy": 0.2111111111111111,
+          "brierScore": 0.6963893131865941,
+          "logLoss": 1.1432115795284394,
+          "recalls": [
+            0.3,
+            0.3333333333333333,
+            0
+          ],
+          "matrix": [
+            [
+              3,
+              6,
+              1
+            ],
+            [
+              4,
+              2,
+              0
+            ],
+            [
+              2,
+              2,
+              0
+            ]
+          ]
+        },
+        "pitReference": {
+          "count": 20,
+          "correct": 6,
+          "errors": 14,
+          "accuracy": 0.3,
+          "balancedAccuracy": 0.39444444444444443,
+          "brierScore": 0.7199592737310847,
+          "logLoss": 1.1811097444274556,
+          "recalls": [
+            0.1,
+            0.3333333333333333,
+            0.75
+          ],
+          "matrix": [
+            [
+              1,
+              4,
+              5
+            ],
+            [
+              2,
+              2,
+              2
+            ],
+            [
+              0,
+              1,
+              3
+            ]
+          ]
+        },
+        "prior": {
+          "count": 20,
+          "correct": 6,
+          "errors": 14,
+          "accuracy": 0.3,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.7067994155905397,
+          "logLoss": 1.1502106523914515,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              10,
+              0
+            ],
+            [
+              0,
+              6,
+              0
+            ],
+            [
+              0,
+              4,
+              0
+            ]
+          ]
+        }
+      },
+      "heads": {
+        "moveCount": 20,
+        "sideCount": 14,
+        "moveAuc": 0.32142857142857145,
+        "sideAuc": 0.55,
+        "moveMatrix": [
+          [
+            0,
+            6
+          ],
+          [
+            0,
+            14
+          ]
+        ],
+        "sideMatrix": [
+          [
+            1,
+            3
+          ],
+          [
+            4,
+            6
+          ]
+        ],
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "count": 10,
+            "meanMove": 0.6249642462453545,
+            "meanSide": 0.5114108869000064
+          },
+          {
+            "actual": "NEUTRAL",
+            "count": 6,
+            "meanMove": 0.66600254302311,
+            "meanSide": 0.5224016714943663
+          },
+          {
+            "actual": "BEARISH",
+            "count": 4,
+            "meanMove": 0.6403441856747389,
+            "meanSide": 0.5117976832835406
+          }
+        ]
+      },
+      "againstPrice": {
+        "wins": 0,
+        "losses": 0,
+        "net": 0,
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "NEUTRAL",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "BEARISH",
+            "wins": 0,
+            "losses": 0
+          }
+        ]
+      }
+    },
+    {
+      "start": "2024-04-26",
+      "end": "2024-05-23",
+      "scores": {
+        "candidate": {
+          "count": 20,
+          "correct": 7,
+          "errors": 13,
+          "accuracy": 0.35,
+          "balancedAccuracy": 0.2916666666666667,
+          "brierScore": 0.6668113546177035,
+          "logLoss": 1.099686759301439,
+          "recalls": [
+            0,
+            0.875,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              7,
+              0
+            ],
+            [
+              0,
+              7,
+              1
+            ],
+            [
+              0,
+              5,
+              0
+            ]
+          ]
+        },
+        "price": {
+          "count": 20,
+          "correct": 7,
+          "errors": 13,
+          "accuracy": 0.35,
+          "balancedAccuracy": 0.2916666666666667,
+          "brierScore": 0.6662761862161886,
+          "logLoss": 1.0986635818919237,
+          "recalls": [
+            0,
+            0.875,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              7,
+              0
+            ],
+            [
+              0,
+              7,
+              1
+            ],
+            [
+              0,
+              5,
+              0
+            ]
+          ]
+        },
+        "pitReference": {
+          "count": 20,
+          "correct": 8,
+          "errors": 12,
+          "accuracy": 0.4,
+          "balancedAccuracy": 0.35833333333333334,
+          "brierScore": 0.671387368658434,
+          "logLoss": 1.107118864214894,
+          "recalls": [
+            0,
+            0.875,
+            0.2
+          ],
+          "matrix": [
+            [
+              0,
+              6,
+              1
+            ],
+            [
+              0,
+              7,
+              1
+            ],
+            [
+              1,
+              3,
+              1
+            ]
+          ]
+        },
+        "prior": {
+          "count": 20,
+          "correct": 8,
+          "errors": 12,
+          "accuracy": 0.4,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6675275709303436,
+          "logLoss": 1.0979132572783734,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              7,
+              0
+            ],
+            [
+              0,
+              8,
+              0
+            ],
+            [
+              0,
+              5,
+              0
+            ]
+          ]
+        }
+      },
+      "heads": {
+        "moveCount": 20,
+        "sideCount": 12,
+        "moveAuc": 0.5208333333333334,
+        "sideAuc": 0.34285714285714286,
+        "moveMatrix": [
+          [
+            0,
+            8
+          ],
+          [
+            0,
+            12
+          ]
+        ],
+        "sideMatrix": [
+          [
+            1,
+            4
+          ],
+          [
+            2,
+            5
+          ]
+        ],
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "count": 7,
+            "meanMove": 0.5742337838103012,
+            "meanSide": 0.5083558171990294
+          },
+          {
+            "actual": "NEUTRAL",
+            "count": 8,
+            "meanMove": 0.5841578209400674,
+            "meanSide": 0.5221430327939406
+          },
+          {
+            "actual": "BEARISH",
+            "count": 5,
+            "meanMove": 0.5981771178573042,
+            "meanSide": 0.5222518005972332
+          }
+        ]
+      },
+      "againstPrice": {
+        "wins": 0,
+        "losses": 0,
+        "net": 0,
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "NEUTRAL",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "BEARISH",
+            "wins": 0,
+            "losses": 0
+          }
+        ]
+      }
+    },
+    {
+      "start": "2024-05-24",
+      "end": "2024-06-20",
+      "scores": {
+        "candidate": {
+          "count": 20,
+          "correct": 6,
+          "errors": 14,
+          "accuracy": 0.3,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6979270868723221,
+          "logLoss": 1.1439904856955654,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              7,
+              0
+            ],
+            [
+              0,
+              6,
+              0
+            ],
+            [
+              0,
+              7,
+              0
+            ]
+          ]
+        },
+        "price": {
+          "count": 20,
+          "correct": 6,
+          "errors": 14,
+          "accuracy": 0.3,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6975131271397553,
+          "logLoss": 1.1430112204712337,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              7,
+              0
+            ],
+            [
+              0,
+              6,
+              0
+            ],
+            [
+              0,
+              7,
+              0
+            ]
+          ]
+        },
+        "pitReference": {
+          "count": 20,
+          "correct": 6,
+          "errors": 14,
+          "accuracy": 0.3,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6884017625019452,
+          "logLoss": 1.1305684484426983,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              6,
+              1
+            ],
+            [
+              0,
+              6,
+              0
+            ],
+            [
+              0,
+              7,
+              0
+            ]
+          ]
+        },
+        "prior": {
+          "count": 20,
+          "correct": 6,
+          "errors": 14,
+          "accuracy": 0.3,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.713935337920637,
+          "logLoss": 1.1639457314202755,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              7,
+              0
+            ],
+            [
+              0,
+              6,
+              0
+            ],
+            [
+              0,
+              7,
+              0
+            ]
+          ]
+        }
+      },
+      "heads": {
+        "moveCount": 20,
+        "sideCount": 14,
+        "moveAuc": 0.4523809523809524,
+        "sideAuc": 0.30612244897959184,
+        "moveMatrix": [
+          [
+            0,
+            6
+          ],
+          [
+            0,
+            14
+          ]
+        ],
+        "sideMatrix": [
+          [
+            0,
+            7
+          ],
+          [
+            1,
+            6
+          ]
+        ],
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "count": 7,
+            "meanMove": 0.572154069583242,
+            "meanSide": 0.5258137170516582
+          },
+          {
+            "actual": "NEUTRAL",
+            "count": 6,
+            "meanMove": 0.5737311556962893,
+            "meanSide": 0.5472798603123341
+          },
+          {
+            "actual": "BEARISH",
+            "count": 7,
+            "meanMove": 0.5712774860508423,
+            "meanSide": 0.5379975437804161
+          }
+        ]
+      },
+      "againstPrice": {
+        "wins": 0,
+        "losses": 0,
+        "net": 0,
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "NEUTRAL",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "BEARISH",
+            "wins": 0,
+            "losses": 0
+          }
+        ]
+      }
+    },
+    {
+      "start": "2024-06-21",
+      "end": "2024-07-18",
+      "scores": {
+        "candidate": {
+          "count": 20,
+          "correct": 9,
+          "errors": 11,
+          "accuracy": 0.45,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6502182355475459,
+          "logLoss": 1.0777083955213294,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              6,
+              0
+            ],
+            [
+              0,
+              9,
+              0
+            ],
+            [
+              0,
+              5,
+              0
+            ]
+          ]
+        },
+        "price": {
+          "count": 20,
+          "correct": 9,
+          "errors": 11,
+          "accuracy": 0.45,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.649480365278118,
+          "logLoss": 1.07642207897408,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              6,
+              0
+            ],
+            [
+              0,
+              9,
+              0
+            ],
+            [
+              0,
+              5,
+              0
+            ]
+          ]
+        },
+        "pitReference": {
+          "count": 20,
+          "correct": 9,
+          "errors": 11,
+          "accuracy": 0.45,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6493239695444418,
+          "logLoss": 1.0770367497205409,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              5,
+              1
+            ],
+            [
+              0,
+              9,
+              0
+            ],
+            [
+              0,
+              5,
+              0
+            ]
+          ]
+        },
+        "prior": {
+          "count": 20,
+          "correct": 9,
+          "errors": 11,
+          "accuracy": 0.45,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6467023282118961,
+          "logLoss": 1.069475379883697,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              6,
+              0
+            ],
+            [
+              0,
+              9,
+              0
+            ],
+            [
+              0,
+              5,
+              0
+            ]
+          ]
+        }
+      },
+      "heads": {
+        "moveCount": 20,
+        "sideCount": 11,
+        "moveAuc": 0.5555555555555556,
+        "sideAuc": 0.23333333333333334,
+        "moveMatrix": [
+          [
+            2,
+            7
+          ],
+          [
+            2,
+            9
+          ]
+        ],
+        "sideMatrix": [
+          [
+            0,
+            5
+          ],
+          [
+            2,
+            4
+          ]
+        ],
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "count": 6,
+            "meanMove": 0.5247928867792475,
+            "meanSide": 0.5080848394282738
+          },
+          {
+            "actual": "NEUTRAL",
+            "count": 9,
+            "meanMove": 0.5248481743488155,
+            "meanSide": 0.5332325280806512
+          },
+          {
+            "actual": "BEARISH",
+            "count": 5,
+            "meanMove": 0.5370152772684267,
+            "meanSide": 0.5311540555837821
+          }
+        ]
+      },
+      "againstPrice": {
+        "wins": 0,
+        "losses": 0,
+        "net": 0,
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "NEUTRAL",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "BEARISH",
+            "wins": 0,
+            "losses": 0
+          }
+        ]
+      }
+    },
+    {
+      "start": "2024-07-19",
+      "end": "2024-08-15",
+      "scores": {
+        "candidate": {
+          "count": 20,
+          "correct": 8,
+          "errors": 12,
+          "accuracy": 0.4,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6460419907467548,
+          "logLoss": 1.0665852444916015,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              7,
+              0
+            ],
+            [
+              0,
+              8,
+              0
+            ],
+            [
+              0,
+              5,
+              0
+            ]
+          ]
+        },
+        "price": {
+          "count": 20,
+          "correct": 8,
+          "errors": 12,
+          "accuracy": 0.4,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6466324125990052,
+          "logLoss": 1.0676620675000046,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              7,
+              0
+            ],
+            [
+              0,
+              8,
+              0
+            ],
+            [
+              0,
+              5,
+              0
+            ]
+          ]
+        },
+        "pitReference": {
+          "count": 20,
+          "correct": 9,
+          "errors": 11,
+          "accuracy": 0.45,
+          "balancedAccuracy": 0.45,
+          "brierScore": 0.6445834613155381,
+          "logLoss": 1.0665433350242783,
+          "recalls": [
+            0,
+            0.75,
+            0.6
+          ],
+          "matrix": [
+            [
+              0,
+              6,
+              1
+            ],
+            [
+              0,
+              6,
+              2
+            ],
+            [
+              0,
+              2,
+              3
+            ]
+          ]
+        },
+        "prior": {
+          "count": 20,
+          "correct": 8,
+          "errors": 12,
+          "accuracy": 0.4,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6675275709303438,
+          "logLoss": 1.0979132572783734,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              7,
+              0
+            ],
+            [
+              0,
+              8,
+              0
+            ],
+            [
+              0,
+              5,
+              0
+            ]
+          ]
+        }
+      },
+      "heads": {
+        "moveCount": 20,
+        "sideCount": 12,
+        "moveAuc": 0.7083333333333334,
+        "sideAuc": 0.6857142857142857,
+        "moveMatrix": [
+          [
+            0,
+            8
+          ],
+          [
+            0,
+            12
+          ]
+        ],
+        "sideMatrix": [
+          [
+            2,
+            3
+          ],
+          [
+            2,
+            5
+          ]
+        ],
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "count": 7,
+            "meanMove": 0.5787341467227386,
+            "meanSide": 0.5276484846492265
+          },
+          {
+            "actual": "NEUTRAL",
+            "count": 8,
+            "meanMove": 0.569014702783096,
+            "meanSide": 0.5372214746837488
+          },
+          {
+            "actual": "BEARISH",
+            "count": 5,
+            "meanMove": 0.582654933631474,
+            "meanSide": 0.507889125522257
+          }
+        ]
+      },
+      "againstPrice": {
+        "wins": 0,
+        "losses": 0,
+        "net": 0,
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "NEUTRAL",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "BEARISH",
+            "wins": 0,
+            "losses": 0
+          }
+        ]
+      }
+    },
+    {
+      "start": "2024-08-16",
+      "end": "2024-09-12",
+      "scores": {
+        "candidate": {
+          "count": 20,
+          "correct": 11,
+          "errors": 9,
+          "accuracy": 0.55,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6135364178284567,
+          "logLoss": 1.0225527482251542,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              5,
+              0
+            ],
+            [
+              0,
+              11,
+              0
+            ],
+            [
+              0,
+              4,
+              0
+            ]
+          ]
+        },
+        "price": {
+          "count": 20,
+          "correct": 11,
+          "errors": 9,
+          "accuracy": 0.55,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6145923834745144,
+          "logLoss": 1.0241126337590938,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              5,
+              0
+            ],
+            [
+              0,
+              11,
+              0
+            ],
+            [
+              0,
+              4,
+              0
+            ]
+          ]
+        },
+        "pitReference": {
+          "count": 20,
+          "correct": 11,
+          "errors": 9,
+          "accuracy": 0.55,
+          "balancedAccuracy": 0.3863636363636364,
+          "brierScore": 0.627825789902194,
+          "logLoss": 1.041826474083736,
+          "recalls": [
+            0,
+            0.9090909090909091,
+            0.25
+          ],
+          "matrix": [
+            [
+              0,
+              4,
+              1
+            ],
+            [
+              0,
+              10,
+              1
+            ],
+            [
+              0,
+              3,
+              1
+            ]
+          ]
+        },
+        "prior": {
+          "count": 20,
+          "correct": 11,
+          "errors": 9,
+          "accuracy": 0.55,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6026732019983019,
+          "logLoss": 1.0080212654180694,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              5,
+              0
+            ],
+            [
+              0,
+              11,
+              0
+            ],
+            [
+              0,
+              4,
+              0
+            ]
+          ]
+        }
+      },
+      "heads": {
+        "moveCount": 20,
+        "sideCount": 9,
+        "moveAuc": 0.5353535353535354,
+        "sideAuc": 0.4,
+        "moveMatrix": [
+          [
+            2,
+            9
+          ],
+          [
+            1,
+            8
+          ]
+        ],
+        "sideMatrix": [
+          [
+            0,
+            4
+          ],
+          [
+            0,
+            5
+          ]
+        ],
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "count": 5,
+            "meanMove": 0.5465156085318789,
+            "meanSide": 0.5354767781190523
+          },
+          {
+            "actual": "NEUTRAL",
+            "count": 11,
+            "meanMove": 0.5560492375087793,
+            "meanSide": 0.5240427297382724
+          },
+          {
+            "actual": "BEARISH",
+            "count": 4,
+            "meanMove": 0.5748737113224878,
+            "meanSide": 0.5384094658657392
+          }
+        ]
+      },
+      "againstPrice": {
+        "wins": 0,
+        "losses": 0,
+        "net": 0,
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "NEUTRAL",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "BEARISH",
+            "wins": 0,
+            "losses": 0
+          }
+        ]
+      }
+    },
+    {
+      "start": "2024-09-13",
+      "end": "2024-10-10",
+      "scores": {
+        "candidate": {
+          "count": 20,
+          "correct": 8,
+          "errors": 12,
+          "accuracy": 0.4,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6737343667371454,
+          "logLoss": 1.1059928186134,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              7,
+              0
+            ],
+            [
+              0,
+              8,
+              0
+            ],
+            [
+              0,
+              5,
+              0
+            ]
+          ]
+        },
+        "price": {
+          "count": 20,
+          "correct": 8,
+          "errors": 12,
+          "accuracy": 0.4,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6736884665235244,
+          "logLoss": 1.1059648848461614,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              7,
+              0
+            ],
+            [
+              0,
+              8,
+              0
+            ],
+            [
+              0,
+              5,
+              0
+            ]
+          ]
+        },
+        "pitReference": {
+          "count": 20,
+          "correct": 8,
+          "errors": 12,
+          "accuracy": 0.4,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6706082305801019,
+          "logLoss": 1.1051796577594168,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              7,
+              0
+            ],
+            [
+              0,
+              8,
+              0
+            ],
+            [
+              0,
+              5,
+              0
+            ]
+          ]
+        },
+        "prior": {
+          "count": 20,
+          "correct": 8,
+          "errors": 12,
+          "accuracy": 0.4,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6675275709303436,
+          "logLoss": 1.0979132572783734,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              7,
+              0
+            ],
+            [
+              0,
+              8,
+              0
+            ],
+            [
+              0,
+              5,
+              0
+            ]
+          ]
+        }
+      },
+      "heads": {
+        "moveCount": 20,
+        "sideCount": 12,
+        "moveAuc": 0.40625,
+        "sideAuc": 0.45714285714285713,
+        "moveMatrix": [
+          [
+            2,
+            6
+          ],
+          [
+            3,
+            9
+          ]
+        ],
+        "sideMatrix": [
+          [
+            0,
+            5
+          ],
+          [
+            0,
+            7
+          ]
+        ],
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "count": 7,
+            "meanMove": 0.5244828519317569,
+            "meanSide": 0.5360503867302151
+          },
+          {
+            "actual": "NEUTRAL",
+            "count": 8,
+            "meanMove": 0.5378464451836247,
+            "meanSide": 0.5346518365915451
+          },
+          {
+            "actual": "BEARISH",
+            "count": 5,
+            "meanMove": 0.5351322050683753,
+            "meanSide": 0.5387466377933114
+          }
+        ]
+      },
+      "againstPrice": {
+        "wins": 0,
+        "losses": 0,
+        "net": 0,
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "NEUTRAL",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "BEARISH",
+            "wins": 0,
+            "losses": 0
+          }
+        ]
+      }
+    },
+    {
+      "start": "2024-10-11",
+      "end": "2024-11-07",
+      "scores": {
+        "candidate": {
+          "count": 20,
+          "correct": 10,
+          "errors": 10,
+          "accuracy": 0.5,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.623612347569465,
+          "logLoss": 1.0353229023525752,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              7,
+              0
+            ],
+            [
+              0,
+              10,
+              0
+            ],
+            [
+              0,
+              3,
+              0
+            ]
+          ]
+        },
+        "price": {
+          "count": 20,
+          "correct": 10,
+          "errors": 10,
+          "accuracy": 0.5,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6238660640793187,
+          "logLoss": 1.0359264315228838,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              7,
+              0
+            ],
+            [
+              0,
+              10,
+              0
+            ],
+            [
+              0,
+              3,
+              0
+            ]
+          ]
+        },
+        "pitReference": {
+          "count": 20,
+          "correct": 10,
+          "errors": 10,
+          "accuracy": 0.5,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6604196063841531,
+          "logLoss": 1.0971412835648673,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              6,
+              1
+            ],
+            [
+              0,
+              10,
+              0
+            ],
+            [
+              0,
+              3,
+              0
+            ]
+          ]
+        },
+        "prior": {
+          "count": 20,
+          "correct": 10,
+          "errors": 10,
+          "accuracy": 0.5,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6211198039400503,
+          "logLoss": 1.0318807831364711,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              7,
+              0
+            ],
+            [
+              0,
+              10,
+              0
+            ],
+            [
+              0,
+              3,
+              0
+            ]
+          ]
+        }
+      },
+      "heads": {
+        "moveCount": 20,
+        "sideCount": 10,
+        "moveAuc": 0.47,
+        "sideAuc": 0.23809523809523808,
+        "moveMatrix": [
+          [
+            5,
+            5
+          ],
+          [
+            5,
+            5
+          ]
+        ],
+        "sideMatrix": [
+          [
+            0,
+            3
+          ],
+          [
+            2,
+            5
+          ]
+        ],
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "count": 7,
+            "meanMove": 0.5127319149569451,
+            "meanSide": 0.5355156502022569
+          },
+          {
+            "actual": "NEUTRAL",
+            "count": 10,
+            "meanMove": 0.5108824839062733,
+            "meanSide": 0.544779605327392
+          },
+          {
+            "actual": "BEARISH",
+            "count": 3,
+            "meanMove": 0.5099233529205798,
+            "meanSide": 0.5536836765374293
+          }
+        ]
+      },
+      "againstPrice": {
+        "wins": 0,
+        "losses": 0,
+        "net": 0,
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "NEUTRAL",
+            "wins": 0,
+            "losses": 0
+          },
+          {
+            "actual": "BEARISH",
+            "wins": 0,
+            "losses": 0
+          }
+        ]
+      }
+    }
+  ]
+}
