@@ -1,2 +1,8 @@
 /mvnw text eol=lf
 *.cmd text eol=crlf
+# 研究源码指纹使用原始字节；这些生产文本跨Windows检出固定LF。
+/src/main/java/com/opspilot/ai/forecast/learning/GoldDatasetBuilder.java text eol=lf
+/src/main/java/com/opspilot/ai/forecast/learning/FeatureScaler.java text eol=lf
+/src/main/java/com/opspilot/ai/analysis/GoldResearchSnapshotService.java text eol=lf
+/src/main/java/com/opspilot/ai/macrodata/FredHistoryStore.java text eol=lf
+/src/main/java/com/opspilot/ai/macrodata/FredHistory.java text eol=lf
