@@ -6,6 +6,9 @@ import com.opspilot.ai.analysis.GoldReturnMetrics;
 import com.opspilot.ai.analysis.RealRateChangeMetrics;
 import com.opspilot.ai.analysis.GoldFactorStatus;
 import com.opspilot.ai.analysis.ResearchFactorAssessment;
+import com.opspilot.ai.analysis.GoldSnapshotFixtures;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -19,9 +22,13 @@ import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.UUID;
+import java.util.ArrayList;
+import java.util.List;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest(properties = "spring.ai.openai.api-key=test-key")
 class JdbcGoldResearchSnapshotRepositoryTests {
@@ -47,9 +54,16 @@ class JdbcGoldResearchSnapshotRepositoryTests {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    @Autowired
+    private ObjectMapper json;
+
+    private final List<UUID> inputIds = new ArrayList<>();
+
     @BeforeEach
     @AfterEach
     void cleanTestData() {
+        for (UUID id : inputIds) jdbcTemplate.update("delete from gold_research_snapshot where id = ?", id);
+        inputIds.clear();
         jdbcTemplate.update(
                 """
                 delete from gold_research_snapshot
@@ -58,6 +72,81 @@ class JdbcGoldResearchSnapshotRepositoryTests {
                 LEGACY_RESEARCH_VERSION,
                 RESEARCH_VERSION
         );
+    }
+
+    @Test
+    @DisplayName("数据库拒绝部分或JSON null依据，不让SQL空值逻辑绕过结构约束")
+    void rejectsPartialInput() {
+        UUID id = repository.saveIfAbsent(snapshot("2026-08-24", "2500.00"), CREATED_AT).record().id();
+        for (String invalid : List.of("{}", "[]", "null", "{\"bars\":[],\"checkedAt\":\"x\"}")) {
+            assertThatThrownBy(() -> jdbcTemplate.update(
+                    "update gold_research_snapshot set gold_input = ?::jsonb where id = ?", invalid, id))
+                    .isInstanceOf(DataIntegrityViolationException.class);
+        }
+        assertThat(repository.findById(id).orElseThrow().snapshot().input()).isNull();
+    }
+
+    @Test
+    @DisplayName("只有新版本名但没有依据的数据库记录不能通过约束")
+    void rejectsVersionWithoutInput() {
+        UUID id = repository.saveIfAbsent(snapshot("2026-08-24", "2500.00"), CREATED_AT).record().id();
+        assertThatThrownBy(() -> jdbcTemplate.update(
+                "update gold_research_snapshot set research_version = ? where id = ?",
+                "gold-multifactor-confirmed-v3", id))
+                .isInstanceOf(DataIntegrityViolationException.class);
+        assertThat(repository.findById(id).orElseThrow().snapshot().researchVersion()).isEqualTo(RESEARCH_VERSION);
+    }
+
+    @Test
+    @DisplayName("同日旧v2与新确认v3各自保存，重复保存不覆盖第一份依据")
+    void keepsLegacyAndConfirmedInputs() {
+        // 隔离到不存在真实黄金记录的早期日期，按精确UUID清理。
+        LocalDate date = LocalDate.of(1000, 1, 1)
+                .plusDays(UUID.randomUUID().getLeastSignificantBits() & 65535);
+        GoldResearchSnapshot source = snapshot(date.toString(), "2500.00");
+        GoldResearchSnapshot old = new GoldResearchSnapshot(date, date, source.latestRealRateDate(),
+                source.latestDollarIndexDate(), source.gold(), source.realRate(), source.dollarIndex(),
+                source.realRateAssessment(), source.dollarIndexAssessment(), "gold-multifactor-v2", source.disclaimer());
+        StoredGoldResearchSnapshot legacy = repository.saveIfAbsent(old, CREATED_AT).record();
+        inputIds.add(legacy.id());
+        GoldResearchSnapshot value = GoldSnapshotFixtures.withInput(source, date,
+                "gold-multifactor-confirmed-v3", CREATED_AT);
+        StoredGoldResearchSnapshot saved = repository.saveIfAbsent(value, CREATED_AT).record();
+        inputIds.add(saved.id());
+        GoldResearchSnapshot changed = GoldSnapshotFixtures.withInput(source, date,
+                "gold-multifactor-confirmed-v3", CREATED_AT.plusMinutes(1));
+        SaveGoldResearchSnapshotResult repeated = repository.saveIfAbsent(changed, CREATED_AT.plusMinutes(1));
+
+        assertThat(saved.id()).isNotEqualTo(legacy.id());
+        assertThat(repository.findById(legacy.id()).orElseThrow().snapshot().input()).isNull();
+        assertThat(repeated.created()).isFalse();
+        assertThat(repeated.record().snapshot().input()).isEqualTo(value.input());
+    }
+
+    @Test
+    @DisplayName("旧回测JSON缺input仍可反序列化，但不能自动补依据")
+    void readsOldJson() throws Exception {
+        ObjectNode value = json.valueToTree(snapshot("2026-08-24", "2500.00"));
+        value.remove("input");
+
+        GoldResearchSnapshot old = json.readValue(json.writeValueAsString(value), GoldResearchSnapshot.class);
+
+        assertThat(old.input()).isNull();
+        assertThat(old.gold().currentPrice()).isEqualByComparingTo("2500.00");
+    }
+
+    @Test
+    @DisplayName("数据库往返保留实际黄金窗口、逐根依据和核验时刻")
+    void roundTripsGoldInput() {
+        GoldResearchSnapshot value = GoldSnapshotFixtures.withInput(snapshot("2026-08-24", "2500.00"),
+                LocalDate.parse("2026-08-24"), RESEARCH_VERSION, CREATED_AT);
+
+        StoredGoldResearchSnapshot saved = repository.saveIfAbsent(value, CREATED_AT).record();
+        GoldResearchSnapshot read = repository.findById(saved.id()).orElseThrow().snapshot();
+
+        assertThat(read.input()).isNotNull();
+        assertThat(read.input()).isEqualTo(value.input());
+        assertThat(read.input().matches(read.latestGoldDate(), read.gold(), CREATED_AT)).isTrue();
     }
 
     @Test
@@ -82,6 +171,60 @@ class JdbcGoldResearchSnapshotRepositoryTests {
         assertThat(result.record().snapshot().researchVersion())
                 .isEqualTo(RESEARCH_VERSION);
         assertThat(result.record().createdAt()).isEqualTo(CREATED_AT);
+    }
+
+    @Test
+    @DisplayName("不能无损保存的九位价格小数在写库前被拒绝")
+    void rejectsPriceLoss() {
+        assertPrecisionRejected("2500.123456789", CREATED_AT.minusHours(1), CREATED_AT);
+    }
+
+    @Test
+    @DisplayName("不能无损保存的纳秒采集时刻在写库前被拒绝")
+    void rejectsCollectionLoss() {
+        assertPrecisionRejected("2500.00", CREATED_AT.minusHours(1).withNano(123456400), CREATED_AT);
+    }
+
+    @Test
+    @DisplayName("不能无损保存的纳秒保存时刻在写库前被拒绝")
+    void rejectsCreationLoss() {
+        assertPrecisionRejected("2500.00", CREATED_AT.minusHours(1), CREATED_AT.withNano(123456400));
+    }
+
+    private void assertPrecisionRejected(String price, OffsetDateTime collectedAt, OffsetDateTime createdAt) {
+        GoldResearchSnapshot value = precisionInput(price, collectedAt, createdAt);
+        assertThat(value.input().matches(value.latestGoldDate(), value.gold(), createdAt)).isTrue();
+        assertThatIllegalArgumentException().isThrownBy(() -> repository.saveIfAbsent(value, createdAt));
+        assertThat(jdbcTemplate.queryForObject(
+                "select count(*) from gold_research_snapshot where research_version = ?",
+                Integer.class, RESEARCH_VERSION)).isZero();
+    }
+
+    @Test
+    @DisplayName("八位有效小数及微秒时间无损往返，尾随零不误拒绝")
+    void keepsExactPrecision() {
+        OffsetDateTime createdAt = CREATED_AT.withNano(123456000);
+        GoldResearchSnapshot value = precisionInput("2500.1234567800",
+                CREATED_AT.minusHours(1).withNano(654321000), createdAt);
+        StoredGoldResearchSnapshot saved = repository.saveIfAbsent(value, createdAt).record();
+        StoredGoldResearchSnapshot read = repository.findById(saved.id()).orElseThrow();
+        assertThat(read.snapshot().gold().currentPrice()).isEqualByComparingTo("2500.12345678");
+        assertThat(read.snapshot().input()).isEqualTo(value.input());
+        assertThat(read.snapshot().input().matches(read.snapshot().latestGoldDate(),
+                read.snapshot().gold(), read.createdAt())).isTrue();
+    }
+
+    private GoldResearchSnapshot precisionInput(String price, OffsetDateTime collectedAt,
+            OffsetDateTime createdAt) {
+        GoldResearchSnapshot source = snapshot("2026-08-24", price);
+        GoldReturnMetrics gold = new GoldReturnMetrics(source.gold().currentPrice(), BigDecimal.ZERO,
+                BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, collectedAt);
+        source = new GoldResearchSnapshot(source.analysisDate(), source.latestGoldDate(),
+                source.latestRealRateDate(), source.latestDollarIndexDate(), gold, source.realRate(),
+                source.dollarIndex(), source.realRateAssessment(), source.dollarIndexAssessment(),
+                RESEARCH_VERSION, source.disclaimer());
+        return GoldSnapshotFixtures.withInput(source,
+                LocalDate.parse("2026-08-24"), RESEARCH_VERSION, createdAt);
     }
 
     @Test

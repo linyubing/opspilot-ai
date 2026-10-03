@@ -1,6 +1,7 @@
 package com.opspilot.ai.forecast;
 
 import com.opspilot.ai.analysis.GoldResearchSnapshot;
+import com.opspilot.ai.analysis.GoldSnapshotFixtures;
 import com.opspilot.ai.analysis.history.GoldResearchSnapshotRepository;
 import com.opspilot.ai.analysis.history.StoredGoldResearchSnapshot;
 import com.opspilot.ai.analysis.narrative.GoldResearchSnapshotNotFoundException;
@@ -31,6 +32,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.lenient;
 
 @ExtendWith(MockitoExtension.class)
 class GoldForecastGenerationServiceTests {
@@ -65,6 +67,43 @@ class GoldForecastGenerationServiceTests {
                 new GoldForecastProperties(MODEL_NAME),
                 Clock.fixed(NOW, ZoneOffset.UTC)
         );
+    }
+
+    @Test
+    @org.junit.jupiter.api.DisplayName("正式v3快照缺窗口依据时拒绝，不读取幂等预测或调用模型")
+    void rejectsMissingInput() {
+        StoredGoldResearchSnapshot source = confirmed();
+        var value = source.snapshot();
+        StoredGoldResearchSnapshot snapshot = new StoredGoldResearchSnapshot(source.id(),
+                new GoldResearchSnapshot(value.analysisDate(), value.latestGoldDate(), value.latestRealRateDate(),
+                        value.latestDollarIndexDate(), value.gold(), value.realRate(), value.dollarIndex(),
+                        value.realRateAssessment(), value.dollarIndexAssessment(), value.researchVersion(),
+                        value.disclaimer()), source.createdAt());
+        when(snapshotRepository.findById(snapshot.id())).thenReturn(Optional.of(snapshot));
+        lenient().when(forecastRepository.findByKey(snapshot.id(), MODEL_NAME,
+                GoldForecastPromptBuilder.PROMPT_VERSION, GoldForecastRule.RULE_VERSION))
+                .thenReturn(Optional.of(existingForecast(snapshot)));
+
+        assertThatThrownBy(() -> service.generate(snapshot.id()))
+                .isInstanceOf(InvalidGoldForecastSnapshotException.class);
+        verifyNoInteractions(forecastRepository, promptBuilder, gateway, validator);
+    }
+
+    @Test
+    @org.junit.jupiter.api.DisplayName("核验时刻晚于快照保存时刻时拒绝，不用后来依据升级旧快照")
+    void rejectsProofAfterSnapshot() {
+        StoredGoldResearchSnapshot source = confirmed();
+        StoredGoldResearchSnapshot snapshot = new StoredGoldResearchSnapshot(source.id(),
+                GoldSnapshotFixtures.withInput(source.snapshot(), source.snapshot().latestGoldDate(),
+                        source.snapshot().researchVersion(), source.createdAt().plusSeconds(1)), source.createdAt());
+        when(snapshotRepository.findById(snapshot.id())).thenReturn(Optional.of(snapshot));
+        lenient().when(forecastRepository.findByKey(snapshot.id(), MODEL_NAME,
+                GoldForecastPromptBuilder.PROMPT_VERSION, GoldForecastRule.RULE_VERSION))
+                .thenReturn(Optional.of(existingForecast(snapshot)));
+
+        assertThatThrownBy(() -> service.generate(snapshot.id()))
+                .isInstanceOf(InvalidGoldForecastSnapshotException.class);
+        verifyNoInteractions(forecastRepository, promptBuilder, gateway, validator);
     }
 
     @Test
@@ -138,7 +177,7 @@ class GoldForecastGenerationServiceTests {
 
     @Test
     void returnsExistingForecastWithoutBuildingPromptOrCallingModel() {
-        StoredGoldResearchSnapshot snapshot = GoldForecastTestFixtures.snapshot("2515.75");
+        StoredGoldResearchSnapshot snapshot = confirmed();
         StoredGoldDirectionForecast existing = existingForecast(snapshot);
         when(snapshotRepository.findById(snapshot.id())).thenReturn(Optional.of(snapshot));
         when(forecastRepository.findByKey(
@@ -251,7 +290,7 @@ class GoldForecastGenerationServiceTests {
     }
 
     private StoredGoldResearchSnapshot prepareNewForecast() {
-        StoredGoldResearchSnapshot snapshot = GoldForecastTestFixtures.snapshot("2515.75");
+        StoredGoldResearchSnapshot snapshot = confirmed();
         when(snapshotRepository.findById(snapshot.id())).thenReturn(Optional.of(snapshot));
         when(forecastRepository.findByKey(
                 snapshot.id(), MODEL_NAME,
@@ -282,7 +321,7 @@ class GoldForecastGenerationServiceTests {
     }
 
     private StoredGoldResearchSnapshot snapshotWithVersion(String version) {
-        StoredGoldResearchSnapshot source = GoldForecastTestFixtures.snapshot("2515.75");
+        StoredGoldResearchSnapshot source = confirmed();
         GoldResearchSnapshot value = source.snapshot();
         return new StoredGoldResearchSnapshot(
                 source.id(),
@@ -291,7 +330,7 @@ class GoldForecastGenerationServiceTests {
                         value.latestRealRateDate(), value.latestDollarIndexDate(),
                         value.gold(), value.realRate(), value.dollarIndex(),
                         value.realRateAssessment(), value.dollarIndexAssessment(),
-                        version, value.disclaimer()
+                        version, value.disclaimer(), value.input()
                 ),
                 source.createdAt()
         );
@@ -302,9 +341,9 @@ class GoldForecastGenerationServiceTests {
             String realRateDate,
             String dollarIndexDate
     ) {
-        StoredGoldResearchSnapshot source =
-                GoldForecastTestFixtures.snapshot("2515.75");
-        GoldResearchSnapshot value = source.snapshot();
+        StoredGoldResearchSnapshot source = confirmed();
+        GoldResearchSnapshot value = GoldSnapshotFixtures.withInput(source.snapshot(),
+                LocalDate.parse(goldDate), source.snapshot().researchVersion(), source.createdAt());
 
         return new StoredGoldResearchSnapshot(
                 source.id(),
@@ -316,10 +355,17 @@ class GoldForecastGenerationServiceTests {
                         value.gold(), value.realRate(), value.dollarIndex(),
                         value.realRateAssessment(),
                         value.dollarIndexAssessment(),
-                        value.researchVersion(), value.disclaimer()
+                        value.researchVersion(), value.disclaimer(), value.input()
                 ),
                 source.createdAt()
         );
+    }
+
+    private StoredGoldResearchSnapshot confirmed() {
+        StoredGoldResearchSnapshot source = GoldForecastTestFixtures.snapshot("2515.75");
+        return new StoredGoldResearchSnapshot(source.id(), GoldSnapshotFixtures.withInput(
+                source.snapshot(), source.snapshot().latestGoldDate(), "gold-multifactor-confirmed-v3", source.createdAt()),
+                source.createdAt());
     }
 
     private StoredGoldDirectionForecast existingForecast(

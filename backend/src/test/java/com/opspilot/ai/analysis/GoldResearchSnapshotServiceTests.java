@@ -139,13 +139,27 @@ class GoldResearchSnapshotServiceTests {
         assertThat(snapshot.dollarIndexAssessment().status())
                 .isEqualTo(GoldFactorStatus.PRESSURING);
         assertThat(snapshot.researchVersion())
-                .isEqualTo("gold-multifactor-v2");
+                .isEqualTo("gold-multifactor-confirmed-v3");
         assertThat(snapshot.disclaimer())
                 .contains("不构成黄金方向预测或投资建议");
 
         verify(goldRepository).findRecent("XAUUSD", "twelve_data", 120);
         verify(macroObservationRepository).findRecent("DFII10", 120);
         verify(macroObservationRepository).findRecent("DTWEXBGS", 120);
+    }
+
+    @Test
+    @DisplayName("自行采样的核验时刻采用微秒精度，不晚于同一时钟的保存时刻")
+    void usesMicrosecondCheck() {
+        service = new GoldResearchSnapshotService(goldRepository, macroObservationRepository,
+                new RealRateFactorEvaluator(), new DollarIndexFactorEvaluator(),
+                Clock.fixed(Instant.parse("2026-10-03T12:00:00.123456400Z"), ZoneId.of("UTC")));
+        when(goldRepository.findRecent("XAUUSD", "twelve_data", 120)).thenReturn(goldPrices(21));
+        when(macroObservationRepository.findRecent("DFII10", 120)).thenReturn(realRates(21));
+        GoldResearchSnapshot value = service.createSnapshot();
+        OffsetDateTime savedAt = OffsetDateTime.parse("2026-10-03T12:00:00.123456Z");
+        assertThat(value.input().checkedAt()).isEqualTo(savedAt);
+        assertThat(value.input().matches(value.latestGoldDate(), value.gold(), savedAt)).isTrue();
     }
 
     @Test

@@ -1,6 +1,7 @@
 package com.opspilot.ai.forecast;
 
 import com.opspilot.ai.analysis.history.GoldResearchSnapshotRepository;
+import com.opspilot.ai.analysis.GoldResearchSnapshotService;
 import com.opspilot.ai.analysis.history.StoredGoldResearchSnapshot;
 import com.opspilot.ai.analysis.narrative.GoldResearchSnapshotNotFoundException;
 import org.springframework.stereotype.Service;
@@ -17,7 +18,7 @@ import java.util.UUID;
 public class GoldForecastGenerationService {
 
     private static final String REQUIRED_RESEARCH_VERSION =
-            "gold-multifactor-v2";
+            GoldResearchSnapshotService.RESEARCH_VERSION;
 
     private final GoldResearchSnapshotRepository snapshotRepository;
     private final GoldForecastRepository forecastRepository;
@@ -57,7 +58,7 @@ public class GoldForecastGenerationService {
     public SaveGoldForecastResult generate(UUID snapshotId) {
         StoredGoldResearchSnapshot snapshot = requireSnapshot(snapshotId);
 
-        validateSnapshot(snapshot);
+        validateSnapshot(snapshot, OffsetDateTime.now(clock));
 
         // 先检查幂等记录，避免重复调用大模型产生费用。
         return forecastRepository.findByKey(
@@ -121,11 +122,19 @@ public class GoldForecastGenerationService {
     /**
      * 旧版或单因子快照不能参与正式方向预测。
      */
-    private void validateSnapshot(StoredGoldResearchSnapshot snapshot) {
+    private void validateSnapshot(StoredGoldResearchSnapshot snapshot, OffsetDateTime asOf) {
         String researchVersion = snapshot.snapshot().researchVersion();
 
         if (!REQUIRED_RESEARCH_VERSION.equals(researchVersion)) {
             throw new InvalidGoldForecastSnapshotException(researchVersion);
+        }
+        // 必须证明保存快照时已经核验，不能用后来补得的依据升级旧快照。
+        var value = snapshot.snapshot();
+        if (snapshot.createdAt() == null || snapshot.createdAt().isAfter(asOf)
+                || value.input() == null || !value.input().matches(
+                        value.latestGoldDate(), value.gold(), snapshot.createdAt())) {
+            throw new InvalidGoldForecastSnapshotException(researchVersion,
+                    "缺少与保存时刻及黄金指标匹配的窗口确认依据");
         }
     }
 

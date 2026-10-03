@@ -32,10 +32,10 @@
 
 文件：JdbcGoldResearchSnapshotRepository、V22迁移、GoldForecastGenerationService、快照记录服务与生成/数据库测试。
 
-- [ ] 真实数据库roundtrip与缺input拒绝生成断言RED。
-- [ ] nullable gold_input jsonb单列保存与映射；旧行不回填；保存新版本v3，同日旧v2保持不可变。
-- [ ] 模型调用前核对已保存输入，时间早于创建；旧预测继续只读，不重写历史。
-- [ ] 回归通过并审查，明确未解决生成早于目标收盘的边界。
+- [x] 真实数据库roundtrip与缺input拒绝生成断言RED。
+- [x] nullable gold_input jsonb单列保存与映射；旧行不回填；保存新版本v3，同日旧v2保持不可变。
+- [x] 模型调用前核对已保存输入，核验时间不晚于创建；旧预测继续只读，不重写历史。
+- [x] 回归通过并审查，修复持久化精度失配；758/0fail/0err/3skip。未解决生成早于目标收盘的边界。
 
 ## 任务3：旧回测与真实核查
 

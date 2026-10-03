@@ -14,6 +14,7 @@ import java.time.Clock;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -31,7 +32,7 @@ public class GoldResearchSnapshotService {
     private static final String GOLD_PROVIDER = "twelve_data";
     private static final String REAL_RATE_SERIES_ID = "DFII10";
     private static final String DOLLAR_INDEX_SERIES_ID = "DTWEXBGS";
-    private static final String RESEARCH_VERSION = "gold-multifactor-v2";
+    public static final String RESEARCH_VERSION = "gold-multifactor-confirmed-v3";
     private static final int QUERY_LIMIT = 120;
     private static final int REQUIRED_OBSERVATION_COUNT = 21;
     private static final ZoneId MARKET_ZONE =
@@ -83,7 +84,7 @@ public class GoldResearchSnapshotService {
     }
 
     public GoldResearchSnapshot createSnapshot() {
-        OffsetDateTime checkedAt = OffsetDateTime.now(clock);
+        OffsetDateTime checkedAt = checkTime();
         List<GoldDailyBar> goldPrices = goldRepository.findRecent(
                 GOLD_SYMBOL,
                 GOLD_PROVIDER,
@@ -115,7 +116,7 @@ public class GoldResearchSnapshotService {
      */
     public GoldResearchSnapshot createSnapshot(LocalDate asOf) {
         Objects.requireNonNull(asOf, "回测日期不能为空");
-        OffsetDateTime checkedAt = OffsetDateTime.now(clock);
+        OffsetDateTime checkedAt = checkTime();
 
         return calculate(
                 goldRepository.findRecent(
@@ -152,7 +153,7 @@ public class GoldResearchSnapshotService {
     public GoldResearchSnapshot createSnapshot(LocalDate asOf,
             List<MacroObservation> realRates, List<MacroObservation> dollarIndexes) {
         Objects.requireNonNull(asOf, "回测日期不能为空");
-        OffsetDateTime checkedAt = OffsetDateTime.now(clock);
+        OffsetDateTime checkedAt = checkTime();
         return calculate(goldRepository.findRecent(GOLD_SYMBOL, GOLD_PROVIDER, asOf, QUERY_LIMIT),
                 realRates, dollarIndexes, checkedAt);
     }
@@ -168,6 +169,11 @@ public class GoldResearchSnapshotService {
             throw new InvalidResearchDataException("冻结黄金窗口不能包含回测日期之后的行情");
         }
         return calculate(goldPrices, realRates, dollarIndexes, checkedAt);
+    }
+
+    /** 自行采样统一到数据库微秒精度；调用方冻结的时刻保持原样。 */
+    private OffsetDateTime checkTime() {
+        return OffsetDateTime.now(clock).truncatedTo(ChronoUnit.MICROS);
     }
 
     private GoldResearchSnapshot calculate(

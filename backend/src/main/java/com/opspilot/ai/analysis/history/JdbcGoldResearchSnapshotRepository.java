@@ -1,11 +1,14 @@
 package com.opspilot.ai.analysis.history;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opspilot.ai.analysis.DollarIndexChangeMetrics;
 import com.opspilot.ai.analysis.GoldResearchSnapshot;
 import com.opspilot.ai.analysis.GoldReturnMetrics;
 import com.opspilot.ai.analysis.RealRateChangeMetrics;
 import com.opspilot.ai.analysis.GoldFactorStatus;
 import com.opspilot.ai.analysis.ResearchFactorAssessment;
+import com.opspilot.ai.analysis.GoldSnapshotInput;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -56,10 +59,12 @@ public class JdbcGoldResearchSnapshotRepository
             dollar_index_explanation,
             research_version,
             disclaimer,
-            created_at
+            created_at,
+            gold_input
             """;
 
     private final JdbcTemplate jdbcTemplate;
+    private final ObjectMapper json;
 
     /**
      * 将数据库行还原成不可变研究快照；基点变化由百分点变化确定性换算。
@@ -149,7 +154,8 @@ public class JdbcGoldResearchSnapshotRepository
                         ),
                         dollarIndexAssessment,
                         resultSet.getString("research_version"),
-                        resultSet.getString("disclaimer")
+                        resultSet.getString("disclaimer"),
+                        readInput(resultSet.getString("gold_input"))
                 );
 
                 return new StoredGoldResearchSnapshot(
@@ -163,9 +169,10 @@ public class JdbcGoldResearchSnapshotRepository
             };
 
     public JdbcGoldResearchSnapshotRepository(
-            JdbcTemplate jdbcTemplate
+            JdbcTemplate jdbcTemplate, ObjectMapper json
     ) {
         this.jdbcTemplate = jdbcTemplate;
+        this.json = json;
     }
 
     @Override
@@ -173,6 +180,18 @@ public class JdbcGoldResearchSnapshotRepository
             GoldResearchSnapshot snapshot,
             OffsetDateTime createdAt
     ) {
+        // JSON不舍入；SQL为八位价格小数、微秒时间，拒绝写入后会失配的依据。
+        if (snapshot.input() != null && (createdAt == null || createdAt.getNano() % 1000 != 0
+                || snapshot.gold() == null || snapshot.gold().collectedAt() == null
+                || snapshot.gold().collectedAt().getNano() % 1000 != 0
+                || snapshot.gold().currentPrice() == null
+                || snapshot.gold().currentPrice().stripTrailingZeros().scale() > 8)) {
+            throw new IllegalArgumentException("黄金快照价格或时刻无法按数据库精度无损保存");
+        }
+        if (snapshot.input() != null && !snapshot.input().matches(
+                snapshot.latestGoldDate(), snapshot.gold(), createdAt)) {
+            throw new IllegalArgumentException("黄金快照窗口依据与指标或保存时刻不匹配");
+        }
         UUID id = UUID.randomUUID();
         DollarIndexChangeMetrics dollarIndex = snapshot.dollarIndex();
         ResearchFactorAssessment dollarAssessment =
@@ -209,13 +228,14 @@ public class JdbcGoldResearchSnapshotRepository
                     dollar_index_explanation,
                     research_version,
                     disclaimer,
-                    created_at
+                    created_at,
+                    gold_input
                 )
                 values (
                     ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
                     ?,
                     ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                    ?, ?, ?, ?, ?, ?, ?, ?, ?
+                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?::jsonb
                 )
                 on conflict (analysis_date, research_version)
                 do nothing
@@ -262,7 +282,8 @@ public class JdbcGoldResearchSnapshotRepository
                         : dollarAssessment.explanation(),
                 snapshot.researchVersion(),
                 snapshot.disclaimer(),
-                createdAt
+                createdAt,
+                writeInput(snapshot.input())
         );
 
         boolean created = inserted == 1;
@@ -334,6 +355,24 @@ public class JdbcGoldResearchSnapshotRepository
         );
 
         return records.stream().findFirst();
+    }
+
+    private String writeInput(GoldSnapshotInput input) {
+        if (input == null) return null;
+        try {
+            return json.writeValueAsString(input);
+        } catch (JsonProcessingException invalid) {
+            throw new IllegalStateException("黄金窗口依据无法序列化", invalid);
+        }
+    }
+
+    private GoldSnapshotInput readInput(String value) {
+        if (value == null) return null;
+        try {
+            return json.readValue(value, GoldSnapshotInput.class);
+        } catch (JsonProcessingException invalid) {
+            throw new IllegalStateException("黄金窗口依据无法读取", invalid);
+        }
     }
 
     private static BigDecimal toBasisPoints(

@@ -76,6 +76,21 @@ class GoldResearchSnapshotRecordingServiceTests {
         verifyNoInteractions(repository);
     }
 
+    @Test
+    @DisplayName("纳秒时钟生成的保存时刻统一为数据库微秒精度")
+    void recordsMicrosecondTime() {
+        GoldResearchSnapshot snapshot = snapshot();
+        when(snapshotService.createSnapshot()).thenReturn(snapshot);
+        // 仓储替身返回收到的时间，断言真实编排服务传递的边界值。
+        when(repository.saveIfAbsent(org.mockito.ArgumentMatchers.eq(snapshot),
+                org.mockito.ArgumentMatchers.any())).thenAnswer(call -> new SaveGoldResearchSnapshotResult(
+                        new StoredGoldResearchSnapshot(UUID.randomUUID(), snapshot, call.getArgument(1)), true));
+        service = new GoldResearchSnapshotRecordingService(snapshotService, repository,
+                Clock.fixed(Instant.parse("2026-08-27T01:00:00.123456400Z"), ZoneOffset.UTC));
+        assertThat(service.recordCurrentSnapshot().record().createdAt())
+                .isEqualTo(OffsetDateTime.parse("2026-08-27T01:00:00.123456Z"));
+    }
+
     private SaveGoldResearchSnapshotResult saveResult(
             GoldResearchSnapshot snapshot
     ) {

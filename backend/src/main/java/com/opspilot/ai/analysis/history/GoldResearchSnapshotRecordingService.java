@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
 import java.time.OffsetDateTime;
+import java.time.temporal.ChronoUnit;
 
 /**
  * 编排当前研究快照生成与不可变历史留痕，不负责指标计算和 SQL。
@@ -35,7 +36,8 @@ public class GoldResearchSnapshotRecordingService {
 
         return repository.saveIfAbsent(
                 snapshot,
-                OffsetDateTime.now(clock)
+                // 自行采样的时刻统一到微秒，避免数据库舍入后早于核验时刻。
+                OffsetDateTime.now(clock).truncatedTo(ChronoUnit.MICROS)
         );
     }
 }
