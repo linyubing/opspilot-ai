@@ -1,0 +1,4964 @@
+{
+  "count": 720,
+  "labels": [
+    "BULLISH",
+    "NEUTRAL",
+    "BEARISH"
+  ],
+  "all": {
+    "candidate": {
+      "score": {
+        "count": 720,
+        "correct": 349,
+        "errors": 371,
+        "accuracy": 0.4847222222222222,
+        "balancedAccuracy": 0.33668341708542715,
+        "brierScore": 0.6306670554684912,
+        "logLoss": 1.048574003769618,
+        "recalls": [
+          0.010050251256281407,
+          1,
+          0
+        ],
+        "matrix": [
+          [
+            2,
+            197,
+            0
+          ],
+          [
+            0,
+            347,
+            0
+          ],
+          [
+            1,
+            173,
+            0
+          ]
+        ]
+      },
+      "predictedCounts": [
+        3,
+        717,
+        0
+      ],
+      "oneVsRestAuc": [
+        0.5114343309638403,
+        0.5550061422688537,
+        0.5097890615131995
+      ],
+      "directionalAuc": 0.46147403685092125,
+      "directionalCount": 373,
+      "byActual": [
+        {
+          "actual": "BULLISH",
+          "count": 199,
+          "meanProbability": [
+            0.26527735521524276,
+            0.49848372762703475,
+            0.23623891715772263
+          ],
+          "predictedCounts": [
+            2,
+            197,
+            0
+          ]
+        },
+        {
+          "actual": "NEUTRAL",
+          "count": 347,
+          "meanProbability": [
+            0.2598865445554416,
+            0.506882990556684,
+            0.233230464887874
+          ],
+          "predictedCounts": [
+            0,
+            347,
+            0
+          ]
+        },
+        {
+          "actual": "BEARISH",
+          "count": 174,
+          "meanProbability": [
+            0.2682420406323977,
+            0.49584950646763776,
+            0.23590845289996437
+          ],
+          "predictedCounts": [
+            1,
+            173,
+            0
+          ]
+        }
+      ]
+    },
+    "price": {
+      "score": {
+        "count": 720,
+        "correct": 350,
+        "errors": 370,
+        "accuracy": 0.4861111111111111,
+        "balancedAccuracy": 0.34980443973486297,
+        "brierScore": 0.6275459635610438,
+        "logLoss": 1.0429471931743959,
+        "recalls": [
+          0.05527638190954774,
+          0.9596541786743515,
+          0.034482758620689655
+        ],
+        "matrix": [
+          [
+            11,
+            182,
+            6
+          ],
+          [
+            10,
+            333,
+            4
+          ],
+          [
+            10,
+            158,
+            6
+          ]
+        ]
+      },
+      "predictedCounts": [
+        31,
+        673,
+        16
+      ],
+      "oneVsRestAuc": [
+        0.5245903220517173,
+        0.5633271781876058,
+        0.5617237168961307
+      ],
+      "directionalAuc": 0.525963149078727,
+      "directionalCount": 373,
+      "byActual": [
+        {
+          "actual": "BULLISH",
+          "count": 199,
+          "meanProbability": [
+            0.272809181607427,
+            0.4735975261843499,
+            0.2535932922082236
+          ],
+          "predictedCounts": [
+            11,
+            182,
+            6
+          ]
+        },
+        {
+          "actual": "NEUTRAL",
+          "count": 347,
+          "meanProbability": [
+            0.2646487008336111,
+            0.49059462900681294,
+            0.24475667015957617
+          ],
+          "predictedCounts": [
+            10,
+            333,
+            4
+          ]
+        },
+        {
+          "actual": "BEARISH",
+          "count": 174,
+          "meanProbability": [
+            0.2755437454390176,
+            0.4672423310072245,
+            0.25721392355375783
+          ],
+          "predictedCounts": [
+            10,
+            158,
+            6
+          ]
+        }
+      ]
+    },
+    "macro": {
+      "score": {
+        "count": 720,
+        "correct": 347,
+        "errors": 373,
+        "accuracy": 0.48194444444444445,
+        "balancedAccuracy": 0.3333333333333333,
+        "brierScore": 0.642585588196488,
+        "logLoss": 1.0671495594455387,
+        "recalls": [
+          0,
+          1,
+          0
+        ],
+        "matrix": [
+          [
+            0,
+            199,
+            0
+          ],
+          [
+            0,
+            347,
+            0
+          ],
+          [
+            0,
+            174,
+            0
+          ]
+        ]
+      },
+      "predictedCounts": [
+        0,
+        720,
+        0
+      ],
+      "oneVsRestAuc": [
+        0.493108536926475,
+        0.4820019933400808,
+        0.43659214348869524
+      ],
+      "directionalAuc": 0.44247097556749265,
+      "directionalCount": 373,
+      "byActual": [
+        {
+          "actual": "BULLISH",
+          "count": 199,
+          "meanProbability": [
+            0.2577455288230588,
+            0.5233699290697189,
+            0.218884542107222
+          ],
+          "predictedCounts": [
+            0,
+            199,
+            0
+          ]
+        },
+        {
+          "actual": "NEUTRAL",
+          "count": 347,
+          "meanProbability": [
+            0.2551243882772725,
+            0.5231713521065557,
+            0.2217042596161719
+          ],
+          "predictedCounts": [
+            0,
+            347,
+            0
+          ]
+        },
+        {
+          "actual": "BEARISH",
+          "count": 174,
+          "meanProbability": [
+            0.2609403358257783,
+            0.5244566819280508,
+            0.2146029822461712
+          ],
+          "predictedCounts": [
+            0,
+            174,
+            0
+          ]
+        }
+      ]
+    },
+    "frequencyMix": {
+      "score": {
+        "count": 720,
+        "correct": 347,
+        "errors": 373,
+        "accuracy": 0.48194444444444445,
+        "balancedAccuracy": 0.3333333333333333,
+        "brierScore": 0.6285194931718275,
+        "logLoss": 1.0444892183455168,
+        "recalls": [
+          0,
+          1,
+          0
+        ],
+        "matrix": [
+          [
+            0,
+            199,
+            0
+          ],
+          [
+            0,
+            347,
+            0
+          ],
+          [
+            0,
+            174,
+            0
+          ]
+        ]
+      },
+      "predictedCounts": [
+        0,
+        720,
+        0
+      ],
+      "oneVsRestAuc": [
+        0.5196616479711417,
+        0.5609938886356437,
+        0.5508083870152836
+      ],
+      "directionalAuc": 0.5133714549760295,
+      "directionalCount": 373,
+      "byActual": [
+        {
+          "actual": "BULLISH",
+          "count": 199,
+          "meanProbability": [
+            0.27262091810064487,
+            0.48949029573275354,
+            0.2378887861666024
+          ],
+          "predictedCounts": [
+            0,
+            199,
+            0
+          ]
+        },
+        {
+          "actual": "NEUTRAL",
+          "count": 347,
+          "meanProbability": [
+            0.2687834857361639,
+            0.49744230314260374,
+            0.23377421112123298
+          ],
+          "predictedCounts": [
+            0,
+            347,
+            0
+          ]
+        },
+        {
+          "actual": "BEARISH",
+          "count": 174,
+          "meanProbability": [
+            0.2742962917478526,
+            0.4864152623192367,
+            0.23928844593291157
+          ],
+          "predictedCounts": [
+            0,
+            174,
+            0
+          ]
+        }
+      ]
+    },
+    "prior": {
+      "score": {
+        "count": 720,
+        "correct": 347,
+        "errors": 373,
+        "accuracy": 0.48194444444444445,
+        "balancedAccuracy": 0.3333333333333333,
+        "brierScore": 0.6332450357864404,
+        "logLoss": 1.0508869574671549,
+        "recalls": [
+          0,
+          1,
+          0
+        ],
+        "matrix": [
+          [
+            0,
+            199,
+            0
+          ],
+          [
+            0,
+            347,
+            0
+          ],
+          [
+            0,
+            174,
+            0
+          ]
+        ]
+      },
+      "predictedCounts": [
+        0,
+        720,
+        0
+      ],
+      "oneVsRestAuc": [
+        0.4745367914428187,
+        0.4573517936197665,
+        0.45958064923582165
+      ],
+      "directionalAuc": 0.48457806272743026,
+      "directionalCount": 373,
+      "byActual": [
+        {
+          "actual": "BULLISH",
+          "count": 199,
+          "meanProbability": [
+            0.2732156345316243,
+            0.47826461425311445,
+            0.2485197512152695
+          ],
+          "predictedCounts": [
+            0,
+            199,
+            0
+          ]
+        },
+        {
+          "actual": "NEUTRAL",
+          "count": 347,
+          "meanProbability": [
+            0.27336490734748203,
+            0.4779164111493609,
+            0.248718681503159
+          ],
+          "predictedCounts": [
+            0,
+            347,
+            0
+          ]
+        },
+        {
+          "actual": "BEARISH",
+          "count": 174,
+          "meanProbability": [
+            0.27339057153459223,
+            0.47807095098485225,
+            0.24853847748055974
+          ],
+          "predictedCounts": [
+            0,
+            174,
+            0
+          ]
+        }
+      ]
+    },
+    "pitReference": {
+      "score": {
+        "count": 720,
+        "correct": 352,
+        "errors": 368,
+        "accuracy": 0.4888888888888889,
+        "balancedAccuracy": 0.3579375673069822,
+        "brierScore": 0.6366376579763903,
+        "logLoss": 1.0575485865731526,
+        "recalls": [
+          0.04522613065326633,
+          0.9481268011527377,
+          0.08045977011494253
+        ],
+        "matrix": [
+          [
+            9,
+            177,
+            13
+          ],
+          [
+            8,
+            329,
+            10
+          ],
+          [
+            8,
+            152,
+            14
+          ]
+        ]
+      },
+      "predictedCounts": [
+        25,
+        658,
+        37
+      ],
+      "oneVsRestAuc": [
+        0.4822384475158904,
+        0.5548052630359033,
+        0.5367773988463643
+      ],
+      "directionalAuc": 0.4706001270721423,
+      "directionalCount": 373,
+      "byActual": [
+        {
+          "actual": "BULLISH",
+          "count": 199,
+          "meanProbability": [
+            0.26901302279201716,
+            0.47522785266902423,
+            0.2557591245389588
+          ],
+          "predictedCounts": [
+            9,
+            177,
+            13
+          ]
+        },
+        {
+          "actual": "NEUTRAL",
+          "count": 347,
+          "meanProbability": [
+            0.26987141775345397,
+            0.48836108473461093,
+            0.24176749751193494
+          ],
+          "predictedCounts": [
+            8,
+            329,
+            10
+          ]
+        },
+        {
+          "actual": "BEARISH",
+          "count": 174,
+          "meanProbability": [
+            0.2766260492193889,
+            0.46863917597857147,
+            0.25473477480203993
+          ],
+          "predictedCounts": [
+            8,
+            152,
+            14
+          ]
+        }
+      ]
+    }
+  },
+  "promotionAllowed": false,
+  "scope": "post-outcome diagnostic only; repeated development dates; no model or threshold selection",
+  "inputHashes": {
+    "tree": "0e61b655c77bf6ead23df4b70217246c29951ef375b3cc71a0300303c5e9832d",
+    "fusion": "9a91a6292ee3c9e95b2d37d6130515a9a2bcf9d3ac2d28a62df1cf22ef5edd73"
+  },
+  "sourceHashes": {
+    "DirectionMath.cjs": "2456bbaa0289a64b00b0f00b16b78ca0de9688a68bfd748941cf6c1bd70f186f",
+    "DirectionAudit.cjs": "31712e8a61407ed3216bbb1d1302a02a6e88ee2e9103fef152adadbb52a1982b",
+    "run-direction.cjs": "e770976a7c683a0c4b88af4eba96ac9a3255581bedd5a59b78f41ea3de4997f0",
+    "InfoMath.cjs": "16a929d4340a5c1f3000443b65c4218e94defa5b0f2df953bfd5d8b8f7d3e60b",
+    "DirectionProbe.java": "83edfe954b8677d968f098f378918de9b36eadaa3bc4dfd65c0169eae4c17f8e",
+    "DirectionProbeChecks.java": "15d4ff677662cf31f34bc92d3cad5fdc96a9a06a9e11f96c1233c8a89edbe5a8",
+    "DirectionCompare.cjs": "d5c3a74f7ac4e35c46ef1ea56650a6bcb2065682709e0d0410b0129b9206858c",
+    "verify-direction.cjs": "698c1699a0ac74471aa27f08b4da6dfbccf7a7dc2542d42c40a70c09b872ef21"
+  },
+  "protocolHash": "6210e194c8c7e98202383fee1fa30d805e367e8d4d54259fdc9f140126e2921c",
+  "groups": [
+    {
+      "group": "WITHIN_0_5",
+      "count": 347,
+      "models": {
+        "candidate": {
+          "score": {
+            "count": 347,
+            "correct": 347,
+            "errors": 0,
+            "accuracy": 1,
+            "balancedAccuracy": null,
+            "brierScore": 0.36814681645670244,
+            "logLoss": 0.6828429760509479,
+            "recalls": [
+              null,
+              1,
+              null
+            ],
+            "matrix": [
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                347,
+                0
+              ],
+              [
+                0,
+                0,
+                0
+              ]
+            ]
+          },
+          "predictedCounts": [
+            0,
+            347,
+            0
+          ],
+          "oneVsRestAuc": [
+            null,
+            null,
+            null
+          ],
+          "directionalAuc": null,
+          "directionalCount": 0,
+          "byActual": [
+            {
+              "actual": "BULLISH",
+              "count": 0,
+              "meanProbability": null,
+              "predictedCounts": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "actual": "NEUTRAL",
+              "count": 347,
+              "meanProbability": [
+                0.2598865445554416,
+                0.506882990556684,
+                0.233230464887874
+              ],
+              "predictedCounts": [
+                0,
+                347,
+                0
+              ]
+            },
+            {
+              "actual": "BEARISH",
+              "count": 0,
+              "meanProbability": null,
+              "predictedCounts": [
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        "price": {
+          "score": {
+            "count": 347,
+            "correct": 333,
+            "errors": 14,
+            "accuracy": 0.9596541786743515,
+            "balancedAccuracy": null,
+            "brierScore": 0.39801949808977716,
+            "logLoss": 0.7245046948947443,
+            "recalls": [
+              null,
+              0.9596541786743515,
+              null
+            ],
+            "matrix": [
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                10,
+                333,
+                4
+              ],
+              [
+                0,
+                0,
+                0
+              ]
+            ]
+          },
+          "predictedCounts": [
+            10,
+            333,
+            4
+          ],
+          "oneVsRestAuc": [
+            null,
+            null,
+            null
+          ],
+          "directionalAuc": null,
+          "directionalCount": 0,
+          "byActual": [
+            {
+              "actual": "BULLISH",
+              "count": 0,
+              "meanProbability": null,
+              "predictedCounts": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "actual": "NEUTRAL",
+              "count": 347,
+              "meanProbability": [
+                0.2646487008336111,
+                0.49059462900681294,
+                0.24475667015957617
+              ],
+              "predictedCounts": [
+                10,
+                333,
+                4
+              ]
+            },
+            {
+              "actual": "BEARISH",
+              "count": 0,
+              "meanProbability": null,
+              "predictedCounts": [
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        "macro": {
+          "score": {
+            "count": 347,
+            "correct": 347,
+            "errors": 0,
+            "accuracy": 1,
+            "balancedAccuracy": null,
+            "brierScore": 0.34629265980652707,
+            "logLoss": 0.651536502665963,
+            "recalls": [
+              null,
+              1,
+              null
+            ],
+            "matrix": [
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                347,
+                0
+              ],
+              [
+                0,
+                0,
+                0
+              ]
+            ]
+          },
+          "predictedCounts": [
+            0,
+            347,
+            0
+          ],
+          "oneVsRestAuc": [
+            null,
+            null,
+            null
+          ],
+          "directionalAuc": null,
+          "directionalCount": 0,
+          "byActual": [
+            {
+              "actual": "BULLISH",
+              "count": 0,
+              "meanProbability": null,
+              "predictedCounts": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "actual": "NEUTRAL",
+              "count": 347,
+              "meanProbability": [
+                0.2551243882772725,
+                0.5231713521065557,
+                0.2217042596161719
+              ],
+              "predictedCounts": [
+                0,
+                347,
+                0
+              ]
+            },
+            {
+              "actual": "BEARISH",
+              "count": 0,
+              "meanProbability": null,
+              "predictedCounts": [
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        "frequencyMix": {
+          "score": {
+            "count": 347,
+            "correct": 347,
+            "errors": 0,
+            "accuracy": 1,
+            "balancedAccuracy": null,
+            "brierScore": 0.38153905932302284,
+            "logLoss": 0.7010207394728162,
+            "recalls": [
+              null,
+              1,
+              null
+            ],
+            "matrix": [
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                347,
+                0
+              ],
+              [
+                0,
+                0,
+                0
+              ]
+            ]
+          },
+          "predictedCounts": [
+            0,
+            347,
+            0
+          ],
+          "oneVsRestAuc": [
+            null,
+            null,
+            null
+          ],
+          "directionalAuc": null,
+          "directionalCount": 0,
+          "byActual": [
+            {
+              "actual": "BULLISH",
+              "count": 0,
+              "meanProbability": null,
+              "predictedCounts": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "actual": "NEUTRAL",
+              "count": 347,
+              "meanProbability": [
+                0.2687834857361639,
+                0.49744230314260374,
+                0.23377421112123298
+              ],
+              "predictedCounts": [
+                0,
+                347,
+                0
+              ]
+            },
+            {
+              "actual": "BEARISH",
+              "count": 0,
+              "meanProbability": null,
+              "predictedCounts": [
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        "prior": {
+          "score": {
+            "count": 347,
+            "correct": 347,
+            "errors": 0,
+            "accuracy": 1,
+            "balancedAccuracy": null,
+            "brierScore": 0.40916556219599637,
+            "logLoss": 0.7383256696238614,
+            "recalls": [
+              null,
+              1,
+              null
+            ],
+            "matrix": [
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                347,
+                0
+              ],
+              [
+                0,
+                0,
+                0
+              ]
+            ]
+          },
+          "predictedCounts": [
+            0,
+            347,
+            0
+          ],
+          "oneVsRestAuc": [
+            null,
+            null,
+            null
+          ],
+          "directionalAuc": null,
+          "directionalCount": 0,
+          "byActual": [
+            {
+              "actual": "BULLISH",
+              "count": 0,
+              "meanProbability": null,
+              "predictedCounts": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "actual": "NEUTRAL",
+              "count": 347,
+              "meanProbability": [
+                0.27336490734748203,
+                0.4779164111493609,
+                0.248718681503159
+              ],
+              "predictedCounts": [
+                0,
+                347,
+                0
+              ]
+            },
+            {
+              "actual": "BEARISH",
+              "count": 0,
+              "meanProbability": null,
+              "predictedCounts": [
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        "pitReference": {
+          "score": {
+            "count": 347,
+            "correct": 329,
+            "errors": 18,
+            "accuracy": 0.9481268011527377,
+            "balancedAccuracy": null,
+            "brierScore": 0.40463868112008183,
+            "logLoss": 0.7302936403652172,
+            "recalls": [
+              null,
+              0.9481268011527377,
+              null
+            ],
+            "matrix": [
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                8,
+                329,
+                10
+              ],
+              [
+                0,
+                0,
+                0
+              ]
+            ]
+          },
+          "predictedCounts": [
+            8,
+            329,
+            10
+          ],
+          "oneVsRestAuc": [
+            null,
+            null,
+            null
+          ],
+          "directionalAuc": null,
+          "directionalCount": 0,
+          "byActual": [
+            {
+              "actual": "BULLISH",
+              "count": 0,
+              "meanProbability": null,
+              "predictedCounts": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "actual": "NEUTRAL",
+              "count": 347,
+              "meanProbability": [
+                0.26987141775345397,
+                0.48836108473461093,
+                0.24176749751193494
+              ],
+              "predictedCounts": [
+                8,
+                329,
+                10
+              ]
+            },
+            {
+              "actual": "BEARISH",
+              "count": 0,
+              "meanProbability": null,
+              "predictedCounts": [
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        }
+      },
+      "againstPrice": {
+        "newHits": 14,
+        "newMisses": 0,
+        "net": 14,
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "newHits": 0,
+            "newMisses": 0
+          },
+          {
+            "actual": "NEUTRAL",
+            "newHits": 14,
+            "newMisses": 0
+          },
+          {
+            "actual": "BEARISH",
+            "newHits": 0,
+            "newMisses": 0
+          }
+        ]
+      },
+      "againstFrequencyMix": {
+        "newHits": 0,
+        "newMisses": 0,
+        "net": 0,
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "newHits": 0,
+            "newMisses": 0
+          },
+          {
+            "actual": "NEUTRAL",
+            "newHits": 0,
+            "newMisses": 0
+          },
+          {
+            "actual": "BEARISH",
+            "newHits": 0,
+            "newMisses": 0
+          }
+        ]
+      }
+    },
+    {
+      "group": "EDGE_0_5_0_6",
+      "count": 61,
+      "models": {
+        "candidate": {
+          "score": {
+            "count": 61,
+            "correct": 1,
+            "errors": 60,
+            "accuracy": 0.01639344262295082,
+            "balancedAccuracy": null,
+            "brierScore": 0.8763570849990925,
+            "logLoss": 1.390960517093499,
+            "recalls": [
+              0.03125,
+              null,
+              0
+            ],
+            "matrix": [
+              [
+                1,
+                31,
+                0
+              ],
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                29,
+                0
+              ]
+            ]
+          },
+          "predictedCounts": [
+            1,
+            60,
+            0
+          ],
+          "oneVsRestAuc": [
+            0.45689655172413796,
+            null,
+            0.5107758620689655
+          ],
+          "directionalAuc": 0.47413793103448276,
+          "directionalCount": 61,
+          "byActual": [
+            {
+              "actual": "BULLISH",
+              "count": 32,
+              "meanProbability": [
+                0.270250541485659,
+                0.49856175292269944,
+                0.23118770559164142
+              ],
+              "predictedCounts": [
+                1,
+                31,
+                0
+              ]
+            },
+            {
+              "actual": "NEUTRAL",
+              "count": 0,
+              "meanProbability": null,
+              "predictedCounts": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "actual": "BEARISH",
+              "count": 29,
+              "meanProbability": [
+                0.27135465851965973,
+                0.4984480004875735,
+                0.2301973409927669
+              ],
+              "predictedCounts": [
+                0,
+                29,
+                0
+              ]
+            }
+          ]
+        },
+        "price": {
+          "score": {
+            "count": 61,
+            "correct": 2,
+            "errors": 59,
+            "accuracy": 0.03278688524590164,
+            "balancedAccuracy": null,
+            "brierScore": 0.858108475797451,
+            "logLoss": 1.3593417044489944,
+            "recalls": [
+              0.0625,
+              null,
+              0
+            ],
+            "matrix": [
+              [
+                2,
+                30,
+                0
+              ],
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                1,
+                28,
+                0
+              ]
+            ]
+          },
+          "predictedCounts": [
+            3,
+            58,
+            0
+          ],
+          "oneVsRestAuc": [
+            0.5323275862068966,
+            null,
+            0.5431034482758621
+          ],
+          "directionalAuc": 0.5959051724137931,
+          "directionalCount": 61,
+          "byActual": [
+            {
+              "actual": "BULLISH",
+              "count": 32,
+              "meanProbability": [
+                0.26896173530507406,
+                0.4814772584063337,
+                0.24956100628859226
+              ],
+              "predictedCounts": [
+                2,
+                30,
+                0
+              ]
+            },
+            {
+              "actual": "NEUTRAL",
+              "count": 0,
+              "meanProbability": null,
+              "predictedCounts": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "actual": "BEARISH",
+              "count": 29,
+              "meanProbability": [
+                0.26206906016093656,
+                0.48873415435645245,
+                0.24919678548261104
+              ],
+              "predictedCounts": [
+                1,
+                28,
+                0
+              ]
+            }
+          ]
+        },
+        "macro": {
+          "score": {
+            "count": 61,
+            "correct": 0,
+            "errors": 61,
+            "accuracy": 0,
+            "balancedAccuracy": null,
+            "brierScore": 0.902416821350406,
+            "logLoss": 1.4362972875571196,
+            "recalls": [
+              0,
+              null,
+              0
+            ],
+            "matrix": [
+              [
+                0,
+                32,
+                0
+              ],
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                29,
+                0
+              ]
+            ]
+          },
+          "predictedCounts": [
+            0,
+            61,
+            0
+          ],
+          "oneVsRestAuc": [
+            0.43103448275862066,
+            null,
+            0.49245689655172414
+          ],
+          "directionalAuc": 0.4418103448275862,
+          "directionalCount": 61,
+          "byActual": [
+            {
+              "actual": "BULLISH",
+              "count": 32,
+              "meanProbability": [
+                0.27153934766624416,
+                0.5156462474390653,
+                0.2128144048946906
+              ],
+              "predictedCounts": [
+                0,
+                32,
+                0
+              ]
+            },
+            {
+              "actual": "NEUTRAL",
+              "count": 0,
+              "meanProbability": null,
+              "predictedCounts": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "actual": "BEARISH",
+              "count": 29,
+              "meanProbability": [
+                0.2806402568783828,
+                0.5081618466186943,
+                0.21119789650292284
+              ],
+              "predictedCounts": [
+                0,
+                29,
+                0
+              ]
+            }
+          ]
+        },
+        "frequencyMix": {
+          "score": {
+            "count": 61,
+            "correct": 0,
+            "errors": 61,
+            "accuracy": 0,
+            "balancedAccuracy": null,
+            "brierScore": 0.8671418844633856,
+            "logLoss": 1.374943845140576,
+            "recalls": [
+              0,
+              null,
+              0
+            ],
+            "matrix": [
+              [
+                0,
+                32,
+                0
+              ],
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                29,
+                0
+              ]
+            ]
+          },
+          "predictedCounts": [
+            0,
+            61,
+            0
+          ],
+          "oneVsRestAuc": [
+            0.5269396551724138,
+            null,
+            0.5420258620689655
+          ],
+          "directionalAuc": 0.5883620689655172,
+          "directionalCount": 61,
+          "byActual": [
+            {
+              "actual": "BULLISH",
+              "count": 32,
+              "meanProbability": [
+                0.2707469512275927,
+                0.49346861338741166,
+                0.23578443538499677
+              ],
+              "predictedCounts": [
+                0,
+                32,
+                0
+              ]
+            },
+            {
+              "actual": "NEUTRAL",
+              "count": 0,
+              "meanProbability": null,
+              "predictedCounts": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "actual": "BEARISH",
+              "count": 29,
+              "meanProbability": [
+                0.2676535274864687,
+                0.49663993839705556,
+                0.2357065341164764
+              ],
+              "predictedCounts": [
+                0,
+                29,
+                0
+              ]
+            }
+          ]
+        },
+        "prior": {
+          "score": {
+            "count": 61,
+            "correct": 0,
+            "errors": 61,
+            "accuracy": 0,
+            "balancedAccuracy": null,
+            "brierScore": 0.8419015251986984,
+            "logLoss": 1.342131352512845,
+            "recalls": [
+              0,
+              null,
+              0
+            ],
+            "matrix": [
+              [
+                0,
+                32,
+                0
+              ],
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                29,
+                0
+              ]
+            ]
+          },
+          "predictedCounts": [
+            0,
+            61,
+            0
+          ],
+          "oneVsRestAuc": [
+            0.4671336206896552,
+            null,
+            0.5317887931034483
+          ],
+          "directionalAuc": 0.5317887931034483,
+          "directionalCount": 61,
+          "byActual": [
+            {
+              "actual": "BULLISH",
+              "count": 32,
+              "meanProbability": [
+                0.2732434886796483,
+                0.4782401611656582,
+                0.24851635015470078
+              ],
+              "predictedCounts": [
+                0,
+                32,
+                0
+              ]
+            },
+            {
+              "actual": "NEUTRAL",
+              "count": 0,
+              "meanProbability": null,
+              "predictedCounts": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "actual": "BEARISH",
+              "count": 29,
+              "meanProbability": [
+                0.2734543212802103,
+                0.47783919604946745,
+                0.24870648267032663
+              ],
+              "predictedCounts": [
+                0,
+                29,
+                0
+              ]
+            }
+          ]
+        },
+        "pitReference": {
+          "score": {
+            "count": 61,
+            "correct": 3,
+            "errors": 58,
+            "accuracy": 0.04918032786885246,
+            "balancedAccuracy": null,
+            "brierScore": 0.8585031267331834,
+            "logLoss": 1.3687862658779724,
+            "recalls": [
+              0.0625,
+              null,
+              0.034482758620689655
+            ],
+            "matrix": [
+              [
+                2,
+                27,
+                3
+              ],
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                1,
+                27,
+                1
+              ]
+            ]
+          },
+          "predictedCounts": [
+            3,
+            54,
+            4
+          ],
+          "oneVsRestAuc": [
+            0.4644396551724138,
+            null,
+            0.5905172413793104
+          ],
+          "directionalAuc": 0.5484913793103449,
+          "directionalCount": 61,
+          "byActual": [
+            {
+              "actual": "BULLISH",
+              "count": 32,
+              "meanProbability": [
+                0.26877379100492393,
+                0.48584341340622195,
+                0.24538279558885412
+              ],
+              "predictedCounts": [
+                2,
+                27,
+                3
+              ]
+            },
+            {
+              "actual": "NEUTRAL",
+              "count": 0,
+              "meanProbability": null,
+              "predictedCounts": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "actual": "BEARISH",
+              "count": 29,
+              "meanProbability": [
+                0.26968438102244685,
+                0.47809425998164407,
+                0.25222135899590903
+              ],
+              "predictedCounts": [
+                1,
+                27,
+                1
+              ]
+            }
+          ]
+        }
+      },
+      "againstPrice": {
+        "newHits": 0,
+        "newMisses": 1,
+        "net": -1,
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "newHits": 0,
+            "newMisses": 1
+          },
+          {
+            "actual": "NEUTRAL",
+            "newHits": 0,
+            "newMisses": 0
+          },
+          {
+            "actual": "BEARISH",
+            "newHits": 0,
+            "newMisses": 0
+          }
+        ]
+      },
+      "againstFrequencyMix": {
+        "newHits": 1,
+        "newMisses": 0,
+        "net": 1,
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "newHits": 1,
+            "newMisses": 0
+          },
+          {
+            "actual": "NEUTRAL",
+            "newHits": 0,
+            "newMisses": 0
+          },
+          {
+            "actual": "BEARISH",
+            "newHits": 0,
+            "newMisses": 0
+          }
+        ]
+      }
+    },
+    {
+      "group": "MID_0_6_1",
+      "count": 147,
+      "models": {
+        "candidate": {
+          "score": {
+            "count": 147,
+            "correct": 1,
+            "errors": 146,
+            "accuracy": 0.006802721088435374,
+            "balancedAccuracy": null,
+            "brierScore": 0.8731540330935864,
+            "logLoss": 1.386793974713739,
+            "recalls": [
+              0.0136986301369863,
+              null,
+              0
+            ],
+            "matrix": [
+              [
+                1,
+                72,
+                0
+              ],
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                74,
+                0
+              ]
+            ]
+          },
+          "predictedCounts": [
+            1,
+            146,
+            0
+          ],
+          "oneVsRestAuc": [
+            0.4189189189189189,
+            null,
+            0.5485005553498704
+          ],
+          "directionalAuc": 0.49185486856719735,
+          "directionalCount": 147,
+          "byActual": [
+            {
+              "actual": "BULLISH",
+              "count": 73,
+              "meanProbability": [
+                0.2660351504739199,
+                0.5001681846136675,
+                0.23379666491241255
+              ],
+              "predictedCounts": [
+                1,
+                72,
+                0
+              ]
+            },
+            {
+              "actual": "NEUTRAL",
+              "count": 0,
+              "meanProbability": null,
+              "predictedCounts": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "actual": "BEARISH",
+              "count": 74,
+              "meanProbability": [
+                0.2702073556145369,
+                0.4912480814757052,
+                0.23854456290975778
+              ],
+              "predictedCounts": [
+                0,
+                74,
+                0
+              ]
+            }
+          ]
+        },
+        "price": {
+          "score": {
+            "count": 147,
+            "correct": 11,
+            "errors": 136,
+            "accuracy": 0.07482993197278912,
+            "balancedAccuracy": null,
+            "brierScore": 0.838821984323276,
+            "logLoss": 1.337233986453691,
+            "recalls": [
+              0.0958904109589041,
+              null,
+              0.05405405405405406
+            ],
+            "matrix": [
+              [
+                7,
+                64,
+                2
+              ],
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                4,
+                66,
+                4
+              ]
+            ]
+          },
+          "predictedCounts": [
+            11,
+            130,
+            6
+          ],
+          "oneVsRestAuc": [
+            0.43965198074787115,
+            null,
+            0.5588670862643466
+          ],
+          "directionalAuc": 0.5046279155868197,
+          "directionalCount": 147,
+          "byActual": [
+            {
+              "actual": "BULLISH",
+              "count": 73,
+              "meanProbability": [
+                0.2724358613353112,
+                0.47527877110379296,
+                0.25228536756089565
+              ],
+              "predictedCounts": [
+                7,
+                64,
+                2
+              ]
+            },
+            {
+              "actual": "NEUTRAL",
+              "count": 0,
+              "meanProbability": null,
+              "predictedCounts": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "actual": "BEARISH",
+              "count": 74,
+              "meanProbability": [
+                0.27991643855546955,
+                0.45937692517432277,
+                0.2607066362702075
+              ],
+              "predictedCounts": [
+                4,
+                66,
+                4
+              ]
+            }
+          ]
+        },
+        "macro": {
+          "score": {
+            "count": 147,
+            "correct": 0,
+            "errors": 147,
+            "accuracy": 0,
+            "balancedAccuracy": null,
+            "brierScore": 0.9177790569767849,
+            "logLoss": 1.4523299015097655,
+            "recalls": [
+              0,
+              null,
+              0
+            ],
+            "matrix": [
+              [
+                0,
+                73,
+                0
+              ],
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                74,
+                0
+              ]
+            ]
+          },
+          "predictedCounts": [
+            0,
+            147,
+            0
+          ],
+          "oneVsRestAuc": [
+            0.47352832284339136,
+            null,
+            0.5166604961125509
+          ],
+          "directionalAuc": 0.466864124398371,
+          "directionalCount": 147,
+          "byActual": [
+            {
+              "actual": "BULLISH",
+              "count": 73,
+              "meanProbability": [
+                0.2596344396125286,
+                0.5250575981235418,
+                0.2153079622639294
+              ],
+              "predictedCounts": [
+                0,
+                73,
+                0
+              ]
+            },
+            {
+              "actual": "NEUTRAL",
+              "count": 0,
+              "meanProbability": null,
+              "predictedCounts": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "actual": "BEARISH",
+              "count": 74,
+              "meanProbability": [
+                0.2604982726736044,
+                0.5231192377770878,
+                0.216382489549308
+              ],
+              "predictedCounts": [
+                0,
+                74,
+                0
+              ]
+            }
+          ]
+        },
+        "frequencyMix": {
+          "score": {
+            "count": 147,
+            "correct": 0,
+            "errors": 147,
+            "accuracy": 0,
+            "balancedAccuracy": null,
+            "brierScore": 0.8584824504346782,
+            "logLoss": 1.3655482861377326,
+            "recalls": [
+              0,
+              null,
+              0
+            ],
+            "matrix": [
+              [
+                0,
+                73,
+                0
+              ],
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                74,
+                0
+              ]
+            ]
+          },
+          "predictedCounts": [
+            0,
+            147,
+            0
+          ],
+          "oneVsRestAuc": [
+            0.4394668641243984,
+            null,
+            0.5586819696408738
+          ],
+          "directionalAuc": 0.5231395779340985,
+          "directionalCount": 147,
+          "byActual": [
+            {
+              "actual": "BULLISH",
+              "count": 73,
+              "meanProbability": [
+                0.2726238144732217,
+                0.4905277166219303,
+                0.23684846890484879
+              ],
+              "predictedCounts": [
+                0,
+                73,
+                0
+              ]
+            },
+            {
+              "actual": "NEUTRAL",
+              "count": 0,
+              "meanProbability": null,
+              "predictedCounts": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "actual": "BEARISH",
+              "count": 74,
+              "meanProbability": [
+                0.276425412994194,
+                0.4824510960163926,
+                0.24112349098941452
+              ],
+              "predictedCounts": [
+                0,
+                74,
+                0
+              ]
+            }
+          ]
+        },
+        "prior": {
+          "score": {
+            "count": 147,
+            "correct": 0,
+            "errors": 147,
+            "accuracy": 0,
+            "balancedAccuracy": null,
+            "brierScore": 0.8434106772337194,
+            "logLoss": 1.3449637591583186,
+            "recalls": [
+              0,
+              null,
+              0
+            ],
+            "matrix": [
+              [
+                0,
+                73,
+                0
+              ],
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                74,
+                0
+              ]
+            ]
+          },
+          "predictedCounts": [
+            0,
+            147,
+            0
+          ],
+          "oneVsRestAuc": [
+            0.49611255090707146,
+            null,
+            0.5090707145501666
+          ],
+          "directionalAuc": 0.5090707145501666,
+          "directionalCount": 147,
+          "byActual": [
+            {
+              "actual": "BULLISH",
+              "count": 73,
+              "meanProbability": [
+                0.2733208359599522,
+                0.4781871387093527,
+                0.24849202533070192
+              ],
+              "predictedCounts": [
+                0,
+                73,
+                0
+              ]
+            },
+            {
+              "actual": "NEUTRAL",
+              "count": 0,
+              "meanProbability": null,
+              "predictedCounts": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "actual": "BEARISH",
+              "count": 74,
+              "meanProbability": [
+                0.2733583041785437,
+                0.4781030526226241,
+                0.2485386431988383
+              ],
+              "predictedCounts": [
+                0,
+                74,
+                0
+              ]
+            }
+          ]
+        },
+        "pitReference": {
+          "score": {
+            "count": 147,
+            "correct": 10,
+            "errors": 137,
+            "accuracy": 0.06802721088435375,
+            "balancedAccuracy": null,
+            "brierScore": 0.8513567715632555,
+            "logLoss": 1.3614925881174167,
+            "recalls": [
+              0.0821917808219178,
+              null,
+              0.05405405405405406
+            ],
+            "matrix": [
+              [
+                6,
+                65,
+                2
+              ],
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                5,
+                65,
+                4
+              ]
+            ]
+          },
+          "predictedCounts": [
+            11,
+            130,
+            6
+          ],
+          "oneVsRestAuc": [
+            0.46945575712699,
+            null,
+            0.4805627545353573
+          ],
+          "directionalAuc": 0.46704924102184375,
+          "directionalCount": 147,
+          "byActual": [
+            {
+              "actual": "BULLISH",
+              "count": 73,
+              "meanProbability": [
+                0.27202171946150716,
+                0.47464421214341557,
+                0.2533340683950772
+              ],
+              "predictedCounts": [
+                6,
+                65,
+                2
+              ]
+            },
+            {
+              "actual": "NEUTRAL",
+              "count": 0,
+              "meanProbability": null,
+              "predictedCounts": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "actual": "BEARISH",
+              "count": 74,
+              "meanProbability": [
+                0.2793296028724098,
+                0.46745686947550275,
+                0.25321352765208754
+              ],
+              "predictedCounts": [
+                5,
+                65,
+                4
+              ]
+            }
+          ]
+        }
+      },
+      "againstPrice": {
+        "newHits": 0,
+        "newMisses": 10,
+        "net": -10,
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "newHits": 0,
+            "newMisses": 6
+          },
+          {
+            "actual": "NEUTRAL",
+            "newHits": 0,
+            "newMisses": 0
+          },
+          {
+            "actual": "BEARISH",
+            "newHits": 0,
+            "newMisses": 4
+          }
+        ]
+      },
+      "againstFrequencyMix": {
+        "newHits": 1,
+        "newMisses": 0,
+        "net": 1,
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "newHits": 1,
+            "newMisses": 0
+          },
+          {
+            "actual": "NEUTRAL",
+            "newHits": 0,
+            "newMisses": 0
+          },
+          {
+            "actual": "BEARISH",
+            "newHits": 0,
+            "newMisses": 0
+          }
+        ]
+      }
+    },
+    {
+      "group": "LARGE_1_2",
+      "count": 145,
+      "models": {
+        "candidate": {
+          "score": {
+            "count": 145,
+            "correct": 0,
+            "errors": 145,
+            "accuracy": 0,
+            "balancedAccuracy": null,
+            "brierScore": 0.8766324961611992,
+            "logLoss": 1.3912748467633287,
+            "recalls": [
+              0,
+              null,
+              0
+            ],
+            "matrix": [
+              [
+                0,
+                83,
+                0
+              ],
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                1,
+                61,
+                0
+              ]
+            ]
+          },
+          "predictedCounts": [
+            1,
+            144,
+            0
+          ],
+          "oneVsRestAuc": [
+            0.5223474543334629,
+            null,
+            0.4006995724834823
+          ],
+          "directionalAuc": 0.42576758647493196,
+          "directionalCount": 145,
+          "byActual": [
+            {
+              "actual": "BULLISH",
+              "count": 83,
+              "meanProbability": [
+                0.2642258776828635,
+                0.4948934920211435,
+                0.24088063029599321
+              ],
+              "predictedCounts": [
+                0,
+                83,
+                0
+              ]
+            },
+            {
+              "actual": "NEUTRAL",
+              "count": 0,
+              "meanProbability": null,
+              "predictedCounts": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "actual": "BEARISH",
+              "count": 62,
+              "meanProbability": [
+                0.26469705208540545,
+                0.5024531756357483,
+                0.23284977227884643
+              ],
+              "predictedCounts": [
+                1,
+                61,
+                0
+              ]
+            }
+          ]
+        },
+        "price": {
+          "score": {
+            "count": 145,
+            "correct": 3,
+            "errors": 142,
+            "accuracy": 0.020689655172413793,
+            "balancedAccuracy": null,
+            "brierScore": 0.8390937215238611,
+            "logLoss": 1.337026920952196,
+            "recalls": [
+              0.024096385542168676,
+              null,
+              0.016129032258064516
+            ],
+            "matrix": [
+              [
+                2,
+                77,
+                4
+              ],
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                4,
+                57,
+                1
+              ]
+            ]
+          },
+          "predictedCounts": [
+            6,
+            134,
+            5
+          ],
+          "oneVsRestAuc": [
+            0.5258453167508744,
+            null,
+            0.4588029537504858
+          ],
+          "directionalAuc": 0.4959191605130198,
+          "directionalCount": 145,
+          "byActual": [
+            {
+              "actual": "BULLISH",
+              "count": 83,
+              "meanProbability": [
+                0.27643596942127857,
+                0.46592231413523855,
+                0.25764171644348305
+              ],
+              "predictedCounts": [
+                2,
+                77,
+                4
+              ]
+            },
+            {
+              "actual": "NEUTRAL",
+              "count": 0,
+              "meanProbability": null,
+              "predictedCounts": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "actual": "BEARISH",
+              "count": 62,
+              "meanProbability": [
+                0.27404268851012403,
+                0.473929697946072,
+                0.25202761354380393
+              ],
+              "predictedCounts": [
+                4,
+                57,
+                1
+              ]
+            }
+          ]
+        },
+        "macro": {
+          "score": {
+            "count": 145,
+            "correct": 0,
+            "errors": 145,
+            "accuracy": 0,
+            "balancedAccuracy": null,
+            "brierScore": 0.9233599068324105,
+            "logLoss": 1.4612246354400018,
+            "recalls": [
+              0,
+              null,
+              0
+            ],
+            "matrix": [
+              [
+                0,
+                83,
+                0
+              ],
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                62,
+                0
+              ]
+            ]
+          },
+          "predictedCounts": [
+            0,
+            145,
+            0
+          ],
+          "oneVsRestAuc": [
+            0.47143412359113873,
+            null,
+            0.387679751263117
+          ],
+          "directionalAuc": 0.4220753983676642,
+          "directionalCount": 145,
+          "byActual": [
+            {
+              "actual": "BULLISH",
+              "count": 83,
+              "meanProbability": [
+                0.2520157859444483,
+                0.5238646699070485,
+                0.22411954414850316
+              ],
+              "predictedCounts": [
+                0,
+                83,
+                0
+              ]
+            },
+            {
+              "actual": "NEUTRAL",
+              "count": 0,
+              "meanProbability": null,
+              "predictedCounts": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "actual": "BEARISH",
+              "count": 62,
+              "meanProbability": [
+                0.2553514156606868,
+                0.5309766533254243,
+                0.21367193101388893
+              ],
+              "predictedCounts": [
+                0,
+                62,
+                0
+              ]
+            }
+          ]
+        },
+        "frequencyMix": {
+          "score": {
+            "count": 145,
+            "correct": 0,
+            "errors": 145,
+            "accuracy": 0,
+            "balancedAccuracy": null,
+            "brierScore": 0.8560419216846185,
+            "logLoss": 1.3607806526075295,
+            "recalls": [
+              0,
+              null,
+              0
+            ],
+            "matrix": [
+              [
+                0,
+                83,
+                0
+              ],
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                62,
+                0
+              ]
+            ]
+          },
+          "predictedCounts": [
+            0,
+            145,
+            0
+          ],
+          "oneVsRestAuc": [
+            0.5141857753595025,
+            null,
+            0.4422852701127089
+          ],
+          "directionalAuc": 0.455110765643218,
+          "directionalCount": 145,
+          "byActual": [
+            {
+              "actual": "BULLISH",
+              "count": 83,
+              "meanProbability": [
+                0.2741419200132546,
+                0.4854651558586379,
+                0.2403929241281089
+              ],
+              "predictedCounts": [
+                0,
+                83,
+                0
+              ]
+            },
+            {
+              "actual": "NEUTRAL",
+              "count": 0,
+              "meanProbability": null,
+              "predictedCounts": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "actual": "BEARISH",
+              "count": 62,
+              "meanProbability": [
+                0.2737013743403555,
+                0.48993834755064714,
+                0.23636027810899818
+              ],
+              "predictedCounts": [
+                0,
+                62,
+                0
+              ]
+            }
+          ]
+        },
+        "prior": {
+          "score": {
+            "count": 145,
+            "correct": 0,
+            "errors": 145,
+            "accuracy": 0,
+            "balancedAccuracy": null,
+            "brierScore": 0.8400271020031771,
+            "logLoss": 1.3383714019433333,
+            "recalls": [
+              0,
+              null,
+              0
+            ],
+            "matrix": [
+              [
+                0,
+                83,
+                0
+              ],
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                62,
+                0
+              ]
+            ]
+          },
+          "predictedCounts": [
+            0,
+            145,
+            0
+          ],
+          "oneVsRestAuc": [
+            0.3863194714341236,
+            null,
+            0.4432568985619899
+          ],
+          "directionalAuc": 0.4432568985619899,
+          "directionalCount": 145,
+          "byActual": [
+            {
+              "actual": "BULLISH",
+              "count": 83,
+              "meanProbability": [
+                0.27305125155470816,
+                0.47842029129010233,
+                0.24852845715519886
+              ],
+              "predictedCounts": [
+                0,
+                83,
+                0
+              ]
+            },
+            {
+              "actual": "NEUTRAL",
+              "count": 0,
+              "meanProbability": null,
+              "predictedCounts": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "actual": "BEARISH",
+              "count": 62,
+              "meanProbability": [
+                0.2734766092744737,
+                0.4780129127913135,
+                0.24851047793421832
+              ],
+              "predictedCounts": [
+                0,
+                62,
+                0
+              ]
+            }
+          ]
+        },
+        "pitReference": {
+          "score": {
+            "count": 145,
+            "correct": 8,
+            "errors": 137,
+            "accuracy": 0.05517241379310345,
+            "balancedAccuracy": null,
+            "brierScore": 0.8578701136223215,
+            "logLoss": 1.3705765724125667,
+            "recalls": [
+              0.012048192771084338,
+              null,
+              0.11290322580645161
+            ],
+            "matrix": [
+              [
+                1,
+                75,
+                7
+              ],
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                1,
+                54,
+                7
+              ]
+            ]
+          },
+          "predictedCounts": [
+            2,
+            129,
+            14
+          ],
+          "oneVsRestAuc": [
+            0.47007384376214534,
+            null,
+            0.43781577924601633
+          ],
+          "directionalAuc": 0.4265448892343568,
+          "directionalCount": 145,
+          "byActual": [
+            {
+              "actual": "BULLISH",
+              "count": 83,
+              "meanProbability": [
+                0.26831483382360954,
+                0.4679074818464376,
+                0.26377768432995263
+              ],
+              "predictedCounts": [
+                1,
+                75,
+                7
+              ]
+            },
+            {
+              "actual": "NEUTRAL",
+              "count": 0,
+              "meanProbability": null,
+              "predictedCounts": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "actual": "BEARISH",
+              "count": 62,
+              "meanProbability": [
+                0.2729927693269874,
+                0.47864437782168506,
+                0.2483628528513274
+              ],
+              "predictedCounts": [
+                1,
+                54,
+                7
+              ]
+            }
+          ]
+        }
+      },
+      "againstPrice": {
+        "newHits": 0,
+        "newMisses": 3,
+        "net": -3,
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "newHits": 0,
+            "newMisses": 2
+          },
+          {
+            "actual": "NEUTRAL",
+            "newHits": 0,
+            "newMisses": 0
+          },
+          {
+            "actual": "BEARISH",
+            "newHits": 0,
+            "newMisses": 1
+          }
+        ]
+      },
+      "againstFrequencyMix": {
+        "newHits": 0,
+        "newMisses": 0,
+        "net": 0,
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "newHits": 0,
+            "newMisses": 0
+          },
+          {
+            "actual": "NEUTRAL",
+            "newHits": 0,
+            "newMisses": 0
+          },
+          {
+            "actual": "BEARISH",
+            "newHits": 0,
+            "newMisses": 0
+          }
+        ]
+      }
+    },
+    {
+      "group": "OVER_2",
+      "count": 20,
+      "models": {
+        "candidate": {
+          "score": {
+            "count": 20,
+            "correct": 0,
+            "errors": 20,
+            "accuracy": 0,
+            "balancedAccuracy": null,
+            "brierScore": 0.8705098816880822,
+            "logLoss": 1.3792305709070374,
+            "recalls": [
+              0,
+              null,
+              0
+            ],
+            "matrix": [
+              [
+                0,
+                11,
+                0
+              ],
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                9,
+                0
+              ]
+            ]
+          },
+          "predictedCounts": [
+            0,
+            20,
+            0
+          ],
+          "oneVsRestAuc": [
+            0.32323232323232326,
+            null,
+            0.6767676767676768
+          ],
+          "directionalAuc": 0.5050505050505051,
+          "directionalCount": 20,
+          "byActual": [
+            {
+              "actual": "BULLISH",
+              "count": 11,
+              "meanProbability": [
+                0.2537147752744002,
+                0.5141680354273495,
+                0.2321171892982504
+              ],
+              "predictedCounts": [
+                0,
+                11,
+                0
+              ]
+            },
+            {
+              "actual": "NEUTRAL",
+              "count": 0,
+              "meanProbability": null,
+              "predictedCounts": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "actual": "BEARISH",
+              "count": 9,
+              "meanProbability": [
+                0.2664742697995799,
+                0.4798185769567515,
+                0.25370715324366855
+              ],
+              "predictedCounts": [
+                0,
+                9,
+                0
+              ]
+            }
+          ]
+        },
+        "price": {
+          "score": {
+            "count": 20,
+            "correct": 1,
+            "errors": 19,
+            "accuracy": 0.05,
+            "balancedAccuracy": null,
+            "brierScore": 0.8200144793336495,
+            "logLoss": 1.307835321946948,
+            "recalls": [
+              0,
+              null,
+              0.1111111111111111
+            ],
+            "matrix": [
+              [
+                0,
+                11,
+                0
+              ],
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                1,
+                7,
+                1
+              ]
+            ]
+          },
+          "predictedCounts": [
+            1,
+            18,
+            1
+          ],
+          "oneVsRestAuc": [
+            0.2222222222222222,
+            null,
+            0.8080808080808081
+          ],
+          "directionalAuc": 0.6363636363636364,
+          "directionalCount": 20,
+          "byActual": [
+            {
+              "actual": "BULLISH",
+              "count": 11,
+              "meanProbability": [
+                0.25911347915197575,
+                0.49743027980738524,
+                0.243456241040639
+              ],
+              "predictedCounts": [
+                0,
+                11,
+                0
+              ]
+            },
+            {
+              "actual": "NEUTRAL",
+              "count": 0,
+              "meanProbability": null,
+              "predictedCounts": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "actual": "BEARISH",
+              "count": 9,
+              "meanProbability": [
+                0.2933495356654939,
+                0.4165934870404015,
+                0.2900569772941046
+              ],
+              "predictedCounts": [
+                1,
+                7,
+                1
+              ]
+            }
+          ]
+        },
+        "macro": {
+          "score": {
+            "count": 20,
+            "correct": 0,
+            "errors": 20,
+            "accuracy": 0,
+            "balancedAccuracy": null,
+            "brierScore": 0.932496828997242,
+            "logLoss": 1.4640157086989156,
+            "recalls": [
+              0,
+              null,
+              0
+            ],
+            "matrix": [
+              [
+                0,
+                11,
+                0
+              ],
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                9,
+                0
+              ]
+            ]
+          },
+          "predictedCounts": [
+            0,
+            20,
+            0
+          ],
+          "oneVsRestAuc": [
+            0.5757575757575758,
+            null,
+            0.4444444444444444
+          ],
+          "directionalAuc": 0.47474747474747475,
+          "directionalCount": 20,
+          "byActual": [
+            {
+              "actual": "BULLISH",
+              "count": 11,
+              "meanProbability": [
+                0.24831607139682463,
+                0.5309057910473136,
+                0.22077813755586173
+              ],
+              "predictedCounts": [
+                0,
+                11,
+                0
+              ]
+            },
+            {
+              "actual": "NEUTRAL",
+              "count": 0,
+              "meanProbability": null,
+              "predictedCounts": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "actual": "BEARISH",
+              "count": 9,
+              "meanProbability": [
+                0.23959900393366607,
+                0.5430436668731015,
+                0.21735732919323247
+              ],
+              "predictedCounts": [
+                0,
+                9,
+                0
+              ]
+            }
+          ]
+        },
+        "frequencyMix": {
+          "score": {
+            "count": 20,
+            "correct": 0,
+            "errors": 20,
+            "accuracy": 0,
+            "balancedAccuracy": null,
+            "brierScore": 0.8460663844096519,
+            "logLoss": 1.3428836683895498,
+            "recalls": [
+              0,
+              null,
+              0
+            ],
+            "matrix": [
+              [
+                0,
+                11,
+                0
+              ],
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                9,
+                0
+              ]
+            ]
+          },
+          "predictedCounts": [
+            0,
+            20,
+            0
+          ],
+          "oneVsRestAuc": [
+            0.20202020202020202,
+            null,
+            0.797979797979798
+          ],
+          "directionalAuc": 0.7070707070707071,
+          "directionalCount": 20,
+          "byActual": [
+            {
+              "actual": "BULLISH",
+              "count": 11,
+              "meanProbability": [
+                0.26657658591818806,
+                0.5014038157048145,
+                0.2320195983769979
+              ],
+              "predictedCounts": [
+                0,
+                11,
+                0
+              ]
+            },
+            {
+              "actual": "NEUTRAL",
+              "count": 0,
+              "meanProbability": null,
+              "predictedCounts": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "actual": "BEARISH",
+              "count": 9,
+              "meanProbability": [
+                0.2822929662607097,
+                0.4617931974088215,
+                0.2559138363304707
+              ],
+              "predictedCounts": [
+                0,
+                9,
+                0
+              ]
+            }
+          ]
+        },
+        "prior": {
+          "score": {
+            "count": 20,
+            "correct": 0,
+            "errors": 20,
+            "accuracy": 0,
+            "balancedAccuracy": null,
+            "brierScore": 0.8407341651646547,
+            "logLoss": 1.3398031817765432,
+            "recalls": [
+              0,
+              null,
+              0
+            ],
+            "matrix": [
+              [
+                0,
+                11,
+                0
+              ],
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                9,
+                0
+              ]
+            ]
+          },
+          "predictedCounts": [
+            0,
+            20,
+            0
+          ],
+          "oneVsRestAuc": [
+            0.6515151515151515,
+            null,
+            0.4696969696969697
+          ],
+          "directionalAuc": 0.4696969696969697,
+          "directionalCount": 20,
+          "byActual": [
+            {
+              "actual": "BULLISH",
+              "count": 11,
+              "meanProbability": [
+                0.2736767936297516,
+                0.4776752523824903,
+                0.24864795398775996
+              ],
+              "predictedCounts": [
+                0,
+                11,
+                0
+              ]
+            },
+            {
+              "actual": "NEUTRAL",
+              "count": 0,
+              "meanProbability": null,
+              "predictedCounts": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "actual": "BEARISH",
+              "count": 9,
+              "meanProbability": [
+                0.2728577606292577,
+                0.4789535887549175,
+                0.24818865061583723
+              ],
+              "predictedCounts": [
+                0,
+                9,
+                0
+              ]
+            }
+          ]
+        },
+        "pitReference": {
+          "score": {
+            "count": 20,
+            "correct": 2,
+            "errors": 18,
+            "accuracy": 0.1,
+            "balancedAccuracy": null,
+            "brierScore": 0.8030094384286969,
+            "logLoss": 1.2827056727149972,
+            "recalls": [
+              0,
+              null,
+              0.2222222222222222
+            ],
+            "matrix": [
+              [
+                0,
+                10,
+                1
+              ],
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                1,
+                6,
+                2
+              ]
+            ]
+          },
+          "predictedCounts": [
+            1,
+            16,
+            3
+          ],
+          "oneVsRestAuc": [
+            0.1919191919191919,
+            null,
+            0.7777777777777778
+          ],
+          "directionalAuc": 0.6060606060606061,
+          "directionalCount": 20,
+          "byActual": [
+            {
+              "actual": "BULLISH",
+              "count": 11,
+              "meanProbability": [
+                0.2550103177640201,
+                0.5034549974920915,
+                0.24153468474388842
+              ],
+              "predictedCounts": [
+                0,
+                10,
+                1
+              ]
+            },
+            {
+              "actual": "NEUTRAL",
+              "count": 0,
+              "meanProbability": null,
+              "predictedCounts": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "actual": "BEARISH",
+              "count": 9,
+              "meanProbability": [
+                0.3017936892990173,
+                0.37896925718578434,
+                0.31923705351519843
+              ],
+              "predictedCounts": [
+                1,
+                6,
+                2
+              ]
+            }
+          ]
+        }
+      },
+      "againstPrice": {
+        "newHits": 0,
+        "newMisses": 1,
+        "net": -1,
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "newHits": 0,
+            "newMisses": 0
+          },
+          {
+            "actual": "NEUTRAL",
+            "newHits": 0,
+            "newMisses": 0
+          },
+          {
+            "actual": "BEARISH",
+            "newHits": 0,
+            "newMisses": 1
+          }
+        ]
+      },
+      "againstFrequencyMix": {
+        "newHits": 0,
+        "newMisses": 0,
+        "net": 0,
+        "byActual": [
+          {
+            "actual": "BULLISH",
+            "newHits": 0,
+            "newMisses": 0
+          },
+          {
+            "actual": "NEUTRAL",
+            "newHits": 0,
+            "newMisses": 0
+          },
+          {
+            "actual": "BEARISH",
+            "newHits": 0,
+            "newMisses": 0
+          }
+        ]
+      }
+    }
+  ],
+  "folds": [
+    {
+      "start": "2022-02-02",
+      "end": "2023-01-03",
+      "count": 240,
+      "models": {
+        "candidate": {
+          "score": {
+            "count": 240,
+            "correct": 108,
+            "errors": 132,
+            "accuracy": 0.45,
+            "balancedAccuracy": 0.3434343434343434,
+            "brierScore": 0.6557357217544829,
+            "logLoss": 1.0844155670016467,
+            "recalls": [
+              0.030303030303030304,
+              1,
+              0
+            ],
+            "matrix": [
+              [
+                2,
+                64,
+                0
+              ],
+              [
+                0,
+                106,
+                0
+              ],
+              [
+                1,
+                67,
+                0
+              ]
+            ]
+          },
+          "predictedCounts": [
+            3,
+            237,
+            0
+          ],
+          "oneVsRestAuc": [
+            0.5375304771856496,
+            0.5334412841453112,
+            0.47785567715458277
+          ],
+          "directionalAuc": 0.5111408199643493,
+          "directionalCount": 134,
+          "byActual": [
+            {
+              "actual": "BULLISH",
+              "count": 66,
+              "meanProbability": [
+                0.270124328075415,
+                0.5077738867630233,
+                0.22210178516156168
+              ],
+              "predictedCounts": [
+                2,
+                64,
+                0
+              ]
+            },
+            {
+              "actual": "NEUTRAL",
+              "count": 106,
+              "meanProbability": [
+                0.26139112479319293,
+                0.5186303817031044,
+                0.21997849350370258
+              ],
+              "predictedCounts": [
+                0,
+                106,
+                0
+              ]
+            },
+            {
+              "actual": "BEARISH",
+              "count": 68,
+              "meanProbability": [
+                0.26761767269474984,
+                0.5119671547356143,
+                0.22041517256963578
+              ],
+              "predictedCounts": [
+                1,
+                67,
+                0
+              ]
+            }
+          ]
+        },
+        "price": {
+          "score": {
+            "count": 240,
+            "correct": 106,
+            "errors": 134,
+            "accuracy": 0.44166666666666665,
+            "balancedAccuracy": 0.34447135057567907,
+            "brierScore": 0.656723137089331,
+            "logLoss": 1.0845841631293096,
+            "recalls": [
+              0.06060606060606061,
+              0.9433962264150944,
+              0.029411764705882353
+            ],
+            "matrix": [
+              [
+                4,
+                60,
+                2
+              ],
+              [
+                4,
+                100,
+                2
+              ],
+              [
+                7,
+                59,
+                2
+              ]
+            ]
+          },
+          "predictedCounts": [
+            15,
+            219,
+            6
+          ],
+          "oneVsRestAuc": [
+            0.4624695228143504,
+            0.4866234863418755,
+            0.4960670314637483
+          ],
+          "directionalAuc": 0.48373440285204994,
+          "directionalCount": 134,
+          "byActual": [
+            {
+              "actual": "BULLISH",
+              "count": 66,
+              "meanProbability": [
+                0.27007703281548945,
+                0.47462767979974,
+                0.25529528738477025
+              ],
+              "predictedCounts": [
+                4,
+                60,
+                2
+              ]
+            },
+            {
+              "actual": "NEUTRAL",
+              "count": 106,
+              "meanProbability": [
+                0.26930864751778605,
+                0.4788727843045493,
+                0.2518185681776646
+              ],
+              "predictedCounts": [
+                4,
+                100,
+                2
+              ]
+            },
+            {
+              "actual": "BEARISH",
+              "count": 68,
+              "meanProbability": [
+                0.27543860493565286,
+                0.4703703423286599,
+                0.2541910527356873
+              ],
+              "predictedCounts": [
+                7,
+                59,
+                2
+              ]
+            }
+          ]
+        },
+        "macro": {
+          "score": {
+            "count": 240,
+            "correct": 106,
+            "errors": 134,
+            "accuracy": 0.44166666666666665,
+            "balancedAccuracy": 0.3333333333333333,
+            "brierScore": 0.6658242303730657,
+            "logLoss": 1.102367014632876,
+            "recalls": [
+              0,
+              1,
+              0
+            ],
+            "matrix": [
+              [
+                0,
+                66,
+                0
+              ],
+              [
+                0,
+                106,
+                0
+              ],
+              [
+                0,
+                68,
+                0
+              ]
+            ]
+          },
+          "predictedCounts": [
+            0,
+            240,
+            0
+          ],
+          "oneVsRestAuc": [
+            0.5751480320445838,
+            0.5525204167840045,
+            0.47614569083447333
+          ],
+          "directionalAuc": 0.5258467023172906,
+          "directionalCount": 134,
+          "byActual": [
+            {
+              "actual": "BULLISH",
+              "count": 66,
+              "meanProbability": [
+                0.2701716233353405,
+                0.5409200937263065,
+                0.18890828293835307
+              ],
+              "predictedCounts": [
+                0,
+                66,
+                0
+              ]
+            },
+            {
+              "actual": "NEUTRAL",
+              "count": 106,
+              "meanProbability": [
+                0.25347360206859976,
+                0.5583879791016597,
+                0.1881384188297406
+              ],
+              "predictedCounts": [
+                0,
+                106,
+                0
+              ]
+            },
+            {
+              "actual": "BEARISH",
+              "count": 68,
+              "meanProbability": [
+                0.25979674045384676,
+                0.5535639671425691,
+                0.18663929240358434
+              ],
+              "predictedCounts": [
+                0,
+                68,
+                0
+              ]
+            }
+          ]
+        },
+        "frequencyMix": {
+          "score": {
+            "count": 240,
+            "correct": 106,
+            "errors": 134,
+            "accuracy": 0.44166666666666665,
+            "balancedAccuracy": 0.3333333333333333,
+            "brierScore": 0.6549941735710445,
+            "logLoss": 1.0827144365354413,
+            "recalls": [
+              0,
+              1,
+              0
+            ],
+            "matrix": [
+              [
+                0,
+                66,
+                0
+              ],
+              [
+                0,
+                106,
+                0
+              ],
+              [
+                0,
+                68,
+                0
+              ]
+            ]
+          },
+          "predictedCounts": [
+            0,
+            240,
+            0
+          ],
+          "oneVsRestAuc": [
+            0.4624695228143504,
+            0.4866234863418755,
+            0.4960670314637483
+          ],
+          "directionalAuc": 0.4893048128342246,
+          "directionalCount": 134,
+          "byActual": [
+            {
+              "actual": "BULLISH",
+              "count": 66,
+              "meanProbability": [
+                0.2730359490136496,
+                0.49341140087548124,
+                0.2335526501108702
+              ],
+              "predictedCounts": [
+                0,
+                66,
+                0
+              ]
+            },
+            {
+              "actual": "NEUTRAL",
+              "count": 106,
+              "meanProbability": [
+                0.27265175636479777,
+                0.4955339531278859,
+                0.23181429050731717
+              ],
+              "predictedCounts": [
+                0,
+                106,
+                0
+              ]
+            },
+            {
+              "actual": "BEARISH",
+              "count": 68,
+              "meanProbability": [
+                0.2757167350737311,
+                0.4912827321399412,
+                0.23300053278632857
+              ],
+              "predictedCounts": [
+                0,
+                68,
+                0
+              ]
+            }
+          ]
+        },
+        "prior": {
+          "score": {
+            "count": 240,
+            "correct": 106,
+            "errors": 134,
+            "accuracy": 0.44166666666666665,
+            "balancedAccuracy": 0.3333333333333333,
+            "brierScore": 0.6516126272994397,
+            "logLoss": 1.0771248557352713,
+            "recalls": [
+              0,
+              1,
+              0
+            ],
+            "matrix": [
+              [
+                0,
+                66,
+                0
+              ],
+              [
+                0,
+                106,
+                0
+              ],
+              [
+                0,
+                68,
+                0
+              ]
+            ]
+          },
+          "predictedCounts": [
+            0,
+            240,
+            0
+          ],
+          "oneVsRestAuc": [
+            0.5,
+            0.5,
+            0.5
+          ],
+          "directionalAuc": 0.5,
+          "directionalCount": 134,
+          "byActual": [
+            {
+              "actual": "BULLISH",
+              "count": 66,
+              "meanProbability": [
+                0.27417582417582353,
+                0.4780219780219756,
+                0.24780219780219695
+              ],
+              "predictedCounts": [
+                0,
+                66,
+                0
+              ]
+            },
+            {
+              "actual": "NEUTRAL",
+              "count": 106,
+              "meanProbability": [
+                0.27417582417582315,
+                0.4780219780219772,
+                0.24780219780219662
+              ],
+              "predictedCounts": [
+                0,
+                106,
+                0
+              ]
+            },
+            {
+              "actual": "BEARISH",
+              "count": 68,
+              "meanProbability": [
+                0.27417582417582326,
+                0.4780219780219764,
+                0.24780219780219695
+              ],
+              "predictedCounts": [
+                0,
+                68,
+                0
+              ]
+            }
+          ]
+        },
+        "pitReference": {
+          "score": {
+            "count": 240,
+            "correct": 108,
+            "errors": 132,
+            "accuracy": 0.45,
+            "balancedAccuracy": 0.3525179654480432,
+            "brierScore": 0.6625753081769813,
+            "logLoss": 1.0950832093026779,
+            "recalls": [
+              0.06060606060606061,
+              0.9528301886792453,
+              0.04411764705882353
+            ],
+            "matrix": [
+              [
+                4,
+                60,
+                2
+              ],
+              [
+                2,
+                101,
+                3
+              ],
+              [
+                4,
+                61,
+                3
+              ]
+            ]
+          },
+          "predictedCounts": [
+            10,
+            222,
+            8
+          ],
+          "oneVsRestAuc": [
+            0.5042668059909439,
+            0.530484370599831,
+            0.5200068399452804
+          ],
+          "directionalAuc": 0.4803921568627451,
+          "directionalCount": 134,
+          "byActual": [
+            {
+              "actual": "BULLISH",
+              "count": 66,
+              "meanProbability": [
+                0.2723507288859709,
+                0.49788743216355513,
+                0.22976183895047408
+              ],
+              "predictedCounts": [
+                4,
+                60,
+                2
+              ]
+            },
+            {
+              "actual": "NEUTRAL",
+              "count": 106,
+              "meanProbability": [
+                0.2698324327766221,
+                0.5099910657588433,
+                0.2201765014645347
+              ],
+              "predictedCounts": [
+                2,
+                101,
+                3
+              ]
+            },
+            {
+              "actual": "BEARISH",
+              "count": 68,
+              "meanProbability": [
+                0.27417366654875147,
+                0.4961110263372876,
+                0.22971530711396093
+              ],
+              "predictedCounts": [
+                4,
+                61,
+                3
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "start": "2023-01-04",
+      "end": "2023-12-06",
+      "count": 240,
+      "models": {
+        "candidate": {
+          "score": {
+            "count": 240,
+            "correct": 132,
+            "errors": 108,
+            "accuracy": 0.55,
+            "balancedAccuracy": 0.3333333333333333,
+            "brierScore": 0.5907895598396224,
+            "logLoss": 0.9931552944942001,
+            "recalls": [
+              0,
+              1,
+              0
+            ],
+            "matrix": [
+              [
+                0,
+                56,
+                0
+              ],
+              [
+                0,
+                132,
+                0
+              ],
+              [
+                0,
+                52,
+                0
+              ]
+            ]
+          },
+          "predictedCounts": [
+            0,
+            240,
+            0
+          ],
+          "oneVsRestAuc": [
+            0.5262034161490683,
+            0.5908389450056116,
+            0.5627045826513911
+          ],
+          "directionalAuc": 0.48729395604395603,
+          "directionalCount": 108,
+          "byActual": [
+            {
+              "actual": "BULLISH",
+              "count": 56,
+              "meanProbability": [
+                0.2621289264806497,
+                0.4937549784829761,
+                0.24411609503637416
+              ],
+              "predictedCounts": [
+                0,
+                56,
+                0
+              ]
+            },
+            {
+              "actual": "NEUTRAL",
+              "count": 132,
+              "meanProbability": [
+                0.2532300443665512,
+                0.5071205083335705,
+                0.23964944729987847
+              ],
+              "predictedCounts": [
+                0,
+                132,
+                0
+              ]
+            },
+            {
+              "actual": "BEARISH",
+              "count": 52,
+              "meanProbability": [
+                0.26558386042460086,
+                0.48608865679800617,
+                0.24832748277739283
+              ],
+              "predictedCounts": [
+                0,
+                52,
+                0
+              ]
+            }
+          ]
+        },
+        "price": {
+          "score": {
+            "count": 240,
+            "correct": 137,
+            "errors": 103,
+            "accuracy": 0.5708333333333333,
+            "balancedAccuracy": 0.3752081252081252,
+            "brierScore": 0.5877002877869735,
+            "logLoss": 0.9865877881037697,
+            "recalls": [
+              0.07142857142857142,
+              0.9772727272727273,
+              0.07692307692307693
+            ],
+            "matrix": [
+              [
+                4,
+                49,
+                3
+              ],
+              [
+                2,
+                129,
+                1
+              ],
+              [
+                1,
+                47,
+                4
+              ]
+            ]
+          },
+          "predictedCounts": [
+            7,
+            225,
+            8
+          ],
+          "oneVsRestAuc": [
+            0.5510481366459627,
+            0.5710578002244668,
+            0.6002454991816694
+          ],
+          "directionalAuc": 0.6133241758241759,
+          "directionalCount": 108,
+          "byActual": [
+            {
+              "actual": "BULLISH",
+              "count": 56,
+              "meanProbability": [
+                0.2618870660228314,
+                0.49505994075873366,
+                0.24305299321843493
+              ],
+              "predictedCounts": [
+                4,
+                49,
+                3
+              ]
+            },
+            {
+              "actual": "NEUTRAL",
+              "count": 132,
+              "meanProbability": [
+                0.2496388628826808,
+                0.5167084692450609,
+                0.23365266787225858
+              ],
+              "predictedCounts": [
+                2,
+                129,
+                1
+              ]
+            },
+            {
+              "actual": "BEARISH",
+              "count": 52,
+              "meanProbability": [
+                0.26232011336563715,
+                0.48288504758436424,
+                0.25479483904999856
+              ],
+              "predictedCounts": [
+                1,
+                47,
+                4
+              ]
+            }
+          ]
+        },
+        "macro": {
+          "score": {
+            "count": 240,
+            "correct": 132,
+            "errors": 108,
+            "accuracy": 0.55,
+            "balancedAccuracy": 0.3333333333333333,
+            "brierScore": 0.6006983621031854,
+            "logLoss": 1.008547829300336,
+            "recalls": [
+              0,
+              1,
+              0
+            ],
+            "matrix": [
+              [
+                0,
+                56,
+                0
+              ],
+              [
+                0,
+                132,
+                0
+              ],
+              [
+                0,
+                52,
+                0
+              ]
+            ]
+          },
+          "predictedCounts": [
+            0,
+            240,
+            0
+          ],
+          "oneVsRestAuc": [
+            0.515819099378882,
+            0.5643237934904601,
+            0.443126022913257
+          ],
+          "directionalAuc": 0.44402472527472525,
+          "directionalCount": 108,
+          "byActual": [
+            {
+              "actual": "BULLISH",
+              "count": 56,
+              "meanProbability": [
+                0.26237078693846827,
+                0.49245001620721846,
+                0.24517919685431327
+              ],
+              "predictedCounts": [
+                0,
+                56,
+                0
+              ]
+            },
+            {
+              "actual": "NEUTRAL",
+              "count": 132,
+              "meanProbability": [
+                0.2568212258504218,
+                0.4975325474220799,
+                0.24564622672749828
+              ],
+              "predictedCounts": [
+                0,
+                132,
+                0
+              ]
+            },
+            {
+              "actual": "BEARISH",
+              "count": 52,
+              "meanProbability": [
+                0.26884760748356473,
+                0.4892922660116484,
+                0.24186012650478703
+              ],
+              "predictedCounts": [
+                0,
+                52,
+                0
+              ]
+            }
+          ]
+        },
+        "frequencyMix": {
+          "score": {
+            "count": 240,
+            "correct": 132,
+            "errors": 108,
+            "accuracy": 0.55,
+            "balancedAccuracy": 0.3333333333333333,
+            "brierScore": 0.5912683677848671,
+            "logLoss": 0.9923054200846183,
+            "recalls": [
+              0,
+              1,
+              0
+            ],
+            "matrix": [
+              [
+                0,
+                56,
+                0
+              ],
+              [
+                0,
+                132,
+                0
+              ],
+              [
+                0,
+                52,
+                0
+              ]
+            ]
+          },
+          "predictedCounts": [
+            0,
+            240,
+            0
+          ],
+          "oneVsRestAuc": [
+            0.5510481366459627,
+            0.5710578002244668,
+            0.6002454991816694
+          ],
+          "directionalAuc": 0.6150412087912088,
+          "directionalCount": 108,
+          "byActual": [
+            {
+              "actual": "BULLISH",
+              "count": 56,
+              "meanProbability": [
+                0.26833313065616515,
+                0.49581260040880665,
+                0.23585426893502687
+              ],
+              "predictedCounts": [
+                0,
+                56,
+                0
+              ]
+            },
+            {
+              "actual": "NEUTRAL",
+              "count": 132,
+              "meanProbability": [
+                0.26220902908608984,
+                0.5066368646519701,
+                0.23115410626193872
+              ],
+              "predictedCounts": [
+                0,
+                132,
+                0
+              ]
+            },
+            {
+              "actual": "BEARISH",
+              "count": 52,
+              "meanProbability": [
+                0.2685496543275679,
+                0.4897251538216221,
+                0.24172519185080862
+              ],
+              "predictedCounts": [
+                0,
+                52,
+                0
+              ]
+            }
+          ]
+        },
+        "prior": {
+          "score": {
+            "count": 240,
+            "correct": 132,
+            "errors": 108,
+            "accuracy": 0.55,
+            "balancedAccuracy": 0.3333333333333333,
+            "brierScore": 0.6043449091295582,
+            "logLoss": 1.0107196397368452,
+            "recalls": [
+              0,
+              1,
+              0
+            ],
+            "matrix": [
+              [
+                0,
+                56,
+                0
+              ],
+              [
+                0,
+                132,
+                0
+              ],
+              [
+                0,
+                52,
+                0
+              ]
+            ]
+          },
+          "predictedCounts": [
+            0,
+            240,
+            0
+          ],
+          "oneVsRestAuc": [
+            0.5,
+            0.5,
+            0.5
+          ],
+          "directionalAuc": 0.5,
+          "directionalCount": 108,
+          "byActual": [
+            {
+              "actual": "BULLISH",
+              "count": 56,
+              "meanProbability": [
+                0.27396907216494754,
+                0.4760309278350499,
+                0.24999999999999914
+              ],
+              "predictedCounts": [
+                0,
+                56,
+                0
+              ]
+            },
+            {
+              "actual": "NEUTRAL",
+              "count": 132,
+              "meanProbability": [
+                0.2739690721649469,
+                0.4760309278350513,
+                0.24999999999999958
+              ],
+              "predictedCounts": [
+                0,
+                132,
+                0
+              ]
+            },
+            {
+              "actual": "BEARISH",
+              "count": 52,
+              "meanProbability": [
+                0.27396907216494754,
+                0.4760309278350499,
+                0.24999999999999914
+              ],
+              "predictedCounts": [
+                0,
+                52,
+                0
+              ]
+            }
+          ]
+        },
+        "pitReference": {
+          "score": {
+            "count": 240,
+            "correct": 135,
+            "errors": 105,
+            "accuracy": 0.5625,
+            "balancedAccuracy": 0.36627261627261626,
+            "brierScore": 0.6050552270556815,
+            "logLoss": 1.0125421073493215,
+            "recalls": [
+              0.07142857142857142,
+              0.9696969696969697,
+              0.057692307692307696
+            ],
+            "matrix": [
+              [
+                4,
+                52,
+                0
+              ],
+              [
+                3,
+                128,
+                1
+              ],
+              [
+                3,
+                46,
+                3
+              ]
+            ]
+          },
+          "predictedCounts": [
+            10,
+            226,
+            4
+          ],
+          "oneVsRestAuc": [
+            0.44439052795031053,
+            0.5393518518518519,
+            0.5972790507364976
+          ],
+          "directionalAuc": 0.4852335164835165,
+          "directionalCount": 108,
+          "byActual": [
+            {
+              "actual": "BULLISH",
+              "count": 56,
+              "meanProbability": [
+                0.26530829519375404,
+                0.49948920619336523,
+                0.2352024986128807
+              ],
+              "predictedCounts": [
+                4,
+                52,
+                0
+              ]
+            },
+            {
+              "actual": "NEUTRAL",
+              "count": 132,
+              "meanProbability": [
+                0.27096308865955715,
+                0.4940429391549929,
+                0.23499397218544976
+              ],
+              "predictedCounts": [
+                3,
+                128,
+                1
+              ]
+            },
+            {
+              "actual": "BEARISH",
+              "count": 52,
+              "meanProbability": [
+                0.28605635701199505,
+                0.46511754828929336,
+                0.24882609469871145
+              ],
+              "predictedCounts": [
+                3,
+                46,
+                3
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "start": "2023-12-07",
+      "end": "2024-11-07",
+      "count": 240,
+      "models": {
+        "candidate": {
+          "score": {
+            "count": 240,
+            "correct": 109,
+            "errors": 131,
+            "accuracy": 0.45416666666666666,
+            "balancedAccuracy": 0.3333333333333333,
+            "brierScore": 0.6454758848113661,
+            "logLoss": 1.0681511498130094,
+            "recalls": [
+              0,
+              1,
+              0
+            ],
+            "matrix": [
+              [
+                0,
+                77,
+                0
+              ],
+              [
+                0,
+                109,
+                0
+              ],
+              [
+                0,
+                54,
+                0
+              ]
+            ]
+          },
+          "predictedCounts": [
+            0,
+            240,
+            0
+          ],
+          "oneVsRestAuc": [
+            0.44546251294717554,
+            0.5392534491210869,
+            0.5544603743528475
+          ],
+          "directionalAuc": 0.41125541125541126,
+          "directionalCount": 131,
+          "byActual": [
+            {
+              "actual": "BULLISH",
+              "count": 77,
+              "meanProbability": [
+                0.26341257340181207,
+                0.4939598243684894,
+                0.24262760222969865
+              ],
+              "predictedCounts": [
+                0,
+                77,
+                0
+              ]
+            },
+            {
+              "actual": "NEUTRAL",
+              "count": 109,
+              "meanProbability": [
+                0.26648445758050526,
+                0.49517128589549586,
+                0.23834425652399896
+              ],
+              "predictedCounts": [
+                0,
+                109,
+                0
+              ]
+            },
+            {
+              "actual": "BEARISH",
+              "count": 54,
+              "meanProbability": [
+                0.2715880108280553,
+                0.4849525453676086,
+                0.24345944380433607
+              ],
+              "predictedCounts": [
+                0,
+                54,
+                0
+              ]
+            }
+          ]
+        },
+        "price": {
+          "score": {
+            "count": 240,
+            "correct": 107,
+            "errors": 133,
+            "accuracy": 0.44583333333333336,
+            "balancedAccuracy": 0.3310298264426705,
+            "brierScore": 0.6382144658068268,
+            "logLoss": 1.0576696282901077,
+            "recalls": [
+              0.03896103896103896,
+              0.9541284403669725,
+              0
+            ],
+            "matrix": [
+              [
+                3,
+                73,
+                1
+              ],
+              [
+                4,
+                104,
+                1
+              ],
+              [
+                2,
+                52,
+                0
+              ]
+            ]
+          },
+          "predictedCounts": [
+            9,
+            229,
+            2
+          ],
+          "oneVsRestAuc": [
+            0.5049000079674927,
+            0.5749702360109251,
+            0.5673038630027878
+          ],
+          "directionalAuc": 0.49783549783549785,
+          "directionalCount": 131,
+          "byActual": [
+            {
+              "actual": "BULLISH",
+              "count": 77,
+              "meanProbability": [
+                0.28309438021788413,
+                0.45710550858978793,
+                0.25980011119232793
+              ],
+              "predictedCounts": [
+                3,
+                73,
+                1
+              ]
+            },
+            {
+              "actual": "NEUTRAL",
+              "count": 109,
+              "meanProbability": [
+                0.2782940610262737,
+                0.4703697540250807,
+                0.25133618494864557
+              ],
+              "predictedCounts": [
+                4,
+                104,
+                1
+              ]
+            },
+            {
+              "actual": "BEARISH",
+              "count": 54,
+              "meanProbability": [
+                0.2884100125139167,
+                0.4482399970837275,
+                0.2633499904023557
+              ],
+              "predictedCounts": [
+                2,
+                52,
+                0
+              ]
+            }
+          ]
+        },
+        "macro": {
+          "score": {
+            "count": 240,
+            "correct": 109,
+            "errors": 131,
+            "accuracy": 0.45416666666666666,
+            "balancedAccuracy": 0.3333333333333333,
+            "brierScore": 0.6612341721132132,
+            "logLoss": 1.0905338344034035,
+            "recalls": [
+              0,
+              1,
+              0
+            ],
+            "matrix": [
+              [
+                0,
+                77,
+                0
+              ],
+              [
+                0,
+                109,
+                0
+              ],
+              [
+                0,
+                54,
+                0
+              ]
+            ]
+          },
+          "predictedCounts": [
+            0,
+            240,
+            0
+          ],
+          "oneVsRestAuc": [
+            0.40339415186040956,
+            0.44218782827929126,
+            0.43140183193946635
+          ],
+          "directionalAuc": 0.39466089466089466,
+          "directionalCount": 131,
+          "byActual": [
+            {
+              "actual": "BULLISH",
+              "count": 77,
+              "meanProbability": [
+                0.24373076658574008,
+                0.5308141401471905,
+                0.22545509326706942
+              ],
+              "predictedCounts": [
+                0,
+                77,
+                0
+              ]
+            },
+            {
+              "actual": "NEUTRAL",
+              "count": 109,
+              "meanProbability": [
+                0.25467485413473684,
+                0.519972817765911,
+                0.22535232809935227
+              ],
+              "predictedCounts": [
+                0,
+                109,
+                0
+              ]
+            },
+            {
+              "actual": "BEARISH",
+              "count": 54,
+              "meanProbability": [
+                0.25476600914219366,
+                0.5216650936514897,
+                0.2235688972063166
+              ],
+              "predictedCounts": [
+                0,
+                54,
+                0
+              ]
+            }
+          ]
+        },
+        "frequencyMix": {
+          "score": {
+            "count": 240,
+            "correct": 109,
+            "errors": 131,
+            "accuracy": 0.45416666666666666,
+            "balancedAccuracy": 0.3333333333333333,
+            "brierScore": 0.6392959381595706,
+            "logLoss": 1.0584477984164888,
+            "recalls": [
+              0,
+              1,
+              0
+            ],
+            "matrix": [
+              [
+                0,
+                77,
+                0
+              ],
+              [
+                0,
+                109,
+                0
+              ],
+              [
+                0,
+                54,
+                0
+              ]
+            ]
+          },
+          "predictedCounts": [
+            0,
+            240,
+            0
+          ],
+          "oneVsRestAuc": [
+            0.5049000079674927,
+            0.5749702360109251,
+            0.5673038630027878
+          ],
+          "directionalAuc": 0.4975949975949976,
+          "directionalCount": 131,
+          "byActual": [
+            {
+              "actual": "BULLISH",
+              "count": 77,
+              "meanProbability": [
+                0.2753835681867822,
+                0.48153130870315664,
+                0.2430851231100643
+              ],
+              "predictedCounts": [
+                0,
+                77,
+                0
+              ]
+            },
+            {
+              "actual": "NEUTRAL",
+              "count": 109,
+              "meanProbability": [
+                0.27298340859097703,
+                0.48816343142080315,
+                0.2388531599882231
+              ],
+              "predictedCounts": [
+                0,
+                109,
+                0
+              ]
+            },
+            {
+              "actual": "BEARISH",
+              "count": 54,
+              "meanProbability": [
+                0.2780413843347986,
+                0.4770985529501263,
+                0.2448600627150782
+              ],
+              "predictedCounts": [
+                0,
+                54,
+                0
+              ]
+            }
+          ]
+        },
+        "prior": {
+          "score": {
+            "count": 240,
+            "correct": 109,
+            "errors": 131,
+            "accuracy": 0.45416666666666666,
+            "balancedAccuracy": 0.3333333333333333,
+            "brierScore": 0.6437775709303435,
+            "logLoss": 1.0648163769293377,
+            "recalls": [
+              0,
+              1,
+              0
+            ],
+            "matrix": [
+              [
+                0,
+                77,
+                0
+              ],
+              [
+                0,
+                109,
+                0
+              ],
+              [
+                0,
+                54,
+                0
+              ]
+            ]
+          },
+          "predictedCounts": [
+            0,
+            240,
+            0
+          ],
+          "oneVsRestAuc": [
+            0.5,
+            0.5,
+            0.5
+          ],
+          "directionalAuc": 0.5,
+          "directionalCount": 131,
+          "byActual": [
+            {
+              "actual": "BULLISH",
+              "count": 77,
+              "meanProbability": [
+                0.27184466019418013,
+                0.48009708737865686,
+                0.24805825242718849
+              ],
+              "predictedCounts": [
+                0,
+                77,
+                0
+              ]
+            },
+            {
+              "actual": "NEUTRAL",
+              "count": 109,
+              "meanProbability": [
+                0.2718446601941806,
+                0.4800970873786563,
+                0.24805825242718862
+              ],
+              "predictedCounts": [
+                0,
+                109,
+                0
+              ]
+            },
+            {
+              "actual": "BEARISH",
+              "count": 54,
+              "meanProbability": [
+                0.2718446601941806,
+                0.48009708737865603,
+                0.24805825242718912
+              ],
+              "predictedCounts": [
+                0,
+                54,
+                0
+              ]
+            }
+          ]
+        },
+        "pitReference": {
+          "score": {
+            "count": 240,
+            "correct": 109,
+            "errors": 131,
+            "accuracy": 0.45416666666666666,
+            "balancedAccuracy": 0.3595221179319039,
+            "brierScore": 0.6422824386965114,
+            "logLoss": 1.0650204430674555,
+            "recalls": [
+              0.012987012987012988,
+              0.9174311926605505,
+              0.14814814814814814
+            ],
+            "matrix": [
+              [
+                1,
+                65,
+                11
+              ],
+              [
+                3,
+                100,
+                6
+              ],
+              [
+                1,
+                45,
+                8
+              ]
+            ]
+          },
+          "predictedCounts": [
+            5,
+            210,
+            25
+          ],
+          "oneVsRestAuc": [
+            0.49302844394868933,
+            0.5824637579662442,
+            0.5409199522102748
+          ],
+          "directionalAuc": 0.48244348244348245,
+          "directionalCount": 131,
+          "byActual": [
+            {
+              "actual": "BULLISH",
+              "count": 77,
+              "meanProbability": [
+                0.2688464791985337,
+                0.4381607352144505,
+                0.29299278558701586
+              ],
+              "predictedCounts": [
+                1,
+                65,
+                11
+              ]
+            },
+            {
+              "actual": "NEUTRAL",
+              "count": 109,
+              "meanProbability": [
+                0.26858730626665167,
+                0.46044564645884023,
+                0.2709670472745082
+              ],
+              "predictedCounts": [
+                3,
+                100,
+                6
+              ]
+            },
+            {
+              "actual": "BEARISH",
+              "count": 54,
+              "meanProbability": [
+                0.2706331976710151,
+                0.43743619107949244,
+                0.29193061124949243
+              ],
+              "predictedCounts": [
+                1,
+                45,
+                8
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
