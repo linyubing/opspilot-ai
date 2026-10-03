@@ -9,7 +9,7 @@ import com.opspilot.ai.forecast.SaveGoldForecastResult;
 import com.opspilot.ai.macrodata.DollarIndexSyncResult;
 import com.opspilot.ai.macrodata.MacroDataUnavailableException;
 import com.opspilot.ai.macrodata.RealRateSyncResult;
-import com.opspilot.ai.marketdata.GoldPriceSyncResult;
+import com.opspilot.ai.marketdata.GoldDailyBarSyncResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -111,7 +111,7 @@ class GoldDailyResearchReportServiceTests {
         when(snapshot.id()).thenReturn(SNAPSHOT_ID);
 
         return new GoldResearchPreparationResult(
-                mock(GoldPriceSyncResult.class),
+                mock(GoldDailyBarSyncResult.class),
                 mock(RealRateSyncResult.class),
                 mock(DollarIndexSyncResult.class),
                 new SaveGoldResearchSnapshotResult(snapshot, true)

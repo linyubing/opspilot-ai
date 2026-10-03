@@ -6,26 +6,26 @@ import com.opspilot.ai.macrodata.DollarIndexSyncResult;
 import com.opspilot.ai.macrodata.DollarIndexSyncService;
 import com.opspilot.ai.macrodata.RealRateSyncResult;
 import com.opspilot.ai.macrodata.RealRateSyncService;
-import com.opspilot.ai.marketdata.GoldPriceSyncResult;
-import com.opspilot.ai.marketdata.GoldPriceSyncService;
+import com.opspilot.ai.marketdata.GoldDailyBarSyncResult;
+import com.opspilot.ai.marketdata.GoldDailyBarSyncService;
 import org.springframework.stereotype.Service;
 
 /** 编排黄金、宏观数据同步和研究快照留痕，不调用大模型。 */
 @Service
 public class GoldResearchPreparationService {
 
-    private final GoldPriceSyncService goldPriceSyncService;
+    private final GoldDailyBarSyncService goldBarSync;
     private final RealRateSyncService realRateSyncService;
     private final DollarIndexSyncService dollarIndexSyncService;
     private final GoldResearchSnapshotRecordingService recordingService;
 
     public GoldResearchPreparationService(
-            GoldPriceSyncService goldPriceSyncService,
+            GoldDailyBarSyncService goldBarSync,
             RealRateSyncService realRateSyncService,
             DollarIndexSyncService dollarIndexSyncService,
             GoldResearchSnapshotRecordingService recordingService
     ) {
-        this.goldPriceSyncService = goldPriceSyncService;
+        this.goldBarSync = goldBarSync;
         this.realRateSyncService = realRateSyncService;
         this.dollarIndexSyncService = dollarIndexSyncService;
         this.recordingService = recordingService;
@@ -36,8 +36,8 @@ public class GoldResearchPreparationService {
          * 外部接口调用不能纳入数据库事务。任一步失败都直接停止，
          * 已保存的数据由各仓储按版本化或幂等规则安全保留。
          */
-        GoldPriceSyncResult goldPrice =
-                goldPriceSyncService.syncDailyPrices();
+        // 快照计算用OHLC，必须同步同一份输入，不能用旧参考价同步替代。
+        GoldDailyBarSyncResult goldBars = goldBarSync.sync();
         RealRateSyncResult realRate =
                 realRateSyncService.syncDailyObservations();
         DollarIndexSyncResult dollarIndex =
@@ -46,7 +46,7 @@ public class GoldResearchPreparationService {
                 recordingService.recordCurrentSnapshot();
 
         return new GoldResearchPreparationResult(
-                goldPrice,
+                goldBars,
                 realRate,
                 dollarIndex,
                 snapshot

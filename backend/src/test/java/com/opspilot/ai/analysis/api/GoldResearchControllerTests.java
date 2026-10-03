@@ -29,7 +29,7 @@ import com.opspilot.ai.forecast.StaleGoldForecastDataException;
 import com.opspilot.ai.forecast.StoredGoldDirectionForecast;
 import com.opspilot.ai.macrodata.DollarIndexSyncResult;
 import com.opspilot.ai.macrodata.RealRateSyncResult;
-import com.opspilot.ai.marketdata.GoldPriceSyncResult;
+import com.opspilot.ai.marketdata.GoldDailyBarSyncResult;
 import com.opspilot.ai.chat.api.GlobalExceptionHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -121,7 +121,9 @@ class GoldResearchControllerTests {
 
         mockMvc.perform(post("/api/research/gold/daily-preparation"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.goldPriceSync.savedCount").value(2))
+                .andExpect(jsonPath("$.goldBarSync.savedCount").value(2))
+                .andExpect(jsonPath("$.goldBarSync.latestPriceDate").value("2026-08-26"))
+                .andExpect(jsonPath("$.goldPriceSync").doesNotExist())
                 .andExpect(jsonPath("$.realRateSync.insertedCount").value(3))
                 .andExpect(jsonPath("$.dollarIndexSync.insertedCount").value(4))
                 .andExpect(jsonPath("$.snapshot.created").value(true));
@@ -318,7 +320,7 @@ class GoldResearchControllerTests {
         );
 
         return new GoldResearchPreparationResult(
-                new GoldPriceSyncResult(
+                new GoldDailyBarSyncResult(
                         3, 2, 1, LocalDate.parse("2026-08-26")
                 ),
                 new RealRateSyncResult(5, 1, 3, 0, 1, collectedAt),

@@ -7,8 +7,8 @@ import com.opspilot.ai.macrodata.DollarIndexSyncService;
 import com.opspilot.ai.macrodata.MacroDataUnavailableException;
 import com.opspilot.ai.macrodata.RealRateSyncResult;
 import com.opspilot.ai.macrodata.RealRateSyncService;
-import com.opspilot.ai.marketdata.GoldPriceSyncResult;
-import com.opspilot.ai.marketdata.GoldPriceSyncService;
+import com.opspilot.ai.marketdata.GoldDailyBarSyncResult;
+import com.opspilot.ai.marketdata.GoldDailyBarSyncService;
 import com.opspilot.ai.marketdata.MarketDataUnavailableException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -33,7 +33,7 @@ import static org.mockito.Mockito.when;
 class GoldResearchPreparationServiceTests {
 
     @Mock
-    private GoldPriceSyncService goldPriceSyncService;
+    private GoldDailyBarSyncService goldPriceSyncService;
 
     @Mock
     private RealRateSyncService realRateSyncService;
@@ -59,12 +59,12 @@ class GoldResearchPreparationServiceTests {
     @Test
     @DisplayName("三类数据全部同步成功后生成并保存研究快照")
     void recordsSnapshotAfterAllDataIsSynchronized() {
-        GoldPriceSyncResult gold = goldResult();
+        GoldDailyBarSyncResult gold = goldResult();
         RealRateSyncResult realRate = realRateResult();
         DollarIndexSyncResult dollarIndex = dollarIndexResult();
         SaveGoldResearchSnapshotResult snapshot =
                 mock(SaveGoldResearchSnapshotResult.class);
-        when(goldPriceSyncService.syncDailyPrices()).thenReturn(gold);
+        when(goldPriceSyncService.sync()).thenReturn(gold);
         when(realRateSyncService.syncDailyObservations()).thenReturn(realRate);
         when(dollarIndexSyncService.syncDailyObservations())
                 .thenReturn(dollarIndex);
@@ -72,7 +72,7 @@ class GoldResearchPreparationServiceTests {
 
         GoldResearchPreparationResult result = service.prepareDaily();
 
-        assertThat(result.goldPriceSync()).isSameAs(gold);
+        assertThat(result.goldBarSync()).isSameAs(gold);
         assertThat(result.realRateSync()).isSameAs(realRate);
         assertThat(result.dollarIndexSync()).isSameAs(dollarIndex);
         assertThat(result.snapshot()).isSameAs(snapshot);
@@ -82,7 +82,7 @@ class GoldResearchPreparationServiceTests {
                 dollarIndexSyncService,
                 recordingService
         );
-        order.verify(goldPriceSyncService).syncDailyPrices();
+        order.verify(goldPriceSyncService).sync();
         order.verify(realRateSyncService).syncDailyObservations();
         order.verify(dollarIndexSyncService).syncDailyObservations();
         order.verify(recordingService).recordCurrentSnapshot();
@@ -93,7 +93,7 @@ class GoldResearchPreparationServiceTests {
     void stopsWhenGoldPriceSyncFails() {
         MarketDataUnavailableException failure =
                 new MarketDataUnavailableException("黄金行情暂时不可用");
-        when(goldPriceSyncService.syncDailyPrices()).thenThrow(failure);
+        when(goldPriceSyncService.sync()).thenThrow(failure);
 
         assertThatThrownBy(service::prepareDaily).isSameAs(failure);
         verifyNoInteractions(
@@ -106,7 +106,7 @@ class GoldResearchPreparationServiceTests {
     @Test
     @DisplayName("实际利率同步失败时不执行美元指数同步和快照保存")
     void stopsWhenRealRateSyncFails() {
-        when(goldPriceSyncService.syncDailyPrices()).thenReturn(goldResult());
+        when(goldPriceSyncService.sync()).thenReturn(goldResult());
         MacroDataUnavailableException failure =
                 new MacroDataUnavailableException("实际利率暂时不可用");
         when(realRateSyncService.syncDailyObservations()).thenThrow(failure);
@@ -118,7 +118,7 @@ class GoldResearchPreparationServiceTests {
     @Test
     @DisplayName("美元指数同步失败时不保存研究快照")
     void stopsWhenDollarIndexSyncFails() {
-        when(goldPriceSyncService.syncDailyPrices()).thenReturn(goldResult());
+        when(goldPriceSyncService.sync()).thenReturn(goldResult());
         when(realRateSyncService.syncDailyObservations())
                 .thenReturn(realRateResult());
         MacroDataUnavailableException failure =
@@ -130,8 +130,8 @@ class GoldResearchPreparationServiceTests {
         verifyNoInteractions(recordingService);
     }
 
-    private GoldPriceSyncResult goldResult() {
-        return new GoldPriceSyncResult(
+    private GoldDailyBarSyncResult goldResult() {
+        return new GoldDailyBarSyncResult(
                 3, 2, 1, LocalDate.parse("2026-08-26")
         );
     }
