@@ -8,12 +8,16 @@ import com.opspilot.ai.forecast.GoldForecastRule;
 import com.opspilot.ai.marketdata.GoldDailyBar;
 import com.opspilot.ai.marketdata.GoldDailyBarRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.time.Clock;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,6 +34,7 @@ public class HistoricalHorizonDiagnosticService {
     private final GoldResearchSnapshotService snapshots;
     private final GoldForecastRule rule;
     private final FactorDiagnosticService factors;
+    private final Clock clock;
     private final VolatilityDiagnosticService volatility =
             new VolatilityDiagnosticService();
 
@@ -40,30 +45,46 @@ public class HistoricalHorizonDiagnosticService {
             GoldForecastRule rule,
             FactorDiagnosticService factors
     ) {
+        this(bars, selector, snapshots, rule, factors, Clock.systemUTC());
+    }
+
+    @Autowired
+    public HistoricalHorizonDiagnosticService(GoldDailyBarRepository bars,
+            BacktestDateSelector selector, GoldResearchSnapshotService snapshots,
+            GoldForecastRule rule, FactorDiagnosticService factors, Clock clock) {
         this.bars = bars;
         this.selector = selector;
         this.snapshots = snapshots;
         this.rule = rule;
         this.factors = factors;
+        this.clock = clock;
     }
 
     public HistoricalHorizonReport diagnose(int samples) {
+        OffsetDateTime checkedAt = OffsetDateTime.now(clock);
         List<GoldDailyBar> history = bars.findAll(SYMBOL, PROVIDER);
         List<LocalDate> dates = selector.selectBars(
                 history, samples, BacktestSampleSet.HOLDOUT
         );
-        List<HistorySample> selected = loadSamples(dates);
+        List<HistorySample> selected = loadSamples(dates, history, checkedAt);
         List<HorizonDiagnostic> result = HORIZONS.stream()
-                .map(days -> diagnose(history, selected, days))
+                .map(days -> diagnose(history, selected, days, checkedAt))
                 .toList();
         return new HistoricalHorizonReport(samples, result);
     }
 
-    private List<HistorySample> loadSamples(List<LocalDate> dates) {
+    private List<HistorySample> loadSamples(List<LocalDate> dates,
+            List<GoldDailyBar> history, OffsetDateTime checkedAt) {
         List<HistorySample> result = new ArrayList<>();
         for (LocalDate date : dates) {
             try {
-                GoldResearchSnapshot snapshot = snapshots.createSnapshot(date);
+                // 基准和目标共用首次读取的价格；未确认行保留，由快照拒绝整个窗口。
+                List<GoldDailyBar> window = history.stream()
+                        .filter(bar -> !bar.priceDate().isAfter(date))
+                        .sorted(Comparator.comparing(GoldDailyBar::priceDate).reversed())
+                        .limit(21)
+                        .toList();
+                GoldResearchSnapshot snapshot = snapshots.createSnapshot(date, window, checkedAt);
                 result.add(new HistorySample(
                         date, snapshot, snapshot.gold().currentPrice()
                 ));
@@ -77,7 +98,7 @@ public class HistoricalHorizonDiagnosticService {
     private HorizonDiagnostic diagnose(
             List<GoldDailyBar> history,
             List<HistorySample> selected,
-            int sessions
+            int sessions, OffsetDateTime checkedAt
     ) {
         List<FactorSample> samples = new ArrayList<>();
         List<VolatilitySample> volatilitySamples = new ArrayList<>();
@@ -87,6 +108,8 @@ public class HistoricalHorizonDiagnosticService {
                     .limit(sessions)
                     .toList();
             if (future.size() < sessions) continue;
+            // 不能过滤未确认行并让更晚行情冒充第N个交易日。
+            if (future.stream().anyMatch(bar -> !bar.isConfirmedAt(checkedAt))) continue;
             BigDecimal target = future.get(sessions - 1).close();
             BigDecimal change = target.subtract(item.basePrice())
                     .divide(item.basePrice(), 8, RoundingMode.HALF_UP)

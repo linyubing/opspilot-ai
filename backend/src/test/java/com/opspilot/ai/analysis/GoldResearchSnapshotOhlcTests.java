@@ -3,6 +3,7 @@ package com.opspilot.ai.analysis;
 import com.opspilot.ai.macrodata.MacroObservation;
 import com.opspilot.ai.macrodata.MacroObservationRepository;
 import com.opspilot.ai.marketdata.GoldDailyBar;
+import com.opspilot.ai.marketdata.GoldBarConfirmation;
 import com.opspilot.ai.marketdata.GoldDailyBarRepository;
 import org.junit.jupiter.api.Test;
 
@@ -67,7 +68,10 @@ class GoldResearchSnapshotOhlcTests {
                     "usd",
                     "troy_ounce",
                     "twelve_data",
-                    COLLECTED_AT
+                    COLLECTED_AT,
+                    // 合成算法夹具，不代表供应商实测确认。
+                    new GoldBarConfirmation(GoldBarConfirmation.SOURCE, AS_OF,
+                            COLLECTED_AT, "a".repeat(64))
             ));
         }
         return bars;

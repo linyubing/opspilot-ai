@@ -32,6 +32,9 @@ import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.any;
 
 class GoldDatasetBuilderTests {
 
@@ -60,9 +63,9 @@ class GoldDatasetBuilderTests {
         List<GoldDailyBar> bars = bars(23);
         when(repository.findAll("XAUUSD", "twelve_data"))
                 .thenReturn(bars);
-        when(snapshots.createSnapshot(bars.get(20).priceDate(), List.of(), List.of()))
+        when(snapshots.createSnapshot(eq(bars.get(20).priceDate()), anyList(), eq(List.of()), eq(List.of()), any(OffsetDateTime.class)))
                 .thenReturn(snapshot(bars.get(20).priceDate()));
-        when(snapshots.createSnapshot(bars.get(21).priceDate(), List.of(), List.of()))
+        when(snapshots.createSnapshot(eq(bars.get(21).priceDate()), anyList(), eq(List.of()), eq(List.of()), any(OffsetDateTime.class)))
                 .thenReturn(snapshot(bars.get(21).priceDate()));
 
         GoldDataset dataset = builder.build(ForecastHorizon.NEXT_DAY);
@@ -93,7 +96,7 @@ class GoldDatasetBuilderTests {
         List<GoldDailyBar> bars = bars(22);
         when(repository.findAll("XAUUSD", "twelve_data"))
                 .thenReturn(bars);
-        when(snapshots.createSnapshot(bars.get(20).priceDate(), List.of(), List.of()))
+        when(snapshots.createSnapshot(eq(bars.get(20).priceDate()), anyList(), eq(List.of()), eq(List.of()), any(OffsetDateTime.class)))
                 .thenThrow(new InsufficientResearchDataException("缺少美元指数"));
 
         GoldDataset dataset = builder.build(ForecastHorizon.NEXT_DAY);
@@ -108,7 +111,7 @@ class GoldDatasetBuilderTests {
         List<GoldDailyBar> bars = bars(26);
         when(repository.findAll("XAUUSD", "twelve_data"))
                 .thenReturn(bars);
-        when(snapshots.createSnapshot(bars.get(20).priceDate(), List.of(), List.of()))
+        when(snapshots.createSnapshot(eq(bars.get(20).priceDate()), anyList(), eq(List.of()), eq(List.of()), any(OffsetDateTime.class)))
                 .thenReturn(snapshot(bars.get(20).priceDate()));
 
         GoldDataset dataset = builder.build(ForecastHorizon.FIVE_DAYS);
@@ -126,7 +129,7 @@ class GoldDatasetBuilderTests {
         LocalDate date = bars.get(20).priceDate();
         when(repository.findAll("XAUUSD", "twelve_data"))
                 .thenReturn(bars);
-        when(snapshots.createSnapshot(date, List.of(), List.of()))
+        when(snapshots.createSnapshot(eq(date), anyList(), eq(List.of()), eq(List.of()), any(OffsetDateTime.class)))
                 .thenReturn(snapshot(date, date.plusDays(1), date));
 
         assertThatThrownBy(() -> builder.build(ForecastHorizon.NEXT_DAY))
@@ -144,9 +147,9 @@ class GoldDatasetBuilderTests {
         List<GoldDailyBar> bars = bars(23);
         when(repository.findAll("XAUUSD", "twelve_data"))
                 .thenReturn(bars);
-        when(snapshots.createSnapshot(bars.get(20).priceDate(), List.of(), List.of()))
+        when(snapshots.createSnapshot(eq(bars.get(20).priceDate()), anyList(), eq(List.of()), eq(List.of()), any(OffsetDateTime.class)))
                 .thenReturn(snapshot(bars.get(20).priceDate()));
-        when(snapshots.createSnapshot(bars.get(21).priceDate(), List.of(), List.of()))
+        when(snapshots.createSnapshot(eq(bars.get(21).priceDate()), anyList(), eq(List.of()), eq(List.of()), any(OffsetDateTime.class)))
                 .thenReturn(snapshot(bars.get(21).priceDate()));
 
         GoldDataset dataset = builder.build(ForecastHorizon.NEXT_DAY);
@@ -162,9 +165,9 @@ class GoldDatasetBuilderTests {
         List<GoldDailyBar> bars = bars(23);
         when(repository.findAll("XAUUSD", "twelve_data"))
                 .thenReturn(bars);
-        when(snapshots.createSnapshot(bars.get(20).priceDate(), List.of(), List.of()))
+        when(snapshots.createSnapshot(eq(bars.get(20).priceDate()), anyList(), eq(List.of()), eq(List.of()), any(OffsetDateTime.class)))
                 .thenReturn(snapshot(bars.get(20).priceDate()));
-        when(snapshots.createSnapshot(bars.get(21).priceDate(), List.of(), List.of()))
+        when(snapshots.createSnapshot(eq(bars.get(21).priceDate()), anyList(), eq(List.of()), eq(List.of()), any(OffsetDateTime.class)))
                 .thenReturn(snapshot(bars.get(21).priceDate()));
 
         GoldDataset dataset = builder.build(ForecastHorizon.NEXT_DAY);
@@ -183,9 +186,9 @@ class GoldDatasetBuilderTests {
         List<GoldDailyBar> bars = bars(23);
         when(repository.findAll("XAUUSD", "twelve_data"))
                 .thenReturn(bars);
-        when(snapshots.createSnapshot(bars.get(20).priceDate(), List.of(), List.of()))
+        when(snapshots.createSnapshot(eq(bars.get(20).priceDate()), anyList(), eq(List.of()), eq(List.of()), any(OffsetDateTime.class)))
                 .thenReturn(snapshot(bars.get(20).priceDate()));
-        when(snapshots.createSnapshot(bars.get(21).priceDate(), List.of(), List.of()))
+        when(snapshots.createSnapshot(eq(bars.get(21).priceDate()), anyList(), eq(List.of()), eq(List.of()), any(OffsetDateTime.class)))
                 .thenReturn(snapshot(bars.get(21).priceDate()));
 
         builder.build(ForecastHorizon.NEXT_DAY);
@@ -204,7 +207,7 @@ class GoldDatasetBuilderTests {
         bars.set(0, raw(bars.getFirst()));
         when(repository.findAll("XAUUSD", "twelve_data")).thenReturn(bars);
         for (int i = 20; i < 22; i++) {
-            when(snapshots.createSnapshot(bars.get(i).priceDate(), List.of(), List.of()))
+            when(snapshots.createSnapshot(eq(bars.get(i).priceDate()), anyList(), eq(List.of()), eq(List.of()), any(OffsetDateTime.class)))
                     .thenReturn(snapshot(bars.get(i).priceDate()));
         }
 
@@ -224,7 +227,7 @@ class GoldDatasetBuilderTests {
         bars.set(22, raw(bars.get(22)));
         when(repository.findAll("XAUUSD", "twelve_data")).thenReturn(bars);
         for (int i = 20; i < 22; i++) {
-            when(snapshots.createSnapshot(bars.get(i).priceDate(), List.of(), List.of()))
+            when(snapshots.createSnapshot(eq(bars.get(i).priceDate()), anyList(), eq(List.of()), eq(List.of()), any(OffsetDateTime.class)))
                     .thenReturn(snapshot(bars.get(i).priceDate()));
         }
 
@@ -244,7 +247,7 @@ class GoldDatasetBuilderTests {
                 target.provider(), target.collectedAt(), new GoldBarConfirmation(GoldBarConfirmation.SOURCE,
                 target.priceDate(), OffsetDateTime.parse("2099-01-01T00:00:00Z"), "a".repeat(64))));
         when(repository.findAll("XAUUSD", "twelve_data")).thenReturn(bars);
-        when(snapshots.createSnapshot(bars.get(20).priceDate(), List.of(), List.of()))
+        when(snapshots.createSnapshot(eq(bars.get(20).priceDate()), anyList(), eq(List.of()), eq(List.of()), any(OffsetDateTime.class)))
                 .thenReturn(snapshot(bars.get(20).priceDate()));
 
         GoldDataset result = builder.build(ForecastHorizon.NEXT_DAY);

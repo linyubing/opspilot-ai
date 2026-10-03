@@ -15,6 +15,7 @@ import com.opspilot.ai.forecast.GoldForecastAiUnavailableException;
 import com.opspilot.ai.forecast.GoldForecastRule;
 import com.opspilot.ai.forecast.GoldForecastValidator;
 import com.opspilot.ai.marketdata.GoldDailyBar;
+import com.opspilot.ai.marketdata.GoldBarConfirmation;
 import com.opspilot.ai.marketdata.GoldDailyBarRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -337,6 +338,40 @@ class BacktestRunnerTests {
         verify(repo).saveCase(any());
     }
 
+    @Test
+    @org.junit.jupiter.api.DisplayName("第一结算目标未确认时记录失败，不调用模型也不跳到更晚日期")
+    void rejectsUnconfirmedTarget() {
+        GoldDailyBar confirmed = bar(DATE.plusDays(4), "2520");
+        GoldDailyBar raw = new GoldDailyBar(confirmed.symbol(), confirmed.priceDate(),
+                confirmed.open(), confirmed.high(), confirmed.low(), confirmed.close(),
+                confirmed.currency(), confirmed.unit(), confirmed.provider(), confirmed.collectedAt());
+        when(barRepo.findNext("XAUUSD", "twelve_data", DATE)).thenReturn(Optional.of(raw));
+
+        runner.run(TASK_ID);
+
+        verify(repo).recordFailure(eq(TASK_ID), contains("未确认"));
+        verify(repo, never()).saveCase(any());
+        verify(gateway, never()).generate(any());
+        verify(barRepo, never()).findAfter(any(), any(), any(), org.mockito.ArgumentMatchers.anyInt());
+    }
+
+    @Test
+    @org.junit.jupiter.api.DisplayName("确认时刻在当前核验之后的目标不能进入回测评分")
+    void rejectsFutureTargetConfirmation() {
+        GoldDailyBar bar = bar(DATE.plusDays(4), "2520");
+        GoldDailyBar future = new GoldDailyBar(bar.symbol(), bar.priceDate(), bar.open(), bar.high(),
+                bar.low(), bar.close(), bar.currency(), bar.unit(), bar.provider(), bar.collectedAt(),
+                new GoldBarConfirmation(GoldBarConfirmation.SOURCE, bar.priceDate(),
+                        OffsetDateTime.ofInstant(NOW.plusSeconds(1), ZoneOffset.UTC), "a".repeat(64)));
+        when(barRepo.findNext("XAUUSD", "twelve_data", DATE)).thenReturn(Optional.of(future));
+
+        runner.run(TASK_ID);
+
+        verify(repo).recordFailure(eq(TASK_ID), contains("未确认"));
+        verify(repo, never()).saveCase(any());
+        verify(gateway, never()).generate(any());
+    }
+
     private BacktestTask task() {
         return task(BacktestPromptBuilder.VERSION);
     }
@@ -363,7 +398,10 @@ class BacktestRunnerTests {
                 value.add(BigDecimal.TEN),
                 value.subtract(BigDecimal.TEN), value,
                 "usd", "troy_ounce", "twelve_data",
-                OffsetDateTime.ofInstant(NOW, ZoneOffset.UTC)
+                OffsetDateTime.ofInstant(NOW, ZoneOffset.UTC),
+                // 数学样例确认，不是实际供应商回执。
+                new GoldBarConfirmation(GoldBarConfirmation.SOURCE, date,
+                        OffsetDateTime.ofInstant(NOW, ZoneOffset.UTC), "a".repeat(64))
         );
     }
 

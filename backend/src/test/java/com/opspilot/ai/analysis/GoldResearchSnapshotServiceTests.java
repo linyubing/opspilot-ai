@@ -3,6 +3,7 @@ package com.opspilot.ai.analysis;
 import com.opspilot.ai.macrodata.MacroObservation;
 import com.opspilot.ai.macrodata.MacroObservationRepository;
 import com.opspilot.ai.marketdata.GoldDailyBar;
+import com.opspilot.ai.marketdata.GoldBarConfirmation;
 import com.opspilot.ai.marketdata.GoldDailyBarRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -48,7 +49,8 @@ class GoldResearchSnapshotServiceTests {
                 goldRepository,
                 macroObservationRepository,
                 new RealRateFactorEvaluator(),
-                new DollarIndexFactorEvaluator()
+                new DollarIndexFactorEvaluator(),
+                Clock.fixed(Instant.parse("2026-10-03T12:00:00Z"), ZoneId.of("America/New_York"))
         );
         when(macroObservationRepository.findRecent("DTWEXBGS", 120))
                 .thenReturn(dollarIndexes(21));
@@ -369,6 +371,66 @@ class GoldResearchSnapshotServiceTests {
                 );
     }
 
+    @Test
+    @DisplayName("参与波动率计算的中间日线未确认时拒绝快照")
+    void rejectsUnconfirmedWindow() {
+        List<GoldDailyBar> prices = goldPrices(22);
+        prices.set(7, raw(prices.get(7)));
+        when(goldRepository.findRecent("XAUUSD", "twelve_data", 120)).thenReturn(prices);
+        when(macroObservationRepository.findRecent("DFII10", 120)).thenReturn(realRates(21));
+
+        assertThatThrownBy(service::createSnapshot)
+                .isInstanceOf(InsufficientResearchDataException.class)
+                .hasMessageContaining("未确认");
+    }
+
+    @Test
+    @DisplayName("采集已完成但供应商确认在未来时拒绝快照")
+    void rejectsFutureConfirmation() {
+        List<GoldDailyBar> prices = goldPrices(21);
+        GoldDailyBar bar = prices.getFirst();
+        prices.set(0, new GoldDailyBar(bar.symbol(), bar.priceDate(), bar.open(), bar.high(),
+                bar.low(), bar.close(), bar.currency(), bar.unit(), bar.provider(), bar.collectedAt(),
+                new GoldBarConfirmation(GoldBarConfirmation.SOURCE, ANALYSIS_DATE,
+                        OffsetDateTime.parse("2026-10-03T12:00:01Z"), "a".repeat(64))));
+        when(goldRepository.findRecent("XAUUSD", "twelve_data", 120)).thenReturn(prices);
+        when(macroObservationRepository.findRecent("DFII10", 120)).thenReturn(realRates(21));
+
+        assertThatThrownBy(service::createSnapshot)
+                .isInstanceOf(InsufficientResearchDataException.class)
+                .hasMessageContaining("未确认");
+    }
+
+    @Test
+    @DisplayName("未参与计算的更旧行不阻断已确认的21根窗口")
+    void ignoresUnusedConfirmation() {
+        List<GoldDailyBar> prices = goldPrices(22);
+        prices.set(21, raw(prices.get(21)));
+        when(goldRepository.findRecent("XAUUSD", "twelve_data", 120)).thenReturn(prices);
+        when(macroObservationRepository.findRecent("DFII10", 120)).thenReturn(realRates(21));
+
+        assertThat(service.createSnapshot().latestGoldDate()).isEqualTo(ANALYSIS_DATE);
+    }
+
+    @Test
+    @DisplayName("历史研究检查当前确认依据，不篡改为历史核验时刻")
+    void checksHistoryConfirmation() {
+        List<GoldDailyBar> prices = goldPrices(21);
+        prices.set(7, raw(prices.get(7)));
+        when(goldRepository.findRecent("XAUUSD", "twelve_data", ANALYSIS_DATE, 120)).thenReturn(prices);
+        when(macroObservationRepository.findRecent("DFII10", ANALYSIS_DATE, 120)).thenReturn(realRates(21));
+        when(macroObservationRepository.findRecent("DTWEXBGS", ANALYSIS_DATE, 120)).thenReturn(dollarIndexes(21));
+
+        assertThatThrownBy(() -> service.createSnapshot(ANALYSIS_DATE))
+                .isInstanceOf(InsufficientResearchDataException.class)
+                .hasMessageContaining("未确认");
+    }
+
+    private GoldDailyBar raw(GoldDailyBar bar) {
+        return new GoldDailyBar(bar.symbol(), bar.priceDate(), bar.open(), bar.high(), bar.low(),
+                bar.close(), bar.currency(), bar.unit(), bar.provider(), bar.collectedAt());
+    }
+
     private List<GoldDailyBar> goldPrices(int count) {
         List<GoldDailyBar> prices = new ArrayList<>();
         for (int index = 0; index < count; index++) {
@@ -434,7 +496,10 @@ class GoldResearchSnapshotServiceTests {
                 "usd",
                 "troy_ounce",
                 "twelve_data",
-                GOLD_COLLECTED_AT
+                GOLD_COLLECTED_AT,
+                // 明确附上合成确认，仅验证计算边界，不是市场实测数据。
+                new GoldBarConfirmation(GoldBarConfirmation.SOURCE, date,
+                        GOLD_COLLECTED_AT, "a".repeat(64))
         );
     }
 

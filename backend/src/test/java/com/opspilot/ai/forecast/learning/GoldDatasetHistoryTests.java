@@ -55,6 +55,38 @@ class GoldDatasetHistoryTests {
         assertThat(second.samples()).isEqualTo(first.samples());
     }
 
+    @Test
+    @DisplayName("模型特征使用首次读取的黄金窗口，不混入快照二次查询的覆盖价格")
+    void freezesGoldWindow() throws Exception {
+        write("DFII10", "2.04", "9.99");
+        write("DTWEXBGS", "125.0403", "124.8076");
+        var gold = mock(GoldDailyBarRepository.class);
+        var macro = mock(MacroObservationRepository.class);
+        var rows = bars();
+        when(gold.findAll("XAUUSD", "twelve_data")).thenReturn(rows);
+        List<GoldDailyBar> overwritten = new ArrayList<>(rows.subList(0, 21));
+        GoldDailyBar old = rows.get(20);
+        BigDecimal changed = new BigDecimal("9999");
+        overwritten.set(20, new GoldDailyBar(old.symbol(), old.priceDate(), changed,
+                changed.add(BigDecimal.ONE), changed.subtract(BigDecimal.ONE), changed,
+                old.currency(), old.unit(), old.provider(), old.collectedAt(), old.confirmation()));
+        when(gold.findRecent(eq("XAUUSD"), eq("twelve_data"), eq(base), anyInt()))
+                .thenReturn(overwritten);
+        var snapshots = new GoldResearchSnapshotService(gold, macro,
+                new RealRateFactorEvaluator(), new DollarIndexFactorEvaluator());
+        var builder = new GoldDatasetBuilder(gold, snapshots, new GoldForecastRule(),
+                new GoldFeatureCalculator(), new FredHistoryStore(json, dir.toString()),
+                Clock.fixed(Instant.parse("2026-10-03T12:00:00Z"), ZoneOffset.UTC));
+
+        GoldDataset result = builder.build(ForecastHorizon.NEXT_DAY);
+
+        assertThat(result.samples()).singleElement().satisfies(sample ->
+                // 手算：(2020 / 2019 - 1) * 100，按快照规则保留4位。
+                assertThat(sample.features().values()).containsEntry("gold_return_1", 0.0495));
+        verify(gold, never()).findRecent(anyString(), anyString(), any(LocalDate.class), anyInt());
+        verifyNoInteractions(macro);
+    }
+
     private List<GoldDailyBar> bars() {
         List<GoldDailyBar> result = new ArrayList<>();
         for (int i = 0; i < 22; i++) {

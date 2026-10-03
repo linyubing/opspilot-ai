@@ -6,8 +6,11 @@ import com.opspilot.ai.analysis.ResearchFactorAssessment;
 import com.opspilot.ai.analysis.GoldFactorStatus;
 import com.opspilot.ai.forecast.GoldForecastRule;
 import com.opspilot.ai.marketdata.GoldDailyBar;
+import com.opspilot.ai.marketdata.GoldBarConfirmation;
 import com.opspilot.ai.marketdata.GoldDailyBarRepository;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -57,6 +60,30 @@ class HorizonDiagnosticServiceTests {
         );
     }
 
+    @ParameterizedTest
+    @CsvSource({"0,0", "1,1"})
+    @org.junit.jupiter.api.DisplayName("中间目标未确认只排除受影响周期，不删除行缩短周期")
+    void preservesUnconfirmedTarget(int index, int nextCount) {
+        UUID id = UUID.randomUUID();
+        BacktestService backtests = mock(BacktestService.class);
+        GoldDailyBarRepository bars = mock(GoldDailyBarRepository.class);
+        BacktestCase item = item();
+        List<GoldDailyBar> future = futureBars();
+        GoldDailyBar bar = future.get(index);
+        future.set(index, new GoldDailyBar(bar.symbol(), bar.priceDate(), bar.open(), bar.high(),
+                bar.low(), bar.close(), bar.currency(), bar.unit(), bar.provider(), bar.collectedAt()));
+        when(backtests.results(id, 120)).thenReturn(List.of(item));
+        LocalDate baseDate = item.asOfDate();
+        when(bars.findAfter(eq("XAUUSD"), eq("twelve_data"), eq(baseDate), anyInt()))
+                .thenReturn(future);
+
+        HorizonDiagnosticReport result = new HorizonDiagnosticService(backtests, bars,
+                new GoldForecastRule(), new FactorDiagnosticService(backtests)).diagnose(id);
+
+        assertThat(result.horizons()).extracting(HorizonDiagnostic::sampleCount)
+                .containsExactly(nextCount, 0, 0);
+    }
+
     private BigDecimal momentumAccuracy(
             HorizonDiagnosticReport report,
             int sessions
@@ -104,7 +131,10 @@ class HorizonDiagnosticServiceTests {
                 result.add(new GoldDailyBar(
                         "XAUUSD", date, value, value, value, value,
                         "usd", "troy_ounce", "twelve_data",
-                        OffsetDateTime.parse("2026-01-01T00:00:00Z")
+                        OffsetDateTime.parse("2026-02-01T00:00:00Z"),
+                        // 数学样例的显式确认，不作为市场准确率依据。
+                        new GoldBarConfirmation(GoldBarConfirmation.SOURCE, date,
+                                OffsetDateTime.parse("2026-02-01T00:00:00Z"), "a".repeat(64))
                 ));
             }
             date = date.plusDays(1);

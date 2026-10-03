@@ -5,9 +5,12 @@ import com.opspilot.ai.forecast.GoldForecastRule;
 import com.opspilot.ai.marketdata.GoldDailyBar;
 import com.opspilot.ai.marketdata.GoldDailyBarRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.Clock;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
 import java.util.List;
@@ -26,6 +29,7 @@ public class HorizonDiagnosticService {
     private final GoldDailyBarRepository bars;
     private final GoldForecastRule rule;
     private final FactorDiagnosticService factors;
+    private final Clock clock;
 
     public HorizonDiagnosticService(
             BacktestService backtests,
@@ -33,18 +37,26 @@ public class HorizonDiagnosticService {
             GoldForecastRule rule,
             FactorDiagnosticService factors
     ) {
+        this(backtests, bars, rule, factors, Clock.systemUTC());
+    }
+
+    @Autowired
+    public HorizonDiagnosticService(BacktestService backtests, GoldDailyBarRepository bars,
+            GoldForecastRule rule, FactorDiagnosticService factors, Clock clock) {
         this.backtests = backtests;
         this.bars = bars;
         this.rule = rule;
         this.factors = factors;
+        this.clock = clock;
     }
 
     public HorizonDiagnosticReport diagnose(UUID id) {
+        OffsetDateTime checkedAt = OffsetDateTime.now(clock);
         List<BacktestCase> cases = backtests.results(id, 120);
         Map<BacktestCase, List<GoldDailyBar>> futureBars = loadBars(cases);
         List<HorizonDiagnostic> result = new ArrayList<>();
         for (int sessions : HORIZONS) {
-            result.add(diagnose(id, cases, futureBars, sessions));
+            result.add(diagnose(id, cases, futureBars, sessions, checkedAt));
         }
         return new HorizonDiagnosticReport(id, List.copyOf(result));
     }
@@ -66,13 +78,15 @@ public class HorizonDiagnosticService {
             UUID id,
             List<BacktestCase> cases,
             Map<BacktestCase, List<GoldDailyBar>> futureBars,
-            int sessions
+            int sessions, OffsetDateTime checkedAt
     ) {
         List<BacktestCase> available = new ArrayList<>();
         Map<BacktestCase, ForecastDirection> actual = new IdentityHashMap<>();
         for (BacktestCase item : cases) {
             List<GoldDailyBar> future = futureBars.get(item);
             if (future.size() < sessions) continue;
+            // 保留第一至第N根目标原序列，不能删掉中间未确认行后继续计分。
+            if (future.subList(0, sessions).stream().anyMatch(bar -> !bar.isConfirmedAt(checkedAt))) continue;
 
             BigDecimal target = future.get(sessions - 1).close();
             BigDecimal change = target.subtract(item.basePrice())

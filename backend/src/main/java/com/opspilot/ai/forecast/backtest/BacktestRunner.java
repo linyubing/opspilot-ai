@@ -103,10 +103,6 @@ public class BacktestRunner {
         GoldResearchSnapshot snapshot = snapshotService.createSnapshot(date);
         validateTimeConstraints(snapshot, date, task.priceBasis());
 
-        GoldForecastPrompt prompt = buildPrompt(task, caseId, snapshot);
-        GeneratedGoldForecast generated = gateway.generate(prompt);
-        validator.validate(generated.content());
-
         GoldDailyBar nextBar = barRepo.findNext(
                 SYMBOL,
                 PROVIDER,
@@ -121,6 +117,17 @@ public class BacktestRunner {
                             + "，回测日期=" + date
             );
         }
+
+        OffsetDateTime checkedAt = now();
+        if (!nextBar.isConfirmedAt(checkedAt)) {
+            throw new BacktestDataInsufficientException(
+                    "回测第一目标日线未确认，日期=" + nextBar.priceDate());
+        }
+
+        // 先核验实际目标，避免对不能评分的样本付费调用模型。
+        GoldForecastPrompt prompt = buildPrompt(task, caseId, snapshot);
+        GeneratedGoldForecast generated = gateway.generate(prompt);
+        validator.validate(generated.content());
 
         BigDecimal basePrice = snapshot.gold().currentPrice();
         BigDecimal targetClose = nextBar.close();

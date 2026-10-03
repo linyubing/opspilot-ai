@@ -85,8 +85,9 @@ public class GoldDatasetBuilder {
             }
             try {
                 GoldResearchSnapshot snapshot = snapshots.createSnapshot(base.priceDate(),
+                        allBars.subList(i - HISTORY, i + 1),
                         batch.recent("DFII10", base.priceDate(), 120),
-                        batch.recent("DTWEXBGS", base.priceDate(), 120));
+                        batch.recent("DTWEXBGS", base.priceDate(), 120), asOf);
                 validateDates(snapshot);
 
                 // 计算 OHLC 特征
