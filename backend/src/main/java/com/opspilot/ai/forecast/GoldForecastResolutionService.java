@@ -18,10 +18,7 @@ public class GoldForecastResolutionService {
     private static final String GOLD_SYMBOL = "XAUUSD";
     private static final String GOLD_PROVIDER = "twelve_data";
 
-    /*
-     * 单次只读取基准日期之后的前 10 条真实行情。
-     * 周末行情会由 NextValidMarketPriceSelector 排除。
-     */
+    // 只使用基准日后的第一根记录，不因该记录暂不可用而跳到更晚的目标。
     private static final BigDecimal PERCENT_MULTIPLIER =
             new BigDecimal("100");
 
@@ -87,9 +84,15 @@ public class GoldForecastResolutionService {
         if (target.isEmpty()) {
             return false;
         }
+        // 同一次校验和落库使用同一时刻，避免跨日或时钟变化造成口径不一致。
+        OffsetDateTime asOf = OffsetDateTime.now(clock);
+        if (!hasValidTime(forecast, target.get(), asOf)) {
+            return false;
+        }
         ForecastResolution resolution = createResolution(
                 forecast,
-                target.get()
+                target.get(),
+                asOf
         );
 
         StoredGoldDirectionForecast resolved = forecastRepository.resolve(
@@ -102,12 +105,24 @@ public class GoldForecastResolutionService {
          */
         return resolved.status() == ForecastStatus.RESOLVED;
     }
+
+    /** 时间一致性是必要条件，不等同于已经确认供应商日线收盘。 */
+    private boolean hasValidTime(StoredGoldDirectionForecast forecast,
+            GoldDailyBar target, OffsetDateTime asOf) {
+        return target.priceDate() != null
+                && target.collectedAt() != null
+                && target.priceDate().isAfter(forecast.baseDate())
+                && !target.priceDate().isAfter(asOf.toLocalDate())
+                && !target.collectedAt().isAfter(asOf);
+    }
+
     /**
      * 根据基准价格和后续真实价格生成确定性的解析结果。
      */
     private ForecastResolution createResolution(
             StoredGoldDirectionForecast forecast,
-            GoldDailyBar target
+            GoldDailyBar target,
+            OffsetDateTime asOf
     ) {
         BigDecimal actualReturn = calculateReturn(
                 forecast.basePrice(),
@@ -124,7 +139,7 @@ public class GoldForecastResolutionService {
                 actualReturn,
                 actualDirection,
                 hit,
-                OffsetDateTime.now(clock)
+                asOf
         );
     }
 

@@ -14,9 +14,11 @@ public final class TimingProbe {
     public static void main(String[] args) {
         check("past", "2026-09-01", "2026-09-02T01:00:00Z", true);
         check("current-day", "2026-09-02", "2026-09-02T11:00:00Z", true);
-        check("future", "2026-09-03", "2026-09-04T01:00:00Z", true);
+        check("future", "2026-09-03", "2026-09-04T01:00:00Z", false);
+        check("future-date", "2026-09-03", "2026-09-02T11:00:00Z", false);
+        check("future-collection", "2026-09-01", "2026-09-02T13:00:00Z", false);
         check("missing", null, null, false);
-        System.out.println("PASS: 4 production timing observations; no market accuracy claim");
+        System.out.println("PASS: 6 production timing observations; current-day close remains unverified");
     }
 
     private static void check(String name, String date, String collected, boolean accepted) {
@@ -46,7 +48,7 @@ public final class TimingProbe {
                 forecasts, bars, new GoldForecastRule(), Clock.fixed(NOW, ZoneOffset.UTC));
         ResolveGoldForecastsResult result = service.resolvePending(1);
         boolean resolved = result.resolvedCount() == 1;
-        // 固定当前代码的观测结果；修复后应更新审计，而不是保持这项缺陷。
+        // 固定已修复的时间边界；当前日线仍可被使用，不宣称已完成收盘保护。
         if (resolved != accepted || (saved.get() != null) != accepted
                 || result.pendingCount() != (accepted ? 0 : 1)) {
             throw new AssertionError("Observed timing behavior changed: " + name);

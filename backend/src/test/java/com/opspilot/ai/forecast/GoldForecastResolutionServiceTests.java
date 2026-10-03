@@ -3,10 +3,12 @@ package com.opspilot.ai.forecast;
 import com.opspilot.ai.marketdata.GoldDailyBar;
 import com.opspilot.ai.marketdata.GoldDailyBarRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -16,10 +18,12 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
@@ -33,7 +37,8 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class GoldForecastResolutionServiceTests {
 
-    private static final Instant NOW = Instant.parse("2026-08-31T01:00:00Z");
+    // 正向用例必须在目标日线采集之后运行，不能用未来行情证明结算正确。
+    private static final Instant NOW = Instant.parse("2026-09-02T12:00:00Z");
     private static final LocalDate FRIDAY = LocalDate.parse("2026-08-28");
 
     @Mock
@@ -196,6 +201,96 @@ class GoldForecastResolutionServiceTests {
         assertThat(captor.getValue().hit()).isFalse();
     }
 
+    @ParameterizedTest
+    @CsvSource(value = {
+            "2026-09-03,2026-09-02T11:00:00Z",
+            "2026-09-01,2026-09-02T12:00:00.000000001Z",
+            "2026-09-01,2026-09-02T08:00:00-05:00",
+            "2026-09-01,NULL",
+            "NULL,2026-09-02T11:00:00Z",
+            "2026-08-28,2026-09-01T23:00:00Z",
+            "2026-08-27,2026-09-01T23:00:00Z"
+    }, nullValues = "NULL")
+    @DisplayName("未来或缺失时点、非后续行情不写入结算状态")
+    void waitsForValidTime(String date, String collected) {
+        StoredGoldDirectionForecast forecast = pendingForecast("2500", ForecastDirection.BULLISH);
+        when(forecastRepository.findPending(10)).thenReturn(List.of(forecast));
+        when(goldRepository.findNext("XAUUSD", "twelve_data", FRIDAY))
+                .thenReturn(Optional.of(bar(date, "2525", collected)));
+        // 旧代码会真的产生结算结果；让断言捕获错误状态而不是 mock 空指针。
+        org.mockito.Mockito.lenient().when(forecastRepository.resolve(any(), any()))
+                .thenAnswer(invocation -> resolvedForecast(forecast, invocation.getArgument(1)));
+
+        assertThat(service.resolvePending(10)).isEqualTo(new ResolveGoldForecastsResult(1, 0, 1));
+        verify(forecastRepository, never()).resolve(any(), any());
+        verify(goldRepository, never()).findAfter(any(), any(), any(), org.mockito.ArgumentMatchers.anyInt());
+    }
+
+    @Test
+    @DisplayName("采集时间使用真实瞬间比较，等于结算时刻可以使用")
+    void acceptsSameInstant() {
+        StoredGoldDirectionForecast forecast = pendingForecast("2500", ForecastDirection.BULLISH);
+        when(forecastRepository.findPending(10)).thenReturn(List.of(forecast));
+        when(goldRepository.findNext("XAUUSD", "twelve_data", FRIDAY))
+                .thenReturn(Optional.of(bar("2026-09-01", "2525", "2026-09-02T20:00:00+08:00")));
+        when(forecastRepository.resolve(any(), any()))
+                .thenAnswer(invocation -> resolvedForecast(forecast, invocation.getArgument(1)));
+
+        assertThat(service.resolvePending(10)).isEqualTo(new ResolveGoldForecastsResult(1, 1, 0));
+        ArgumentCaptor<ForecastResolution> saved = ArgumentCaptor.forClass(ForecastResolution.class);
+        verify(forecastRepository).resolve(eq(forecast.id()), saved.capture());
+        assertThat(saved.getValue().resolvedAt().toInstant()).isEqualTo(NOW);
+    }
+
+    @Test
+    @DisplayName("暂不可见的目标行情继续等待，时间到达后仍结算同一根")
+    void resolvesAfterWaiting() {
+        StoredGoldDirectionForecast forecast = pendingForecast("2500", ForecastDirection.BULLISH);
+        when(forecastRepository.findPending(10)).thenReturn(List.of(forecast));
+        when(goldRepository.findNext("XAUUSD", "twelve_data", FRIDAY))
+                .thenReturn(Optional.of(bar("2026-09-01", "2525", "2026-09-02T13:00:00Z")));
+        org.mockito.Mockito.lenient().when(forecastRepository.resolve(any(), any()))
+                .thenAnswer(invocation -> resolvedForecast(forecast, invocation.getArgument(1)));
+
+        assertThat(service.resolvePending(10)).isEqualTo(new ResolveGoldForecastsResult(1, 0, 1));
+        verify(forecastRepository, never()).resolve(any(), any());
+
+        GoldForecastResolutionService later = new GoldForecastResolutionService(
+                forecastRepository, goldRepository, new GoldForecastRule(),
+                Clock.fixed(Instant.parse("2026-09-02T14:00:00Z"), ZoneOffset.UTC));
+        assertThat(later.resolvePending(10)).isEqualTo(new ResolveGoldForecastsResult(1, 1, 0));
+        ArgumentCaptor<ForecastResolution> saved = ArgumentCaptor.forClass(ForecastResolution.class);
+        verify(forecastRepository).resolve(eq(forecast.id()), saved.capture());
+        assertThat(saved.getValue().targetDate()).isEqualTo("2026-09-01");
+        assertThat(saved.getValue().resolvedAt()).isEqualTo("2026-09-02T14:00:00Z");
+    }
+
+    @Test
+    @DisplayName("时钟在调用间跳动时，结算仍沿用校验时刻")
+    void freezesTime() {
+        AtomicInteger calls = new AtomicInteger();
+        Clock changing = new Clock() {
+            @Override public ZoneId getZone() { return ZoneOffset.UTC; }
+            @Override public Clock withZone(ZoneId zone) { return Clock.fixed(NOW, zone); }
+            @Override public Instant instant() {
+                return NOW.plusSeconds(calls.getAndIncrement() * 60L);
+            }
+        };
+        GoldForecastResolutionService changingService = new GoldForecastResolutionService(
+                forecastRepository, goldRepository, new GoldForecastRule(), changing);
+        StoredGoldDirectionForecast forecast = pendingForecast("2500", ForecastDirection.BULLISH);
+        when(forecastRepository.findPending(10)).thenReturn(List.of(forecast));
+        when(goldRepository.findNext("XAUUSD", "twelve_data", FRIDAY))
+                .thenReturn(Optional.of(bar("2026-09-01", "2525", "2026-09-02T12:00:00Z")));
+        when(forecastRepository.resolve(any(), any()))
+                .thenAnswer(invocation -> resolvedForecast(forecast, invocation.getArgument(1)));
+
+        assertThat(changingService.resolvePending(10)).isEqualTo(new ResolveGoldForecastsResult(1, 1, 0));
+        ArgumentCaptor<ForecastResolution> saved = ArgumentCaptor.forClass(ForecastResolution.class);
+        verify(forecastRepository).resolve(eq(forecast.id()), saved.capture());
+        assertThat(saved.getValue().resolvedAt().toInstant()).isEqualTo(NOW);
+    }
+
     private StoredGoldDirectionForecast pendingForecast(
             String basePrice,
             ForecastDirection predictedDirection
@@ -212,13 +307,17 @@ class GoldForecastResolutionServiceTests {
     }
 
     private GoldDailyBar bar(String date, String close) {
+        return bar(date, close, date + "T23:00:00Z");
+    }
+
+    private GoldDailyBar bar(String date, String close, String collected) {
         BigDecimal value = new BigDecimal(close);
         return new GoldDailyBar(
-                "XAUUSD", LocalDate.parse(date),
+                "XAUUSD", date == null ? null : LocalDate.parse(date),
                 value, value.add(BigDecimal.TEN),
                 value.subtract(BigDecimal.TEN), value,
                 "usd", "troy_ounce", "twelve_data",
-                OffsetDateTime.parse(date + "T23:00:00Z")
+                collected == null ? null : OffsetDateTime.parse(collected)
         );
     }
 
