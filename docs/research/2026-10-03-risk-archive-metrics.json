@@ -1,0 +1,47 @@
+{
+  "count": 4361,
+  "validationCount": 720,
+  "firstComplete": "2010-11-23",
+  "full": {
+    "NO_OBSERVATION": 725,
+    "AGE_4_7": 472,
+    "AGE_1_3": 3164
+  },
+  "validation": {
+    "AGE_1_3": 709,
+    "AGE_4_7": 11
+  },
+  "training": [
+    {
+      "start": "2022-02-02",
+      "completeTraining": 2915
+    },
+    {
+      "start": "2023-01-04",
+      "completeTraining": 3155
+    },
+    {
+      "start": "2023-12-07",
+      "completeTraining": 3395
+    }
+  ],
+  "recordCount": 39595,
+  "firstVintage": "2010-11-22",
+  "sourceHashes": {
+    "first": "ea703773449991e367efefe5e6b2087fea194f31bb5c3bdf04c0218eafb0b139",
+    "repeat": "b46228c267ae00c22e2a416ff7848894892cfc0dfb3cb0854b22d18ef65100f8"
+  },
+  "codeHashes": {
+    "RiskArchive.cjs": "274aeb965e4bfcf475024c7d7b1d29656bd3ed643631e7cc06c620e479cd3575",
+    "RiskArchiveChecks.cjs": "f590b446a8d14a9227bbee712ec49fa7508086c8a4cff734cb2a0afbcad494ef",
+    "RiskCheck.java": "2b02d764ab88f6f762032f43ea38ea8016dcfe326159afc26c8ec26436340920",
+    "RiskPathChecks.cjs": "1342cf0c2c763aec2373f7e8c9ed362daa11af7f51dde2982a0457d59bbf977a",
+    "download-risk.cjs": "72bda5b328e88bb125bd080103740a169943fa7306c678b96ffcdfd6639b3d05",
+    "verify-risk.cjs": "8299a239d2ba1580f496a5572c6762d98f8884833254bdcd382aa397b1c5a3b2",
+    "InfoMath.cjs": "16a929d4340a5c1f3000443b65c4218e94defa5b0f2df953bfd5d8b8f7d3e60b",
+    "FredHistory.java": "6f33c6f1c04b4ff2589fc47cdebc12a0d464d1e97b9677c98a4245a86eb61efc",
+    "MacroObservation.java": "12d48eaf37bf74feb00669cbe0406c4eac0c2538643e9b3787752042f732078b"
+  },
+  "treeHash": "0e61b655c77bf6ead23df4b70217246c29951ef375b3cc71a0300303c5e9832d",
+  "promotionAllowed": false
+}
