@@ -426,6 +426,22 @@ class GoldResearchSnapshotServiceTests {
                 .hasMessageContaining("未确认");
     }
 
+    @Test
+    @DisplayName("快照留痕保存实际计算的21根黄金窗口，不含更旧行")
+    void recordsGoldInput() {
+        List<GoldDailyBar> prices = goldPrices(22);
+        when(goldRepository.findRecent("XAUUSD", "twelve_data", 120)).thenReturn(prices);
+        when(macroObservationRepository.findRecent("DFII10", 120)).thenReturn(realRates(21));
+
+        GoldResearchSnapshot snapshot = service.createSnapshot();
+
+        assertThat(snapshot.input()).isNotNull();
+        assertThat(snapshot.input().bars()).containsExactlyElementsOf(prices.subList(0, 21));
+        assertThat(snapshot.input().matches(snapshot.latestGoldDate(), snapshot.gold(),
+                OffsetDateTime.parse("2026-10-03T12:00:00Z"))).isTrue();
+        verify(goldRepository).findRecent("XAUUSD", "twelve_data", 120);
+    }
+
     private GoldDailyBar raw(GoldDailyBar bar) {
         return new GoldDailyBar(bar.symbol(), bar.priceDate(), bar.open(), bar.high(), bar.low(),
                 bar.close(), bar.currency(), bar.unit(), bar.provider(), bar.collectedAt());

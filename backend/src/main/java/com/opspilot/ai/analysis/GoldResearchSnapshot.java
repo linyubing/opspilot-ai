@@ -16,8 +16,19 @@ public record GoldResearchSnapshot(
         ResearchFactorAssessment realRateAssessment,
         ResearchFactorAssessment dollarIndexAssessment,
         String researchVersion,
-        String disclaimer
+        String disclaimer,
+        GoldSnapshotInput input
 ) {
+
+    /** 旧快照没有黄金窗口留痕，不自动添加确认依据。 */
+    public GoldResearchSnapshot(LocalDate analysisDate, LocalDate latestGoldDate,
+            LocalDate latestRealRateDate, LocalDate latestDollarIndexDate, GoldReturnMetrics gold,
+            RealRateChangeMetrics realRate, DollarIndexChangeMetrics dollarIndex,
+            ResearchFactorAssessment realRateAssessment, ResearchFactorAssessment dollarIndexAssessment,
+            String researchVersion, String disclaimer) {
+        this(analysisDate, latestGoldDate, latestRealRateDate, latestDollarIndexDate, gold, realRate,
+                dollarIndex, realRateAssessment, dollarIndexAssessment, researchVersion, disclaimer, null);
+    }
 
     /** 兼容读取改造前的单因子历史快照。 */
     public GoldResearchSnapshot(

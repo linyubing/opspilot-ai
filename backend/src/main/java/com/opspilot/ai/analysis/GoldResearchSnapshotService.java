@@ -331,7 +331,8 @@ public class GoldResearchSnapshotService {
                 realRateAssessment,
                 dollarIndexAssessment,
                 RESEARCH_VERSION,
-                DISCLAIMER
+                DISCLAIMER,
+                new GoldSnapshotInput(sortedGold.subList(0, REQUIRED_OBSERVATION_COUNT), checkedAt)
         );
     }
 
