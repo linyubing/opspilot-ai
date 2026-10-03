@@ -2,6 +2,7 @@ package com.opspilot.ai.forecast.backtest;
 
 import com.opspilot.ai.analysis.GoldResearchSnapshot;
 import com.opspilot.ai.analysis.GoldReturnMetrics;
+import com.opspilot.ai.analysis.GoldSnapshotInput;
 import com.opspilot.ai.analysis.ResearchFactorAssessment;
 import com.opspilot.ai.analysis.GoldFactorStatus;
 import com.opspilot.ai.forecast.GoldForecastRule;
@@ -96,22 +97,59 @@ class HorizonDiagnosticServiceTests {
 
     private BacktestCase item() {
         BacktestCase item = mock(BacktestCase.class);
-        GoldResearchSnapshot snapshot = mock(GoldResearchSnapshot.class);
-        GoldReturnMetrics gold = mock(GoldReturnMetrics.class);
         when(item.asOfDate()).thenReturn(LocalDate.parse("2026-01-01"));
         when(item.basePrice()).thenReturn(new BigDecimal("100"));
-        when(item.snapshot()).thenReturn(snapshot);
-        when(snapshot.gold()).thenReturn(gold);
-        when(gold.return1()).thenReturn(BigDecimal.ZERO);
-        when(gold.return5()).thenReturn(BigDecimal.ZERO);
-        when(gold.return20()).thenReturn(BigDecimal.ONE);
-        when(snapshot.realRateAssessment()).thenReturn(new ResearchFactorAssessment(
-                GoldFactorStatus.NEUTRAL, "test", "test"
-        ));
-        when(snapshot.dollarIndexAssessment()).thenReturn(new ResearchFactorAssessment(
-                GoldFactorStatus.NEUTRAL, "test", "test"
-        ));
+        when(item.snapshot()).thenReturn(snapshot());
+        when(item.createdAt()).thenReturn(OffsetDateTime.parse("2026-02-01T00:00:00Z"));
         return item;
+    }
+
+    /** 20个收益率中只有99到100的一次变动，波动率手算为3.4772。 */
+    private GoldResearchSnapshot snapshot() {
+        LocalDate date = LocalDate.parse("2026-01-01");
+        OffsetDateTime time = OffsetDateTime.parse("2026-02-01T00:00:00Z");
+        List<GoldDailyBar> window = new ArrayList<>();
+        for (int i = 0; i < 21; i++) {
+            BigDecimal price = new BigDecimal(i == 20 ? "99" : "100");
+            window.add(new GoldDailyBar("XAUUSD", date.minusDays(i), price, price, price, price,
+                    "usd", "troy_ounce", "twelve_data", time,
+                    new GoldBarConfirmation(GoldBarConfirmation.SOURCE, date, time, "a".repeat(64))));
+        }
+        var assessment = new ResearchFactorAssessment(GoldFactorStatus.NEUTRAL, "test", "数学样例");
+        return new GoldResearchSnapshot(date, date, date, date,
+                new GoldReturnMetrics(new BigDecimal("100"), BigDecimal.ZERO, BigDecimal.ZERO,
+                        new BigDecimal("1.0101"), new BigDecimal("3.4772"), time),
+                null, null, assessment, assessment, "test", "不是市场准确率证据",
+                new GoldSnapshotInput(window, time));
+    }
+
+    @ParameterizedTest
+    @org.junit.jupiter.params.provider.ValueSource(strings = {"missing", "price", "late", "date"})
+    @org.junit.jupiter.api.DisplayName("旧回测缺依据、价格不符、后来核验或基准日不符不能重新计分")
+    void rejectsUntrustedBase(String defect) {
+        UUID id = UUID.randomUUID();
+        BacktestService backtests = mock(BacktestService.class);
+        GoldDailyBarRepository bars = mock(GoldDailyBarRepository.class);
+        BacktestCase item = item();
+        GoldResearchSnapshot source = snapshot();
+        GoldSnapshotInput input = source.input();
+        if (defect.equals("missing")) input = null;
+        if (defect.equals("late")) input = new GoldSnapshotInput(input.bars(), input.checkedAt().plusSeconds(1));
+        GoldResearchSnapshot value = new GoldResearchSnapshot(source.analysisDate(), source.latestGoldDate(),
+                source.latestRealRateDate(), source.latestDollarIndexDate(), source.gold(), source.realRate(),
+                source.dollarIndex(), source.realRateAssessment(), source.dollarIndexAssessment(),
+                source.researchVersion(), source.disclaimer(), input);
+        when(item.snapshot()).thenReturn(value);
+        if (defect.equals("price")) when(item.basePrice()).thenReturn(new BigDecimal("101"));
+        if (defect.equals("date")) when(item.asOfDate()).thenReturn(source.latestGoldDate().plusDays(1));
+        when(backtests.results(id, 120)).thenReturn(List.of(item));
+        LocalDate baseDate = item.asOfDate();
+        when(bars.findAfter(eq("XAUUSD"), eq("twelve_data"), eq(baseDate), anyInt()))
+                .thenReturn(futureBars());
+        HorizonDiagnosticReport report = new HorizonDiagnosticService(backtests, bars,
+                new GoldForecastRule(), new FactorDiagnosticService(backtests)).diagnose(id);
+        assertThat(report.horizons()).extracting(HorizonDiagnostic::sampleCount).containsOnly(0);
+        assertThat(momentumAccuracy(report, 1)).isNull();
     }
 
     private List<GoldDailyBar> futureBars() {

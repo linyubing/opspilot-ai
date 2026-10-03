@@ -52,13 +52,28 @@ public class HorizonDiagnosticService {
 
     public HorizonDiagnosticReport diagnose(UUID id) {
         OffsetDateTime checkedAt = OffsetDateTime.now(clock);
-        List<BacktestCase> cases = backtests.results(id, 120);
+        // 旧结果只读保留；不能用今天重新查得的窗口替旧样本补证。
+        List<BacktestCase> cases = backtests.results(id, 120).stream()
+                .filter(item -> validBase(item, checkedAt)).toList();
         Map<BacktestCase, List<GoldDailyBar>> futureBars = loadBars(cases);
         List<HorizonDiagnostic> result = new ArrayList<>();
         for (int sessions : HORIZONS) {
             result.add(diagnose(id, cases, futureBars, sessions, checkedAt));
         }
         return new HorizonDiagnosticReport(id, List.copyOf(result));
+    }
+
+    /** 依据必须在样本保存时已存在，且与实际计分的基准价、日期一致。 */
+    private boolean validBase(BacktestCase item, OffsetDateTime checkedAt) {
+        if (item == null || item.snapshot() == null || item.createdAt() == null
+                || item.createdAt().isAfter(checkedAt) || item.asOfDate() == null
+                || item.basePrice() == null || item.basePrice().signum() <= 0) return false;
+        var snapshot = item.snapshot();
+        return snapshot.input() != null && snapshot.gold() != null
+                && item.asOfDate().equals(snapshot.latestGoldDate())
+                && snapshot.gold().currentPrice() != null
+                && item.basePrice().compareTo(snapshot.gold().currentPrice()) == 0
+                && snapshot.input().matches(item.asOfDate(), snapshot.gold(), item.createdAt());
     }
 
     private Map<BacktestCase, List<GoldDailyBar>> loadBars(
