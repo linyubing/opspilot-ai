@@ -1,0 +1,1227 @@
+{
+  "promotionAllowed": false,
+  "scores": {
+    "price": {
+      "count": 720,
+      "correct": 353,
+      "errors": 367,
+      "accuracy": 0.49027777777777776,
+      "balancedAccuracy": 0.35627356698028545,
+      "brierScore": 0.627397565583824,
+      "logLoss": 1.042704851534803,
+      "recalls": [
+        0.04020100502512563,
+        0.9596541786743515,
+        0.06896551724137931
+      ],
+      "matrix": [
+        [
+          8,
+          180,
+          11
+        ],
+        [
+          6,
+          333,
+          8
+        ],
+        [
+          5,
+          157,
+          12
+        ]
+      ]
+    },
+    "candidate": {
+      "count": 720,
+      "correct": 349,
+      "errors": 371,
+      "accuracy": 0.4847222222222222,
+      "balancedAccuracy": 0.3493327325398843,
+      "brierScore": 0.6305844272906092,
+      "logLoss": 1.0484017587100025,
+      "recalls": [
+        0.02512562814070352,
+        0.9596541786743515,
+        0.06321839080459771
+      ],
+      "matrix": [
+        [
+          5,
+          182,
+          12
+        ],
+        [
+          5,
+          333,
+          9
+        ],
+        [
+          6,
+          157,
+          11
+        ]
+      ]
+    },
+    "prior": {
+      "count": 720,
+      "correct": 347,
+      "errors": 373,
+      "accuracy": 0.48194444444444445,
+      "balancedAccuracy": 0.3333333333333333,
+      "brierScore": 0.6341090483553501,
+      "logLoss": 1.052052703675199,
+      "recalls": [
+        0,
+        1,
+        0
+      ],
+      "matrix": [
+        [
+          0,
+          199,
+          0
+        ],
+        [
+          0,
+          347,
+          0
+        ],
+        [
+          0,
+          174,
+          0
+        ]
+      ]
+    },
+    "fullPrice": {
+      "count": 720,
+      "correct": 350,
+      "errors": 370,
+      "accuracy": 0.4861111111111111,
+      "balancedAccuracy": 0.34980443973486297,
+      "brierScore": 0.6275459635610438,
+      "logLoss": 1.0429471931743959,
+      "recalls": [
+        0.05527638190954774,
+        0.9596541786743515,
+        0.034482758620689655
+      ],
+      "matrix": [
+        [
+          11,
+          182,
+          6
+        ],
+        [
+          10,
+          333,
+          4
+        ],
+        [
+          10,
+          158,
+          6
+        ]
+      ]
+    }
+  },
+  "signals": {
+    "count": 189,
+    "correct": 109,
+    "errors": 80,
+    "accuracy": 0.5767195767195767,
+    "balancedAccuracy": 0.3333333333333333,
+    "brierScore": 0.5742420316755666,
+    "logLoss": 0.9691934953707212,
+    "recalls": [
+      0,
+      1,
+      0
+    ],
+    "matrix": [
+      [
+        0,
+        49,
+        0
+      ],
+      [
+        0,
+        109,
+        0
+      ],
+      [
+        0,
+        31,
+        0
+      ]
+    ],
+    "coverage": 0.2625
+  },
+  "priceOnSignals": {
+    "count": 189,
+    "correct": 109,
+    "errors": 80,
+    "accuracy": 0.5767195767195767,
+    "balancedAccuracy": 0.3333333333333333,
+    "brierScore": 0.5726691090150425,
+    "logLoss": 0.9659098829041097,
+    "recalls": [
+      0,
+      1,
+      0
+    ],
+    "matrix": [
+      [
+        0,
+        49,
+        0
+      ],
+      [
+        0,
+        109,
+        0
+      ],
+      [
+        0,
+        31,
+        0
+      ]
+    ]
+  },
+  "priorOnSignals": {
+    "count": 189,
+    "correct": 109,
+    "errors": 80,
+    "accuracy": 0.5767195767195767,
+    "balancedAccuracy": 0.3333333333333333,
+    "brierScore": 0.5844374468763939,
+    "logLoss": 0.9824098453120665,
+    "recalls": [
+      0,
+      1,
+      0
+    ],
+    "matrix": [
+      [
+        0,
+        49,
+        0
+      ],
+      [
+        0,
+        109,
+        0
+      ],
+      [
+        0,
+        31,
+        0
+      ]
+    ]
+  },
+  "againstPrice": {
+    "newHits": 6,
+    "newMisses": 10,
+    "net": -4,
+    "byActual": {
+      "BULLISH": {
+        "newHits": 2,
+        "newMisses": 5
+      },
+      "NEUTRAL": {
+        "newHits": 3,
+        "newMisses": 3
+      },
+      "BEARISH": {
+        "newHits": 1,
+        "newMisses": 2
+      }
+    }
+  },
+  "folds": [
+    {
+      "start": "2022-02-02",
+      "end": "2023-01-03",
+      "trainingCount": 2915,
+      "trainLabels": [
+        751,
+        1476,
+        688
+      ],
+      "gradients": {
+        "price": 3.410919342022238e-8,
+        "candidate": 3.8461498173269506e-8
+      },
+      "training": {
+        "price": {
+          "count": 2915,
+          "correct": 1517,
+          "errors": 1398,
+          "accuracy": 0.5204116638078902,
+          "balancedAccuracy": 0.36718036483696825,
+          "brierScore": 0.6023216732157727,
+          "logLoss": 1.0079897098081243,
+          "recalls": [
+            0.10119840213049268,
+            0.9552845528455285,
+            0.04505813953488372
+          ],
+          "matrix": [
+            [
+              76,
+              646,
+              29
+            ],
+            [
+              46,
+              1410,
+              20
+            ],
+            [
+              54,
+              603,
+              31
+            ]
+          ]
+        },
+        "candidate": {
+          "count": 2915,
+          "correct": 1520,
+          "errors": 1395,
+          "accuracy": 0.5214408233276158,
+          "balancedAccuracy": 0.37047407620284356,
+          "brierScore": 0.5999061553045401,
+          "logLoss": 1.004531416321125,
+          "recalls": [
+            0.11717709720372836,
+            0.9491869918699187,
+            0.04505813953488372
+          ],
+          "matrix": [
+            [
+              88,
+              639,
+              24
+            ],
+            [
+              53,
+              1401,
+              22
+            ],
+            [
+              58,
+              599,
+              31
+            ]
+          ]
+        }
+      },
+      "scores": {
+        "price": {
+          "count": 240,
+          "correct": 106,
+          "errors": 134,
+          "accuracy": 0.44166666666666665,
+          "balancedAccuracy": 0.3443228063094878,
+          "brierScore": 0.6584744572907084,
+          "logLoss": 1.0870002488715294,
+          "recalls": [
+            0.045454545454545456,
+            0.9433962264150944,
+            0.04411764705882353
+          ],
+          "matrix": [
+            [
+              3,
+              59,
+              4
+            ],
+            [
+              3,
+              100,
+              3
+            ],
+            [
+              4,
+              61,
+              3
+            ]
+          ]
+        },
+        "candidate": {
+          "count": 240,
+          "correct": 105,
+          "errors": 135,
+          "accuracy": 0.4375,
+          "balancedAccuracy": 0.3430840031838922,
+          "brierScore": 0.6575140281212497,
+          "logLoss": 1.0865315528018016,
+          "recalls": [
+            0.06060606060606061,
+            0.9245283018867925,
+            0.04411764705882353
+          ],
+          "matrix": [
+            [
+              4,
+              59,
+              3
+            ],
+            [
+              5,
+              98,
+              3
+            ],
+            [
+              6,
+              59,
+              3
+            ]
+          ]
+        },
+        "prior": {
+          "count": 240,
+          "correct": 106,
+          "errors": 134,
+          "accuracy": 0.44166666666666665,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6557513678485228,
+          "logLoss": 1.0826165131891667,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              66,
+              0
+            ],
+            [
+              0,
+              106,
+              0
+            ],
+            [
+              0,
+              68,
+              0
+            ]
+          ]
+        },
+        "fullPrice": {
+          "count": 240,
+          "correct": 106,
+          "errors": 134,
+          "accuracy": 0.44166666666666665,
+          "balancedAccuracy": 0.34447135057567907,
+          "brierScore": 0.656723137089331,
+          "logLoss": 1.0845841631293096,
+          "recalls": [
+            0.06060606060606061,
+            0.9433962264150944,
+            0.029411764705882353
+          ],
+          "matrix": [
+            [
+              4,
+              60,
+              2
+            ],
+            [
+              4,
+              100,
+              2
+            ],
+            [
+              7,
+              59,
+              2
+            ]
+          ]
+        }
+      },
+      "signals": {
+        "count": 14,
+        "correct": 7,
+        "errors": 7,
+        "accuracy": 0.5,
+        "balancedAccuracy": 0.3333333333333333,
+        "brierScore": 0.6209179922980859,
+        "logLoss": 1.027472910466764,
+        "recalls": [
+          0,
+          1,
+          0
+        ],
+        "matrix": [
+          [
+            0,
+            5,
+            0
+          ],
+          [
+            0,
+            7,
+            0
+          ],
+          [
+            0,
+            2,
+            0
+          ]
+        ],
+        "coverage": 0.058333333333333334
+      },
+      "priceOnSignals": {
+        "count": 14,
+        "correct": 7,
+        "errors": 7,
+        "accuracy": 0.5,
+        "balancedAccuracy": 0.3333333333333333,
+        "brierScore": 0.6381095598760489,
+        "logLoss": 1.0545617083529224,
+        "recalls": [
+          0,
+          1,
+          0
+        ],
+        "matrix": [
+          [
+            0,
+            5,
+            0
+          ],
+          [
+            0,
+            7,
+            0
+          ],
+          [
+            0,
+            2,
+            0
+          ]
+        ]
+      },
+      "priorOnSignals": {
+        "count": 14,
+        "correct": 7,
+        "errors": 7,
+        "accuracy": 0.5,
+        "balancedAccuracy": 0.3333333333333333,
+        "brierScore": 0.620662745778769,
+        "logLoss": 1.03089345801244,
+        "recalls": [
+          0,
+          1,
+          0
+        ],
+        "matrix": [
+          [
+            0,
+            5,
+            0
+          ],
+          [
+            0,
+            7,
+            0
+          ],
+          [
+            0,
+            2,
+            0
+          ]
+        ]
+      },
+      "againstPrice": {
+        "newHits": 2,
+        "newMisses": 3,
+        "net": -1,
+        "byActual": {
+          "BULLISH": {
+            "newHits": 2,
+            "newMisses": 1
+          },
+          "NEUTRAL": {
+            "newHits": 0,
+            "newMisses": 2
+          },
+          "BEARISH": {
+            "newHits": 0,
+            "newMisses": 0
+          }
+        }
+      }
+    },
+    {
+      "start": "2023-01-04",
+      "end": "2023-12-06",
+      "trainingCount": 3155,
+      "trainLabels": [
+        816,
+        1583,
+        756
+      ],
+      "gradients": {
+        "price": 2.4437308184833972e-8,
+        "candidate": 2.574161809436922e-8
+      },
+      "training": {
+        "price": {
+          "count": 3155,
+          "correct": 1628,
+          "errors": 1527,
+          "accuracy": 0.5160063391442156,
+          "balancedAccuracy": 0.3661114471525022,
+          "brierScore": 0.6062845015963143,
+          "logLoss": 1.0134233282231273,
+          "recalls": [
+            0.09436274509803921,
+            0.9576753000631711,
+            0.046296296296296294
+          ],
+          "matrix": [
+            [
+              77,
+              709,
+              30
+            ],
+            [
+              46,
+              1516,
+              21
+            ],
+            [
+              59,
+              662,
+              35
+            ]
+          ]
+        },
+        "candidate": {
+          "count": 3155,
+          "correct": 1630,
+          "errors": 1525,
+          "accuracy": 0.5166402535657686,
+          "balancedAccuracy": 0.36828150284001665,
+          "brierScore": 0.6040133172487379,
+          "logLoss": 1.0102409217355248,
+          "recalls": [
+            0.10661764705882353,
+            0.9532533164876816,
+            0.04497354497354497
+          ],
+          "matrix": [
+            [
+              87,
+              702,
+              27
+            ],
+            [
+              47,
+              1509,
+              27
+            ],
+            [
+              64,
+              658,
+              34
+            ]
+          ]
+        }
+      },
+      "scores": {
+        "price": {
+          "count": 240,
+          "correct": 139,
+          "errors": 101,
+          "accuracy": 0.5791666666666667,
+          "balancedAccuracy": 0.3884865134865135,
+          "brierScore": 0.5841604626598553,
+          "logLoss": 0.9809433593099298,
+          "recalls": [
+            0.05357142857142857,
+            0.9772727272727273,
+            0.1346153846153846
+          ],
+          "matrix": [
+            [
+              3,
+              48,
+              5
+            ],
+            [
+              2,
+              129,
+              1
+            ],
+            [
+              0,
+              45,
+              7
+            ]
+          ]
+        },
+        "candidate": {
+          "count": 240,
+          "correct": 137,
+          "errors": 103,
+          "accuracy": 0.5708333333333333,
+          "balancedAccuracy": 0.3726967476967477,
+          "brierScore": 0.5822131388161249,
+          "logLoss": 0.978447703192605,
+          "recalls": [
+            0.017857142857142856,
+            0.9848484848484849,
+            0.11538461538461539
+          ],
+          "matrix": [
+            [
+              1,
+              48,
+              7
+            ],
+            [
+              0,
+              130,
+              2
+            ],
+            [
+              0,
+              46,
+              6
+            ]
+          ]
+        },
+        "prior": {
+          "count": 240,
+          "correct": 132,
+          "errors": 108,
+          "accuracy": 0.55,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.5996069429200745,
+          "logLoss": 1.0044124110435502,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              56,
+              0
+            ],
+            [
+              0,
+              132,
+              0
+            ],
+            [
+              0,
+              52,
+              0
+            ]
+          ]
+        },
+        "fullPrice": {
+          "count": 240,
+          "correct": 137,
+          "errors": 103,
+          "accuracy": 0.5708333333333333,
+          "balancedAccuracy": 0.3752081252081252,
+          "brierScore": 0.5877002877869735,
+          "logLoss": 0.9865877881037697,
+          "recalls": [
+            0.07142857142857142,
+            0.9772727272727273,
+            0.07692307692307693
+          ],
+          "matrix": [
+            [
+              4,
+              49,
+              3
+            ],
+            [
+              2,
+              129,
+              1
+            ],
+            [
+              1,
+              47,
+              4
+            ]
+          ]
+        }
+      },
+      "signals": {
+        "count": 115,
+        "correct": 69,
+        "errors": 46,
+        "accuracy": 0.6,
+        "balancedAccuracy": 0.3333333333333333,
+        "brierScore": 0.5545491530985183,
+        "logLoss": 0.9416063914390036,
+        "recalls": [
+          0,
+          1,
+          0
+        ],
+        "matrix": [
+          [
+            0,
+            27,
+            0
+          ],
+          [
+            0,
+            69,
+            0
+          ],
+          [
+            0,
+            19,
+            0
+          ]
+        ],
+        "coverage": 0.4791666666666667
+      },
+      "priceOnSignals": {
+        "count": 115,
+        "correct": 69,
+        "errors": 46,
+        "accuracy": 0.6,
+        "balancedAccuracy": 0.3333333333333333,
+        "brierScore": 0.5539933598599298,
+        "logLoss": 0.94018271224895,
+        "recalls": [
+          0,
+          1,
+          0
+        ],
+        "matrix": [
+          [
+            0,
+            27,
+            0
+          ],
+          [
+            0,
+            69,
+            0
+          ],
+          [
+            0,
+            19,
+            0
+          ]
+        ]
+      },
+      "priorOnSignals": {
+        "count": 115,
+        "correct": 69,
+        "errors": 46,
+        "accuracy": 0.6,
+        "balancedAccuracy": 0.3333333333333333,
+        "brierScore": 0.5733394585956723,
+        "logLoss": 0.9673499413819756,
+        "recalls": [
+          0,
+          1,
+          0
+        ],
+        "matrix": [
+          [
+            0,
+            27,
+            0
+          ],
+          [
+            0,
+            69,
+            0
+          ],
+          [
+            0,
+            19,
+            0
+          ]
+        ]
+      },
+      "againstPrice": {
+        "newHits": 1,
+        "newMisses": 3,
+        "net": -2,
+        "byActual": {
+          "BULLISH": {
+            "newHits": 0,
+            "newMisses": 2
+          },
+          "NEUTRAL": {
+            "newHits": 1,
+            "newMisses": 0
+          },
+          "BEARISH": {
+            "newHits": 0,
+            "newMisses": 1
+          }
+        }
+      }
+    },
+    {
+      "start": "2023-12-07",
+      "end": "2024-11-07",
+      "trainingCount": 3395,
+      "trainLabels": [
+        873,
+        1714,
+        808
+      ],
+      "gradients": {
+        "price": 3.2633712444379544e-8,
+        "candidate": 3.447557221292392e-8
+      },
+      "training": {
+        "price": {
+          "count": 3395,
+          "correct": 1765,
+          "errors": 1630,
+          "accuracy": 0.5198821796759941,
+          "balancedAccuracy": 0.3678036317327314,
+          "brierScore": 0.6046401173842999,
+          "logLoss": 1.010957066100465,
+          "recalls": [
+            0.09278350515463918,
+            0.9574095682613769,
+            0.053217821782178217
+          ],
+          "matrix": [
+            [
+              81,
+              760,
+              32
+            ],
+            [
+              48,
+              1641,
+              25
+            ],
+            [
+              56,
+              709,
+              43
+            ]
+          ]
+        },
+        "candidate": {
+          "count": 3395,
+          "correct": 1760,
+          "errors": 1635,
+          "accuracy": 0.5184094256259205,
+          "balancedAccuracy": 0.36767584039056067,
+          "brierScore": 0.6023781530445024,
+          "logLoss": 1.0078150419120164,
+          "recalls": [
+            0.10194730813287514,
+            0.9515752625437572,
+            0.04950495049504951
+          ],
+          "matrix": [
+            [
+              89,
+              751,
+              33
+            ],
+            [
+              57,
+              1631,
+              26
+            ],
+            [
+              62,
+              706,
+              40
+            ]
+          ]
+        }
+      },
+      "scores": {
+        "price": {
+          "count": 240,
+          "correct": 108,
+          "errors": 132,
+          "accuracy": 0.45,
+          "balancedAccuracy": 0.3390465011260118,
+          "brierScore": 0.6395577768009062,
+          "logLoss": 1.0601709464229483,
+          "recalls": [
+            0.025974025974025976,
+            0.9541284403669725,
+            0.037037037037037035
+          ],
+          "matrix": [
+            [
+              2,
+              73,
+              2
+            ],
+            [
+              1,
+              104,
+              4
+            ],
+            [
+              1,
+              51,
+              2
+            ]
+          ]
+        },
+        "candidate": {
+          "count": 240,
+          "correct": 107,
+          "errors": 133,
+          "accuracy": 0.44583333333333336,
+          "balancedAccuracy": 0.3334465964435383,
+          "brierScore": 0.6520261149344521,
+          "logLoss": 1.0802260201356026,
+          "recalls": [
+            0,
+            0.963302752293578,
+            0.037037037037037035
+          ],
+          "matrix": [
+            [
+              0,
+              75,
+              2
+            ],
+            [
+              0,
+              105,
+              4
+            ],
+            [
+              0,
+              52,
+              2
+            ]
+          ]
+        },
+        "prior": {
+          "count": 240,
+          "correct": 109,
+          "errors": 131,
+          "accuracy": 0.45416666666666666,
+          "balancedAccuracy": 0.3333333333333333,
+          "brierScore": 0.6469688342974566,
+          "logLoss": 1.0691291867928832,
+          "recalls": [
+            0,
+            1,
+            0
+          ],
+          "matrix": [
+            [
+              0,
+              77,
+              0
+            ],
+            [
+              0,
+              109,
+              0
+            ],
+            [
+              0,
+              54,
+              0
+            ]
+          ]
+        },
+        "fullPrice": {
+          "count": 240,
+          "correct": 107,
+          "errors": 133,
+          "accuracy": 0.44583333333333336,
+          "balancedAccuracy": 0.3310298264426705,
+          "brierScore": 0.6382144658068268,
+          "logLoss": 1.0576696282901077,
+          "recalls": [
+            0.03896103896103896,
+            0.9541284403669725,
+            0
+          ],
+          "matrix": [
+            [
+              3,
+              73,
+              1
+            ],
+            [
+              4,
+              104,
+              1
+            ],
+            [
+              2,
+              52,
+              0
+            ]
+          ]
+        }
+      },
+      "signals": {
+        "count": 60,
+        "correct": 33,
+        "errors": 27,
+        "accuracy": 0.55,
+        "balancedAccuracy": 0.3333333333333333,
+        "brierScore": 0.601095658136321,
+        "logLoss": 1.0084702477174385,
+        "recalls": [
+          0,
+          1,
+          0
+        ],
+        "matrix": [
+          [
+            0,
+            17,
+            0
+          ],
+          [
+            0,
+            33,
+            0
+          ],
+          [
+            0,
+            10,
+            0
+          ]
+        ],
+        "coverage": 0.25
+      },
+      "priceOnSignals": {
+        "count": 60,
+        "correct": 33,
+        "errors": 27,
+        "accuracy": 0.55,
+        "balancedAccuracy": 0.3333333333333333,
+        "brierScore": 0.5931948563614406,
+        "logLoss": 0.994534867388442,
+        "recalls": [
+          0,
+          1,
+          0
+        ],
+        "matrix": [
+          [
+            0,
+            17,
+            0
+          ],
+          [
+            0,
+            33,
+            0
+          ],
+          [
+            0,
+            10,
+            0
+          ]
+        ]
+      },
+      "priorOnSignals": {
+        "count": 60,
+        "correct": 33,
+        "errors": 27,
+        "accuracy": 0.55,
+        "balancedAccuracy": 0.3333333333333333,
+        "brierScore": 0.5972560213372202,
+        "logLoss": 0.9999618182146468,
+        "recalls": [
+          0,
+          1,
+          0
+        ],
+        "matrix": [
+          [
+            0,
+            17,
+            0
+          ],
+          [
+            0,
+            33,
+            0
+          ],
+          [
+            0,
+            10,
+            0
+          ]
+        ]
+      },
+      "againstPrice": {
+        "newHits": 3,
+        "newMisses": 4,
+        "net": -1,
+        "byActual": {
+          "BULLISH": {
+            "newHits": 0,
+            "newMisses": 2
+          },
+          "NEUTRAL": {
+            "newHits": 2,
+            "newMisses": 1
+          },
+          "BEARISH": {
+            "newHits": 1,
+            "newMisses": 1
+          }
+        }
+      }
+    }
+  ],
+  "gates": {
+    "accuracy": false,
+    "balancedGain": false,
+    "recalls": false,
+    "brier": false,
+    "logLoss": false
+  },
+  "signalGates": {
+    "coverage": false,
+    "sameDateBaselines": false,
+    "recalls": false
+  },
+  "diagnosticPass": false,
+  "signalPass": false,
+  "resultHash": "904c12db51cc858627550718d5ecfc002f284647a7b40fdf2faf89cbac1aec5c",
+  "treeHash": "0e61b655c77bf6ead23df4b70217246c29951ef375b3cc71a0300303c5e9832d",
+  "vectorsHash": "3b5b7b3023ada3b5f5f2035f5e8dd95923dc8108347e3c165955fdc20c43c077",
+  "protocolHash": "e699a717f35b57e2e967d8ec27b05efd7c6a93d632e7e8f13d3ded0cf8e8c10f",
+  "codeHashes": {
+    "VixRun.java": "a7d6262605bf9d234e78f9fe46cc61c2f1d6dae9550328a125825221297d0428",
+    "VixCohort.java": "4c816b4292c56d5a972a8ae664e3fc562d0a76876b35db45c1561c1dc098c745",
+    "VixCohortChecks.java": "a32185fe6c03f20258eba58ebc24506812ae4f386a327c4af953a90c536a6279",
+    "FusionScale.java": "98e4e93c07fe9fa723d23874a66133db6551c05cc4394598dfcd17df9436fbbe",
+    "RidgeFit.java": "e2f6fc2f22765bdea5150a2b13a8d9b7a8434abae0abf6a42100f3ecf221f471",
+    "SoftmaxFit.java": "9c3aad8e9cb2f272f0c4768246752761b90028f4808104cd5a636fe867d5ec5e",
+    "VixFitMath.cjs": "e5bd506cbe4467e8c1dbe063adb38b0632be93daaae8667b2301d25008a0f825",
+    "VixFitMathChecks.cjs": "e69de8abc145472433227d958612b5d6083b6b9e5054e48b0a0d11bcedbb17c0",
+    "VixModelAudit.cjs": "a22864b9e5de5c14e2d4c32ee4165a7f626301ae6823257c97832d8fb06391d4",
+    "VixModelAuditChecks.cjs": "71e3821b8a03e0d38978791e09935c4291954d3ef84e93d5a0de6b39d425527a",
+    "verify-vix-model.cjs": "ea83c7f693a5efdf021ee51e7c16381e07f7cb3bdb232b33f74518f43379573f",
+    "InfoMath.cjs": "16a929d4340a5c1f3000443b65c4218e94defa5b0f2df953bfd5d8b8f7d3e60b"
+  }
+}
