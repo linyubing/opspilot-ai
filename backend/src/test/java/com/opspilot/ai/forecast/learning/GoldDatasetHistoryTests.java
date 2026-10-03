@@ -62,7 +62,10 @@ class GoldDatasetHistoryTests {
             BigDecimal close = BigDecimal.valueOf(2000 + i);
             result.add(new GoldDailyBar("XAUUSD", day, close, close.add(BigDecimal.ONE),
                     close.subtract(BigDecimal.ONE), close, "USD", "troy_ounce", "twelve_data",
-                    OffsetDateTime.parse("2026-09-30T00:00:00Z")));
+                    OffsetDateTime.parse("2026-09-30T00:00:00Z"),
+                    // 当前核验的合成确认，不代表黄金历史当时已公布的版本。
+                    new GoldBarConfirmation(GoldBarConfirmation.SOURCE, base.plusDays(1),
+                            OffsetDateTime.parse("2026-09-30T00:00:00Z"), "a".repeat(64))));
         }
         return result;
     }

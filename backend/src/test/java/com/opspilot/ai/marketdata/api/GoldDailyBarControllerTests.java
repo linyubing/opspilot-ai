@@ -1,6 +1,7 @@
 package com.opspilot.ai.marketdata.api;
 
 import com.opspilot.ai.marketdata.GoldDailyBar;
+import com.opspilot.ai.marketdata.GoldBarConfirmation;
 import com.opspilot.ai.marketdata.GoldDailyBarRepository;
 import com.opspilot.ai.marketdata.GoldDailyBarSyncResult;
 import com.opspilot.ai.marketdata.GoldDailyBarSyncService;
@@ -10,6 +11,9 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.time.OffsetDateTime;
 import java.util.Optional;
 
@@ -31,7 +35,8 @@ class GoldDailyBarControllerTests {
     void setUp() {
         sync = mock(GoldDailyBarSyncService.class);
         repository = mock(GoldDailyBarRepository.class);
-        mvc = standaloneSetup(new GoldDailyBarController(sync, repository))
+        mvc = standaloneSetup(new GoldDailyBarController(sync, repository,
+                Clock.fixed(Instant.parse("2026-08-31T01:00:00Z"), ZoneOffset.UTC)))
                 .build();
     }
 
@@ -62,13 +67,41 @@ class GoldDailyBarControllerTests {
                         .value("2026-08-28"));
     }
 
+    @Test
+    void hidesUnconfirmedPrice() throws Exception {
+        GoldDailyBar confirmed = bar();
+        GoldDailyBar raw = new GoldDailyBar(confirmed.symbol(), confirmed.priceDate(),
+                confirmed.open(), confirmed.high(), confirmed.low(), confirmed.close(),
+                confirmed.currency(), confirmed.unit(), confirmed.provider(), confirmed.collectedAt());
+        when(repository.findLatest("XAUUSD", "twelve_data")).thenReturn(Optional.of(raw));
+
+        mvc.perform(get("/api/market-data/gold/daily-bars/latest"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void hidesFutureConfirmation() throws Exception {
+        GoldDailyBar base = bar();
+        GoldDailyBar future = new GoldDailyBar(base.symbol(), base.priceDate(), base.open(),
+                base.high(), base.low(), base.close(), base.currency(), base.unit(), base.provider(),
+                base.collectedAt(), new GoldBarConfirmation(GoldBarConfirmation.SOURCE,
+                base.priceDate(), OffsetDateTime.parse("2099-01-01T00:00:00Z"), "a".repeat(64)));
+        when(repository.findLatest("XAUUSD", "twelve_data")).thenReturn(Optional.of(future));
+
+        mvc.perform(get("/api/market-data/gold/daily-bars/latest"))
+                .andExpect(status().isNotFound());
+    }
+
     private GoldDailyBar bar() {
         return new GoldDailyBar(
                 "XAUUSD", LocalDate.parse("2026-08-28"),
                 new BigDecimal("4601.3"), new BigDecimal("4637.2"),
                 new BigDecimal("4444.6"), new BigDecimal("4456.4"),
                 "usd", "troy_ounce", "twelve_data",
-                OffsetDateTime.parse("2026-08-31T00:00:00Z")
+                OffsetDateTime.parse("2026-08-31T00:00:00Z"),
+                // 明确标记数学样例，不是供应商真实确认回执。
+                new GoldBarConfirmation(GoldBarConfirmation.SOURCE, LocalDate.parse("2026-08-28"),
+                        OffsetDateTime.parse("2026-08-31T00:00:00Z"), "a".repeat(64))
         );
     }
 }

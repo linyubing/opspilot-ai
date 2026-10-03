@@ -8,10 +8,13 @@ import com.opspilot.ai.marketdata.GoldDailyBar;
 import com.opspilot.ai.marketdata.GoldDailyBarRepository;
 import com.opspilot.ai.macrodata.FredHistoryStore;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.time.LocalDate;
+import java.time.Clock;
+import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -34,6 +37,7 @@ public class GoldDatasetBuilder {
     private final GoldForecastRule rule;
     private final GoldFeatureCalculator calculator;
     private final FredHistoryStore history;
+    private final Clock clock;
 
     public GoldDatasetBuilder(
             GoldDailyBarRepository repository,
@@ -42,15 +46,25 @@ public class GoldDatasetBuilder {
             GoldFeatureCalculator calculator,
             FredHistoryStore history
     ) {
+        this(repository, snapshots, rule, calculator, history, Clock.systemUTC());
+    }
+
+    @Autowired
+    public GoldDatasetBuilder(GoldDailyBarRepository repository,
+            GoldResearchSnapshotService snapshots, GoldForecastRule rule,
+            GoldFeatureCalculator calculator, FredHistoryStore history, Clock clock) {
         this.repository = repository;
         this.snapshots = snapshots;
         this.rule = rule;
         this.calculator = calculator;
         this.history = history;
+        this.clock = clock;
     }
 
     public GoldDataset build(ForecastHorizon horizon) {
         Objects.requireNonNull(horizon, "预测周期不能为空");
+        // 这是当前闭市核验时刻，不冒充历史当时的 OHLC 可得性证明。
+        OffsetDateTime asOf = OffsetDateTime.now(clock);
         // 每次实验只读一次归档。禁止中途切换文件，更不能缺失时回退最新值。
         FredHistoryStore.Batch batch = history.load();
         // 一次查询全部日线，避免每个样本重复查询
@@ -63,6 +77,12 @@ public class GoldDatasetBuilder {
         for (int i = HISTORY; i + horizon.sessions() < allBars.size(); i++) {
             GoldDailyBar base = allBars.get(i);
             GoldDailyBar target = allBars.get(i + horizon.sessions());
+            // 保留原始序列；任一特征或目标窗口行未确认就弃用样本，不能挪动目标。
+            if (allBars.subList(i - HISTORY, i + horizon.sessions() + 1).stream()
+                    .anyMatch(bar -> !bar.isConfirmedAt(asOf))) {
+                skipped++;
+                continue;
+            }
             try {
                 GoldResearchSnapshot snapshot = snapshots.createSnapshot(base.priceDate(),
                         batch.recent("DFII10", base.priceDate(), 120),

@@ -9,6 +9,7 @@ import com.opspilot.ai.analysis.RealRateChangeMetrics;
 import com.opspilot.ai.forecast.ForecastDirection;
 import com.opspilot.ai.forecast.GoldForecastRule;
 import com.opspilot.ai.marketdata.GoldDailyBar;
+import com.opspilot.ai.marketdata.GoldBarConfirmation;
 import com.opspilot.ai.marketdata.GoldDailyBarRepository;
 import com.opspilot.ai.macrodata.FredHistoryStore;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,6 +19,9 @@ import org.mockito.InOrder;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +49,8 @@ class GoldDatasetBuilderTests {
                 repository,
                 snapshots,
                 new GoldForecastRule(),
-                new GoldFeatureCalculator(), history
+                new GoldFeatureCalculator(), history,
+                Clock.fixed(Instant.parse("2026-01-30T00:00:00Z"), ZoneOffset.UTC)
         );
     }
 
@@ -192,6 +197,67 @@ class GoldDatasetBuilderTests {
         inOrder.verifyNoMoreInteractions();
     }
 
+    @Test
+    @DisplayName("未确认的历史窗口只跳过受影响样本，不删除日线")
+    void skipsUnconfirmedHistory() {
+        List<GoldDailyBar> bars = bars(23);
+        bars.set(0, raw(bars.getFirst()));
+        when(repository.findAll("XAUUSD", "twelve_data")).thenReturn(bars);
+        for (int i = 20; i < 22; i++) {
+            when(snapshots.createSnapshot(bars.get(i).priceDate(), List.of(), List.of()))
+                    .thenReturn(snapshot(bars.get(i).priceDate()));
+        }
+
+        GoldDataset result = builder.build(ForecastHorizon.NEXT_DAY);
+
+        assertThat(result.skippedCount()).isOne();
+        assertThat(result.samples()).singleElement().satisfies(sample -> {
+            assertThat(sample.asOfDate()).isEqualTo("2026-01-22");
+            assertThat(sample.targetDate()).isEqualTo("2026-01-23");
+        });
+    }
+
+    @Test
+    @DisplayName("五日目标中间行未确认时跳过，不能过滤后挪动目标日")
+    void keepsTargetWindow() {
+        List<GoldDailyBar> bars = bars(27);
+        bars.set(22, raw(bars.get(22)));
+        when(repository.findAll("XAUUSD", "twelve_data")).thenReturn(bars);
+        for (int i = 20; i < 22; i++) {
+            when(snapshots.createSnapshot(bars.get(i).priceDate(), List.of(), List.of()))
+                    .thenReturn(snapshot(bars.get(i).priceDate()));
+        }
+
+        GoldDataset result = builder.build(ForecastHorizon.FIVE_DAYS);
+
+        assertThat(result.skippedCount()).isEqualTo(2);
+        assertThat(result.samples()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("目标价格已采集但确认时刻在未来时跳过样本")
+    void skipsFutureConfirmation() {
+        List<GoldDailyBar> bars = bars(22);
+        GoldDailyBar target = bars.get(21);
+        bars.set(21, new GoldDailyBar(target.symbol(), target.priceDate(), target.open(),
+                target.high(), target.low(), target.close(), target.currency(), target.unit(),
+                target.provider(), target.collectedAt(), new GoldBarConfirmation(GoldBarConfirmation.SOURCE,
+                target.priceDate(), OffsetDateTime.parse("2099-01-01T00:00:00Z"), "a".repeat(64))));
+        when(repository.findAll("XAUUSD", "twelve_data")).thenReturn(bars);
+        when(snapshots.createSnapshot(bars.get(20).priceDate(), List.of(), List.of()))
+                .thenReturn(snapshot(bars.get(20).priceDate()));
+
+        GoldDataset result = builder.build(ForecastHorizon.NEXT_DAY);
+
+        assertThat(result.skippedCount()).isOne();
+        assertThat(result.samples()).isEmpty();
+    }
+
+    private GoldDailyBar raw(GoldDailyBar bar) {
+        return new GoldDailyBar(bar.symbol(), bar.priceDate(), bar.open(), bar.high(), bar.low(),
+                bar.close(), bar.currency(), bar.unit(), bar.provider(), bar.collectedAt());
+    }
+
     private GoldResearchSnapshot snapshot(LocalDate date) {
         return snapshot(date, date.minusDays(2), date.minusDays(1));
     }
@@ -254,7 +320,10 @@ class GoldDatasetBuilderTests {
                     "USD",
                     "troy_ounce",
                     "twelve_data",
-                    date.plusDays(i).atStartOfDay().atOffset(java.time.ZoneOffset.UTC)
+                    date.plusDays(i).atStartOfDay().atOffset(java.time.ZoneOffset.UTC),
+                    // 合成数学样例，仅用于窗口边界测试，不进入真实市场实验。
+                    new GoldBarConfirmation(GoldBarConfirmation.SOURCE, date.plusDays(i),
+                            date.plusDays(i).atStartOfDay().atOffset(java.time.ZoneOffset.UTC), "a".repeat(64))
             ));
         }
         return result;
