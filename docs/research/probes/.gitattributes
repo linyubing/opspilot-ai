@@ -98,3 +98,4 @@ VixModelAudit.cjs text eol=lf
 VixModelAuditChecks.cjs text eol=lf
 verify-vix-model.cjs text eol=lf
 TimingProbe.java text eol=lf
+ClosedDayProbe.java text eol=lf
