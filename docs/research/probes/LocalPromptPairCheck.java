@@ -22,10 +22,10 @@ public class LocalPromptPairCheck {
         var inputFile = Path.of(args[0]);
         var pair = json.readTree(inputFile.toFile());
         var result = json.readTree(Path.of(args[1]).toFile());
-        var inputHash = hash(Files.readAllBytes(inputFile));
+        var inputHash = fileHash(inputFile);
         check(inputHash.equals(result.path("inputSha256").asText()) && inputHash.equals(
                 "493567c81d051d9e1818fa3d47a00f77e3b15e2dff2622c4acdcd38d1a67407c"), "INPUT_HASH");
-        check(hash(Files.readAllBytes(Path.of(result.path("protocol").asText())))
+        check(fileHash(Path.of(result.path("protocol").asText()))
                 .equals(result.path("protocolSha256").asText()), "PROTOCOL_HASH");
         check(result.path("researchOnly").asBoolean()
                 && !result.path("trustedAccuracyEligible").asBoolean()
@@ -111,6 +111,12 @@ public class LocalPromptPairCheck {
 
     private static String hash(byte[] bytes) throws Exception {
         return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(bytes));
+    }
+
+    private static String fileHash(Path file) throws Exception {
+        // 原归档为UTF8/LF；只兼容Git检出为CRLF，不改模型原始正文或其摘要。
+        return hash(Files.readString(file, StandardCharsets.UTF_8)
+                .replace("\r\n", "\n").getBytes(StandardCharsets.UTF_8));
     }
 
     private static void check(boolean valid, String reason) {
