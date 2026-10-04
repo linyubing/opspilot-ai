@@ -10,6 +10,8 @@ public interface GoldForecastRepository {
             UUID snapshotId, String modelName, String promptVersion, String ruleVersion);
     SaveGoldForecastResult saveIfAbsent(StoredGoldDirectionForecast candidate);
     List<StoredGoldDirectionForecast> findPending(int limit);
+    /** 标记已尝试的待结算记录，避免永久失败记录占住队首。 */
+    void markScanned(UUID id);
     List<StoredGoldDirectionForecast> findRecent(int limit);
     List<StoredGoldDirectionForecast> findAllForEvaluation();
     Optional<StoredGoldDirectionForecast> findLatestBySnapshotId(UUID snapshotId);

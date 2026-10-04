@@ -26,12 +26,12 @@
 
 **Files:** 新增forecast/GoldForecastTiming.java、GoldForecastPublicationPolicy.java、InvalidGoldPublicationException.java、migration/V23__add_gold_forecast_timing.sql；修改StoredGoldDirectionForecast、GenerationService、JdbcGoldForecastRepository、GlobalExceptionHandler；测试GenerationServiceTests、PublicationPolicyTests、JdbcGoldForecastRepositoryTests。
 
-**Interfaces:** Produces Timing(targetDate,start,end,ruleVersion)、phase(OffsetDateTime)返回Phase；Policy.plan(LocalDate)、validate(LocalDate,Timing,OffsetDateTime)；StoredForecast新增timing，保留旧构造器。
+**Interfaces:** Produces Timing(targetDate,start,end,ruleVersion)、phase(OffsetDateTime)返回Phase；Policy.plan(LocalDate)、check(LocalDate,Timing,Clock)返回查询后核验时刻；StoredForecast新增timing，保留旧构造器。最终审查补V24扫描时间和Repository.markScanned，避免错日队首永久阻塞。
 
-- [ ] 在现有生成测试加过期/已知目标/跨线与候选持久化行为，先运行观察断言RED，不使用缺类编译错误。
-- [ ] 实现类型、Policy、前后检查与422；纯验证逐一覆盖before/equal/after、offset、DST、周末/假日、错误版本/端点。期望有效before-end允许，end及之后拒绝。
-- [ ] 增加隔离数据库往返、幂等与半字段拒绝测试，观察RED，再实现V23与仓储读取/插入；旧列保持null。
-- [ ] 运行定向和裸`./mvnw.cmd test`，均0失败0错误；记录日志与迁移是否真实执行，中文提交。
+- [x] 在现有生成测试加过期/已知目标/跨线与候选持久化行为，先运行观察断言RED，不使用缺类编译错误。
+- [x] 实现类型、Policy、前后检查与422；纯验证逐一覆盖before/equal/after、offset、DST、周末/假日、错误版本/端点。期望有效before-end允许，end及之后拒绝。
+- [x] 增加隔离数据库往返、幂等与半字段拒绝测试，观察RED，再实现V23与仓储读取/插入；旧列保持null。
+- [x] 运行定向和裸`./mvnw.cmd test`，均0失败0错误；记录日志与迁移是否真实执行，中文提交。
 
 ### Task 2: 结算资格与对外分层
 
@@ -39,10 +39,10 @@
 
 **Interfaces:** Consumes Task1 Timing及StoredForecast.timing；Produces evaluation.timing()返回未知/候选开盘前/候选盘中/无效计数、分层率与trustedCount/trustedAccuracy，API新增phase、timing、warning。
 
-- [ ] 写行为RED：承诺标签不匹配不结算、目标end前不结算、旧流程不升级、日历改变不修改expectedTargetDate、unknown及candidate不得可信。
-- [ ] 实现结算检查；API先持久化承诺后旧回退，阶段依据createdAt；统计完整资格并保留旧历史描述。
-- [ ] 复盘提示明确历史描述并展示未知/候选资格，不让大模型把旧overall解释为可信前瞻率。
-- [ ] 定向及裸全量回归0失败0错误；中文提交，记录任务证据。
+- [x] 写行为RED：承诺标签不匹配不结算、目标end前不结算、旧流程不升级、日历改变不修改expectedTargetDate、unknown及candidate不得可信。
+- [x] 实现结算检查；API先持久化承诺后旧回退，阶段依据createdAt；统计完整资格并保留旧历史描述。
+- [x] 复盘提示明确历史描述并展示未知/候选资格，不让大模型把旧overall解释为可信前瞻率。
+- [x] 定向及裸全量回归0失败0错误；中文提交，记录任务证据。
 
 ### Task 3: 页面与真实只读验收
 
@@ -50,8 +50,8 @@
 
 **Interfaces:** Consumes Task2 API字段；Produces页面展示UTC候选区间、阶段、固定可信限制、分层计数，不新增预测写入。
 
-- [ ] 按前端测试技能写可运行渲染验证：未知和候选盘中记录均显示正确中文限制，trusted null不显示0%成功率。
-- [ ] 实现页面展示；运行定向及全量Maven，浏览器或可运行JS验证无错误。
-- [ ] 全分支独立只读审查，重要发现用RED/GREEN修复，记录未判范围和裁决。
-- [ ] 启动自己标记且关闭调度的8080服务；GET history/evaluation验证旧记录UNKNOWN、可信0/null，核对旧记录数与内容未修改；只停止自有进程。
+- [x] 按前端测试技能写可运行渲染验证：未知和候选盘中记录均显示正确中文限制，trusted null不显示0%成功率。
+- [x] 实现页面展示；运行定向及全量Maven，浏览器或可运行JS验证无JS错误，唯一日报404解释见验收报告。
+- [x] 全分支独立只读审查，重要发现用RED/GREEN修复，记录未判范围和裁决。
+- [x] 启动自己标记且关闭调度的8080服务；GET history/evaluation验证旧记录UNKNOWN、可信0/null，核对旧记录数与内容未修改；只停止自有进程。
 - [ ] 保存证据与多轮路线结论，中文提交推送、远程SHA核验；清理仅本计划scratch，总目标保持active。

@@ -24,7 +24,7 @@ class GoldForecastSchemaTests {
                 where table_schema = 'public'
                   and table_name = 'gold_direction_forecast'
                 """, Long.class);
-        assertThat(count).isEqualTo(24L);
+        assertThat(count).isEqualTo(25L);
     }
 
     @Test

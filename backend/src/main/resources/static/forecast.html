@@ -13,7 +13,7 @@
         <div>
             <p class="eyebrow">黄金研究助手</p>
             <h1>下一有效交易日预测</h1>
-            <p>基于预测时已经公开的真实市场数据，预测上涨、中性或下跌。</p>
+            <p>预测下一有效黄金日收盘相对基准收盘的上涨、中性或下跌；实际发布时间与候选时段资格单独披露。</p>
         </div>
         <button id="generateButton" type="button">同步最新数据并生成预测</button>
     </header>
@@ -38,8 +38,15 @@
                 <div><dt id="basePriceLabel">预测基准价</dt><dd id="basePrice">-</dd></div>
                 <div><dt>验证状态</dt><dd id="forecastStatus">-</dd></div>
                 <div><dt>生成时间</dt><dd id="createdAt">-</dd></div>
+                <div><dt>发布时间阶段</dt><dd id="publicationPhase">未知</dd></div>
             </dl>
         </article>
+
+        <section class="panel">
+            <div class="heading"><h2>预测发布时间与目标承诺</h2></div>
+            <p id="targetInterval" class="reasoning">旧记录未保存候选时段。</p>
+            <p id="publicationWarning" class="note">发布时间合同未知，不能证明事前预测。</p>
+        </section>
 
         <section id="missReasonPanel" class="panel miss-reason" hidden>
             <div class="heading">
@@ -121,13 +128,21 @@
         </div>
         <div class="accuracy-grid">
             <article><span>正式预测已结算</span><strong id="resolvedCount">0</strong></article>
-            <article><span>正式预测累计准确率</span><strong id="overallAccuracy">暂无</strong></article>
-            <article><span>最近 20 条准确率</span><strong id="rollingAccuracy">暂无</strong></article>
+            <article><span>历史混合命中率（未核验）</span><strong id="overallAccuracy">暂无</strong></article>
+            <article><span>最近 20 条历史命中率</span><strong id="rollingAccuracy">暂无</strong></article>
             <article><span>当前回测准确率</span><strong id="backtestAccuracy">未选择回测</strong></article>
         </div>
-        <p class="note">历史回测衡量方法过去的表现；本次预测必须等下一条真实金价发布后才能判断准不准。</p>
+        <div class="accuracy-grid">
+            <article><span>可信预测样本</span><strong id="trustedCount">暂无</strong></article>
+            <article><span>可信准确率</span><strong id="trustedAccuracy">暂无</strong></article>
+            <article><span>已结算·发布时间未知</span><strong id="timingUnknown">暂无</strong></article>
+            <article><span>已结算·候选开盘前</span><strong id="timingBefore">暂无</strong></article>
+            <article><span>已结算·候选盘中</span><strong id="timingDuring">暂无</strong></article>
+            <article><span>已结算·候选资格无效</span><strong id="timingInvalid">暂无</strong></article>
+        </div>
+        <p class="note">历史回测衡量方法过去的表现；历史混合命中率仅为描述，不能证明未来预测准确率。候选时段不是官方合同或历史可得性证明，未知、候选开盘前与盘中样本不能混算为可信率。</p>
     </section>
 </main>
-<script src="/forecast.js?v=6" defer></script>
+<script src="/forecast.js?v=7" defer></script>
 </body>
 </html>

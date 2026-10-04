@@ -80,7 +80,7 @@ public class GoldForecastGenerationService {
         // 新鲜度只约束新预测，已经保存的历史预测仍可按幂等键读取。
         freshnessPolicy.validate(snapshot.snapshot());
         var timing = publication.plan(snapshot.snapshot().latestGoldDate());
-        publication.validate(snapshot.snapshot().latestGoldDate(), timing, OffsetDateTime.now(clock));
+        publication.check(snapshot.snapshot().latestGoldDate(), timing, clock);
 
         GoldForecastPrompt prompt = promptBuilder.build(snapshot);
         GeneratedGoldForecast generated = gateway.generate(prompt);
@@ -89,8 +89,7 @@ public class GoldForecastGenerationService {
         validator.validate(generated.content());
 
         // 模型耗时可能跨过截止线，最终核验与createdAt使用同一绝对时刻。
-        OffsetDateTime publishedAt = OffsetDateTime.now(clock);
-        publication.validate(snapshot.snapshot().latestGoldDate(), timing, publishedAt);
+        OffsetDateTime publishedAt = publication.check(snapshot.snapshot().latestGoldDate(), timing, clock);
 
         GoldDirectionForecastContent content = generated.content();
         StoredGoldDirectionForecast candidate =

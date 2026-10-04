@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.time.Clock;
 
 /** 使用候选时段守住发布时间，候选依据不能升级为官方确认。 */
 @Component
@@ -30,7 +31,19 @@ public class GoldForecastPublicationPolicy {
                 GoldSessionCheckResult.RULE_VERSION);
     }
 
-    public void validate(LocalDate baseDate, GoldForecastTiming timing, OffsetDateTime asOf) {
+    /** 返回行情查询结束后的核验时刻，不能用查询前的旧时间判断新回执。 */
+    public OffsetDateTime check(LocalDate baseDate, GoldForecastTiming timing, Clock clock) {
+        validateTime(baseDate, timing, OffsetDateTime.now(clock));
+        var next = repository.findNext("XAUUSD", "twelve_data", baseDate);
+        OffsetDateTime observedAt = OffsetDateTime.now(clock);
+        validateTime(baseDate, timing, observedAt);
+        if (next.filter(bar -> bar.isConfirmedAt(observedAt)).isPresent()) {
+            throw new InvalidGoldPublicationException("后续目标行情已经确认并已知，不能新建未来预测");
+        }
+        return observedAt;
+    }
+
+    private void validateTime(LocalDate baseDate, GoldForecastTiming timing, OffsetDateTime asOf) {
         if (baseDate == null || timing == null || asOf == null
                 || !timing.targetDate().isAfter(baseDate)) {
             throw new InvalidGoldPublicationException("预测发布时间或承诺目标无效");
@@ -40,10 +53,6 @@ public class GoldForecastPublicationPolicy {
         }
         if (!asOf.toInstant().isBefore(timing.end())) {
             throw new InvalidGoldPublicationException("目标候选时段已结束，不能新建未来预测");
-        }
-        if (repository.findNext("XAUUSD", "twelve_data", baseDate)
-                .filter(bar -> bar.isConfirmedAt(asOf)).isPresent()) {
-            throw new InvalidGoldPublicationException("后续目标行情已经确认并已知，不能新建未来预测");
         }
     }
 }

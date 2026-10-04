@@ -27,6 +27,51 @@ class JdbcGoldForecastRepositoryTests {
     private UUID snapshotId;
 
     @Test
+    @org.springframework.transaction.annotation.Transactional
+    @DisplayName("最老100条永久错日记录不阻塞第101条有效预测，且不移动原承诺")
+    void advancesPastMismatch() {
+        // 数学样例仅在回滚事务内运行，不写入真实预测统计。
+        var wrong = new GoldForecastTiming(LocalDate.parse("2026-08-28"),
+                java.time.Instant.parse("2026-08-27T21:00:00Z"),
+                java.time.Instant.parse("2026-08-28T21:00:00Z"), "sydney-0700-candidate-v1");
+        var correct = new GoldForecastTiming(LocalDate.parse("2026-08-27"),
+                java.time.Instant.parse("2026-08-26T21:00:00Z"),
+                java.time.Instant.parse("2026-08-27T21:00:00Z"), "sydney-0700-candidate-v1");
+        StoredGoldDirectionForecast last = null;
+        for (int i = 0; i <= 100; i++) {
+            var c = candidate("轮转数学样例", "rotation-" + i,
+                    OffsetDateTime.parse("2026-08-27T00:00:00Z").plusSeconds(i));
+            last = new StoredGoldDirectionForecast(c.id(), c.snapshotId(), c.baseDate(), c.basePrice(),
+                    c.predictedDirection(), c.reasoning(), c.invalidationConditions(), c.modelName(),
+                    c.promptVersion(), c.promptHash(), c.forecastRuleVersion(), c.rawResponse(), c.status(),
+                    null, null, null, null, null, null, c.createdAt(), i < 100 ? wrong : correct);
+            repository.saveIfAbsent(last);
+        }
+        var bars = org.mockito.Mockito.mock(com.opspilot.ai.marketdata.GoldDailyBarRepository.class);
+        var received = OffsetDateTime.parse("2026-08-28T01:00:00Z");
+        var bar = new com.opspilot.ai.marketdata.GoldDailyBar("XAUUSD", LocalDate.parse("2026-08-27"),
+                new BigDecimal("4520"), new BigDecimal("4550"), new BigDecimal("4500"), new BigDecimal("4520"),
+                "usd", "troy_ounce", "twelve_data", received,
+                new com.opspilot.ai.marketdata.GoldBarConfirmation(
+                        com.opspilot.ai.marketdata.GoldBarConfirmation.SOURCE,
+                        LocalDate.parse("2026-08-27"), received, "a".repeat(64)));
+        org.mockito.Mockito.when(bars.findNext("XAUUSD", "twelve_data", LocalDate.parse("2026-08-26")))
+                .thenReturn(java.util.Optional.of(bar));
+        var resolver = new GoldForecastResolutionService(repository, bars, new GoldForecastRule(),
+                java.time.Clock.fixed(java.time.Instant.parse("2026-09-02T12:00:00Z"), java.time.ZoneOffset.UTC));
+        assertThat(resolver.resolvePending(100).resolvedCount()).isZero();
+        resolver.resolvePending(100);
+        assertThat(repository.findByKey(snapshotId, last.modelName(), last.promptVersion(), last.forecastRuleVersion())
+                .orElseThrow().status()).isEqualTo(ForecastStatus.RESOLVED);
+        assertThat(repository.findAllForEvaluation().stream()
+                .filter(f -> f.snapshotId().equals(snapshotId) && !f.promptVersion().equals("rotation-100")))
+                .allSatisfy(f -> {
+                    assertThat(f.status()).isEqualTo(ForecastStatus.PENDING);
+                    assertThat(f.timing().targetDate()).isEqualTo("2026-08-28");
+                });
+    }
+
+    @Test
     @DisplayName("候选目标及UTC区间往返入库，重复幂等不覆盖原承诺")
     void preservesTiming() {
         var legacy = candidate("发布时间数学样例");

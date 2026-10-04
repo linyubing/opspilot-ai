@@ -55,7 +55,13 @@ public class GoldForecastResolutionService {
         int pendingCount = 0;
 
         for (StoredGoldDirectionForecast forecast : pendingForecasts) {
-            boolean resolved = resolveOne(forecast);
+            boolean resolved;
+            try {
+                resolved = resolveOne(forecast);
+            } finally {
+                // 只轮转扫描顺序，不作废预测、不改承诺；异常记录也不永久阻塞后续批次。
+                forecastRepository.markScanned(forecast.id());
+            }
 
             if (resolved) {
                 resolvedCount++;

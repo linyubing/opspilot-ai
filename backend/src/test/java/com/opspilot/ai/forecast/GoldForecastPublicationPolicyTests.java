@@ -25,7 +25,7 @@ class GoldForecastPublicationPolicyTests {
 
     @Test @DisplayName("基准候选日线未结束时，不能把完整收盘当作已知输入")
     void rejectsUnendedBase() {
-        assertThatThrownBy(() -> policy.validate(base, policy.plan(base), at("2026-08-26T20:59:59Z")))
+        assertThatThrownBy(() -> policy.check(base, policy.plan(base), clockAt("2026-08-26T20:59:59Z")))
                 .isInstanceOf(InvalidGoldPublicationException.class).hasMessageContaining("基准");
         verifyNoInteractions(repository);
     }
@@ -34,7 +34,7 @@ class GoldForecastPublicationPolicyTests {
     void rejectsKnownTarget() {
         when(repository.findNext("XAUUSD", "twelve_data", base))
                 .thenReturn(Optional.of(bar("2026-08-27", true)));
-        assertThatThrownBy(() -> policy.validate(base, policy.plan(base), at("2026-08-27T12:00:00Z")))
+        assertThatThrownBy(() -> policy.check(base, policy.plan(base), clockAt("2026-08-27T12:00:00Z")))
                 .isInstanceOf(InvalidGoldPublicationException.class).hasMessageContaining("已知");
     }
 
@@ -42,9 +42,9 @@ class GoldForecastPublicationPolicyTests {
     void allowsUnknownTarget() {
         when(repository.findNext("XAUUSD", "twelve_data", base))
                 .thenReturn(Optional.of(bar("2026-08-27", false)));
-        assertThatCode(() -> policy.validate(base, policy.plan(base), at("2026-08-27T12:00:00Z")))
+        assertThatCode(() -> policy.check(base, policy.plan(base), clockAt("2026-08-27T12:00:00Z")))
                 .doesNotThrowAnyException();
-        assertThatThrownBy(() -> policy.validate(base, policy.plan(base), at("2026-08-27T21:00:00Z")))
+        assertThatThrownBy(() -> policy.check(base, policy.plan(base), clockAt("2026-08-27T21:00:00Z")))
                 .isInstanceOf(InvalidGoldPublicationException.class);
     }
 
@@ -52,10 +52,10 @@ class GoldForecastPublicationPolicyTests {
     void comparesInstants() {
         var timing = policy.plan(base);
         for (String now : new String[]{"2026-08-27T21:00:00Z", "2026-08-28T05:00:00+08:00"}) {
-            assertThatThrownBy(() -> policy.validate(base, timing, at(now)))
+            assertThatThrownBy(() -> policy.check(base, timing, clockAt(now)))
                     .isInstanceOf(InvalidGoldPublicationException.class);
         }
-        assertThatCode(() -> policy.validate(base, timing, at("2026-08-28T04:59:59+08:00")))
+        assertThatCode(() -> policy.check(base, timing, clockAt("2026-08-28T04:59:59+08:00")))
                 .doesNotThrowAnyException();
     }
 
@@ -86,7 +86,7 @@ class GoldForecastPublicationPolicyTests {
     @Test @DisplayName("不晚于基准的承诺目标不能进入验证")
     void rejectsEarlierTarget() {
         var earlier = policy.plan(LocalDate.parse("2026-08-25"));
-        assertThatThrownBy(() -> policy.validate(base, earlier, at("2026-08-26T12:00:00Z")))
+        assertThatThrownBy(() -> policy.check(base, earlier, clockAt("2026-08-26T12:00:00Z")))
                 .isInstanceOf(InvalidGoldPublicationException.class);
     }
 
@@ -104,6 +104,9 @@ class GoldForecastPublicationPolicyTests {
     }
 
     private OffsetDateTime at(String value) { return OffsetDateTime.parse(value); }
+    private java.time.Clock clockAt(String value) {
+        return java.time.Clock.fixed(at(value).toInstant(), java.time.ZoneOffset.UTC);
+    }
 
     private GoldDailyBar bar(String date, boolean confirmed) {
         var now = at("2026-08-27T10:00:00Z");

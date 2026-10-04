@@ -75,6 +75,12 @@ function renderForecast(forecast) {
     text("basePrice", money(forecast.basePrice));
     text("forecastStatus", statuses[forecast.status] || forecast.status);
     text("createdAt", forecast.createdAt ? new Date(forecast.createdAt).toLocaleString("zh-CN") : "-");
+    const phases = {UNKNOWN: "未知", BEFORE_SESSION: "候选开盘前", IN_SESSION: "候选盘中（非开盘前）", EXPIRED: "候选时段结束后"};
+    text("publicationPhase", phases[forecast.publicationPhase] || "未知");
+    text("targetInterval", forecast.timing
+        ? `承诺目标日：${forecast.timing.targetDate}；${forecast.timing.start} → ${forecast.timing.end}（UTC候选区间；${forecast.timing.ruleVersion}）`
+        : "旧记录未保存承诺目标日或候选时段，显示的预计日期不是历史发布证据。");
+    text("publicationWarning", forecast.publicationWarning || "发布时间合同未知，不能证明事前预测。");
     text("modelName", forecast.modelName);
     text("reasoning", forecast.reasoning);
     renderPriceBasis();
@@ -169,6 +175,13 @@ async function loadAccuracy() {
         text("resolvedCount", data.resolvedCount);
         text("overallAccuracy", percent(data.overallAccuracy));
         text("rollingAccuracy", percent(data.rolling20Accuracy));
+        const timing = data.timing;
+        text("trustedCount", timing?.trustedCount ?? "暂无");
+        text("trustedAccuracy", percent(timing?.trustedAccuracy));
+        text("timingUnknown", timing?.unknown?.sampleCount ?? "暂无");
+        text("timingBefore", timing?.beforeSession?.sampleCount ?? "暂无");
+        text("timingDuring", timing?.inSession?.sampleCount ?? "暂无");
+        text("timingInvalid", timing?.invalid?.sampleCount ?? "暂无");
     } catch (error) {
         text("overallAccuracy", "读取失败");
     }

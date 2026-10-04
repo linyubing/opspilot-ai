@@ -96,8 +96,15 @@ public class JdbcGoldForecastRepository implements GoldForecastRepository {
         validateLimit(limit);
         return jdbcTemplate.query("select " + COLUMNS + """
                 from gold_direction_forecast where status = 'pending'
-                order by created_at asc, id asc limit ?
+                order by last_scanned_at asc nulls first, created_at asc, id asc limit ?
                 """, rowMapper, limit);
+    }
+    @Override public void markScanned(UUID id) {
+        Objects.requireNonNull(id, "预测编号不能为空");
+        jdbcTemplate.update("""
+                update gold_direction_forecast set last_scanned_at = clock_timestamp()
+                where id = ? and status = 'pending'
+                """, id);
     }
     @Override public List<StoredGoldDirectionForecast> findRecent(int limit) {
         validateLimit(limit);

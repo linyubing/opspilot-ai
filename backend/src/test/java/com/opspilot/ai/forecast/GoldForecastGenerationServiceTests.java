@@ -50,8 +50,54 @@ class GoldForecastGenerationServiceTests {
     private GoldForecastGateway gateway;
     @Mock
     private GoldForecastValidator validator;
+    @Mock
+    private com.opspilot.ai.marketdata.GoldDailyBarRepository bars;
 
     private GoldForecastGenerationService service;
+
+    @Test
+    @org.junit.jupiter.api.DisplayName("最终查询跨过截止线，不能沿用查询前的发布时间保存")
+    void rejectsSlowLookup() {
+        lookupRace(false);
+    }
+
+    @Test
+    @org.junit.jupiter.api.DisplayName("模型返回后的查询期间目标变为已知，不能以旧时钟避开确认")
+    void rejectsKnownDuringLookup() {
+        lookupRace(true);
+    }
+
+    private void lookupRace(boolean known) {
+        var time = new java.util.concurrent.atomic.AtomicReference<>(NOW);
+        Clock clock = org.mockito.Mockito.mock(Clock.class);
+        when(clock.getZone()).thenReturn(ZoneOffset.UTC);
+        when(clock.instant()).thenAnswer(call -> time.get());
+        service = serviceAt(clock);
+        var snapshot = prepareNewForecast();
+        when(promptBuilder.build(snapshot)).thenReturn(prompt());
+        when(gateway.generate(prompt())).thenReturn(generated());
+        var queries = new java.util.concurrent.atomic.AtomicInteger();
+        when(bars.findNext("XAUUSD", "twelve_data", LocalDate.parse("2026-08-26")))
+                .thenAnswer(call -> {
+                    if (queries.incrementAndGet() == 1) return Optional.empty();
+                    time.set(known ? NOW.plusSeconds(1) : Instant.parse("2026-08-27T21:00:00Z"));
+                    if (!known) return Optional.empty();
+                    var receipt = OffsetDateTime.ofInstant(time.get(), ZoneOffset.UTC);
+                    return Optional.of(new com.opspilot.ai.marketdata.GoldDailyBar("XAUUSD",
+                            LocalDate.parse("2026-08-27"), new BigDecimal("10"), new BigDecimal("12"),
+                            new BigDecimal("8"), new BigDecimal("11"), "usd", "troy_ounce", "twelve_data", receipt,
+                            new com.opspilot.ai.marketdata.GoldBarConfirmation(
+                                    com.opspilot.ai.marketdata.GoldBarConfirmation.SOURCE,
+                                    LocalDate.parse("2026-08-27"), receipt, "a".repeat(64))));
+                });
+        lenient().when(forecastRepository.saveIfAbsent(any())).thenAnswer(call ->
+                new SaveGoldForecastResult(call.getArgument(0), true));
+        assertThatThrownBy(() -> service.generate(snapshot.id()))
+                .isInstanceOf(InvalidGoldPublicationException.class)
+                .hasMessageContaining(known ? "已知" : "结束");
+        verify(gateway).generate(prompt());
+        verify(forecastRepository, never()).saveIfAbsent(any());
+    }
 
     @Test
     @org.junit.jupiter.api.DisplayName("目标候选时段已结束，即使数据库没有后续行情也不能新建")
@@ -74,7 +120,8 @@ class GoldForecastGenerationServiceTests {
     void rejectsCrossingDeadline() {
         Clock clock = org.mockito.Mockito.mock(Clock.class);
         when(clock.getZone()).thenReturn(ZoneOffset.UTC);
-        when(clock.instant()).thenReturn(NOW, NOW, Instant.parse("2026-08-27T21:00:00Z"));
+        // 快照核验、初次查询前后均未过期，模型返回后的核验恰好到截止线。
+        when(clock.instant()).thenReturn(NOW, NOW, NOW, Instant.parse("2026-08-27T21:00:00Z"));
         service = serviceAt(clock);
         StoredGoldResearchSnapshot snapshot = prepareNewForecast();
         when(promptBuilder.build(snapshot)).thenReturn(prompt());
@@ -114,7 +161,7 @@ class GoldForecastGenerationServiceTests {
 
     private GoldForecastPublicationPolicy publication() {
         return new GoldForecastPublicationPolicy(new ConfiguredGoldTradingCalendar(),
-                org.mockito.Mockito.mock(com.opspilot.ai.marketdata.GoldDailyBarRepository.class));
+                bars);
     }
 
     @Test
