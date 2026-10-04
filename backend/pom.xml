@@ -91,7 +91,7 @@
 
         <!--
             接入本地 Ollama 模型服务。
-            当前只使用它提供的 EmbeddingModel，不使用它的聊天模型。
+            默认用于 EmbeddingModel；local-ai 配置同时启用本地聊天模型。
         -->
         <dependency>
             <groupId>org.springframework.ai</groupId>

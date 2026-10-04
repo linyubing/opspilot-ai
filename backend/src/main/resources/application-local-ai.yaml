@@ -1,0 +1,34 @@
+# 只有显式启用 local-ai 时才使用本地模型；不改变原来的智谱默认配置。
+spring:
+  ai:
+    model:
+      chat: ollama
+      embedding: ollama
+    ollama:
+      # 独立服务使用 D 盘模型目录，避免复用未继承环境变量的旧服务。
+      base-url: http://127.0.0.1:11435
+      chat:
+        options:
+          model: qwen3.5:9b
+          # 限制上下文与输出，给 16GB 显卡保留运行余量。
+          num-ctx: 8192
+          num-predict: 2048
+          temperature: 0
+      embedding:
+        model: nomic-embed-text
+      init:
+        pull-model-strategy: never
+
+opspilot:
+  forecast:
+    gold:
+      # 幂等键与历史结果按实际模型隔离，不得继续标成 glm-4.7。
+      model-name: qwen3.5:9b
+      settlement-schedule:
+        enabled: false
+  research:
+    narrative:
+      model-name: qwen3.5:9b
+    gold:
+      daily-report-schedule:
+        enabled: false
