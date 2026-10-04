@@ -34,6 +34,17 @@ public class LocalEvidenceRun {
 
     public static void main(String[] args) throws Exception {
         var calendar = calendar();
+        if (args.length == 1 && "--window-check".equals(args[0])) {
+            windowCase("weekday-before-has-no-window", "2026-10-05", "2026-10-06", "2026-10-05T20:00:00Z", false, false);
+            windowCase("in-session-before-start-rejected", "2026-10-05", "2026-10-06", "2026-10-05T19:59:59Z", true, false);
+            windowCase("in-session-start-accepted", "2026-10-05", "2026-10-06", "2026-10-05T20:00:00Z", true, true);
+            windowCase("in-session-last-second-accepted", "2026-10-05", "2026-10-06", "2026-10-05T20:29:59Z", true, true);
+            windowCase("in-session-deadline-rejected", "2026-10-05", "2026-10-06", "2026-10-05T20:30:00Z", true, false);
+            windowCase("in-session-after-deadline-rejected", "2026-10-05", "2026-10-06", "2026-10-05T21:00:00Z", true, false);
+            windowCase("weekend-before-accepted", "2026-10-09", "2026-10-12", "2026-10-10T00:00:00Z", false, true);
+            windowCase("weekend-unclosed-base-rejected", "2026-10-09", "2026-10-12", "2026-10-09T19:59:59Z", false, false);
+            return;
+        }
         if (args.length == 1 && "--calendar-check".equals(args[0])) {
             for (LocalDate date = LocalDate.of(2026, 10, 5); !date.isAfter(LocalDate.of(2026, 10, 16)); date = date.plusDays(1)) {
                 if (date.getDayOfWeek().getValue() > 5) continue;
@@ -43,7 +54,10 @@ public class LocalEvidenceRun {
             }
             return;
         }
-        if (args.length != 3) throw new IllegalArgumentException("请提供冻结输入、结果目录和目标标签日期");
+        if (args.length < 3 || args.length > 4 || (args.length == 4 && !"--in-session".equals(args[3]))) {
+            throw new IllegalArgumentException("请提供冻结输入、结果目录和目标标签日期，可选--in-session研究模式");
+        }
+        boolean inSession = args.length == 4;
         var json = new ObjectMapper().findAndRegisterModules().disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         String frozen = Files.readString(Path.of(args[0]), StandardCharsets.UTF_8);
         var input = json.readTree(frozen);
@@ -61,11 +75,8 @@ public class LocalEvidenceRun {
                 && !snapshot.dollarIndex().collectedAt().isAfter(now), "DOLLAR_TIME_INVALID");
         LocalDate target = LocalDate.parse(args[2]);
         check(target.equals(calendar.nextBusinessDay(snapshot.latestGoldDate())), "TARGET_DATE_INVALID");
-        var deadline = GoldSession.forDate(target).start();
-        var baseEnd = GoldSession.forDate(snapshot.latestGoldDate()).end();
-        check(baseEnd.isBefore(deadline), "NO_PRE_SESSION_WINDOW");
-        check(!now.toInstant().isBefore(baseEnd), "BASE_SESSION_NOT_CLOSED");
-        check(now.toInstant().isBefore(deadline), "TOO_LATE_FOR_CANDIDATE_SESSION");
+        var targetSession = GoldSession.forDate(target);
+        var deadline = window(snapshot.latestGoldDate(), target, now, inSession);
         check("gold-direction-forecast-prompt-v2".equals(input.path("baseline").path("version").asText())
                 && "gold-evidence-candidate-v1".equals(input.path("candidate").path("version").asText()), "PROMPT_VERSION_INVALID");
         for (String name : List.of("baseline", "candidate")) check(hash(input.path(name).path("content").asText())
@@ -73,9 +84,11 @@ public class LocalEvidenceRun {
 
         var directory = Path.of(args[1]).toAbsolutePath().normalize();
         check(Files.isDirectory(directory), "RESULT_DIRECTORY_REQUIRED");
-        var output = directory.resolve(snapshot.latestGoldDate() + "-evidence-pair.json");
+        var phase = inSession ? "IN_SESSION_30_MIN" : "BEFORE_SESSION";
+        var output = directory.resolve(snapshot.latestGoldDate() + "-" + phase + "-evidence-pair.json");
         var result = new LinkedHashMap<String, Object>();
-        result.put("protocol", "local-evidence-pair-v1");
+        result.put("protocol", inSession ? "local-evidence-in-session-v1" : "local-evidence-pair-v1");
+        result.put("publicationLayer", phase);
         result.put("researchOnly", true);
         result.put("trustedAccuracyEligible", false);
         result.put("officialSessionCertified", false);
@@ -83,7 +96,8 @@ public class LocalEvidenceRun {
         result.put("snapshotId", record.id());
         result.put("baseDate", snapshot.latestGoldDate());
         result.put("targetDate", target);
-        result.put("candidateSessionStart", deadline);
+        result.put("candidateSessionStart", targetSession.start());
+        result.put("publicationDeadline", deadline);
         result.put("calendarSource", "classpath-application-yaml-not-runtime-overrides");
         result.put("status", "STARTED_DO_NOT_RETRY");
         var outputs = new ArrayList<Map<String, Object>>();
@@ -157,6 +171,31 @@ public class LocalEvidenceRun {
             if (MODEL.equals(model.path("name").asText()) && DIGEST.equals(model.path("digest").asText())) return;
         }
         throw new IllegalArgumentException("MODEL_DIGEST_CHANGED");
+    }
+
+    private static java.time.Instant window(LocalDate base, LocalDate target, OffsetDateTime now, boolean inSession) {
+        var start = GoldSession.forDate(target).start();
+        var baseEnd = GoldSession.forDate(base).end();
+        // 独立研究层固定候选开始后30分钟，不把已经发生的大半天走势称作开盘前预测。
+        var deadline = inSession ? start.plusSeconds(1800) : start;
+        if (inSession) check(!now.toInstant().isBefore(start), "TARGET_SESSION_NOT_STARTED");
+        else check(baseEnd.isBefore(deadline), "NO_PRE_SESSION_WINDOW");
+        check(!now.toInstant().isBefore(baseEnd), "BASE_SESSION_NOT_CLOSED");
+        check(now.toInstant().isBefore(deadline), "TOO_LATE_FOR_CANDIDATE_SESSION");
+        return deadline;
+    }
+
+    // 研究工具的离线边界检查：仅使用日期与时刻，不生成行情或模型回执。
+    private static void windowCase(String name, String base, String target, String time, boolean mode, boolean expected) {
+        boolean accepted;
+        try {
+            window(LocalDate.parse(base), LocalDate.parse(target), OffsetDateTime.parse(time), mode);
+            accepted = true;
+        } catch (IllegalArgumentException rejected) {
+            accepted = false;
+        }
+        if (accepted != expected) throw new AssertionError(name);
+        System.out.println("PASS " + name);
     }
 
     // 不启动应用或调度器；只复用编译资源的基础休市配置，不能冒充官方时段认证。
