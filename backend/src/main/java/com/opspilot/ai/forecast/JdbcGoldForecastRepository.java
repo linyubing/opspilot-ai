@@ -1,6 +1,7 @@
 package com.opspilot.ai.forecast;
 
 import java.sql.SQLException;
+import java.sql.ResultSet;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -25,7 +26,8 @@ public class JdbcGoldForecastRepository implements GoldForecastRepository {
             reasoning, invalidation_conditions, model_name, prompt_version,
             prompt_hash, forecast_rule_version, raw_response, status,
             target_date, target_price, actual_return, actual_direction,
-            hit, resolved_at, created_at
+            hit, resolved_at, created_at,
+            promised_target_date, target_start, target_end, timing_rule
             """;
     private static final TypeReference<List<String>> STRING_LIST = new TypeReference<>() {};
 
@@ -43,7 +45,7 @@ public class JdbcGoldForecastRepository implements GoldForecastRepository {
                     rs.getObject("target_date", LocalDate.class), rs.getBigDecimal("target_price"),
                     rs.getBigDecimal("actual_return"), direction(rs.getString("actual_direction")),
                     rs.getObject("hit", Boolean.class), rs.getObject("resolved_at", OffsetDateTime.class),
-                    rs.getObject("created_at", OffsetDateTime.class)
+                    rs.getObject("created_at", OffsetDateTime.class), readTiming(rs)
             );
 
     public JdbcGoldForecastRepository(JdbcTemplate jdbcTemplate, ObjectMapper objectMapper) {
@@ -71,14 +73,19 @@ public class JdbcGoldForecastRepository implements GoldForecastRepository {
                     reasoning, invalidation_conditions, model_name, prompt_version,
                     prompt_hash, forecast_rule_version, raw_response, status,
                     target_date, target_price, actual_return, actual_direction,
-                    hit, resolved_at, created_at
-                ) values (?, ?, ?, ?, ?, ?, cast(? as jsonb), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    hit, resolved_at, created_at,
+                    promised_target_date, target_start, target_end, timing_rule
+                ) values (?, ?, ?, ?, ?, ?, cast(? as jsonb), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 on conflict (snapshot_id, model_name, prompt_version, forecast_rule_version)
                 do nothing
                 """, c.id(), c.snapshotId(), c.baseDate(), c.basePrice(), lower(c.predictedDirection()),
                 c.reasoning(), writeList(c.invalidationConditions()), c.modelName(), c.promptVersion(),
                 c.promptHash(), c.forecastRuleVersion(), c.rawResponse(), lower(c.status()), c.targetDate(),
-                c.targetPrice(), c.actualReturn(), lower(c.actualDirection()), c.hit(), c.resolvedAt(), c.createdAt());
+                c.targetPrice(), c.actualReturn(), lower(c.actualDirection()), c.hit(), c.resolvedAt(), c.createdAt(),
+                c.timing() == null ? null : c.timing().targetDate(),
+                c.timing() == null ? null : OffsetDateTime.ofInstant(c.timing().start(), java.time.ZoneOffset.UTC),
+                c.timing() == null ? null : OffsetDateTime.ofInstant(c.timing().end(), java.time.ZoneOffset.UTC),
+                c.timing() == null ? null : c.timing().ruleVersion());
         StoredGoldDirectionForecast stored = findByKey(c.snapshotId(), c.modelName(),
                 c.promptVersion(), c.forecastRuleVersion())
                 .orElseThrow(() -> new IllegalStateException("黄金方向预测保存后未能读取"));
@@ -132,6 +139,15 @@ public class JdbcGoldForecastRepository implements GoldForecastRepository {
     private Optional<StoredGoldDirectionForecast> findById(UUID id) {
         return jdbcTemplate.query("select " + COLUMNS
                 + "from gold_direction_forecast where id = ?", rowMapper, id).stream().findFirst();
+    }
+    private GoldForecastTiming readTiming(ResultSet rs) throws SQLException {
+        LocalDate date = rs.getObject("promised_target_date", LocalDate.class);
+        OffsetDateTime start = rs.getObject("target_start", OffsetDateTime.class);
+        OffsetDateTime end = rs.getObject("target_end", OffsetDateTime.class);
+        String rule = rs.getString("timing_rule");
+        if (date == null && start == null && end == null && rule == null) return null;
+        return new GoldForecastTiming(date, start == null ? null : start.toInstant(),
+                end == null ? null : end.toInstant(), rule);
     }
     private void validateLimit(int limit) {
         if (limit < 1 || limit > 100) throw new IllegalArgumentException("limit 必须在 1 到 100 之间");

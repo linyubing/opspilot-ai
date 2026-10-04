@@ -16,15 +16,15 @@ class GoldForecastSchemaTests {
     private JdbcTemplate jdbcTemplate;
 
     @Test
-    @DisplayName("创建包含二十个字段的方向预测表")
-    void createsTwentyColumnTable() {
+    @DisplayName("创建包含发布时间承诺字段的方向预测表")
+    void createsForecastTable() {
         Long count = jdbcTemplate.queryForObject("""
                 select count(*)
                 from information_schema.columns
                 where table_schema = 'public'
                   and table_name = 'gold_direction_forecast'
                 """, Long.class);
-        assertThat(count).isEqualTo(20L);
+        assertThat(count).isEqualTo(24L);
     }
 
     @Test

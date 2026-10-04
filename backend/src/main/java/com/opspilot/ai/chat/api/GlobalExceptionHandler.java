@@ -13,6 +13,7 @@ import com.opspilot.ai.forecast.GoldForecastAiUnavailableException;
 import com.opspilot.ai.forecast.InvalidGoldForecastAiResponseException;
 import com.opspilot.ai.forecast.InvalidGoldForecastSnapshotException;
 import com.opspilot.ai.forecast.StaleGoldForecastDataException;
+import com.opspilot.ai.forecast.InvalidGoldPublicationException;
 import com.opspilot.ai.forecast.UnsafeGoldForecastException;
 import com.opspilot.ai.forecast.backtest.BacktestDataInsufficientException;
 import com.opspilot.ai.forecast.backtest.BacktestNotFoundException;
@@ -39,6 +40,12 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(InvalidGoldPublicationException.class)
+    public ResponseEntity<ApiError> handlePublication(InvalidGoldPublicationException exception) {
+        return ResponseEntity.unprocessableEntity().body(
+                new ApiError("FORECAST_PUBLICATION_INVALID", exception.getMessage()));
+    }
 
     @ExceptionHandler(NoBacktestErrorsException.class)
     public ResponseEntity<ApiError> handleNoBacktestErrors(

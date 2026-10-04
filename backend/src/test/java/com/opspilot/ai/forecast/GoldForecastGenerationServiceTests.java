@@ -53,6 +53,48 @@ class GoldForecastGenerationServiceTests {
 
     private GoldForecastGenerationService service;
 
+    @Test
+    @org.junit.jupiter.api.DisplayName("目标候选时段已结束，即使数据库没有后续行情也不能新建")
+    void rejectsExpiredPublication() {
+        service = serviceAt(Clock.fixed(Instant.parse("2026-08-27T21:00:00Z"), ZoneOffset.UTC));
+        StoredGoldResearchSnapshot snapshot = prepareNewForecast();
+        lenient().when(promptBuilder.build(snapshot)).thenReturn(prompt());
+        lenient().when(gateway.generate(prompt())).thenReturn(generated());
+        lenient().when(forecastRepository.saveIfAbsent(any())).thenAnswer(invocation ->
+                new SaveGoldForecastResult(invocation.getArgument(0), true));
+
+        assertThatThrownBy(() -> service.generate(snapshot.id()))
+                .hasMessageContaining("目标").hasMessageContaining("结束");
+        verifyNoInteractions(promptBuilder, gateway, validator);
+        verify(forecastRepository, never()).saveIfAbsent(any());
+    }
+
+    @Test
+    @org.junit.jupiter.api.DisplayName("模型调用跨过目标结束线，已返回的答案也不能保存")
+    void rejectsCrossingDeadline() {
+        Clock clock = org.mockito.Mockito.mock(Clock.class);
+        when(clock.getZone()).thenReturn(ZoneOffset.UTC);
+        when(clock.instant()).thenReturn(NOW, NOW, Instant.parse("2026-08-27T21:00:00Z"));
+        service = serviceAt(clock);
+        StoredGoldResearchSnapshot snapshot = prepareNewForecast();
+        when(promptBuilder.build(snapshot)).thenReturn(prompt());
+        when(gateway.generate(prompt())).thenReturn(generated());
+        lenient().when(forecastRepository.saveIfAbsent(any())).thenAnswer(invocation ->
+                new SaveGoldForecastResult(invocation.getArgument(0), true));
+
+        assertThatThrownBy(() -> service.generate(snapshot.id()))
+                .hasMessageContaining("目标").hasMessageContaining("结束");
+        verify(gateway).generate(prompt());
+        verify(forecastRepository, never()).saveIfAbsent(any());
+    }
+
+    private GoldForecastGenerationService serviceAt(Clock clock) {
+        return new GoldForecastGenerationService(snapshotRepository, forecastRepository,
+                promptBuilder, gateway, validator,
+                new GoldForecastDataFreshnessPolicy(Clock.fixed(NOW, ZoneOffset.UTC)),
+                new GoldForecastProperties(MODEL_NAME), clock, publication());
+    }
+
     @BeforeEach
     void setUp() {
         service = new GoldForecastGenerationService(
@@ -65,8 +107,14 @@ class GoldForecastGenerationServiceTests {
                         Clock.fixed(NOW, ZoneOffset.UTC)
                 ),
                 new GoldForecastProperties(MODEL_NAME),
-                Clock.fixed(NOW, ZoneOffset.UTC)
+                Clock.fixed(NOW, ZoneOffset.UTC),
+                publication()
         );
+    }
+
+    private GoldForecastPublicationPolicy publication() {
+        return new GoldForecastPublicationPolicy(new ConfiguredGoldTradingCalendar(),
+                org.mockito.Mockito.mock(com.opspilot.ai.marketdata.GoldDailyBarRepository.class));
     }
 
     @Test

@@ -28,6 +28,7 @@ public class GoldForecastGenerationService {
     private final GoldForecastDataFreshnessPolicy freshnessPolicy;
     private final String modelName;
     private final Clock clock;
+    private final GoldForecastPublicationPolicy publication;
 
     public GoldForecastGenerationService(
             GoldResearchSnapshotRepository snapshotRepository,
@@ -37,7 +38,8 @@ public class GoldForecastGenerationService {
             GoldForecastValidator validator,
             GoldForecastDataFreshnessPolicy freshnessPolicy,
             GoldForecastProperties properties,
-            Clock clock
+            Clock clock,
+            GoldForecastPublicationPolicy publication
     ) {
         this.snapshotRepository = snapshotRepository;
         this.forecastRepository = forecastRepository;
@@ -47,6 +49,7 @@ public class GoldForecastGenerationService {
         this.freshnessPolicy = freshnessPolicy;
         this.modelName = properties.modelName();
         this.clock = clock;
+        this.publication = publication;
     }
 
     /**
@@ -76,12 +79,18 @@ public class GoldForecastGenerationService {
     private SaveGoldForecastResult generateAndSave(StoredGoldResearchSnapshot snapshot) {
         // 新鲜度只约束新预测，已经保存的历史预测仍可按幂等键读取。
         freshnessPolicy.validate(snapshot.snapshot());
+        var timing = publication.plan(snapshot.snapshot().latestGoldDate());
+        publication.validate(snapshot.snapshot().latestGoldDate(), timing, OffsetDateTime.now(clock));
 
         GoldForecastPrompt prompt = promptBuilder.build(snapshot);
         GeneratedGoldForecast generated = gateway.generate(prompt);
 
         // 模型返回内容必须先通过安全边界校验，才能写入数据库。
         validator.validate(generated.content());
+
+        // 模型耗时可能跨过截止线，最终核验与createdAt使用同一绝对时刻。
+        OffsetDateTime publishedAt = OffsetDateTime.now(clock);
+        publication.validate(snapshot.snapshot().latestGoldDate(), timing, publishedAt);
 
         GoldDirectionForecastContent content = generated.content();
         StoredGoldDirectionForecast candidate =
@@ -108,7 +117,8 @@ public class GoldForecastGenerationService {
                         null,
                         null,
 
-                        OffsetDateTime.now(clock)
+                        publishedAt,
+                        timing
                 );
 
         /*

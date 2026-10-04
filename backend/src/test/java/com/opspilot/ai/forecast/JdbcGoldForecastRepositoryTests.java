@@ -26,6 +26,38 @@ class JdbcGoldForecastRepositoryTests {
     @Autowired private JdbcTemplate jdbcTemplate;
     private UUID snapshotId;
 
+    @Test
+    @DisplayName("候选目标及UTC区间往返入库，重复幂等不覆盖原承诺")
+    void preservesTiming() {
+        var legacy = candidate("发布时间数学样例");
+        var timing = new GoldForecastTiming(LocalDate.parse("2026-08-27"),
+                java.time.Instant.parse("2026-08-26T21:00:00Z"),
+                java.time.Instant.parse("2026-08-27T21:00:00Z"), "sydney-0700-candidate-v1");
+        var timed = new StoredGoldDirectionForecast(legacy.id(), legacy.snapshotId(), legacy.baseDate(), legacy.basePrice(),
+                legacy.predictedDirection(), legacy.reasoning(), legacy.invalidationConditions(), legacy.modelName(),
+                legacy.promptVersion(), legacy.promptHash(), legacy.forecastRuleVersion(), legacy.rawResponse(), legacy.status(),
+                legacy.targetDate(), legacy.targetPrice(), legacy.actualReturn(), legacy.actualDirection(), legacy.hit(),
+                legacy.resolvedAt(), legacy.createdAt(), timing);
+        var saved = repository.saveIfAbsent(timed);
+        assertThat(saved.record().timing()).isEqualTo(timing);
+        assertThat(repository.saveIfAbsent(legacy).record().timing()).isEqualTo(timing);
+        var resolved = repository.resolve(saved.record().id(), new ForecastResolution(LocalDate.parse("2026-08-27"),
+                new BigDecimal("4550"), new BigDecimal("0.663503"), ForecastDirection.BULLISH, true,
+                OffsetDateTime.parse("2026-08-28T01:00:00Z")));
+        assertThat(resolved.timing()).isEqualTo(timing);
+    }
+
+    @Test
+    @DisplayName("数据库拒绝只有日期而没有完整时段的半记录")
+    void rejectsPartialTiming() {
+        var saved = repository.saveIfAbsent(candidate("旧记录")).record();
+        org.assertj.core.api.Assertions.assertThatThrownBy(() -> jdbcTemplate.update(
+                "update gold_direction_forecast set promised_target_date = ? where id = ?",
+                LocalDate.parse("2026-08-27"), saved.id()))
+                .isInstanceOf(org.springframework.dao.DataIntegrityViolationException.class);
+        assertThat(repository.findLatestBySnapshotId(snapshotId).orElseThrow().timing()).isNull();
+    }
+
     @BeforeEach
     void setUp() {
         snapshotId = snapshotRepository.saveIfAbsent(
