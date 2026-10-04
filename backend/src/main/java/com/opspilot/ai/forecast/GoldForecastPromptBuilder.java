@@ -5,6 +5,7 @@ import com.opspilot.ai.analysis.history.StoredGoldResearchSnapshot;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
+import java.math.BigDecimal;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HexFormat;
@@ -17,6 +18,7 @@ public class GoldForecastPromptBuilder {
     public static final String PROMPT_VERSION =
             "gold-direction-forecast-prompt-v2";
     public static final String CANDIDATE_VERSION = "gold-neutral-contract-candidate-v1";
+    public static final String MACRO_VERSION = "gold-macro-values-candidate-v1";
 
     private static final String BASE_RULE = "7. 波动率较高时，优先考虑 NEUTRAL 或反转风险。";
     private static final String CANDIDATE_RULE = "7. 波动率较高只表示价格变动可能更大，不能因此优先选择 NEUTRAL；"
@@ -30,6 +32,49 @@ public class GoldForecastPromptBuilder {
 
     public GoldForecastPrompt build(StoredGoldResearchSnapshot record) {
         return build(record, PROMPT_VERSION, BASE_RULE);
+    }
+
+    /** 宏观数值研究候选；正式生成路径不调用。 */
+    public GoldForecastPrompt buildMacro(StoredGoldResearchSnapshot record) {
+        var base = build(record);
+        var snapshot = record.snapshot();
+        var rate = snapshot.realRate();
+        var dollar = snapshot.dollarIndex();
+        // 保留原方向合同，仅追加快照已保存的事实；不查询外部行情或反推缺失值。
+        String content = base.content() + """
+
+                【宏观数值补充】
+                1/5/20期表示相应宏观序列的观测间隔，不是自然日，也不等于黄金交易日。
+                广义美元指数不是DXY；本快照未留存来源码，不能据此推断具体序列编号。
+                因子解释是既有摘要，数值发生周期分歧时须结合各期原值说明，不得把5期称作1期。
+                实际利率观察日期：%s
+                广义美元观察日期：%s
+                实际利率当前值（%%）：%s
+                实际利率1期变化（基点）：%s
+                实际利率5期变化（基点）：%s
+                实际利率20期变化（基点）：%s
+                广义美元当前值（指数点）：%s
+                广义美元1期变化（%%）：%s
+                广义美元5期变化（%%）：%s
+                广义美元20期变化（%%）：%s
+                缺失表示快照未提供该值，不得补零、估算或从因子标签反推。
+                """.formatted(
+                snapshot.latestRealRateDate() == null ? "缺失" : snapshot.latestRealRateDate(),
+                snapshot.latestDollarIndexDate() == null ? "缺失" : snapshot.latestDollarIndexDate(),
+                value(rate == null ? null : rate.currentRate()),
+                value(rate == null ? null : rate.basisPointChange1()),
+                value(rate == null ? null : rate.basisPointChange5()),
+                value(rate == null ? null : rate.basisPointChange20()),
+                value(dollar == null ? null : dollar.currentIndex()),
+                value(dollar == null ? null : dollar.return1()),
+                value(dollar == null ? null : dollar.return5()),
+                value(dollar == null ? null : dollar.return20()));
+        return new GoldForecastPrompt(MACRO_VERSION, content, sha256(content));
+    }
+
+    // 保留原始精度，区分真实零值与未提供的值。
+    private String value(BigDecimal number) {
+        return number == null ? "缺失" : number.toPlainString();
     }
 
     // 共用模板和事实输入，只改变预先指定的规则；不对事实文本做全局替换。
