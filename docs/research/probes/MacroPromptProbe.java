@@ -16,7 +16,9 @@ import java.util.UUID;
 /** 只读导出真实快照的宏观数值候选；不调用模型，不产生预测或准确率。 */
 public class MacroPromptProbe {
     public static void main(String[] args) throws Exception {
-        if (args.length != 1) throw new IllegalArgumentException("请提供正式快照UUID");
+        if (args.length < 1 || args.length > 2 || (args.length == 2 && !"evidence".equals(args[1]))) {
+            throw new IllegalArgumentException("请提供正式快照UUID，可选evidence研究格式");
+        }
         String password = System.getenv("OPSPILOT_DB_PASSWORD");
         if (password == null || password.isBlank()) throw new IllegalStateException("缺少数据库密码环境变量");
         var json = new ObjectMapper().findAndRegisterModules()
@@ -47,7 +49,7 @@ public class MacroPromptProbe {
             output.put("exportedAt", exportedAt);
             output.put("snapshot", record);
             output.put("baseline", builder.build(record));
-            output.put("candidate", builder.buildMacro(record));
+            output.put("candidate", args.length == 2 ? builder.buildEvidence(record) : builder.buildMacro(record));
             connection.rollback();
             // ASCII封装避免PowerShell代码页破坏中文或提示词摘要。
             System.out.println("MACRO_PAIR_BASE64="

@@ -19,6 +19,28 @@ public class GoldForecastPromptBuilder {
             "gold-direction-forecast-prompt-v2";
     public static final String CANDIDATE_VERSION = "gold-neutral-contract-candidate-v1";
     public static final String MACRO_VERSION = "gold-macro-values-candidate-v1";
+    public static final String EVIDENCE_VERSION = "gold-evidence-candidate-v1";
+
+    /** 独立研究格式：方向预测外包一层可核对引用，不用于正式生成。 */
+    public GoldForecastPrompt buildEvidence(StoredGoldResearchSnapshot record) {
+        var macro = buildMacro(record);
+        String contract = "{\"direction\":\"BULLISH|NEUTRAL|BEARISH\",\"reasoning\":\"研究依据\",\"invalidationConditions\":[\"失效条件\"]}";
+        // 只替换唯一的输出合同，不替换任何行情事实；已有两个候选保留原格式。
+        String content = macro.content().replace(contract,
+                "{\"forecast\":" + contract + ",\"evidence\":[]}") + """
+
+                【结构化引用合同】
+                evidence必须覆盖九项，不能为空：gold1,gold5,gold20,rate1,rate5,rate20,usd1,usd5,usd20。
+                gold对应黄金收益率（%），rate对应实际利率变化（基点），usd对应广义美元收益率（%）。
+                数字1/5/20对应相应观测周期，不得混用字段、单位或周期。
+                每项仅含key、value、trend；key是上述字段名，value为原始JSON数值或null。
+                trend使用UP/DOWN/FLAT/MISSING：正值UP、负值DOWN、零FLAT，缺失为null与MISSING。
+                trend描述已提供变化值的符号，不是未来预测方向；不得改写原值、补零、遗漏或重复。
+                forecast.reasoning应与所引用的原值及符号一致，不得把负变化说成上涨。
+                不增加新闻、价格位置、反弹需求等未提供的事实。只返回外层forecast与evidence两个字段。
+                """;
+        return new GoldForecastPrompt(EVIDENCE_VERSION, content, sha256(content));
+    }
 
     private static final String BASE_RULE = "7. 波动率较高时，优先考虑 NEUTRAL 或反转风险。";
     private static final String CANDIDATE_RULE = "7. 波动率较高只表示价格变动可能更大，不能因此优先选择 NEUTRAL；"

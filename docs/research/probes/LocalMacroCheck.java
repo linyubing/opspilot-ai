@@ -1,6 +1,8 @@
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opspilot.ai.forecast.GoldDirectionForecastContent;
 import com.opspilot.ai.forecast.GoldForecastValidator;
+import com.opspilot.ai.forecast.GoldEvidenceForecast;
+import com.opspilot.ai.analysis.history.StoredGoldResearchSnapshot;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -26,9 +28,15 @@ public class LocalMacroCheck {
         check(result.path("httpStatus").asInt() == 200 && response.path("done").asBoolean()
                 && "stop".equals(response.path("done_reason").asText()), "COMPLETE_RESPONSE");
         check(result.path("researchOnly").asBoolean() && !result.path("trustedAccuracyEligible").asBoolean(), "RESEARCH_ONLY");
-        var content = json.treeToValue(json.readTree(response.path("message").path("content").asText()),
-                GoldDirectionForecastContent.class);
-        new GoldForecastValidator().validate(content);
+        var body = json.readTree(response.path("message").path("content").asText());
+        var validator = new GoldForecastValidator();
+        if ("gold-evidence-candidate-v1".equals(input.path("candidate").path("version").asText())) {
+            var record = json.treeToValue(input.path("snapshot"), StoredGoldResearchSnapshot.class);
+            validator.validateEvidence(record.snapshot(), json.treeToValue(body, GoldEvidenceForecast.class));
+            System.out.println("STRUCTURED_CITATIONS_PASSED; FREE_TEXT_NOT_CERTIFIED");
+        } else {
+            validator.validate(json.treeToValue(body, GoldDirectionForecastContent.class));
+        }
         System.out.println("ARTIFACT_VALID; EXISTING_SAFETY_PASSED; FACTS_NOT_CERTIFIED; NOT_SCORED");
     }
 
