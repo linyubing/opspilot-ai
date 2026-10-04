@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 public class GoldForecastReviewPromptBuilder {
 
     public static final String PROMPT_VERSION =
-            "gold-forecast-review-prompt-v1";
+            "gold-forecast-review-prompt-v2";
 
     private static final int MINIMUM_RESOLVED_COUNT = 30;
 
@@ -44,6 +44,17 @@ public class GoldForecastReviewPromptBuilder {
             总体命中率：%s
             最近20条命中率：%s
             中性基线命中率：%s
+
+            【发布时间资格】
+            未知发布时间样本：%d
+            候选开盘前样本：%d
+            候选盘中样本：%d
+            无效候选样本：%d
+            可信预测样本：%d
+            可信准确率：%s
+            上述总体、方向及版本指标仅为历史描述，不能证明未来预测准确率。
+            候选时段不是官方合同，也不是历史输入当时可得的证明。
+            不得混合候选盘中与开盘前样本宣称全时段预测准确率。
 
             【分方向表现】
             %s
@@ -104,6 +115,12 @@ public class GoldForecastReviewPromptBuilder {
                 formatAccuracy(evaluation.overallAccuracy()),
                 formatAccuracy(evaluation.rolling20Accuracy()),
                 formatAccuracy(evaluation.neutralBaselineAccuracy()),
+                evaluation.timing().unknown().sampleCount(),
+                evaluation.timing().beforeSession().sampleCount(),
+                evaluation.timing().inSession().sampleCount(),
+                evaluation.timing().invalid().sampleCount(),
+                evaluation.timing().trustedCount(),
+                formatAccuracy(evaluation.timing().trustedAccuracy()),
                 formatDirection(evaluation.bullish()),
                 formatDirection(evaluation.neutral()),
                 formatDirection(evaluation.bearish()),

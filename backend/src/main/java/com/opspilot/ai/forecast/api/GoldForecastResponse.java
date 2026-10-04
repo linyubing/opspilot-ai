@@ -5,6 +5,7 @@ import com.opspilot.ai.forecast.ForecastStatus;
 import com.opspilot.ai.forecast.GoldForecastMissReason;
 import com.opspilot.ai.forecast.GoldTradingCalendar;
 import com.opspilot.ai.forecast.StoredGoldDirectionForecast;
+import com.opspilot.ai.forecast.GoldForecastTiming;
 
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
@@ -23,7 +24,9 @@ public record GoldForecastResponse(
         LocalDate targetDate, BigDecimal targetPrice,
         BigDecimal actualReturn, ForecastDirection actualDirection,
         Boolean hit, GoldForecastMissReason missReason,
-        OffsetDateTime resolvedAt, OffsetDateTime createdAt
+        OffsetDateTime resolvedAt, OffsetDateTime createdAt,
+        GoldForecastTiming timing, GoldForecastTiming.Phase publicationPhase,
+        String publicationWarning
 ) {
     public static GoldForecastResponse from(StoredGoldDirectionForecast record) {
         return from(record, null);
@@ -40,9 +43,11 @@ public record GoldForecastResponse(
             GoldForecastMissReason missReason,
             GoldTradingCalendar calendar
     ) {
-        LocalDate expectedTarget = calendar != null
+        LocalDate expectedTarget = record.timing() != null ? record.timing().targetDate() : calendar != null
                 ? calendar.nextBusinessDay(record.baseDate())
                 : nextWeekday(record.baseDate());
+        var phase = record.timing() == null ? GoldForecastTiming.Phase.UNKNOWN
+                : record.timing().phase(record.createdAt());
         return new GoldForecastResponse(
                 record.id(), record.snapshotId(), record.baseDate(), record.basePrice(),
                 record.predictedDirection(), record.reasoning(), record.invalidationConditions(),
@@ -50,8 +55,17 @@ public record GoldForecastResponse(
                 record.forecastRuleVersion(), record.status(), expectedTarget.toString(),
                 record.targetDate(), record.targetPrice(), record.actualReturn(),
                 record.actualDirection(), record.hit(), missReason,
-                record.resolvedAt(), record.createdAt()
+                record.resolvedAt(), record.createdAt(), record.timing(), phase, warning(phase)
         );
+    }
+
+    private static String warning(GoldForecastTiming.Phase phase) {
+        return switch (phase) {
+            case UNKNOWN -> "发布时间合同未知，旧记录不能证明事前预测，不计为可信预测样本。";
+            case IN_SESSION -> "目标候选时段已经开始，不能视为开盘前预测；候选依据不是官方时段或历史可得性证明。";
+            case BEFORE_SESSION -> "候选时段开盘前发布；候选依据不能视为官方时段或历史可得性证明。";
+            case EXPIRED -> "发布时目标候选时段已结束，不能计为事前预测。";
+        };
     }
 
     private static LocalDate nextWeekday(LocalDate baseDate) {

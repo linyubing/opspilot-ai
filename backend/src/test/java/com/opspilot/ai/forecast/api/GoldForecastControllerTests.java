@@ -44,7 +44,17 @@ class GoldForecastControllerTests {
         mockMvc = MockMvcBuilders.standaloneSetup(new GoldForecastController(
                 generationService, resolutionService, evaluationService,
                 settlementService, historyService, reviewService
-        )).build();
+        )).setControllerAdvice(new com.opspilot.ai.chat.api.GlobalExceptionHandler()).build();
+    }
+
+    @Test @DisplayName("发布时间无效返回422和中文业务错误，不暴露原始响应")
+    void returnsPublicationError() throws Exception {
+        when(generationService.generate(SNAPSHOT_ID)).thenThrow(new InvalidGoldPublicationException("目标候选时段已结束"));
+        mockMvc.perform(post("/api/research/gold/snapshots/{id}/forecasts", SNAPSHOT_ID))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(jsonPath("$.code").value("FORECAST_PUBLICATION_INVALID"))
+                .andExpect(jsonPath("$.message").value("目标候选时段已结束"))
+                .andExpect(jsonPath("$.rawResponse").doesNotExist());
     }
 
     @Test

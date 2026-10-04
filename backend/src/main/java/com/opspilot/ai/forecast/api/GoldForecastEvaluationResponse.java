@@ -3,6 +3,7 @@ package com.opspilot.ai.forecast.api;
 import com.opspilot.ai.forecast.DirectionEvaluation;
 import com.opspilot.ai.forecast.ForecastVersionEvaluation;
 import com.opspilot.ai.forecast.GoldForecastEvaluation;
+import com.opspilot.ai.forecast.GoldForecastTimingEvaluation;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -13,13 +14,14 @@ public record GoldForecastEvaluationResponse(
         BigDecimal overallAccuracy, DirectionEvaluation bullish,
         DirectionEvaluation neutral, DirectionEvaluation bearish,
         BigDecimal rolling20Accuracy, BigDecimal neutralBaselineAccuracy,
-        List<ForecastVersionEvaluation> versions
+        List<ForecastVersionEvaluation> versions,
+        GoldForecastTimingEvaluation timing
 ) {
     public static GoldForecastEvaluationResponse from(GoldForecastEvaluation value) {
         return new GoldForecastEvaluationResponse(
                 value.totalCount(), value.pendingCount(), value.resolvedCount(),
                 value.overallAccuracy(), value.bullish(), value.neutral(), value.bearish(),
-                value.rolling20Accuracy(), value.neutralBaselineAccuracy(), value.versions()
+                value.rolling20Accuracy(), value.neutralBaselineAccuracy(), value.versions(), value.timing()
         );
     }
 }

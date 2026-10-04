@@ -87,7 +87,9 @@ public class GoldForecastResolutionService {
         // 同一次校验和落库使用同一时刻，避免跨日或时钟变化造成口径不一致。
         OffsetDateTime asOf = OffsetDateTime.now(clock);
         if (!hasValidTime(forecast, target.get(), asOf)
-                || !target.get().isConfirmedAt(asOf)) {
+                || !target.get().isConfirmedAt(asOf)
+                || (forecast.timing() != null && !forecast.timing().canResolve(
+                        forecast.baseDate(), target.get().priceDate(), forecast.createdAt(), asOf))) {
             return false;
         }
         ForecastResolution resolution = createResolution(

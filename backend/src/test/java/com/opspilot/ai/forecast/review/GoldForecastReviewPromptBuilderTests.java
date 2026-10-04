@@ -19,13 +19,20 @@ class GoldForecastReviewPromptBuilderTests {
     private final GoldForecastReviewPromptBuilder builder =
             new GoldForecastReviewPromptBuilder();
 
+    @Test @DisplayName("复盘必须知道旧命中率只是历史描述，未知时刻不能证明前瞻准确率")
+    void includesPublicationLimits() {
+        assertThat(builder.build(eval(40)).content())
+                .contains("未知发布时间样本：40", "可信预测样本：0", "可信准确率：暂无有效样本")
+                .contains("历史描述", "不能证明未来预测准确率");
+    }
+
     @Test
     @DisplayName("包含评测事实、输出合同和安全边界")
     void includesFactsAndBoundaries() {
         GoldForecastReviewPrompt prompt = builder.build(eval(40));
 
         assertThat(prompt.version())
-                .isEqualTo("gold-forecast-review-prompt-v1");
+                .isEqualTo("gold-forecast-review-prompt-v2");
         assertThat(prompt.content())
                 .contains("已解析样本数：40")
                 .contains("总体命中率：0.6250")

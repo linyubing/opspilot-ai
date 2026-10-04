@@ -49,6 +49,43 @@ class GoldForecastResolutionServiceTests {
 
     private GoldForecastResolutionService service;
 
+    @Test @DisplayName("真实下一根日线与承诺日不一致时保持等待，不能移动目标")
+    void rejectsPromisedDateMismatch() {
+        var forecast = timedForecast("2026-09-01");
+        when(forecastRepository.findPending(10)).thenReturn(List.of(forecast));
+        when(goldRepository.findNext("XAUUSD", "twelve_data", FRIDAY))
+                .thenReturn(Optional.of(bar("2026-08-31", "2525")));
+        org.mockito.Mockito.lenient().when(forecastRepository.resolve(any(), any()))
+                .thenAnswer(invocation -> resolvedForecast(forecast, invocation.getArgument(1)));
+        assertThat(service.resolvePending(10)).isEqualTo(new ResolveGoldForecastsResult(1, 0, 1));
+        verify(forecastRepository, never()).resolve(any(), any());
+    }
+
+    @Test @DisplayName("即使收到确认标志，候选目标时段尚未结束也不能结算")
+    void waitsForPromisedEnd() {
+        service = new GoldForecastResolutionService(forecastRepository, goldRepository, new GoldForecastRule(),
+                Clock.fixed(Instant.parse("2026-08-31T15:00:00Z"), ZoneOffset.UTC));
+        var forecast = timedForecast("2026-08-31");
+        when(forecastRepository.findPending(10)).thenReturn(List.of(forecast));
+        when(goldRepository.findNext("XAUUSD", "twelve_data", FRIDAY))
+                .thenReturn(Optional.of(bar("2026-08-31", "2525", "2026-08-31T12:00:00Z")));
+        org.mockito.Mockito.lenient().when(forecastRepository.resolve(any(), any()))
+                .thenAnswer(invocation -> resolvedForecast(forecast, invocation.getArgument(1)));
+        assertThat(service.resolvePending(10)).isEqualTo(new ResolveGoldForecastsResult(1, 0, 1));
+        verify(forecastRepository, never()).resolve(any(), any());
+    }
+
+    private StoredGoldDirectionForecast timedForecast(String promisedDate) {
+        var old = pendingForecast("2500", ForecastDirection.BULLISH);
+        var s = com.opspilot.ai.marketdata.GoldSession.forDate(LocalDate.parse(promisedDate));
+        return new StoredGoldDirectionForecast(old.id(), old.snapshotId(), old.baseDate(), old.basePrice(),
+                old.predictedDirection(), old.reasoning(), old.invalidationConditions(), old.modelName(),
+                old.promptVersion(), old.promptHash(), old.forecastRuleVersion(), old.rawResponse(), old.status(),
+                old.targetDate(), old.targetPrice(), old.actualReturn(), old.actualDirection(), old.hit(), old.resolvedAt(),
+                OffsetDateTime.parse("2026-08-29T12:00:00Z"),
+                new GoldForecastTiming(s.date(), s.start(), s.end(), "sydney-0700-candidate-v1"));
+    }
+
     @BeforeEach
     void setUp() {
         service = new GoldForecastResolutionService(

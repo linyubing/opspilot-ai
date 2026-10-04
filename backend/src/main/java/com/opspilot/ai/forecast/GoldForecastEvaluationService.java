@@ -64,7 +64,8 @@ public class GoldForecastEvaluationService {
                 bearish,
                 calculateRolling20Accuracy(resolvedForecasts),
                 calculateNeutralBaselineAccuracy(resolvedForecasts),
-                evaluateVersions(resolvedForecasts)
+                evaluateVersions(resolvedForecasts),
+                GoldForecastTimingEvaluation.from(resolvedForecasts)
         );
     }
     /**
