@@ -29,6 +29,8 @@
 
 全量日志：`backend/target/publication-final-confirmed-suite.log`，完成2026-10-04 11:13:54+08。摘要计算排除新加last_scanned_at列，核对原24列完整JSONB；新列独立验证仍全部为空。101条样例仅在回滚事务中运行，不进入真实预测统计。
 
+功能提交`1485963`已推送origin/master，包含此前发布时间承诺与分层提交；文档收尾后再核对远程HEAD。受保护的两个用户文件保留，不提交。未改变正式模型，未打开最终留出集。
+
 ## 前端QA
 
 - 环境：`http://localhost:8080/forecast.html`，1440×1000、390×844。Browser plugin not available；已验证缓存Playwright Core与本机Chrome后使用，无新增依赖。
