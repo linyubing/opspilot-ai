@@ -16,8 +16,24 @@ public class GoldForecastPromptBuilder {
 
     public static final String PROMPT_VERSION =
             "gold-direction-forecast-prompt-v2";
+    public static final String CANDIDATE_VERSION = "gold-neutral-contract-candidate-v1";
+
+    private static final String BASE_RULE = "7. 波动率较高时，优先考虑 NEUTRAL 或反转风险。";
+    private static final String CANDIDATE_RULE = "7. 波动率较高只表示价格变动可能更大，不能因此优先选择 NEUTRAL；"
+            + "证据不确定不等于涨跌幅位于 [-0.5%, 0.5%]，仍须按三方向合同选择最有依据的类别，"
+            + "并在 reasoning 中说明不确定性。";
+
+    /** 研究候选入口；不由正式生成服务调用。 */
+    public GoldForecastPrompt buildCandidate(StoredGoldResearchSnapshot record) {
+        return build(record, CANDIDATE_VERSION, CANDIDATE_RULE);
+    }
 
     public GoldForecastPrompt build(StoredGoldResearchSnapshot record) {
+        return build(record, PROMPT_VERSION, BASE_RULE);
+    }
+
+    // 共用模板和事实输入，只改变预先指定的规则；不对事实文本做全局替换。
+    private GoldForecastPrompt build(StoredGoldResearchSnapshot record, String version, String rule) {
         Objects.requireNonNull(record, "正式快照记录不能为空");
         GoldResearchSnapshot snapshot = record.snapshot();
 
@@ -56,7 +72,7 @@ public class GoldForecastPromptBuilder {
                 4. 5 期和 1 期方向冲突时，必须降低方向确信度。
                 5. 20 期涨幅很大但 1 期转负时，必须考虑高位回落或获利了结。
                 6. 美元指数数据明显滞后时，必须降低美元指数因子的权重。
-                7. 波动率较高时，优先考虑 NEUTRAL 或反转风险。
+                %s
                 8. 如果证据只支持轻微涨跌，不能判断为 BULLISH 或 BEARISH，应判断为 NEUTRAL。
                 9. reasoning 必须说明短线动量、中期趋势、宏观因子和最终取舍。
 
@@ -84,9 +100,10 @@ public class GoldForecastPromptBuilder {
                 snapshot.realRateAssessment().status().name(),
                 snapshot.realRateAssessment().explanation(),
                 snapshot.dollarIndexAssessment().status().name(),
-                snapshot.dollarIndexAssessment().explanation()
+                snapshot.dollarIndexAssessment().explanation(),
+                rule
         );
-        return new GoldForecastPrompt(PROMPT_VERSION, content, sha256(content));
+        return new GoldForecastPrompt(version, content, sha256(content));
     }
 
     /** 使用 UTF-8 生成稳定摘要，用于预测审计和幂等判断。 */
