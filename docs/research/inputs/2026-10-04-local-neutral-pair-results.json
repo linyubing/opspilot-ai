@@ -1,0 +1,104 @@
+{
+  "trustedAccuracyEligible": false,
+  "inputSha256": "493567c81d051d9e1818fa3d47a00f77e3b15e2dff2622c4acdcd38d1a67407c",
+  "logLoss": null,
+  "codeCommit": "6408bbe5d235cb0d68d83079a581df26de0ceb5a",
+  "baseDate": "2026-10-02",
+  "modelDigest": "6488c96fa5faab64bb65cbd30d4289e20e6130ef535a93ef9a49f42eda893ea7",
+  "researchOnly": true,
+  "snapshotId": "26d256f3-7614-4683-9bb5-c78162a1453b",
+  "basePrice": 4141.52795,
+  "officialSessionCertified": false,
+  "outputs": [
+    {
+      "completedAt": "2026-10-04T15:59:38.5329763+00:00",
+      "promptSha256": "6c23e30aa82a088ecb984c0f5e782015d7276821125a941bf052de3073da933e",
+      "request": {
+        "messages": [
+          {
+            "content": "你是个人黄金投资研究助手。请基于给定正式快照，\n预测黄金下一个有效交易日的方向。\n\n只能使用下列事实，不得修改、重新计算或补充外部数据。\n\n【正式快照】\n快照编号：26d256f3-7614-4683-9bb5-c78162a1453b\n分析日期：2026-10-02\n黄金数据日期：2026-10-02\n实际利率数据日期：2026-10-01\n美元指数数据日期：2026-09-25\n研究版本：gold-multifactor-confirmed-v3\n黄金当前价格：4141.52795000\n黄金1期收益率：-0.8598%\n黄金5期收益率：-3.3875%\n黄金20期收益率：-6.5130%\n黄金20期波动率：20.9165\n实际利率因子：PRESSURING\n实际利率解释：实际利率中期明显上升且短期继续上升，对黄金构成单因子压力。\n美元指数因子：PRESSURING\n美元指数解释：广义美元指数中期明显走强且短期继续走强，对黄金构成单因子压力。\n\n【方向合同】\n后续真实涨跌幅大于 0.5% 为 BULLISH；\n小于 -0.5% 为 BEARISH；\n其余包括两个边界值均为 NEUTRAL（中性）。\n\n【第二版校正规则】\n1. 预测的是下一个有效交易日，不是中长期趋势。\n2. 不得因为 20 期收益率为正就自动判断为 BULLISH。\n3. 1 期收益率为负时，必须说明短线转弱风险。\n4. 5 期和 1 期方向冲突时，必须降低方向确信度。\n5. 20 期涨幅很大但 1 期转负时，必须考虑高位回落或获利了结。\n6. 美元指数数据明显滞后时，必须降低美元指数因子的权重。\n7. 波动率较高时，优先考虑 NEUTRAL 或反转风险。\n8. 如果证据只支持轻微涨跌，不能判断为 BULLISH 或 BEARISH，应判断为 NEUTRAL。\n9. reasoning 必须说明短线动量、中期趋势、宏观因子和最终取舍。\n\n【安全边界】\n只返回 JSON，不要使用 Markdown 代码块。\n不得生成新闻、市场事件或任何未提供的事实。\n不得给出目标价、涨跌概率、止损位、仓位或买卖建议。\n\n严格返回：\n{\"direction\":\"BULLISH|NEUTRAL|BEARISH\",\"reasoning\":\"研究依据\",\"invalidationConditions\":[\"失效条件\"]}\n",
+            "role": "user"
+          }
+        ],
+        "stream": false,
+        "keep_alive": "5m",
+        "think": false,
+        "model": "qwen3.5:9b",
+        "options": {
+          "num_ctx": 8192,
+          "seed": 42,
+          "num_predict": 2048,
+          "temperature": 0
+        }
+      },
+      "variant": "baseline",
+      "responseSha256": "3b58cb22ceec62faacbff50f46ebd9d87b4623ecf5b51635b4828f917928956b",
+      "startedAt": "2026-10-04T15:59:33.7639172+00:00",
+      "promptVersion": "gold-direction-forecast-prompt-v2",
+      "http": 200,
+      "beforeCandidateSession": true,
+      "rawResponse": "{\"model\":\"qwen3.5:9b\",\"created_at\":\"2026-10-04T15:59:38.5240864Z\",\"message\":{\"role\":\"assistant\",\"content\":\"{\\\"direction\\\":\\\"BEARISH\\\",\\\"reasoning\\\":\\\"短线动量方面，1 期收益率为 -0.8598%，已跌破中性区间且处于负值，表明短期动能转弱；中期趋势上，5 期收益率 -3.3875% 与 20 期收益率 -6.5130% 均显示下行压力，尽管 20 期为负但结合当前价格高位及因子压力，需警惕获利了结或高位回落风险。宏观因子方面，实际利率因子处于 PRESSURING 状态（中期上升且短期继续上升），对黄金构成单因子压力；美元指数因子同样为 PRESSURING（中期走强且短期继续走强），进一步压制金价。根据校正规则，1 期收益率为负时必须说明短线转弱风险，且当 5 期和 1 期方向一致（均为负）时虽未冲突，但结合两个宏观因子均施压，证据支持下跌而非轻微波动，故判断为 BEARISH。\\\", \\\"invalidationConditions\\\":[\\\"实际利率或美元指数数据更新显示压力解除\\\",\\\"下一个有效交易日开盘价较当前价格涨幅超过 0.5%\\\"]}\"},\"done\":true,\"done_reason\":\"stop\",\"total_duration\":4748061900,\"load_duration\":2531952000,\"prompt_eval_count\":620,\"prompt_eval_cached_count\":0,\"prompt_eval_duration\":166579000,\"eval_count\":246,\"eval_duration\":2046298000}",
+      "parsed": {
+        "direction": "BEARISH",
+        "reasoning": "短线动量方面，1 期收益率为 -0.8598%，已跌破中性区间且处于负值，表明短期动能转弱；中期趋势上，5 期收益率 -3.3875% 与 20 期收益率 -6.5130% 均显示下行压力，尽管 20 期为负但结合当前价格高位及因子压力，需警惕获利了结或高位回落风险。宏观因子方面，实际利率因子处于 PRESSURING 状态（中期上升且短期继续上升），对黄金构成单因子压力；美元指数因子同样为 PRESSURING（中期走强且短期继续走强），进一步压制金价。根据校正规则，1 期收益率为负时必须说明短线转弱风险，且当 5 期和 1 期方向一致（均为负）时虽未冲突，但结合两个宏观因子均施压，证据支持下跌而非轻微波动，故判断为 BEARISH。",
+        "invalidationConditions": [
+          "实际利率或美元指数数据更新显示压力解除",
+          "下一个有效交易日开盘价较当前价格涨幅超过 0.5%"
+        ]
+      },
+      "structuralPass": true,
+      "completedNormally": true,
+      "protocolPass": true,
+      "contentSha256": "d0ee0b288f8e8c62ca2831ff5a5080fc11efb6d3fb48f6afc86096b86615fde9"
+    },
+    {
+      "completedAt": "2026-10-04T15:59:40.2590090+00:00",
+      "promptSha256": "caa3f2f2d7e57e7179913c1961c0070da93c974c208cfa3b588daa22208aa6dd",
+      "request": {
+        "messages": [
+          {
+            "content": "你是个人黄金投资研究助手。请基于给定正式快照，\n预测黄金下一个有效交易日的方向。\n\n只能使用下列事实，不得修改、重新计算或补充外部数据。\n\n【正式快照】\n快照编号：26d256f3-7614-4683-9bb5-c78162a1453b\n分析日期：2026-10-02\n黄金数据日期：2026-10-02\n实际利率数据日期：2026-10-01\n美元指数数据日期：2026-09-25\n研究版本：gold-multifactor-confirmed-v3\n黄金当前价格：4141.52795000\n黄金1期收益率：-0.8598%\n黄金5期收益率：-3.3875%\n黄金20期收益率：-6.5130%\n黄金20期波动率：20.9165\n实际利率因子：PRESSURING\n实际利率解释：实际利率中期明显上升且短期继续上升，对黄金构成单因子压力。\n美元指数因子：PRESSURING\n美元指数解释：广义美元指数中期明显走强且短期继续走强，对黄金构成单因子压力。\n\n【方向合同】\n后续真实涨跌幅大于 0.5% 为 BULLISH；\n小于 -0.5% 为 BEARISH；\n其余包括两个边界值均为 NEUTRAL（中性）。\n\n【第二版校正规则】\n1. 预测的是下一个有效交易日，不是中长期趋势。\n2. 不得因为 20 期收益率为正就自动判断为 BULLISH。\n3. 1 期收益率为负时，必须说明短线转弱风险。\n4. 5 期和 1 期方向冲突时，必须降低方向确信度。\n5. 20 期涨幅很大但 1 期转负时，必须考虑高位回落或获利了结。\n6. 美元指数数据明显滞后时，必须降低美元指数因子的权重。\n7. 波动率较高只表示价格变动可能更大，不能因此优先选择 NEUTRAL；证据不确定不等于涨跌幅位于 [-0.5%, 0.5%]，仍须按三方向合同选择最有依据的类别，并在 reasoning 中说明不确定性。\n8. 如果证据只支持轻微涨跌，不能判断为 BULLISH 或 BEARISH，应判断为 NEUTRAL。\n9. reasoning 必须说明短线动量、中期趋势、宏观因子和最终取舍。\n\n【安全边界】\n只返回 JSON，不要使用 Markdown 代码块。\n不得生成新闻、市场事件或任何未提供的事实。\n不得给出目标价、涨跌概率、止损位、仓位或买卖建议。\n\n严格返回：\n{\"direction\":\"BULLISH|NEUTRAL|BEARISH\",\"reasoning\":\"研究依据\",\"invalidationConditions\":[\"失效条件\"]}\n",
+            "role": "user"
+          }
+        ],
+        "stream": false,
+        "keep_alive": "5m",
+        "think": false,
+        "model": "qwen3.5:9b",
+        "options": {
+          "num_ctx": 8192,
+          "seed": 42,
+          "num_predict": 2048,
+          "temperature": 0
+        }
+      },
+      "variant": "candidate",
+      "responseSha256": "83b4db8b0660730012b3bbab759ab34539b235f6aa1f05357ce0a1a910a7ac14",
+      "startedAt": "2026-10-04T15:59:38.5445379+00:00",
+      "promptVersion": "gold-neutral-contract-candidate-v1",
+      "http": 200,
+      "beforeCandidateSession": true,
+      "rawResponse": "{\"model\":\"qwen3.5:9b\",\"created_at\":\"2026-10-04T15:59:40.2535018Z\",\"message\":{\"role\":\"assistant\",\"content\":\"{\\\"direction\\\":\\\"BEARISH\\\",\\\"reasoning\\\":\\\"短线动量方面，1 期收益率为 -0.8598%，已跌破 -0.5% 阈值，且 20 期收益率高达 -6.5130%，显示中期趋势显著向下；宏观因子中，实际利率与美元指数均处于 PRESSURING 状态，分别对黄金构成单因子压力。尽管美元指数数据日期（2026-09-25）滞后于分析日期（2026-10-02），但根据规则需降低其权重，而实际利率数据为最新且同样施压。综合来看，短线转弱风险明确，中期趋势与宏观因子共振向下，证据支持轻微下跌而非中性，故判定为 BEARISH。\\\",\\\"invalidationConditions\\\":[\\\"若下一交易日 1 期收益率回升至 -0.5% 以上\\\"]}\"},\"done\":true,\"done_reason\":\"stop\",\"total_duration\":1708289500,\"load_duration\":833100,\"prompt_eval_count\":660,\"prompt_eval_cached_count\":0,\"prompt_eval_duration\":144575000,\"eval_count\":189,\"eval_duration\":1559036000}",
+      "parsed": {
+        "direction": "BEARISH",
+        "reasoning": "短线动量方面，1 期收益率为 -0.8598%，已跌破 -0.5% 阈值，且 20 期收益率高达 -6.5130%，显示中期趋势显著向下；宏观因子中，实际利率与美元指数均处于 PRESSURING 状态，分别对黄金构成单因子压力。尽管美元指数数据日期（2026-09-25）滞后于分析日期（2026-10-02），但根据规则需降低其权重，而实际利率数据为最新且同样施压。综合来看，短线转弱风险明确，中期趋势与宏观因子共振向下，证据支持轻微下跌而非中性，故判定为 BEARISH。",
+        "invalidationConditions": [
+          "若下一交易日 1 期收益率回升至 -0.5% 以上"
+        ]
+      },
+      "structuralPass": true,
+      "completedNormally": true,
+      "protocolPass": true,
+      "contentSha256": "d0ce0b9c42b56f5d10b19497f2c8bfddef5b8efdc303d9644f11e583e2ca96f3"
+    }
+  ],
+  "protocol": "docs/research/2026-10-04-local-neutral-pair-protocol.md",
+  "candidateSessionStart": "2026-10-04T20:00:00.0000000+00:00",
+  "brierScore": null,
+  "inputFile": "docs/research/inputs/2026-10-04-neutral-prompt-pair.json",
+  "protocolSha256": "12a457373234da242482cfee762ffb5ae92b8c8cb1b9ccda98017453aff23c99",
+  "modelUnchanged": true,
+  "targetDate": "2026-10-05",
+  "modelName": "qwen3.5:9b",
+  "status": "PAIRED_OUTPUTS_NOT_SCORED"
+}
