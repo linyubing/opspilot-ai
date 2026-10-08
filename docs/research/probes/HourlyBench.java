@@ -2,6 +2,8 @@ package com.opspilot.ai.forecast.learning;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opspilot.ai.marketdata.GoldDailyBar;
+import com.opspilot.ai.macrodata.FredHistoryStore;
+import com.opspilot.ai.macrodata.MacroObservation;
 import org.tribuo.Model;
 import org.tribuo.MutableDataset;
 import org.tribuo.classification.Label;
@@ -16,6 +18,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.time.OffsetDateTime;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HexFormat;
@@ -27,6 +31,7 @@ import java.util.Map;
 public class HourlyBench {
     static final String[] CLASSES={"BULLISH","NEUTRAL","BEARISH"};
     static final String[] FEATURES={"return1","return5","return20","ma20Distance","dailyRange"};
+    static final String[] RATE_FEATURES={"return1","return5","return20","ma20Distance","dailyRange","realRate","rateChange5"};
     record Sample(String baseEnd,String targetEnd,String label,double actualReturn,double[] values) {}
     record Score(String actual, String predicted, double[] probabilities) {}
     record Metrics(int samples, double accuracy, Double balancedAccuracy, double brier,
@@ -184,9 +189,26 @@ public class HourlyBench {
         return new ArrayExample<>(label,FEATURES,scale.apply(values));
     }
 
+    // 5个观测间隔的百分点变化，不把周末缺失补成新观测。
+    static double[] rateValues(LocalDate day,List<MacroObservation> rows) {
+        if(rows.size()!=6) throw new IllegalArgumentException("实际利率缺少6条已知观测，停止配对比较");
+        LocalDate previous=day;
+        for(var row:rows) {
+            if(!row.seriesId().equals("DFII10") || !row.observationDate().isBefore(previous)
+                    || !Double.isFinite(row.value().doubleValue())) throw new IllegalArgumentException("实际利率日期或值无效");
+            previous=row.observationDate();
+        }
+        if(ChronoUnit.DAYS.between(rows.getFirst().observationDate(),day)>7) {
+            throw new IllegalArgumentException("实际利率观测超期，停止配对比较");
+        }
+        return new double[]{rows.getFirst().value().doubleValue(),rows.getFirst().value().subtract(rows.getLast().value()).doubleValue()};
+    }
+
     public static void main(String[] args) throws Exception {
         if(args.length==4 && args[0].equals("--settle")) { settle(args[1],args[2],args[3]); return; }
-        if(args.length!=2) throw new IllegalArgumentException("Expected source receipt and output file");
+        if(args.length!=2 && args.length!=3) throw new IllegalArgumentException("Expected source receipt, output file and optional FRED archive");
+        // 可选利率消融与旧价格协议并列运行，不更换旧控制组。
+        FredHistoryStore.Batch macro=args.length==3?new FredHistoryStore(new ObjectMapper(),args[2]).load():null;
         Path receipt=Path.of(args[0]), output=Path.of(args[1]);
         if(Files.exists(output)) throw new IllegalArgumentException("Experiment output exists; no overwrite");
         ObjectMapper mapper=new ObjectMapper();
@@ -199,6 +221,11 @@ public class HourlyBench {
             throw new IllegalArgumentException("Independent research lineage not verified");
         }
         int available=checked.path("consecutiveCompleteWindows").asInt();
+        // 固定历史消融只接受预先冻结的两个真实回执；新批次必须另立协议。
+        if(macro!=null && (!fingerprint.equals("5f2921bd1541c5aa114cd525e93349836cb50b7d298ec3523b67005966272439")
+                || available!=186 || !macro.metadata().get("DFII10.sha256").equals("fe6ff2b7f3be1ceefd05d44123e7fcfca3b70715691e4abb9ad622e8dab9a62b"))) {
+            throw new IllegalArgumentException("FROZEN_RATE_COHORT_MISMATCH: 实际利率消融的冻结数据批次不匹配");
+        }
         if(available<132) throw new IllegalArgumentException("Not enough real continuous history for fixed protocol");
         var rows=checked.path("bars");
         var collected=OffsetDateTime.parse(checked.path("checkedAt").asText());
@@ -220,6 +247,8 @@ public class HourlyBench {
         final int reserved=30, warmup=20, firstValidation=61, refitEvery=10;
         int devEnd=bars.size()-1-reserved;
         List<Sample> samples=new ArrayList<>();
+        List<double[]> rateSamples=new ArrayList<>();
+        List<Map<String,Object>> rateInputs=new ArrayList<>();
         var calculator=new GoldFeatureCalculator();
         for(int i=warmup;i<devEnd;i++) {
             var f=calculator.compute(bars.get(i).priceDate(),bars.subList(0,i+1)).orElseThrow();
@@ -227,13 +256,25 @@ public class HourlyBench {
             double actual=bars.get(i+1).close().divide(bars.get(i).close(),MathContext.DECIMAL128)
                     .subtract(BigDecimal.ONE).multiply(BigDecimal.valueOf(100)).doubleValue();
             samples.add(new Sample(ends.get(i),ends.get(i+1),direction(actual),actual,values));
+            if(macro!=null) {
+                var day=bars.get(i).priceDate();
+                var known=macro.recent("DFII10",day,6);
+                var rate=rateValues(day,known);
+                double[] combined=Arrays.copyOf(values,7); combined[5]=rate[0]; combined[6]=rate[1];
+                rateSamples.add(combined);
+                rateInputs.add(Map.of("baseDate",day.toString(),"latestDate",known.getFirst().observationDate().toString(),
+                        "cutoff",day.minusDays(1).toString(),"level",rate[0],"change5",rate[1]));
+            }
         }
         Map<String,List<Score>> scores=new LinkedHashMap<>();
         for(String name:List.of("ALWAYS_NEUTRAL","PAST_MAJORITY","RETURN1_CONTINUATION","LOGISTIC_5","TRANSITION_3")) scores.put(name,new ArrayList<>());
+        if(macro!=null) scores.put("LOGISTIC_7",new ArrayList<>());
         List<Map<String,Object>> cases=new ArrayList<>(), folds=new ArrayList<>();
         var factory=new LabelFactory();
         Model<Label> model=null;
         Scale scale=null;
+        Model<Label> rateModel=null;
+        Scale rateScale=null;
         for(int i=firstValidation;i<samples.size();i++) {
             var sample=samples.get(i);
             // 所有可学习方法共享本折已冻结训练样本，不能让基线每天偷偷多看标签。
@@ -246,6 +287,12 @@ public class HourlyBench {
                 var dataset=new MutableDataset<Label>(new SimpleDataSourceProvenance("hourly-independent-research",factory),factory);
                 for(var train:training) dataset.add(example(new Label(train.label()),train.values(),scale));
                 model=new LogisticRegressionTrainer().train(dataset);
+                if(macro!=null) {
+                    rateScale=fit(rateSamples.subList(0,training.size()));
+                    var rateDataset=new MutableDataset<Label>(new SimpleDataSourceProvenance("hourly-rate-independent-research",factory),factory);
+                    for(int t=0;t<training.size();t++) rateDataset.add(new ArrayExample<>(new Label(training.get(t).label()),RATE_FEATURES,rateScale.apply(rateSamples.get(t))));
+                    rateModel=new LogisticRegressionTrainer().train(rateDataset);
+                }
                 folds.add(Map.of("validationBase",sample.baseEnd(),"trainingSamples",training.size(),
                         "latestTrainingTarget",training.getLast().targetEnd(),"purgedSamples",1));
             }
@@ -266,6 +313,17 @@ public class HourlyBench {
             probs.put("ALWAYS_NEUTRAL",new double[]{0,1,0}); probs.put("PAST_MAJORITY",majority);
             probs.put("RETURN1_CONTINUATION",point); probs.put("LOGISTIC_5",logistic);
             probs.put("TRANSITION_3",transition(training,sample.values()[0]));
+            if(macro!=null) {
+                var p=rateModel.predict(new ArrayExample<>(LabelFactory.UNKNOWN_LABEL,RATE_FEATURES,rateScale.apply(rateSamples.get(i))));
+                if(!p.hasProbabilities()) throw new IllegalStateException("实际利率模型没有三方向概率");
+                double[] rateProb=new double[3];
+                for(int c=0;c<3;c++) {
+                    var s=p.getOutputScores().get(CLASSES[c]);
+                    if(s==null) throw new IllegalStateException("实际利率训练折缺少类别");
+                    rateProb[c]=s.getScore();
+                }
+                probs.put("LOGISTIC_7",rateProb);
+            }
             var predictions=new LinkedHashMap<String,String>();
             for(var entry:probs.entrySet()) {
                 int best=0; for(int c=1;c<3;c++) if(entry.getValue()[c]>entry.getValue()[best]) best=c;
@@ -278,10 +336,14 @@ public class HourlyBench {
         var metrics=new LinkedHashMap<String,Metrics>();
         scores.forEach((name,rowsScored)->metrics.put(name,metrics(rowsScored)));
         var pairs=new LinkedHashMap<String,Object>();
-        for(String name:List.of("LOGISTIC_5","TRANSITION_3")) {
+        var candidates=new ArrayList<>(List.of("LOGISTIC_5","TRANSITION_3"));
+        if(macro!=null) candidates.add("LOGISTIC_7");
+        for(String name:candidates) {
             var candidate=scores.get(name);
             var comparisons=new LinkedHashMap<String,Object>();
-            for(String baseline:List.of("ALWAYS_NEUTRAL","PAST_MAJORITY","RETURN1_CONTINUATION")) {
+            var baselines=new ArrayList<>(List.of("ALWAYS_NEUTRAL","PAST_MAJORITY","RETURN1_CONTINUATION"));
+            if(name.equals("LOGISTIC_7")) baselines.add("LOGISTIC_5");
+            for(String baseline:baselines) {
                 int better=0,worse=0;
                 var reference=scores.get(baseline);
                 for(int i=0;i<candidate.size();i++) {
@@ -294,7 +356,7 @@ public class HourlyBench {
             pairs.put(name,comparisons);
         }
         var result=new LinkedHashMap<String,Object>();
-        result.put("version","hourly-retrospective-fixed-protocol-v3-shared-folds");
+        result.put("version",macro==null?"hourly-retrospective-fixed-protocol-v3-shared-folds":"hourly-price-rate-ablation-v1");
         result.put("basis",checked.path("basis").asText()); result.put("sourceReceiptSha256",fingerprint);
         result.put("collectedAt",collected.toString()); result.put("evaluationType","RETROSPECTIVE_RECONSTRUCTION");
         result.put("officialSessionCertified",false); result.put("productionEligible",false);
@@ -305,6 +367,20 @@ public class HourlyBench {
         result.put("reservedPurpose","EXCLUDED_FROM_DEVELOPMENT_SCORING_NOT_BLIND_HOLDOUT");
         result.put("validationStart",samples.get(firstValidation).baseEnd()); result.put("validationEnd",samples.getLast().baseEnd());
         result.put("featureNames",FEATURES); result.put("refitEvery",refitEvery); result.put("purge",1);
+        if(macro!=null) {
+            result.put("rateFeatureNames",RATE_FEATURES); result.put("macroInput",macro.metadata());
+            result.put("rateInputs",rateInputs); result.put("macroVintagePolicy","fred-known-before-day-v1");
+            // 记录实际解析器字节码，不把归档文件摘要冒充运行代码版本。
+            var macroClasses=new LinkedHashMap<String,String>();
+            for(String name:List.of("FredHistory","FredHistoryStore")) {
+                var type=Class.forName("com.opspilot.ai.macrodata."+name);
+                try(var stream=type.getResourceAsStream(name+".class")) {
+                    if(stream==null) throw new IllegalStateException("无法核验历史版本解析器");
+                    macroClasses.put(name,HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(stream.readAllBytes())));
+                }
+            }
+            result.put("macroClassSha256",macroClasses);
+        }
         result.put("transitionSmoothing",1); result.put("thresholdPercent",.5); result.put("coverage",1);
         result.put("probeSourceSha256",HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256")
                 .digest(Files.readAllBytes(Path.of("docs/research/probes/HourlyBench.java")))));
