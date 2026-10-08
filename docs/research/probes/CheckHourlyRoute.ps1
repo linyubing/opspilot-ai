@@ -1,6 +1,7 @@
 ﻿param(
     [string]$Receipt = 'D:\workFile\demo-ai\backend\target\hourly-route-receipt.json',
-    [switch]$Fetch
+    [switch]$Fetch,
+    [ValidateSet(1000,5000)][int]$HourCount=1000
 )
 
 # 真实小时线可行性探针：固定UTC 21点切分，不冒充供应商日线或交易所收盘价。
@@ -12,10 +13,10 @@ if ($Fetch) {
     if ([string]::IsNullOrWhiteSpace($key)) { $key = [Environment]::GetEnvironmentVariable('TWELVE_DATA_API_KEY', 'User') }
     if ([string]::IsNullOrWhiteSpace($key)) { throw 'TWELVE_DATA_API_KEY missing' }
     $started = [DateTimeOffset]::UtcNow
-    $uri = 'https://api.twelvedata.com/time_series?symbol=XAU%2FUSD&interval=1h&timezone=UTC&outputsize=1000&apikey=' + [Uri]::EscapeDataString($key)
+    $uri = 'https://api.twelvedata.com/time_series?symbol=XAU%2FUSD&interval=1h&timezone=UTC&outputsize=' + $HourCount + '&apikey=' + [Uri]::EscapeDataString($key)
     try { $response = Invoke-WebRequest -UseBasicParsing -Uri $uri -TimeoutSec 60 }
     catch { throw 'Hourly request failed; sensitive request URL omitted' }
-    $bundle = [ordered]@{ startedAt=$started.ToString('o'); completedAt=[DateTimeOffset]::UtcNow.ToString('o'); httpStatus=[int]$response.StatusCode; request=@{symbol='XAU/USD';interval='1h';timezone='UTC';outputsize=1000}; rawResponse=$response.Content }
+    $bundle = [ordered]@{ startedAt=$started.ToString('o'); completedAt=[DateTimeOffset]::UtcNow.ToString('o'); httpStatus=[int]$response.StatusCode; request=@{symbol='XAU/USD';interval='1h';timezone='UTC';outputsize=$HourCount}; rawResponse=$response.Content }
     # 回执是运行生成的数据，存到被Git忽略的target，不公开原始价格或密钥。
     [IO.File]::WriteAllText($Receipt, ($bundle | ConvertTo-Json -Depth 8), [Text.UTF8Encoding]::new($false))
 }
@@ -44,7 +45,10 @@ $windows=@()
 $bars=@()
 $consecutive=0
 $counting=$true
-for ($i=0; $i -lt 35; $i++) {
+# 依据真实最早时间确定可覆盖窗口数；不再固定截成35个窗口。
+$first=[DateTimeOffset]::FromUnixTimeSeconds(($hours.Keys | Measure-Object -Minimum).Minimum)
+$windowCount=[int][Math]::Floor(($end-$first).TotalDays)
+for ($i=0; $i -lt $windowCount; $i++) {
     $finish=$end.AddDays(-$i)
     $start=$finish.AddDays(-1)
     $rows=@()
