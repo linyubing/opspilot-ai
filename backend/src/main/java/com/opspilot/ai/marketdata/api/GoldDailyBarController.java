@@ -43,6 +43,12 @@ public class GoldDailyBarController {
         return GoldDailyBarSyncResponse.from(sync.sync());
     }
 
+    /** 只刷新最新确认日，不表示历史完整或预测模型通过验收。 */
+    @PostMapping("/sync-latest")
+    public GoldDailyBarSyncResponse syncLatest() {
+        return GoldDailyBarSyncResponse.from(sync.syncLatest());
+    }
+
     @GetMapping("/latest")
     public ResponseEntity<GoldDailyBarResponse> latest() {
         OffsetDateTime asOf = OffsetDateTime.now(clock);

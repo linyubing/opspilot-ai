@@ -86,6 +86,39 @@ public class TwelveDataGoldBarProvider {
         }
     }
 
+    /** 只读取明确确认日，不因旧历史异常改写或补齐历史窗口。 */
+    public GoldDailyBar fetchLatestBar() {
+        if (properties.apiKey() == null || properties.apiKey().isBlank()) {
+            throw new MarketDataUnavailableException("Twelve Data API Key 未配置");
+        }
+        try {
+            JsonNode quote = restClient.get()
+                    .uri(builder -> builder.path("/quote")
+                            .queryParam("symbol", "XAU/USD").queryParam("eod", true)
+                            .queryParam("apikey", properties.apiKey()).build())
+                    .retrieve().body(JsonNode.class);
+            LocalDate day = confirmationDay(quote, OffsetDateTime.now(clock));
+            JsonNode root = restClient.get()
+                    .uri(builder -> builder.path("/time_series")
+                            .queryParam("symbol", "XAU/USD").queryParam("interval", "1day")
+                            // 单日合同使用 date；相同起止日期可能被接口当作空区间。
+                            .queryParam("date", day)
+                            .queryParam("apikey", properties.apiKey()).build())
+                    .retrieve().body(JsonNode.class);
+            OffsetDateTime checkedAt = OffsetDateTime.now(clock);
+            List<GoldDailyBar> bars = parse(root, checkedAt);
+            // 即使供应商忽略日期范围，也不能挑一条成功记录掩盖额外数据。
+            if (bars.size() != 1 || !bars.getFirst().priceDate().equals(day)) {
+                throw new MarketDataUnavailableException("Twelve Data 最新日线范围不匹配");
+            }
+            return confirmed(bars, quote, checkedAt).getFirst();
+        } catch (MarketDataUnavailableException exception) {
+            throw exception;
+        } catch (RestClientException exception) {
+            throw new MarketDataUnavailableException("Twelve Data 最新日线请求失败");
+        }
+    }
+
     List<GoldDailyBar> parse(JsonNode root, OffsetDateTime collectedAt) {
         validateRoot(root);
         List<GoldDailyBar> bars = new ArrayList<>();
@@ -119,17 +152,7 @@ public class TwelveDataGoldBarProvider {
     private List<GoldDailyBar> confirmed(
             List<GoldDailyBar> bars, JsonNode quote, OffsetDateTime checkedAt
     ) {
-        if (quote == null || !quote.isObject()
-                || (quote.has("status") && !"ok".equals(quote.path("status").asText()))) {
-            throw new MarketDataUnavailableException("Twelve Data 已结束交易日确认响应无效");
-        }
-        if (!"XAU/USD".equals(quote.path("symbol").asText())) {
-            throw new MarketDataUnavailableException("Twelve Data 已结束交易日标的不匹配");
-        }
-        LocalDate closedDay = date(quote);
-        if (closedDay.isAfter(checkedAt.withOffsetSameInstant(java.time.ZoneOffset.UTC).toLocalDate())) {
-            throw new MarketDataUnavailableException("Twelve Data 确认日不能是未来日期");
-        }
+        LocalDate closedDay = confirmationDay(quote, checkedAt);
         BigDecimal open = decimal(quote, "open");
         BigDecimal high = decimal(quote, "high");
         BigDecimal low = decimal(quote, "low");
@@ -151,6 +174,21 @@ public class TwelveDataGoldBarProvider {
                         bar.low(), bar.close(), bar.currency(), bar.unit(), bar.provider(),
                         bar.collectedAt(), proof))
                 .toList();
+    }
+
+    private LocalDate confirmationDay(JsonNode quote, OffsetDateTime checkedAt) {
+        if (quote == null || !quote.isObject()
+                || (quote.has("status") && !"ok".equals(quote.path("status").asText()))) {
+            throw new MarketDataUnavailableException("Twelve Data 已结束交易日确认响应无效");
+        }
+        if (!"XAU/USD".equals(quote.path("symbol").asText())) {
+            throw new MarketDataUnavailableException("Twelve Data 已结束交易日标的不匹配");
+        }
+        LocalDate closedDay = date(quote);
+        if (closedDay.isAfter(checkedAt.withOffsetSameInstant(java.time.ZoneOffset.UTC).toLocalDate())) {
+            throw new MarketDataUnavailableException("Twelve Data 确认日不能是未来日期");
+        }
+        return closedDay;
     }
 
     /** 指纹仅包含合同、日期和规范化十进制报价，不包含凭据或传输 URL。 */
