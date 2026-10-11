@@ -1,0 +1,531 @@
+{
+  "researchOnly": true,
+  "status": "NOT_SCORED",
+  "exportedAt": "2026-10-11T07:17:35.0305757Z",
+  "snapshot": {
+    "id": "64b8c2a6-8b67-4f1d-a31f-b0f1f0d37e93",
+    "snapshot": {
+      "analysisDate": "2026-10-09",
+      "latestGoldDate": "2026-10-09",
+      "latestRealRateDate": "2026-10-08",
+      "latestDollarIndexDate": "2026-10-02",
+      "gold": {
+        "currentPrice": 4195.23193,
+        "return1": 1.5324,
+        "return5": 1.2967,
+        "return20": -3.5328,
+        "volatility20": 21.1394,
+        "collectedAt": "2026-10-11T02:36:59.142895Z"
+      },
+      "realRate": {
+        "currentRate": 2.87,
+        "percentagePointChange1": -0.05,
+        "percentagePointChange5": -0.01,
+        "percentagePointChange20": 0.32,
+        "basisPointChange1": -5,
+        "basisPointChange5": -1,
+        "basisPointChange20": 32,
+        "collectedAt": "2026-10-11T02:38:48.103597Z"
+      },
+      "dollarIndex": {
+        "currentIndex": 121.3848,
+        "return1": -0.3312,
+        "return5": 0.8766,
+        "return20": 2.7579,
+        "collectedAt": "2026-10-11T02:38:50.101975Z"
+      },
+      "realRateAssessment": {
+        "status": "NEUTRAL",
+        "ruleVersion": "gold-real-rate-v1",
+        "explanation": "实际利率变化有限或长短周期方向不一致，单因子状态为中性。"
+      },
+      "dollarIndexAssessment": {
+        "status": "PRESSURING",
+        "ruleVersion": "gold-dollar-index-v1",
+        "explanation": "广义美元指数中期明显走强且短期继续走强，对黄金构成单因子压力。"
+      },
+      "researchVersion": "gold-multifactor-contiguous-v4",
+      "disclaimer": "实际利率状态仅代表单一研究因素，不构成黄金方向预测或投资建议。",
+      "input": {
+        "bars": [
+          {
+            "symbol": "XAUUSD",
+            "priceDate": "2026-10-09",
+            "open": 4131.55064,
+            "high": 4206.98359,
+            "low": 4130.86583,
+            "close": 4195.23193,
+            "currency": "usd",
+            "unit": "troy_ounce",
+            "provider": "twelve_data",
+            "collectedAt": "2026-10-11T02:36:59.142895Z",
+            "confirmation": {
+              "source": "twelve_data_quote_eod_v1",
+              "closedDay": "2026-10-10",
+              "checkedAt": "2026-10-11T02:36:59.142895Z",
+              "receiptHash": "861b347051382c51fa2862e5614fa8d64bf0caee87286536edd4c32e0e3e8e42"
+            }
+          },
+          {
+            "symbol": "XAUUSD",
+            "priceDate": "2026-10-08",
+            "open": 4100.81982,
+            "high": 4146.28079,
+            "low": 4100.4268,
+            "close": 4131.91573,
+            "currency": "usd",
+            "unit": "troy_ounce",
+            "provider": "twelve_data",
+            "collectedAt": "2026-10-11T02:36:58.838997Z",
+            "confirmation": {
+              "source": "twelve_data_quote_eod_v1",
+              "closedDay": "2026-10-10",
+              "checkedAt": "2026-10-11T02:36:59.142895Z",
+              "receiptHash": "861b347051382c51fa2862e5614fa8d64bf0caee87286536edd4c32e0e3e8e42"
+            }
+          },
+          {
+            "symbol": "XAUUSD",
+            "priceDate": "2026-10-07",
+            "open": 4169.13593,
+            "high": 4169.81812,
+            "low": 4061.73421,
+            "close": 4100.53054,
+            "currency": "usd",
+            "unit": "troy_ounce",
+            "provider": "twelve_data",
+            "collectedAt": "2026-10-08T15:56:56.273701Z",
+            "confirmation": {
+              "source": "twelve_data_quote_eod_v1",
+              "closedDay": "2026-10-07",
+              "checkedAt": "2026-10-08T15:56:56.273701Z",
+              "receiptHash": "556115d48b2e395054d275d411a7eadc5f1765778fa071248d7fe5223ac3ca10"
+            }
+          },
+          {
+            "symbol": "XAUUSD",
+            "priceDate": "2026-10-06",
+            "open": 4140.87324,
+            "high": 4183.92536,
+            "low": 4107.78837,
+            "close": 4169.38893,
+            "currency": "usd",
+            "unit": "troy_ounce",
+            "provider": "twelve_data",
+            "collectedAt": "2026-10-11T02:36:58.532708Z",
+            "confirmation": {
+              "source": "twelve_data_quote_eod_v1",
+              "closedDay": "2026-10-10",
+              "checkedAt": "2026-10-11T02:36:59.142895Z",
+              "receiptHash": "861b347051382c51fa2862e5614fa8d64bf0caee87286536edd4c32e0e3e8e42"
+            }
+          },
+          {
+            "symbol": "XAUUSD",
+            "priceDate": "2026-10-05",
+            "open": 4137.53497,
+            "high": 4170.60439,
+            "low": 4125.41139,
+            "close": 4141.04567,
+            "currency": "usd",
+            "unit": "troy_ounce",
+            "provider": "twelve_data",
+            "collectedAt": "2026-10-11T02:36:58.236291Z",
+            "confirmation": {
+              "source": "twelve_data_quote_eod_v1",
+              "closedDay": "2026-10-10",
+              "checkedAt": "2026-10-11T02:36:59.142895Z",
+              "receiptHash": "861b347051382c51fa2862e5614fa8d64bf0caee87286536edd4c32e0e3e8e42"
+            }
+          },
+          {
+            "symbol": "XAUUSD",
+            "priceDate": "2026-10-02",
+            "open": 4177.21832,
+            "high": 4225.64969,
+            "low": 4125.92318,
+            "close": 4141.52795,
+            "currency": "usd",
+            "unit": "troy_ounce",
+            "provider": "twelve_data",
+            "collectedAt": "2026-10-03T17:54:35.415446Z",
+            "confirmation": {
+              "source": "twelve_data_quote_eod_v1",
+              "closedDay": "2026-10-02",
+              "checkedAt": "2026-10-03T17:54:35.415446Z",
+              "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+            }
+          },
+          {
+            "symbol": "XAUUSD",
+            "priceDate": "2026-10-01",
+            "open": 4156.83517,
+            "high": 4192.52149,
+            "low": 4139.77873,
+            "close": 4177.44582,
+            "currency": "usd",
+            "unit": "troy_ounce",
+            "provider": "twelve_data",
+            "collectedAt": "2026-10-03T17:54:35.415446Z",
+            "confirmation": {
+              "source": "twelve_data_quote_eod_v1",
+              "closedDay": "2026-10-02",
+              "checkedAt": "2026-10-03T17:54:35.415446Z",
+              "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+            }
+          },
+          {
+            "symbol": "XAUUSD",
+            "priceDate": "2026-09-30",
+            "open": 4181.67766,
+            "high": 4220.14543,
+            "low": 4147.23455,
+            "close": 4156.46018,
+            "currency": "usd",
+            "unit": "troy_ounce",
+            "provider": "twelve_data",
+            "collectedAt": "2026-10-03T17:54:35.415446Z",
+            "confirmation": {
+              "source": "twelve_data_quote_eod_v1",
+              "closedDay": "2026-10-02",
+              "checkedAt": "2026-10-03T17:54:35.415446Z",
+              "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+            }
+          },
+          {
+            "symbol": "XAUUSD",
+            "priceDate": "2026-09-29",
+            "open": 4114.67004,
+            "high": 4184.8008,
+            "low": 4112.09033,
+            "close": 4181.99954,
+            "currency": "usd",
+            "unit": "troy_ounce",
+            "provider": "twelve_data",
+            "collectedAt": "2026-10-03T17:54:35.415446Z",
+            "confirmation": {
+              "source": "twelve_data_quote_eod_v1",
+              "closedDay": "2026-10-02",
+              "checkedAt": "2026-10-03T17:54:35.415446Z",
+              "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+            }
+          },
+          {
+            "symbol": "XAUUSD",
+            "priceDate": "2026-09-28",
+            "open": 4286.14474,
+            "high": 4287.40522,
+            "low": 4111.79963,
+            "close": 4115.07518,
+            "currency": "usd",
+            "unit": "troy_ounce",
+            "provider": "twelve_data",
+            "collectedAt": "2026-10-03T17:54:35.415446Z",
+            "confirmation": {
+              "source": "twelve_data_quote_eod_v1",
+              "closedDay": "2026-10-02",
+              "checkedAt": "2026-10-03T17:54:35.415446Z",
+              "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+            }
+          },
+          {
+            "symbol": "XAUUSD",
+            "priceDate": "2026-09-25",
+            "open": 4275.09543,
+            "high": 4315.59598,
+            "low": 4254.77599,
+            "close": 4286.73973,
+            "currency": "usd",
+            "unit": "troy_ounce",
+            "provider": "twelve_data",
+            "collectedAt": "2026-10-03T17:54:35.415446Z",
+            "confirmation": {
+              "source": "twelve_data_quote_eod_v1",
+              "closedDay": "2026-10-02",
+              "checkedAt": "2026-10-03T17:54:35.415446Z",
+              "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+            }
+          },
+          {
+            "symbol": "XAUUSD",
+            "priceDate": "2026-09-24",
+            "open": 4287.26647,
+            "high": 4304.10576,
+            "low": 4243.31612,
+            "close": 4275.2841,
+            "currency": "usd",
+            "unit": "troy_ounce",
+            "provider": "twelve_data",
+            "collectedAt": "2026-10-03T17:54:35.415446Z",
+            "confirmation": {
+              "source": "twelve_data_quote_eod_v1",
+              "closedDay": "2026-10-02",
+              "checkedAt": "2026-10-03T17:54:35.415446Z",
+              "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+            }
+          },
+          {
+            "symbol": "XAUUSD",
+            "priceDate": "2026-09-23",
+            "open": 4358.40819,
+            "high": 4370.1704,
+            "low": 4270.72669,
+            "close": 4286.97334,
+            "currency": "usd",
+            "unit": "troy_ounce",
+            "provider": "twelve_data",
+            "collectedAt": "2026-10-03T17:54:35.415446Z",
+            "confirmation": {
+              "source": "twelve_data_quote_eod_v1",
+              "closedDay": "2026-10-02",
+              "checkedAt": "2026-10-03T17:54:35.415446Z",
+              "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+            }
+          },
+          {
+            "symbol": "XAUUSD",
+            "priceDate": "2026-09-22",
+            "open": 4343.72131,
+            "high": 4375.41019,
+            "low": 4290.38053,
+            "close": 4357.67796,
+            "currency": "usd",
+            "unit": "troy_ounce",
+            "provider": "twelve_data",
+            "collectedAt": "2026-10-03T17:54:35.415446Z",
+            "confirmation": {
+              "source": "twelve_data_quote_eod_v1",
+              "closedDay": "2026-10-02",
+              "checkedAt": "2026-10-03T17:54:35.415446Z",
+              "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+            }
+          },
+          {
+            "symbol": "XAUUSD",
+            "priceDate": "2026-09-21",
+            "open": 4380.05355,
+            "high": 4384.52529,
+            "low": 4321.23191,
+            "close": 4343.80964,
+            "currency": "usd",
+            "unit": "troy_ounce",
+            "provider": "twelve_data",
+            "collectedAt": "2026-10-03T17:54:35.415446Z",
+            "confirmation": {
+              "source": "twelve_data_quote_eod_v1",
+              "closedDay": "2026-10-02",
+              "checkedAt": "2026-10-03T17:54:35.415446Z",
+              "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+            }
+          },
+          {
+            "symbol": "XAUUSD",
+            "priceDate": "2026-09-18",
+            "open": 4341.82692,
+            "high": 4399.21898,
+            "low": 4335.00954,
+            "close": 4377.24525,
+            "currency": "usd",
+            "unit": "troy_ounce",
+            "provider": "twelve_data",
+            "collectedAt": "2026-10-03T17:54:35.415446Z",
+            "confirmation": {
+              "source": "twelve_data_quote_eod_v1",
+              "closedDay": "2026-10-02",
+              "checkedAt": "2026-10-03T17:54:35.415446Z",
+              "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+            }
+          },
+          {
+            "symbol": "XAUUSD",
+            "priceDate": "2026-09-17",
+            "open": 4263.9034,
+            "high": 4380.28912,
+            "low": 4256.66113,
+            "close": 4341.90205,
+            "currency": "usd",
+            "unit": "troy_ounce",
+            "provider": "twelve_data",
+            "collectedAt": "2026-10-03T17:54:35.415446Z",
+            "confirmation": {
+              "source": "twelve_data_quote_eod_v1",
+              "closedDay": "2026-10-02",
+              "checkedAt": "2026-10-03T17:54:35.415446Z",
+              "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+            }
+          },
+          {
+            "symbol": "XAUUSD",
+            "priceDate": "2026-09-16",
+            "open": 4293.60981,
+            "high": 4359.57799,
+            "low": 4238.36569,
+            "close": 4264.06814,
+            "currency": "usd",
+            "unit": "troy_ounce",
+            "provider": "twelve_data",
+            "collectedAt": "2026-10-03T17:54:35.415446Z",
+            "confirmation": {
+              "source": "twelve_data_quote_eod_v1",
+              "closedDay": "2026-10-02",
+              "checkedAt": "2026-10-03T17:54:35.415446Z",
+              "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+            }
+          },
+          {
+            "symbol": "XAUUSD",
+            "priceDate": "2026-09-15",
+            "open": 4298.21167,
+            "high": 4317.60287,
+            "low": 4260.03238,
+            "close": 4293.79613,
+            "currency": "usd",
+            "unit": "troy_ounce",
+            "provider": "twelve_data",
+            "collectedAt": "2026-10-03T17:54:35.415446Z",
+            "confirmation": {
+              "source": "twelve_data_quote_eod_v1",
+              "closedDay": "2026-10-02",
+              "checkedAt": "2026-10-03T17:54:35.415446Z",
+              "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+            }
+          },
+          {
+            "symbol": "XAUUSD",
+            "priceDate": "2026-09-14",
+            "open": 4348.36267,
+            "high": 4355.11149,
+            "low": 4253.79055,
+            "close": 4298.34998,
+            "currency": "usd",
+            "unit": "troy_ounce",
+            "provider": "twelve_data",
+            "collectedAt": "2026-10-03T17:54:35.415446Z",
+            "confirmation": {
+              "source": "twelve_data_quote_eod_v1",
+              "closedDay": "2026-10-02",
+              "checkedAt": "2026-10-03T17:54:35.415446Z",
+              "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+            }
+          },
+          {
+            "symbol": "XAUUSD",
+            "priceDate": "2026-09-11",
+            "open": 4316.69142,
+            "high": 4403.795,
+            "low": 4297.93269,
+            "close": 4348.86917,
+            "currency": "usd",
+            "unit": "troy_ounce",
+            "provider": "twelve_data",
+            "collectedAt": "2026-10-03T17:54:35.415446Z",
+            "confirmation": {
+              "source": "twelve_data_quote_eod_v1",
+              "closedDay": "2026-10-02",
+              "checkedAt": "2026-10-03T17:54:35.415446Z",
+              "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+            }
+          }
+        ],
+        "checkedAt": "2026-10-11T07:06:51.333693Z",
+        "macro": {
+          "rates": [
+            {
+              "id": "91b81a2a-be95-4dcd-81a3-4c8db0ccf81d",
+              "seriesId": "DFII10",
+              "observationDate": "2026-10-08",
+              "value": 2.87,
+              "unit": "percent",
+              "provider": "fred",
+              "collectedAt": "2026-10-11T02:38:48.103597Z",
+              "supersededAt": null
+            },
+            {
+              "id": "f96fb6b1-ca4c-438a-9c20-65514c55c3aa",
+              "seriesId": "DFII10",
+              "observationDate": "2026-10-07",
+              "value": 2.92,
+              "unit": "percent",
+              "provider": "fred",
+              "collectedAt": "2026-10-11T02:38:48.103597Z",
+              "supersededAt": null
+            },
+            {
+              "id": "90d4bd4b-de3c-48ef-8dbd-48a1e06e3489",
+              "seriesId": "DFII10",
+              "observationDate": "2026-10-01",
+              "value": 2.88,
+              "unit": "percent",
+              "provider": "fred",
+              "collectedAt": "2026-10-03T17:44:27.235062Z",
+              "supersededAt": null
+            },
+            {
+              "id": "3c67c809-7cf6-4571-a234-66577cefa139",
+              "seriesId": "DFII10",
+              "observationDate": "2026-09-10",
+              "value": 2.55,
+              "unit": "percent",
+              "provider": "fred",
+              "collectedAt": "2026-09-19T17:00:47.667431Z",
+              "supersededAt": null
+            }
+          ],
+          "dollars": [
+            {
+              "id": "27a74212-ad67-4088-8720-86052e4ebcc5",
+              "seriesId": "DTWEXBGS",
+              "observationDate": "2026-10-02",
+              "value": 121.3848,
+              "unit": "index_2006_100",
+              "provider": "fred",
+              "collectedAt": "2026-10-11T02:38:50.101975Z",
+              "supersededAt": null
+            },
+            {
+              "id": "efe62215-d160-4c2f-b030-51b2d5a8273c",
+              "seriesId": "DTWEXBGS",
+              "observationDate": "2026-10-01",
+              "value": 121.7882,
+              "unit": "index_2006_100",
+              "provider": "fred",
+              "collectedAt": "2026-10-11T02:38:50.101975Z",
+              "supersededAt": null
+            },
+            {
+              "id": "23540023-b2f6-43fe-a12b-0cb47609939f",
+              "seriesId": "DTWEXBGS",
+              "observationDate": "2026-09-25",
+              "value": 120.33,
+              "unit": "index_2006_100",
+              "provider": "fred",
+              "collectedAt": "2026-10-03T17:44:30.04295Z",
+              "supersededAt": null
+            },
+            {
+              "id": "289ff88b-790b-4277-8fa4-ad3def674f18",
+              "seriesId": "DTWEXBGS",
+              "observationDate": "2026-09-03",
+              "value": 118.127,
+              "unit": "index_2006_100",
+              "provider": "fred",
+              "collectedAt": "2026-09-19T17:00:55.434399Z",
+              "supersededAt": null
+            }
+          ]
+        }
+      }
+    },
+    "createdAt": "2026-10-11T07:06:51.351286Z"
+  },
+  "baseline": {
+    "version": "gold-direction-forecast-prompt-v2",
+    "content": "你是个人黄金投资研究助手。请基于给定正式快照，\n预测黄金下一个有效交易日的方向。\n\n只能使用下列事实，不得修改、重新计算或补充外部数据。\n\n【正式快照】\n快照编号：64b8c2a6-8b67-4f1d-a31f-b0f1f0d37e93\n分析日期：2026-10-09\n黄金数据日期：2026-10-09\n实际利率数据日期：2026-10-08\n美元指数数据日期：2026-10-02\n研究版本：gold-multifactor-contiguous-v4\n黄金当前价格：4195.23193000\n黄金1期收益率：1.5324%\n黄金5期收益率：1.2967%\n黄金20期收益率：-3.5328%\n黄金20期波动率：21.1394\n实际利率因子：NEUTRAL\n实际利率解释：实际利率变化有限或长短周期方向不一致，单因子状态为中性。\n美元指数因子：PRESSURING\n美元指数解释：广义美元指数中期明显走强且短期继续走强，对黄金构成单因子压力。\n\n【方向合同】\n后续真实涨跌幅大于 0.5% 为 BULLISH；\n小于 -0.5% 为 BEARISH；\n其余包括两个边界值均为 NEUTRAL（中性）。\n\n【第二版校正规则】\n1. 预测的是下一个有效交易日，不是中长期趋势。\n2. 不得因为 20 期收益率为正就自动判断为 BULLISH。\n3. 1 期收益率为负时，必须说明短线转弱风险。\n4. 5 期和 1 期方向冲突时，必须降低方向确信度。\n5. 20 期涨幅很大但 1 期转负时，必须考虑高位回落或获利了结。\n6. 美元指数数据明显滞后时，必须降低美元指数因子的权重。\n7. 波动率较高时，优先考虑 NEUTRAL 或反转风险。\n8. 如果证据只支持轻微涨跌，不能判断为 BULLISH 或 BEARISH，应判断为 NEUTRAL。\n9. reasoning 必须说明短线动量、中期趋势、宏观因子和最终取舍。\n\n【安全边界】\n只返回 JSON，不要使用 Markdown 代码块。\n不得生成新闻、市场事件或任何未提供的事实。\n不得给出目标价、涨跌概率、止损位、仓位或买卖建议。\n\n严格返回：\n{\"direction\":\"BULLISH|NEUTRAL|BEARISH\",\"reasoning\":\"研究依据\",\"invalidationConditions\":[\"失效条件\"]}\n",
+    "sha256": "2d0a9b586249905ac40e42d9a389cba2b3910c776275821e03f522c763d7fcdd"
+  },
+  "candidate": {
+    "version": "gold-neutral-contract-candidate-v1",
+    "content": "你是个人黄金投资研究助手。请基于给定正式快照，\n预测黄金下一个有效交易日的方向。\n\n只能使用下列事实，不得修改、重新计算或补充外部数据。\n\n【正式快照】\n快照编号：64b8c2a6-8b67-4f1d-a31f-b0f1f0d37e93\n分析日期：2026-10-09\n黄金数据日期：2026-10-09\n实际利率数据日期：2026-10-08\n美元指数数据日期：2026-10-02\n研究版本：gold-multifactor-contiguous-v4\n黄金当前价格：4195.23193000\n黄金1期收益率：1.5324%\n黄金5期收益率：1.2967%\n黄金20期收益率：-3.5328%\n黄金20期波动率：21.1394\n实际利率因子：NEUTRAL\n实际利率解释：实际利率变化有限或长短周期方向不一致，单因子状态为中性。\n美元指数因子：PRESSURING\n美元指数解释：广义美元指数中期明显走强且短期继续走强，对黄金构成单因子压力。\n\n【方向合同】\n后续真实涨跌幅大于 0.5% 为 BULLISH；\n小于 -0.5% 为 BEARISH；\n其余包括两个边界值均为 NEUTRAL（中性）。\n\n【第二版校正规则】\n1. 预测的是下一个有效交易日，不是中长期趋势。\n2. 不得因为 20 期收益率为正就自动判断为 BULLISH。\n3. 1 期收益率为负时，必须说明短线转弱风险。\n4. 5 期和 1 期方向冲突时，必须降低方向确信度。\n5. 20 期涨幅很大但 1 期转负时，必须考虑高位回落或获利了结。\n6. 美元指数数据明显滞后时，必须降低美元指数因子的权重。\n7. 波动率较高只表示价格变动可能更大，不能因此优先选择 NEUTRAL；证据不确定不等于涨跌幅位于 [-0.5%, 0.5%]，仍须按三方向合同选择最有依据的类别，并在 reasoning 中说明不确定性。\n8. 如果证据只支持轻微涨跌，不能判断为 BULLISH 或 BEARISH，应判断为 NEUTRAL。\n9. reasoning 必须说明短线动量、中期趋势、宏观因子和最终取舍。\n\n【安全边界】\n只返回 JSON，不要使用 Markdown 代码块。\n不得生成新闻、市场事件或任何未提供的事实。\n不得给出目标价、涨跌概率、止损位、仓位或买卖建议。\n\n严格返回：\n{\"direction\":\"BULLISH|NEUTRAL|BEARISH\",\"reasoning\":\"研究依据\",\"invalidationConditions\":[\"失效条件\"]}\n",
+    "sha256": "9f65b20e79bc3b32cb53bc58b982234dff52de8501ec098c6aa6922b134649c7"
+  }
+}
