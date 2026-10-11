@@ -21,7 +21,7 @@ public class DatasetReadiness {
     private static final LocalDate LIMIT = LocalDate.parse("2024-11-11");
 
     public static void main(String[] args) throws Exception {
-        if (args.length != 2 || !args[1].matches("[0-9a-f]{40}"))
+        if ((args.length != 2 && args.length != 3) || !args[1].matches("[0-9a-f]{40}"))
             throw new IllegalArgumentException("需要新输出路径及完整提交哈希");
         Path output = Path.of(args[0]);
         if (Files.exists(output)) throw new IllegalArgumentException("禁止覆盖已有审计");
@@ -95,6 +95,10 @@ public class DatasetReadiness {
         }
         // 真正复用生产构建器；只在已硬截断的初始训练期内检查特征可构建性。
         var dataset = builder.build(ForecastHorizon.NEXT_DAY);
+        // 可选导出只保存已截断的真实样本，供预登记的离线实验使用；不训练模型。
+        if (args.length == 3) Files.writeString(Path.of(args[2]),
+                json.writerWithDefaultPrettyPrinter().writeValueAsString(dataset) + "\n",
+                StandardCharsets.UTF_8, StandardOpenOption.CREATE_NEW);
         Map<String, Object> report = new LinkedHashMap<>();
         report.put("version", "gold-training-readiness-v1"); report.put("gitCommit", args[1]);
         report.put("checkedAt", now); report.put("cutoffExclusive", LIMIT);
