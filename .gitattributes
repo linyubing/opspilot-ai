@@ -1,3 +1,5 @@
 # 冻结实验输入与结果使用 LF，避免 Windows 检出改写字节摘要。
 /docs/research/2026-10-11-prior-compare-input.json text eol=lf
 /docs/research/2026-10-11-prior-compare-result.json text eol=lf
+/docs/research/2026-10-11-calibration-data.json text eol=lf
+/docs/research/2026-10-11-calibration-result.json text eol=lf
