@@ -91,14 +91,17 @@ public class GoldDailyBarSyncService {
         return day != DayOfWeek.SATURDAY && day != DayOfWeek.SUNDAY;
     }
 
-    /** 最近21个配置交易日最多补5个缺日；来源整批通过后仅插入，不覆盖旧价。 */
+    /** 最近21个配置交易日有界补缺；周末来源锚点只核验，不改名或落库。 */
     public GoldDailyBarSyncResult syncRecent() {
         GoldDailyBar latest = provider.fetchLatestBar();
-        LocalDate day = latest.priceDate();
         OffsetDateTime now = OffsetDateTime.now(clock);
-        if (!latest.isConfirmedAt(now) || !day.equals(calendar.nextBusinessDay(day.minusDays(1)))) {
-            throw new MarketDataUnavailableException("最新黄金日线未确认或不是配置交易日");
+        if (!latest.isConfirmedAt(now)) {
+            throw new MarketDataUnavailableException("最新黄金来源锚点未确认");
         }
+        LocalDate sourceDay = latest.priceDate();
+        LocalDate previous = sourceDay;
+        while (!previous.equals(calendar.nextBusinessDay(previous.minusDays(1)))) previous = previous.minusDays(1);
+        LocalDate day = previous;
         repository.findLatest(latest.symbol(), latest.provider()).ifPresent(old -> {
             if (old.priceDate().isAfter(day)) {
                 throw new MarketDataUnavailableException("Twelve Data 最新确认日落后于已保存行情");
@@ -124,22 +127,29 @@ public class GoldDailyBarSyncService {
         if (missing.size() > 5) {
             throw new MarketDataUnavailableException("近期黄金缺日超过5个，拒绝自动挑选部分历史");
         }
-        List<GoldDailyBar> received = missing.isEmpty() ? List.of() : provider.fetchDays(missing);
-        if (received.size() != missing.size()
-                || !received.stream().map(GoldDailyBar::priceDate).sorted().toList().equals(missing)) {
+        // 周末/休市源日与窗口日分离；必须另外读取窗口日真实价格，不能借锚点改日期。
+        List<LocalDate> requested = new ArrayList<>(missing);
+        if (!sourceDay.equals(day) && !requested.contains(day)) requested.add(day);
+        requested.sort(Comparator.naturalOrder());
+        if (requested.size() > 5) {
+            throw new MarketDataUnavailableException("黄金补缺与窗口日核验超过5个日期，拒绝部分同步");
+        }
+        List<GoldDailyBar> received = requested.isEmpty() ? List.of() : provider.fetchDays(requested);
+        if (received.size() != requested.size()
+                || !received.stream().map(GoldDailyBar::priceDate).sorted().toList().equals(requested)) {
             throw new MarketDataUnavailableException("黄金补缺返回日期与请求不一致");
         }
         List<GoldDailyBar> batch = new ArrayList<>(received);
-        if (!missing.contains(day)) batch.add(latest);
+        if (sourceDay.equals(day) && !requested.contains(day)) batch.add(latest);
         for (GoldDailyBar bar : batch) {
             if (!bar.symbol().equals(latest.symbol()) || !bar.provider().equals(latest.provider())
                     || !bar.isConfirmedAt(OffsetDateTime.now(clock))
-                    || !bar.confirmation().closedDay().equals(day)
+                    || !bar.confirmation().closedDay().equals(sourceDay)
                     // 指纹包含同日四项OHLC；锚点未返回时也不能混入修订后的批次。
                     || !bar.confirmation().receiptHash().equals(latest.confirmation().receiptHash())) {
                 throw new MarketDataUnavailableException("黄金补缺标的或确认依据不匹配");
             }
-            if (bar.priceDate().equals(day)
+            if (bar.priceDate().equals(sourceDay)
                     && (bar.open().compareTo(latest.open()) != 0 || bar.high().compareTo(latest.high()) != 0
                     || bar.low().compareTo(latest.low()) != 0 || bar.close().compareTo(latest.close()) != 0)) {
                 throw new MarketDataUnavailableException("两次确认读取的锚点发生修订，拒绝混合批次");
