@@ -1,0 +1,91 @@
+{
+  "version": "gold-information-inventory-v1",
+  "gitCommit": "e7b6bbc6b2f7ee4f5302dac885b7028ab279840c",
+  "checkedAt": "2026-10-11T08:14:24.128Z",
+  "inputHash": "0e72f54e73b78efb0c12c3a5c474976afadb4c163aba732f9c39e9b6b124d936",
+  "featureSchemaHash": "869148d7653318963320480ba26b387e850bdf1235955b00ff7ee4ac7bca8b31",
+  "sampleCount": 1268,
+  "cutoffExclusive": "2024-11-11",
+  "holdoutRead": false,
+  "trainingPerformed": false,
+  "forecastChanged": false,
+  "goldFeatures": [
+    "atr14",
+    "candle_body",
+    "closeLocation",
+    "close_position",
+    "dailyRange",
+    "drawdown20",
+    "gold_return_1",
+    "gold_return_20",
+    "gold_return_5",
+    "gold_volatility_20",
+    "highBreakout20",
+    "intradayReturn",
+    "intraday_range",
+    "lowBreakdown20",
+    "ma20Distance",
+    "ma20Slope",
+    "ma5Distance",
+    "ma5Slope",
+    "overnightGap",
+    "return1",
+    "return10",
+    "return20",
+    "return3",
+    "return5",
+    "rsi14",
+    "volatility20",
+    "volatility5"
+  ],
+  "macroFeatures": [
+    "dollar_age",
+    "dollar_return_1",
+    "dollar_return_20",
+    "dollar_return_5",
+    "real_rate",
+    "real_rate_age",
+    "real_rate_bp_1",
+    "real_rate_bp_20",
+    "real_rate_bp_5"
+  ],
+  "macroObservationAge": {
+    "real_rate_age": {
+      "max": 6,
+      "sum": 3722,
+      "buckets": {
+        "0..1": 0,
+        "2..4": 1184,
+        "5..7": 84,
+        ">7": 0
+      }
+    },
+    "dollar_age": {
+      "max": 12,
+      "sum": 8372,
+      "buckets": {
+        "0..1": 0,
+        "2..4": 217,
+        "5..7": 757,
+        ">7": 294
+      }
+    }
+  },
+  "duplicatePairs": [
+    {
+      "a": "candle_body",
+      "b": "intradayReturn",
+      "exactCount": 1268,
+      "maxAbsDifference": 0
+    },
+    {
+      "a": "close_position",
+      "b": "closeLocation",
+      "exactCount": 1268,
+      "maxAbsDifference": 0
+    }
+  ],
+  "availabilityPrecision": "FRED vintage date D-1; no original intraday publication timestamp",
+  "eventScheduleFeatures": [],
+  "economicSurpriseFeatures": []
+}

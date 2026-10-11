@@ -1,0 +1,73 @@
+{
+  "version": "official-release-source-audit-v1",
+  "checkedAt": "2026-10-11T08:15:23Z",
+  "method": "official public pages verified with web lookup; not an automated provider integration",
+  "historicalScheduleVintageVerified": false,
+  "modelFeatureIntegration": false,
+  "productionForecastChanged": false,
+  "sources": [
+    {
+      "id": "BLS_OCTOBER_CALENDAR",
+      "url": "https://www.bls.gov/schedule/2026/10_sched.htm",
+      "scheduleTimezone": "America/New_York",
+      "selectedFutureEvents": [
+        {
+          "id": "CPI",
+          "referenceMonth": "2026-09",
+          "scheduledLocal": "2026-10-14T08:30:00",
+          "scheduledUtc": "2026-10-14T12:30:00Z",
+          "scheduledBeijing": "2026-10-14T20:30:00+08:00",
+          "actualValue": null,
+          "consensusBeforeRelease": null,
+          "directionSignal": null
+        },
+        {
+          "id": "PPI",
+          "referenceMonth": "2026-09",
+          "scheduledLocal": "2026-10-15T08:30:00",
+          "scheduledUtc": "2026-10-15T12:30:00Z",
+          "scheduledBeijing": "2026-10-15T20:30:00+08:00",
+          "actualValue": null,
+          "consensusBeforeRelease": null,
+          "directionSignal": null
+        }
+      ],
+      "holidayListed": "2026-10-12",
+      "holidayIsGoldMarketClosureProof": false
+    },
+    {
+      "id": "BLS_ICS_FETCH",
+      "url": "https://www.bls.gov/schedule/news_release/bls.ics",
+      "method": "Node fetch public endpoint without credentials",
+      "httpStatus": 403,
+      "contentType": "text/html",
+      "validCalendarRetrieved": false,
+      "rawBodyArchived": false
+    },
+    {
+      "id": "FED_H10",
+      "url": "https://www.federalreserve.gov/releases/h10/",
+      "cadence": "weekly Monday 16:15; federal holiday shifts release to following business day",
+      "observationPeriod": "previous business week",
+      "sourceIsRealtimeDxy": false
+    },
+    {
+      "id": "FED_H15",
+      "url": "https://www.federalreserve.gov/releases/h15/",
+      "cadence": "weekday 16:15 except holidays or Board closure",
+      "originalSeriesIntradayReceiptsArchived": false
+    },
+    {
+      "id": "FOMC_CALENDAR",
+      "url": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm",
+      "futureMeetingDates": ["2026-10-27", "2026-10-28"],
+      "statementPublishTimeVerifiedByThisPage": false
+    },
+    {
+      "id": "TWELVE_DATA_TIMEZONE",
+      "url": "https://support.twelvedata.com/en/articles/5745849-timezones",
+      "forexDefaultTimezone": "Australia/Sydney",
+      "goldDaily0700BoundaryGuaranteedByThisPage": false
+    }
+  ]
+}
