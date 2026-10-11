@@ -215,17 +215,24 @@ const dataStates = {FRESH: "新鲜", STALE: "过期", UNKNOWN: "未知"};
 
 function renderDataStatus(data) {
     text("dataStatusOverall", dataStates[data.overall] || data.overall || "-");
-    const byCode = {};
+    // API 使用因子名称，页面沿用短节点名；不能直接拼接 API code。
+    const ids = {gold: "gold", realRate: "rate", dollarIndex: "dollar"};
     (data.items || []).forEach(item => {
-        byCode[item.code] = item;
-        const badge = byId(`${item.code}Status`);
+        const id = ids[item.code];
+        if (!id) return;
+        const badge = byId(`${id}Status`);
         if (badge) {
             badge.textContent = dataStates[item.state] || item.state;
             badge.className = `status-pill ${item.state === "STALE" ? "stale" : item.state === "FRESH" ? "fresh" : ""}`;
         }
-        const note = byId(`${item.code}StatusDetail`);
+        const note = byId(`${id}StatusDetail`);
         if (note) note.textContent = item.detail || "";
     });
+    // 后端总体状态只要求核心因子新鲜，不代表可选美元因子也新鲜。
+    if (data.overall === "FRESH" && (data.items || []).some(item =>
+        item.code === "dollarIndex" && item.state === "STALE")) {
+        text("dataStatusOverall", "核心数据新鲜，美元仍过期");
+    }
 }
 
 async function loadDataStatus() {
