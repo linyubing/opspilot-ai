@@ -53,7 +53,7 @@ class GoldDatasetBuilderTests {
                 snapshots,
                 new GoldForecastRule(),
                 new GoldFeatureCalculator(), history,
-                Clock.fixed(Instant.parse("2026-01-30T00:00:00Z"), ZoneOffset.UTC)
+                Clock.fixed(Instant.parse("2026-03-01T00:00:00Z"), ZoneOffset.UTC)
         );
     }
 
@@ -215,8 +215,8 @@ class GoldDatasetBuilderTests {
 
         assertThat(result.skippedCount()).isOne();
         assertThat(result.samples()).singleElement().satisfies(sample -> {
-            assertThat(sample.asOfDate()).isEqualTo("2026-01-22");
-            assertThat(sample.targetDate()).isEqualTo("2026-01-23");
+            assertThat(sample.asOfDate()).isEqualTo("2026-02-02");
+            assertThat(sample.targetDate()).isEqualTo("2026-02-03");
         });
     }
 
@@ -259,6 +259,20 @@ class GoldDatasetBuilderTests {
     private GoldDailyBar raw(GoldDailyBar bar) {
         return new GoldDailyBar(bar.symbol(), bar.priceDate(), bar.open(), bar.high(), bar.low(),
                 bar.close(), bar.currency(), bar.unit(), bar.provider(), bar.collectedAt());
+    }
+
+    @Test
+    @DisplayName("目标区间缺交易日时跳过，不能用后一根冒充下一交易日")
+    void skipsMissingTargetDay() {
+        List<GoldDailyBar> bars = bars(23);
+        bars.remove(21);
+        when(repository.findAll("XAUUSD", "twelve_data")).thenReturn(bars);
+        when(snapshots.createSnapshot(eq(bars.get(20).priceDate()), anyList(),
+                eq(List.of()), eq(List.of()), any(OffsetDateTime.class)))
+                .thenReturn(snapshot(bars.get(20).priceDate()));
+        GoldDataset result = builder.build(ForecastHorizon.NEXT_DAY);
+        assertThat(result.samples()).isEmpty();
+        assertThat(result.skippedCount()).isOne();
     }
 
     private GoldResearchSnapshot snapshot(LocalDate date) {
@@ -310,12 +324,12 @@ class GoldDatasetBuilderTests {
 
     private List<GoldDailyBar> bars(int count) {
         List<GoldDailyBar> result = new ArrayList<>();
-        LocalDate date = LocalDate.parse("2026-01-01");
+        LocalDate date = LocalDate.parse("2026-01-02");
         for (int i = 0; i < count; i++) {
             BigDecimal open = new BigDecimal("100").add(BigDecimal.valueOf(i));
             result.add(new GoldDailyBar(
                     "XAUUSD",
-                    date.plusDays(i),
+                    date,
                     open,
                     open.multiply(new BigDecimal("1.01")),
                     open.multiply(new BigDecimal("0.99")),
@@ -323,11 +337,14 @@ class GoldDatasetBuilderTests {
                     "USD",
                     "troy_ounce",
                     "twelve_data",
-                    date.plusDays(i).atStartOfDay().atOffset(java.time.ZoneOffset.UTC),
+                    date.atStartOfDay().atOffset(java.time.ZoneOffset.UTC),
                     // 合成数学样例，仅用于窗口边界测试，不进入真实市场实验。
-                    new GoldBarConfirmation(GoldBarConfirmation.SOURCE, date.plusDays(i),
-                            date.plusDays(i).atStartOfDay().atOffset(java.time.ZoneOffset.UTC), "a".repeat(64))
+                    new GoldBarConfirmation(GoldBarConfirmation.SOURCE, date,
+                            date.atStartOfDay().atOffset(java.time.ZoneOffset.UTC), "a".repeat(64))
             ));
+            do { date = date.plusDays(1); }
+            while (date.getDayOfWeek() == java.time.DayOfWeek.SATURDAY
+                    || date.getDayOfWeek() == java.time.DayOfWeek.SUNDAY);
         }
         return result;
     }

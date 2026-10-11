@@ -119,6 +119,63 @@ public class TwelveDataGoldBarProvider {
         }
     }
 
+    /** 有界读取指定缺失日；整批确认通过后才返回，不负责持久化。 */
+    public List<GoldDailyBar> fetchDays(List<LocalDate> days) {
+        if (days == null || days.isEmpty() || days.size() > 5
+                || days.stream().anyMatch(day -> day == null)
+                || new HashSet<>(days).size() != days.size()) {
+            throw new MarketDataUnavailableException("Twelve Data 补缺日期需为 1 至 5 个不重复有效日期");
+        }
+        List<LocalDate> requested = List.copyOf(days);
+        if (properties.apiKey() == null || properties.apiKey().isBlank()) {
+            throw new MarketDataUnavailableException("Twelve Data API Key 未配置");
+        }
+        try {
+            JsonNode quote = restClient.get()
+                    .uri(builder -> builder.path("/quote")
+                            .queryParam("symbol", "XAU/USD").queryParam("eod", true)
+                            .queryParam("apikey", properties.apiKey()).build())
+                    .retrieve().body(JsonNode.class);
+            LocalDate closedDay = confirmationDay(quote, OffsetDateTime.now(clock));
+            if (requested.stream().anyMatch(day -> day.isAfter(closedDay))) {
+                throw new MarketDataUnavailableException("Twelve Data 补缺日期晚于供应商确认日");
+            }
+            // 即使缺日不含确认日，也先读取锚点并核验四项真实报价。
+            GoldDailyBar anchor = fetchDate(closedDay);
+            confirmed(List.of(anchor), quote, OffsetDateTime.now(clock));
+            List<GoldDailyBar> bars = new ArrayList<>();
+            for (LocalDate day : requested) {
+                bars.add(day.equals(closedDay) ? anchor : fetchDate(day));
+            }
+            if (!requested.contains(closedDay)) {
+                bars.add(anchor);
+            }
+            // 凭据观察时间取整批完成时刻，不能早于后续单日回执的采集时间。
+            return confirmed(bars, quote, OffsetDateTime.now(clock)).stream()
+                    .filter(bar -> requested.contains(bar.priceDate()))
+                    .toList();
+        } catch (MarketDataUnavailableException exception) {
+            throw exception;
+        } catch (RestClientException exception) {
+            // 不附带可能包含 apikey URL 或供应商正文的外部异常。
+            throw new MarketDataUnavailableException("Twelve Data 有界补缺日线请求失败");
+        }
+    }
+
+    private GoldDailyBar fetchDate(LocalDate day) {
+        JsonNode root = restClient.get()
+                .uri(builder -> builder.path("/time_series")
+                        .queryParam("symbol", "XAU/USD").queryParam("interval", "1day")
+                        .queryParam("date", day)
+                        .queryParam("apikey", properties.apiKey()).build())
+                .retrieve().body(JsonNode.class);
+        List<GoldDailyBar> bars = parse(root, OffsetDateTime.now(clock));
+        if (bars.size() != 1 || !bars.getFirst().priceDate().equals(day)) {
+            throw new MarketDataUnavailableException("Twelve Data 单日日线范围不匹配");
+        }
+        return bars.getFirst();
+    }
+
     List<GoldDailyBar> parse(JsonNode root, OffsetDateTime collectedAt) {
         validateRoot(root);
         List<GoldDailyBar> bars = new ArrayList<>();

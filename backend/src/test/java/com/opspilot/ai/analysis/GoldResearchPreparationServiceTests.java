@@ -64,7 +64,7 @@ class GoldResearchPreparationServiceTests {
         DollarIndexSyncResult dollarIndex = dollarIndexResult();
         SaveGoldResearchSnapshotResult snapshot =
                 mock(SaveGoldResearchSnapshotResult.class);
-        when(goldPriceSyncService.sync()).thenReturn(gold);
+        when(goldPriceSyncService.syncRecent()).thenReturn(gold);
         when(realRateSyncService.syncDailyObservations()).thenReturn(realRate);
         when(dollarIndexSyncService.syncDailyObservations())
                 .thenReturn(dollarIndex);
@@ -82,7 +82,7 @@ class GoldResearchPreparationServiceTests {
                 dollarIndexSyncService,
                 recordingService
         );
-        order.verify(goldPriceSyncService).sync();
+        order.verify(goldPriceSyncService).syncRecent();
         order.verify(realRateSyncService).syncDailyObservations();
         order.verify(dollarIndexSyncService).syncDailyObservations();
         order.verify(recordingService).recordCurrentSnapshot();
@@ -93,7 +93,7 @@ class GoldResearchPreparationServiceTests {
     void stopsWhenGoldPriceSyncFails() {
         MarketDataUnavailableException failure =
                 new MarketDataUnavailableException("黄金行情暂时不可用");
-        when(goldPriceSyncService.sync()).thenThrow(failure);
+        when(goldPriceSyncService.syncRecent()).thenThrow(failure);
 
         assertThatThrownBy(service::prepareDaily).isSameAs(failure);
         verifyNoInteractions(
@@ -106,7 +106,7 @@ class GoldResearchPreparationServiceTests {
     @Test
     @DisplayName("实际利率同步失败时不执行美元指数同步和快照保存")
     void stopsWhenRealRateSyncFails() {
-        when(goldPriceSyncService.sync()).thenReturn(goldResult());
+        when(goldPriceSyncService.syncRecent()).thenReturn(goldResult());
         MacroDataUnavailableException failure =
                 new MacroDataUnavailableException("实际利率暂时不可用");
         when(realRateSyncService.syncDailyObservations()).thenThrow(failure);
@@ -118,7 +118,7 @@ class GoldResearchPreparationServiceTests {
     @Test
     @DisplayName("美元指数同步失败时不保存研究快照")
     void stopsWhenDollarIndexSyncFails() {
-        when(goldPriceSyncService.sync()).thenReturn(goldResult());
+        when(goldPriceSyncService.syncRecent()).thenReturn(goldResult());
         when(realRateSyncService.syncDailyObservations())
                 .thenReturn(realRateResult());
         MacroDataUnavailableException failure =

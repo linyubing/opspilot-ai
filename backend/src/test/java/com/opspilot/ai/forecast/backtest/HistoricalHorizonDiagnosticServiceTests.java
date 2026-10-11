@@ -10,9 +10,11 @@ import com.opspilot.ai.analysis.DollarIndexFactorEvaluator;
 import com.opspilot.ai.macrodata.MacroObservation;
 import com.opspilot.ai.macrodata.MacroObservationRepository;
 import com.opspilot.ai.forecast.GoldForecastRule;
+import com.opspilot.ai.forecast.ConfiguredGoldTradingCalendar;
 import com.opspilot.ai.marketdata.GoldDailyBar;
 import com.opspilot.ai.marketdata.GoldBarConfirmation;
 import com.opspilot.ai.marketdata.GoldDailyBarRepository;
+import com.opspilot.ai.marketdata.GoldBarWindow;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -23,6 +25,7 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.Set;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneOffset;
@@ -40,6 +43,8 @@ import static org.mockito.ArgumentMatchers.anyList;
 
 /** 验证扩大样本诊断直接使用本地历史数据，不依赖大模型回测结果。 */
 class HistoricalHorizonDiagnosticServiceTests {
+
+    private static final OffsetDateTime CHECKED_AT = OffsetDateTime.parse("2026-02-04T00:00:00Z");
 
     @Test
     void diagnosesSelectedHistory() {
@@ -98,18 +103,25 @@ class HistoricalHorizonDiagnosticServiceTests {
     @org.junit.jupiter.api.DisplayName("历史诊断共用首次黄金价格和核验时间，不让覆盖价格改变评分")
     void freezesHistoricalPrices() {
         LocalDate date = LocalDate.parse("2026-01-21");
+        ConfiguredGoldTradingCalendar calendar = calendar();
+        Clock clock = Clock.fixed(CHECKED_AT.toInstant(), ZoneOffset.UTC);
         GoldDailyBarRepository bars = mock(GoldDailyBarRepository.class);
         MacroObservationRepository macro = mock(MacroObservationRepository.class);
         BacktestDateSelector selector = mock(BacktestDateSelector.class);
         BacktestService backtests = mock(BacktestService.class);
         List<GoldDailyBar> initial = new ArrayList<>();
         List<GoldDailyBar> overwritten = new ArrayList<>();
+        // 12/22至01/21是21个配置交易日，后9个交易日截至02/03。
+        LocalDate day = date;
+        for (int i = 0; i < 20; i++) {
+            day = previousTradingDay(day, calendar);
+        }
         for (int i = 0; i < 30; i++) {
-            LocalDate day = LocalDate.parse("2026-01-01").plusDays(i);
             initial.add(mathBar(day, new BigDecimal("100").add(new BigDecimal("0.1").multiply(BigDecimal.valueOf(i)))));
             if (i <= 20) {
                 overwritten.add(mathBar(day, new BigDecimal("98").add(new BigDecimal("0.1").multiply(BigDecimal.valueOf(i)))));
             }
+            day = calendar.nextBusinessDay(day);
         }
         when(bars.findAll("XAUUSD", "twelve_data")).thenReturn(initial);
         when(bars.findRecent(eq("XAUUSD"), eq("twelve_data"), eq(date), anyInt())).thenReturn(overwritten);
@@ -118,17 +130,17 @@ class HistoricalHorizonDiagnosticServiceTests {
         List<MacroObservation> dollars = new ArrayList<>();
         for (int i = 0; i < 21; i++) {
             rates.add(new MacroObservation(UUID.randomUUID(), "DFII10", date.minusDays(i),
-                    new BigDecimal("2"), "percent", "fred", OffsetDateTime.parse("2026-02-01T00:00:00Z"), null));
+                    new BigDecimal("2"), "percent", "fred", CHECKED_AT, null));
             dollars.add(new MacroObservation(UUID.randomUUID(), "DTWEXBGS", date.minusDays(i),
-                    new BigDecimal("120"), "index", "fred", OffsetDateTime.parse("2026-02-01T00:00:00Z"), null));
+                    new BigDecimal("120"), "index", "fred", CHECKED_AT, null));
         }
         when(macro.findRecent("DFII10", date, 120)).thenReturn(rates);
         when(macro.findRecent("DTWEXBGS", date, 120)).thenReturn(dollars);
         GoldResearchSnapshotService snapshots = new GoldResearchSnapshotService(bars, macro,
-                new RealRateFactorEvaluator(), new DollarIndexFactorEvaluator());
+                new RealRateFactorEvaluator(), new DollarIndexFactorEvaluator(), clock, new GoldBarWindow(calendar));
 
         HistoricalHorizonReport result = new HistoricalHorizonDiagnosticService(bars, selector,
-                snapshots, new GoldForecastRule(), new FactorDiagnosticService(backtests)).diagnose(1);
+                snapshots, new GoldForecastRule(), new FactorDiagnosticService(backtests), clock).diagnose(1);
 
         // 原窗口基准102，次日102.1，中性；20日动量上涨，所以这一因子应未命中。
         assertThat(result.horizons().getFirst().factors().getFirst().accuracy()).isEqualByComparingTo("0");
@@ -136,10 +148,24 @@ class HistoricalHorizonDiagnosticServiceTests {
     }
 
     private GoldDailyBar mathBar(LocalDate date, BigDecimal close) {
-        OffsetDateTime checked = OffsetDateTime.parse("2026-02-01T00:00:00Z");
+        OffsetDateTime checked = CHECKED_AT;
         return new GoldDailyBar("XAUUSD", date, close, close, close, close, "usd", "troy_ounce",
                 "twelve_data", checked,
                 new GoldBarConfirmation(GoldBarConfirmation.SOURCE, date, checked, "a".repeat(64)));
+    }
+
+    private LocalDate previousTradingDay(LocalDate from, ConfiguredGoldTradingCalendar calendar) {
+        LocalDate day = from.minusDays(1);
+        while (!calendar.nextBusinessDay(day.minusDays(1)).equals(day)) {
+            day = day.minusDays(1);
+        }
+        return day;
+    }
+
+    private static ConfiguredGoldTradingCalendar calendar() {
+        ConfiguredGoldTradingCalendar calendar = new ConfiguredGoldTradingCalendar();
+        calendar.setHolidays(Set.of("--01-01", "--07-04", "--12-25"));
+        return calendar;
     }
 
     private GoldResearchSnapshot snapshot() {

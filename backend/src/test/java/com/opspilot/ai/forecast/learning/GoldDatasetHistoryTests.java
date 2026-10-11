@@ -3,6 +3,7 @@ package com.opspilot.ai.forecast.learning;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opspilot.ai.analysis.*;
 import com.opspilot.ai.forecast.GoldForecastRule;
+import com.opspilot.ai.forecast.ConfiguredGoldTradingCalendar;
 import com.opspilot.ai.macrodata.*;
 import com.opspilot.ai.marketdata.*;
 import org.junit.jupiter.api.Test;
@@ -23,6 +24,10 @@ class GoldDatasetHistoryTests {
     @TempDir Path dir;
     private final ObjectMapper json = new ObjectMapper();
     private final LocalDate base = LocalDate.parse("2024-11-05");
+    private final LocalDate target = LocalDate.parse("2024-11-06");
+    private final ConfiguredGoldTradingCalendar calendar = calendar();
+    private final GoldBarWindow window = new GoldBarWindow(calendar);
+    private final Clock clock = Clock.fixed(Instant.parse("2026-10-03T12:00:00Z"), ZoneOffset.UTC);
 
     @Test
     @DisplayName("实验采用基准日前已公布版本，绕过最新宏观仓库且不受后来修订影响")
@@ -35,9 +40,10 @@ class GoldDatasetHistoryTests {
         when(gold.findRecent(eq("XAUUSD"), eq("twelve_data"), eq(base), anyInt())).thenReturn(rows.subList(0, 21));
         when(macro.findRecent(anyString(), eq(base), anyInt())).thenReturn(List.of());
         var snapshots = new GoldResearchSnapshotService(gold, macro,
-                new RealRateFactorEvaluator(), new DollarIndexFactorEvaluator());
+                new RealRateFactorEvaluator(), new DollarIndexFactorEvaluator(), clock, window);
         var store = spy(new FredHistoryStore(json, dir.toString()));
-        var builder = new GoldDatasetBuilder(gold, snapshots, new GoldForecastRule(), new GoldFeatureCalculator(), store);
+        var builder = new GoldDatasetBuilder(gold, snapshots, new GoldForecastRule(),
+                new GoldFeatureCalculator(window), store, clock, window);
 
         GoldDataset first = builder.build(ForecastHorizon.NEXT_DAY);
         assertThat(first.macroInput()).containsEntry("policy", FredHistoryStore.POLICY)
@@ -46,7 +52,7 @@ class GoldDatasetHistoryTests {
             assertThat(sample.features().values()).containsEntry("real_rate", 2.04)
                     .containsEntry("real_rate_age", 4.0).containsEntry("dollar_age", 4.0);
             assertThat(sample.asOfDate()).isEqualTo(base);
-            assertThat(sample.targetDate()).isEqualTo(base.plusDays(1));
+            assertThat(sample.targetDate()).isEqualTo(target);
         });
         verify(store).load();
         verifyNoInteractions(macro);
@@ -73,10 +79,9 @@ class GoldDatasetHistoryTests {
         when(gold.findRecent(eq("XAUUSD"), eq("twelve_data"), eq(base), anyInt()))
                 .thenReturn(overwritten);
         var snapshots = new GoldResearchSnapshotService(gold, macro,
-                new RealRateFactorEvaluator(), new DollarIndexFactorEvaluator());
+                new RealRateFactorEvaluator(), new DollarIndexFactorEvaluator(), clock, window);
         var builder = new GoldDatasetBuilder(gold, snapshots, new GoldForecastRule(),
-                new GoldFeatureCalculator(), new FredHistoryStore(json, dir.toString()),
-                Clock.fixed(Instant.parse("2026-10-03T12:00:00Z"), ZoneOffset.UTC));
+                new GoldFeatureCalculator(window), new FredHistoryStore(json, dir.toString()), clock, window);
 
         GoldDataset result = builder.build(ForecastHorizon.NEXT_DAY);
 
@@ -89,17 +94,36 @@ class GoldDatasetHistoryTests {
 
     private List<GoldDailyBar> bars() {
         List<GoldDailyBar> result = new ArrayList<>();
+        // 10/08至11/05共21个交易日，下一交易日为11/06。
+        LocalDate day = base;
+        for (int i = 0; i < 20; i++) {
+            day = previousTradingDay(day);
+        }
         for (int i = 0; i < 22; i++) {
-            LocalDate day = base.minusDays(20).plusDays(i);
             BigDecimal close = BigDecimal.valueOf(2000 + i);
             result.add(new GoldDailyBar("XAUUSD", day, close, close.add(BigDecimal.ONE),
                     close.subtract(BigDecimal.ONE), close, "USD", "troy_ounce", "twelve_data",
                     OffsetDateTime.parse("2026-09-30T00:00:00Z"),
                     // 当前核验的合成确认，不代表黄金历史当时已公布的版本。
-                    new GoldBarConfirmation(GoldBarConfirmation.SOURCE, base.plusDays(1),
+                    new GoldBarConfirmation(GoldBarConfirmation.SOURCE, target,
                             OffsetDateTime.parse("2026-09-30T00:00:00Z"), "a".repeat(64))));
+            day = calendar.nextBusinessDay(day);
         }
         return result;
+    }
+
+    private LocalDate previousTradingDay(LocalDate from) {
+        LocalDate day = from.minusDays(1);
+        while (!calendar.nextBusinessDay(day.minusDays(1)).equals(day)) {
+            day = day.minusDays(1);
+        }
+        return day;
+    }
+
+    private static ConfiguredGoldTradingCalendar calendar() {
+        ConfiguredGoldTradingCalendar calendar = new ConfiguredGoldTradingCalendar();
+        calendar.setHolidays(Set.of("--01-01", "--07-04", "--12-25"));
+        return calendar;
     }
 
     private void write(String series, String initial, String revision) throws Exception {

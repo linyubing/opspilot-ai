@@ -4,6 +4,8 @@ import com.opspilot.ai.macrodata.MacroObservation;
 import com.opspilot.ai.macrodata.MacroObservationRepository;
 import com.opspilot.ai.marketdata.GoldDailyBar;
 import com.opspilot.ai.marketdata.GoldDailyBarRepository;
+import com.opspilot.ai.marketdata.GoldBarWindow;
+import com.opspilot.ai.forecast.ConfiguredGoldTradingCalendar;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,7 +34,7 @@ public class GoldResearchSnapshotService {
     private static final String GOLD_PROVIDER = "twelve_data";
     private static final String REAL_RATE_SERIES_ID = "DFII10";
     private static final String DOLLAR_INDEX_SERIES_ID = "DTWEXBGS";
-    public static final String RESEARCH_VERSION = "gold-multifactor-confirmed-v3";
+    public static final String RESEARCH_VERSION = "gold-multifactor-contiguous-v4";
     private static final int QUERY_LIMIT = 120;
     private static final int REQUIRED_OBSERVATION_COUNT = 21;
     private static final ZoneId MARKET_ZONE =
@@ -50,6 +52,7 @@ public class GoldResearchSnapshotService {
     private final RealRateFactorEvaluator evaluator;
     private final DollarIndexFactorEvaluator dollarIndexEvaluator;
     private final Clock clock;
+    private final GoldBarWindow window;
     private final GoldVolatilityCalculator volatilityCalculator =
             new GoldVolatilityCalculator();
 
@@ -68,7 +71,6 @@ public class GoldResearchSnapshotService {
         );
     }
 
-    @Autowired
     public GoldResearchSnapshotService(
             GoldDailyBarRepository goldRepository,
             MacroObservationRepository macroObservationRepository,
@@ -76,11 +78,20 @@ public class GoldResearchSnapshotService {
             DollarIndexFactorEvaluator dollarIndexEvaluator,
             Clock clock
     ) {
+        this(goldRepository, macroObservationRepository, evaluator, dollarIndexEvaluator,
+                clock, new GoldBarWindow(new ConfiguredGoldTradingCalendar()));
+    }
+
+    @Autowired
+    public GoldResearchSnapshotService(GoldDailyBarRepository goldRepository,
+            MacroObservationRepository macroObservationRepository, RealRateFactorEvaluator evaluator,
+            DollarIndexFactorEvaluator dollarIndexEvaluator, Clock clock, GoldBarWindow window) {
         this.goldRepository = goldRepository;
         this.macroObservationRepository = macroObservationRepository;
         this.evaluator = evaluator;
         this.dollarIndexEvaluator = dollarIndexEvaluator;
         this.clock = clock;
+        this.window = window;
     }
 
     public GoldResearchSnapshot createSnapshot() {
@@ -241,6 +252,10 @@ public class GoldResearchSnapshotService {
             if (!bar.isConfirmedAt(checkedAt)) {
                 throw new InsufficientResearchDataException("黄金日线未确认，日期=" + bar.priceDate());
             }
+        }
+        // 条数足够不代表日线连续；缺日不能把多日涨跌误标为一日收益。
+        if (!window.isContinuous(sortedGold.subList(0, REQUIRED_OBSERVATION_COUNT))) {
+            throw new InsufficientResearchDataException("黄金日线交易日不连续，请先补齐真实缺日");
         }
 
         validateRealRate(currentRealRate);

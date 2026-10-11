@@ -139,7 +139,7 @@ class GoldResearchSnapshotServiceTests {
         assertThat(snapshot.dollarIndexAssessment().status())
                 .isEqualTo(GoldFactorStatus.PRESSURING);
         assertThat(snapshot.researchVersion())
-                .isEqualTo("gold-multifactor-confirmed-v3");
+                .isEqualTo("gold-multifactor-contiguous-v4");
         assertThat(snapshot.disclaimer())
                 .contains("不构成黄金方向预测或投资建议");
 
@@ -250,7 +250,7 @@ class GoldResearchSnapshotServiceTests {
     void rejectsNonPositiveGoldPrice() {
         List<GoldDailyBar> prices = goldPrices(21);
         prices.set(5, goldPrice(
-                ANALYSIS_DATE.minusDays(5),
+                prices.get(5).priceDate(),
                 "0"
         ));
         when(goldRepository.findRecent("XAUUSD", "twelve_data", 120))
@@ -461,13 +461,29 @@ class GoldResearchSnapshotServiceTests {
                 bar.close(), bar.currency(), bar.unit(), bar.provider(), bar.collectedAt());
     }
 
+    @Test
+    @DisplayName("即使有21根确认日线，缺工作日也不能把跨日收益标为1日")
+    void rejectsMissingTradingDay() {
+        List<GoldDailyBar> prices = goldPrices(22);
+        prices.remove(1);
+        when(goldRepository.findRecent("XAUUSD", "twelve_data", 120)).thenReturn(prices);
+        when(macroObservationRepository.findRecent("DFII10", 120)).thenReturn(realRates(21));
+        assertThatThrownBy(service::createSnapshot)
+                .isInstanceOf(InsufficientResearchDataException.class)
+                .hasMessageContaining("不连续");
+    }
+
     private List<GoldDailyBar> goldPrices(int count) {
         List<GoldDailyBar> prices = new ArrayList<>();
+        LocalDate day = ANALYSIS_DATE;
         for (int index = 0; index < count; index++) {
             prices.add(goldPrice(
-                    ANALYSIS_DATE.minusDays(index),
+                    day,
                     goldValue(index)
             ));
+            do { day = day.minusDays(1); }
+            while (day.getDayOfWeek() == java.time.DayOfWeek.SATURDAY
+                    || day.getDayOfWeek() == java.time.DayOfWeek.SUNDAY);
         }
         return prices;
     }

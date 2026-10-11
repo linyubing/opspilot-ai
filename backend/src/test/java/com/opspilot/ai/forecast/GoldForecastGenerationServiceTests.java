@@ -459,8 +459,24 @@ class GoldForecastGenerationServiceTests {
     private StoredGoldResearchSnapshot confirmed() {
         StoredGoldResearchSnapshot source = GoldForecastTestFixtures.snapshot("2515.75");
         return new StoredGoldResearchSnapshot(source.id(), GoldSnapshotFixtures.withInput(
-                source.snapshot(), source.snapshot().latestGoldDate(), "gold-multifactor-confirmed-v3", source.createdAt()),
+                source.snapshot(), source.snapshot().latestGoldDate(), "gold-multifactor-contiguous-v4", source.createdAt()),
                 source.createdAt());
+    }
+
+    @Test
+    @org.junit.jupiter.api.DisplayName("旧v3快照即使有匹配留痕和幂等记录，也不能用于新协议生成")
+    void rejectsPreContinuitySnapshot() {
+        StoredGoldResearchSnapshot source = confirmed();
+        StoredGoldResearchSnapshot snapshot = new StoredGoldResearchSnapshot(source.id(),
+                GoldSnapshotFixtures.withInput(source.snapshot(), source.snapshot().latestGoldDate(),
+                        "gold-multifactor-confirmed-v3", source.createdAt()), source.createdAt());
+        when(snapshotRepository.findById(snapshot.id())).thenReturn(Optional.of(snapshot));
+        lenient().when(forecastRepository.findByKey(snapshot.id(), MODEL_NAME,
+                GoldForecastPromptBuilder.PROMPT_VERSION, GoldForecastRule.RULE_VERSION))
+                .thenReturn(Optional.of(existingForecast(snapshot)));
+        assertThatThrownBy(() -> service.generate(snapshot.id()))
+                .isInstanceOf(InvalidGoldForecastSnapshotException.class);
+        verifyNoInteractions(forecastRepository, promptBuilder, gateway, validator);
     }
 
     private StoredGoldDirectionForecast existingForecast(

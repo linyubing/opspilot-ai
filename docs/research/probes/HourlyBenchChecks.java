@@ -5,6 +5,22 @@ import java.util.List;
 /** 用手算分类案例检查评估器；案例是分类结果，不是假行情。 */
 public class HourlyBenchChecks {
     public static void main(String[] args) throws Exception {
+        // 恒价数学例只检查研究日历隔离，不进入行情仓储或预测成绩。
+        var windows = new java.util.ArrayList<com.opspilot.ai.marketdata.GoldDailyBar>();
+        var first = java.time.LocalDate.parse("2026-09-01");
+        var price = new java.math.BigDecimal("100");
+        for (int i = 0; i < 21; i++) {
+            windows.add(new com.opspilot.ai.marketdata.GoldDailyBar("XAUUSD", first.plusDays(i),
+                    price, price, price, price, "usd", "troy_ounce", "hourly_research_utc21",
+                    java.time.OffsetDateTime.parse("2026-10-11T00:00:00Z")));
+        }
+        var features = HourlyBench.calculator().compute(first.plusDays(20), windows).orElseThrow(
+                () -> new AssertionError("Fixed-24h research windows were treated as gold trading days"));
+        near(features.values().get("return1"), 0.0, "fixed-24h research return");
+        if (new GoldFeatureCalculator().compute(first.plusDays(20), windows).isPresent()) {
+            throw new AssertionError("Research calendar leaked into production calendar");
+        }
+        System.out.println("calendar isolation checks: 2 passed");
         var metric = HourlyBench.metrics(List.of(
                 new HourlyBench.Score("BULLISH", "BULLISH", new double[]{.8,.1,.1}),
                 new HourlyBench.Score("NEUTRAL", "BULLISH", new double[]{.6,.3,.1}),

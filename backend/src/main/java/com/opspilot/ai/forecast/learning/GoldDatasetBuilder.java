@@ -6,6 +6,8 @@ import com.opspilot.ai.analysis.InsufficientResearchDataException;
 import com.opspilot.ai.forecast.GoldForecastRule;
 import com.opspilot.ai.marketdata.GoldDailyBar;
 import com.opspilot.ai.marketdata.GoldDailyBarRepository;
+import com.opspilot.ai.marketdata.GoldBarWindow;
+import com.opspilot.ai.forecast.ConfiguredGoldTradingCalendar;
 import com.opspilot.ai.macrodata.FredHistoryStore;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +40,7 @@ public class GoldDatasetBuilder {
     private final GoldFeatureCalculator calculator;
     private final FredHistoryStore history;
     private final Clock clock;
+    private final GoldBarWindow window;
 
     public GoldDatasetBuilder(
             GoldDailyBarRepository repository,
@@ -49,16 +52,24 @@ public class GoldDatasetBuilder {
         this(repository, snapshots, rule, calculator, history, Clock.systemUTC());
     }
 
-    @Autowired
     public GoldDatasetBuilder(GoldDailyBarRepository repository,
             GoldResearchSnapshotService snapshots, GoldForecastRule rule,
             GoldFeatureCalculator calculator, FredHistoryStore history, Clock clock) {
+        this(repository, snapshots, rule, calculator, history, clock,
+                new GoldBarWindow(new ConfiguredGoldTradingCalendar()));
+    }
+
+    @Autowired
+    public GoldDatasetBuilder(GoldDailyBarRepository repository, GoldResearchSnapshotService snapshots,
+            GoldForecastRule rule, GoldFeatureCalculator calculator, FredHistoryStore history,
+            Clock clock, GoldBarWindow window) {
         this.repository = repository;
         this.snapshots = snapshots;
         this.rule = rule;
         this.calculator = calculator;
         this.history = history;
         this.clock = clock;
+        this.window = window;
     }
 
     public GoldDataset build(ForecastHorizon horizon) {
@@ -79,7 +90,8 @@ public class GoldDatasetBuilder {
             GoldDailyBar target = allBars.get(i + horizon.sessions());
             // 保留原始序列；任一特征或目标窗口行未确认就弃用样本，不能挪动目标。
             if (allBars.subList(i - HISTORY, i + horizon.sessions() + 1).stream()
-                    .anyMatch(bar -> !bar.isConfirmedAt(asOf))) {
+                    .anyMatch(bar -> !bar.isConfirmedAt(asOf))
+                    || !window.isContinuous(allBars.subList(i - HISTORY, i + horizon.sessions() + 1))) {
                 skipped++;
                 continue;
             }
@@ -111,7 +123,10 @@ public class GoldDatasetBuilder {
                 skipped++;
             }
         }
-        return new GoldDataset(samples, skipped, batch.metadata());
+        // 新协议进入数据指纹，不能与缺日曾被压缩的旧实验混用。
+        Map<String, String> metadata = new HashMap<>(batch.metadata());
+        metadata.put("goldWindowPolicy", "configured-calendar-contiguous-v1");
+        return new GoldDataset(samples, skipped, metadata);
     }
 
     private GoldFeatures features(

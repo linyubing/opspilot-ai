@@ -9,6 +9,9 @@ public interface GoldDailyBarRepository {
 
     void saveAll(List<GoldDailyBar> bars);
 
+    /** 仅补入缺失的已确认日线，返回实际新增数；冲突不能覆盖旧记录。 */
+    int saveMissing(List<GoldDailyBar> bars);
+
     Optional<GoldDailyBar> findLatest(String symbol, String provider);
 
     List<GoldDailyBar> findRecent(

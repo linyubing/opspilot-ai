@@ -37,6 +37,12 @@ public class HourlyBench {
     record Metrics(int samples, double accuracy, Double balancedAccuracy, double brier,
                    double logLoss, Double[] recalls) {}
 
+    /** 小时研究是固定24小时窗口；此入口不用于认证黄金交易日。 */
+    static GoldFeatureCalculator calculator() {
+        return new GoldFeatureCalculator(
+                new com.opspilot.ai.marketdata.GoldBarWindow(day -> day.plusDays(1)));
+    }
+
     static Metrics metrics(List<Score> scores) {
         if (scores.isEmpty()) throw new IllegalArgumentException("No scored samples");
         int[] counts=new int[3], hits=new int[3];
@@ -249,7 +255,7 @@ public class HourlyBench {
         List<Sample> samples=new ArrayList<>();
         List<double[]> rateSamples=new ArrayList<>();
         List<Map<String,Object>> rateInputs=new ArrayList<>();
-        var calculator=new GoldFeatureCalculator();
+        var calculator=calculator();
         for(int i=warmup;i<devEnd;i++) {
             var f=calculator.compute(bars.get(i).priceDate(),bars.subList(0,i+1)).orElseThrow();
             double[] values=Arrays.stream(FEATURES).mapToDouble(name->f.values().get(name)).toArray();
@@ -386,10 +392,18 @@ public class HourlyBench {
                 .digest(Files.readAllBytes(Path.of("docs/research/probes/HourlyBench.java")))));
         result.put("featureSourceSha256",HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256")
                 .digest(Files.readAllBytes(Path.of("backend/src/main/java/com/opspilot/ai/forecast/learning/GoldFeatureCalculator.java")))));
+        result.put("windowPolicy","fixed-24h-research-v1");
+        result.put("windowSourceSha256",HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256")
+                .digest(Files.readAllBytes(Path.of("backend/src/main/java/com/opspilot/ai/marketdata/GoldBarWindow.java")))));
         // 同时记录实际加载的字节码，不能只用源码摘要证明运行版本。
         try (var compiled = GoldFeatureCalculator.class.getResourceAsStream("GoldFeatureCalculator.class")) {
             if (compiled == null) throw new IllegalStateException("无法核验特征计算字节码");
             result.put("featureClassSha256",HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256")
+                    .digest(compiled.readAllBytes())));
+        }
+        try (var compiled = com.opspilot.ai.marketdata.GoldBarWindow.class.getResourceAsStream("GoldBarWindow.class")) {
+            if (compiled == null) throw new IllegalStateException("无法核验研究窗口字节码");
+            result.put("windowClassSha256",HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256")
                     .digest(compiled.readAllBytes())));
         }
         result.put("trainer",new LogisticRegressionTrainer().getProvenance().toString());

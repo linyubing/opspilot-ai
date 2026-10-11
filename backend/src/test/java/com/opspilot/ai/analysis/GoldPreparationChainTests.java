@@ -34,7 +34,7 @@ class GoldPreparationChainTests {
     @Test
     @DisplayName("准备必须经过OHLC同步，旧参考价路径不能替代")
     void usesOhlc() {
-        when(bars.sync()).thenReturn(new GoldDailyBarSyncResult(21, 21, 0,
+        when(bars.syncRecent()).thenReturn(new GoldDailyBarSyncResult(21, 21, 0,
                 LocalDate.parse("2026-08-26")));
         var reached = new IllegalStateException("已到快照保存边界");
         when(recording.recordCurrentSnapshot()).thenThrow(reached);
@@ -46,7 +46,7 @@ class GoldPreparationChainTests {
     @DisplayName("OHLC失败必须停止，不能继续用旧库数据生成快照")
     void stopsOnOhlcFailure() {
         var failure = new MarketDataUnavailableException("OHLC暂不可用");
-        when(bars.sync()).thenThrow(failure);
+        when(bars.syncRecent()).thenThrow(failure);
         assertThatThrownBy(service::prepareDaily).isSameAs(failure);
         verifyNoInteractions(legacy, rates, dollars, recording);
     }

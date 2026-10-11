@@ -1,12 +1,17 @@
 package com.opspilot.ai.forecast.learning;
 
 import com.opspilot.ai.marketdata.GoldDailyBar;
+import com.opspilot.ai.marketdata.GoldBarWindow;
+import com.opspilot.ai.forecast.ConfiguredGoldTradingCalendar;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -25,25 +30,55 @@ class GoldFeatureCalculator {
     private static final BigDecimal HUNDRED = new BigDecimal("100");
     private static final MathContext MC = MathContext.DECIMAL128;
 
+    private final GoldBarWindow barWindow;
+
+    GoldFeatureCalculator() {
+        this(new GoldBarWindow(new ConfiguredGoldTradingCalendar()));
+    }
+
+    @Autowired
+    GoldFeatureCalculator(GoldBarWindow barWindow) {
+        this.barWindow = barWindow;
+    }
+
     /**
      * 计算指定日期的所有 OHLC 技术特征。
      *
      * @param asOfDate 预测时点日期
-     * @param bars     全部日线数据（按日期升序）
+     * @param bars     全部日线数据（允许任意排序）
      * @return 特征对象，数据不足时返回 Optional.empty()
      */
     Optional<GoldOhlcFeatures> compute(LocalDate asOfDate, List<GoldDailyBar> bars) {
-        List<GoldDailyBar> window = bars.stream()
-                .filter(b -> !b.priceDate().isAfter(asOfDate))
-                .toList();
+        if (asOfDate == null || bars == null) {
+            return Optional.empty();
+        }
+        List<GoldDailyBar> window = new ArrayList<>();
+        var dates = new HashSet<LocalDate>();
+        for (GoldDailyBar bar : bars) {
+            if (bar == null || bar.priceDate() == null) {
+                return Optional.empty();
+            }
+            if (bar.priceDate().isAfter(asOfDate)) {
+                continue;
+            }
+            // 排序前拒绝重复，不能靠截窗或去重掩盖源数据冲突。
+            if (!dates.add(bar.priceDate())) {
+                return Optional.empty();
+            }
+            window.add(bar);
+        }
 
         if (window.size() < REQUIRED_BARS) {
             return Optional.empty();
         }
+        window.sort(Comparator.comparing(GoldDailyBar::priceDate));
 
         // 取最近 REQUIRED_BARS 根 K 线（含当日）
         List<GoldDailyBar> recent = window.subList(
                 window.size() - REQUIRED_BARS, window.size());
+        if (!barWindow.isContinuous(recent)) {
+            return Optional.empty();
+        }
 
         java.util.Map<String, Double> values = new java.util.HashMap<>();
         values.put("return1", bdr(returnN(recent, 1)));

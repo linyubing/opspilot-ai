@@ -23,7 +23,8 @@ try {
     $dependencies=(Join-Path $projectRoot 'backend\target\classes')+';'+(Get-Content (Join-Path $privateRoot 'probe-classpath.txt') -Raw).Trim()
     $featureRoot=Join-Path $projectRoot 'backend\src\main\java\com\opspilot\ai\forecast\learning'
     $macroRoot=Join-Path $projectRoot 'backend\src\main\java\com\opspilot\ai\macrodata'
-    & javac -encoding UTF-8 -cp $dependencies -d $probeClasses (Join-Path $PSScriptRoot 'HourlyBench.java') (Join-Path $PSScriptRoot 'HourlyBenchChecks.java') (Join-Path $PSScriptRoot 'HourlyRateChecks.java') (Join-Path $featureRoot 'GoldFeatureCalculator.java') (Join-Path $featureRoot 'GoldOhlcFeatures.java') (Join-Path $macroRoot 'FredHistory.java') (Join-Path $macroRoot 'FredHistoryStore.java')
+    $marketRoot=Join-Path $projectRoot 'backend\src\main\java\com\opspilot\ai\marketdata'
+    & javac -encoding UTF-8 -cp $dependencies -d $probeClasses (Join-Path $PSScriptRoot 'HourlyBench.java') (Join-Path $PSScriptRoot 'HourlyBenchChecks.java') (Join-Path $PSScriptRoot 'HourlyRateChecks.java') (Join-Path $featureRoot 'GoldFeatureCalculator.java') (Join-Path $featureRoot 'GoldOhlcFeatures.java') (Join-Path $marketRoot 'GoldBarWindow.java') (Join-Path $macroRoot 'FredHistory.java') (Join-Path $macroRoot 'FredHistoryStore.java')
     $cp=$probeClasses+';'+$dependencies
     if ($LASTEXITCODE -ne 0) { throw 'Research probe compilation failed' }
     if ([string]::IsNullOrWhiteSpace($Forecast)) {

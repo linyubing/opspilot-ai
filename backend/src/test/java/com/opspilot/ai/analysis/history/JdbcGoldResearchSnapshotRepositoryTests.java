@@ -98,6 +98,18 @@ class JdbcGoldResearchSnapshotRepositoryTests {
     }
 
     @Test
+    @DisplayName("连续日历新v4版本也必须有完整窗口依据，不能只换标签")
+    void rejectsContinuousVersionWithoutInput() {
+        UUID id = repository.saveIfAbsent(snapshot("2026-08-24", "2500.00"), CREATED_AT).record().id();
+        inputIds.add(id);
+        assertThatThrownBy(() -> jdbcTemplate.update(
+                "update gold_research_snapshot set research_version = ? where id = ?",
+                "gold-multifactor-contiguous-v4", id))
+                .isInstanceOf(DataIntegrityViolationException.class);
+        assertThat(repository.findById(id).orElseThrow().snapshot().researchVersion()).isEqualTo(RESEARCH_VERSION);
+    }
+
+    @Test
     @DisplayName("同日旧v2与新确认v3各自保存，重复保存不覆盖第一份依据")
     void keepsLegacyAndConfirmedInputs() {
         // 隔离到不存在真实黄金记录的早期日期，按精确UUID清理。

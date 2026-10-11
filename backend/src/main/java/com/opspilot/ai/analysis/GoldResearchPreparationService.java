@@ -37,7 +37,8 @@ public class GoldResearchPreparationService {
          * 已保存的数据由各仓储按版本化或幂等规则安全保留。
          */
         // 快照计算用OHLC，必须同步同一份输入，不能用旧参考价同步替代。
-        GoldDailyBarSyncResult goldBars = goldBarSync.sync();
+        // 只修复近期真实缺日；历史源异常仍由全历史入口报告。
+        GoldDailyBarSyncResult goldBars = goldBarSync.syncRecent();
         RealRateSyncResult realRate =
                 realRateSyncService.syncDailyObservations();
         DollarIndexSyncResult dollarIndex =
