@@ -14,6 +14,23 @@ class DollarIndexFactorEvaluatorTests {
             new DollarIndexFactorEvaluator();
 
     @Test
+    @DisplayName("美元因子摘要明确引用5期和20期，不冒充未输入的1期趋势")
+    void namesPeriods() {
+        var rise = evaluator.evaluate(new BigDecimal("0.8766"), new BigDecimal("2.7579"));
+        assertThat(rise.status()).isEqualTo(GoldFactorStatus.PRESSURING);
+        assertThat(rise.explanation()).contains("20期涨幅达到1%", "5期收益率为正")
+                .doesNotContain("短期继续", "1期", "最新一期");
+        var fall = evaluator.evaluate(new BigDecimal("-0.8766"), new BigDecimal("-2.7579"));
+        assertThat(fall.status()).isEqualTo(GoldFactorStatus.SUPPORTIVE);
+        assertThat(fall.explanation()).contains("20期跌幅达到1%", "5期收益率为负")
+                .doesNotContain("短期继续", "1期", "最新一期");
+        var conflict = evaluator.evaluate(new BigDecimal("-0.8766"), new BigDecimal("2.7579"));
+        assertThat(conflict.status()).isEqualTo(GoldFactorStatus.NEUTRAL);
+        assertThat(conflict.explanation()).contains("20期变化有限", "5期与20期方向不一致")
+                .doesNotContain("短期", "长期");
+    }
+
+    @Test
     @DisplayName("20期上涨达到1%且短期继续上涨时标记为压力")
     void marksSustainedDollarRiseAsPressuring() {
         ResearchFactorAssessment assessment = evaluator.evaluate(
@@ -76,7 +93,7 @@ class DollarIndexFactorEvaluatorTests {
 
     private void assertCommonContract(ResearchFactorAssessment assessment) {
         assertThat(assessment.ruleVersion())
-                .isEqualTo("gold-dollar-index-v1");
+                .isEqualTo("gold-dollar-index-v2");
         assertThat(assessment.explanation())
                 .contains("广义美元指数")
                 .contains("黄金");

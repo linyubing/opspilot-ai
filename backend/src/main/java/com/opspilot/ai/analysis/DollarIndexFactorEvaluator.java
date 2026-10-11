@@ -18,7 +18,7 @@ public class DollarIndexFactorEvaluator {
             new BigDecimal("1.0000");
 
     private static final String RULE_VERSION =
-            "gold-dollar-index-v1";
+            "gold-dollar-index-v2";
 
     public ResearchFactorAssessment evaluate(
             BigDecimal return5,
@@ -34,20 +34,20 @@ public class DollarIndexFactorEvaluator {
         );
 
         /*
-         * 美元中期上涨至少1%，并且短期仍在上涨，
+         * 只评估20期与5期；没有输入1期变化，不能描述最新一期方向。
          * 说明美元保持强势，对以美元计价的黄金构成压力。
          */
         if (return20.compareTo(THRESHOLD_PERCENT) >= 0
                 && return5.compareTo(BigDecimal.ZERO) > 0) {
             return assessment(
                     GoldFactorStatus.PRESSURING,
-                    "广义美元指数中期明显走强且短期继续走强，"
+                    "广义美元指数20期涨幅达到1%且5期收益率为正，"
                             + "对黄金构成单因子压力。"
             );
         }
 
         /*
-         * 美元中期下跌至少1%，并且短期仍在下跌，
+         * 美元20期下跌至少1%，并且5期收益率为负，
          * 说明美元持续走弱，对黄金形成支撑。
          */
         if (return20.compareTo(
@@ -56,14 +56,14 @@ public class DollarIndexFactorEvaluator {
                 && return5.compareTo(BigDecimal.ZERO) < 0) {
             return assessment(
                     GoldFactorStatus.SUPPORTIVE,
-                    "广义美元指数中期明显走弱且短期继续走弱，"
+                    "广义美元指数20期跌幅达到1%且5期收益率为负，"
                             + "对黄金构成单因子支撑。"
             );
         }
 
         return assessment(
                 GoldFactorStatus.NEUTRAL,
-                "广义美元指数变化有限或长短周期方向不一致，"
+                "广义美元指数20期变化有限或5期与20期方向不一致，"
                         + "对黄金的单因子状态为中性。"
         );
     }

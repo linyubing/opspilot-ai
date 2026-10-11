@@ -1,0 +1,110 @@
+{
+  "researchOnly": true,
+  "trustedAccuracyEligible": false,
+  "officialSessionCertified": false,
+  "status": "PAIRED_OUTPUTS_NOT_SCORED",
+  "sourceCommit": "932230d",
+  "snapshotId": "64b8c2a6-8b67-4f1d-a31f-b0f1f0d37e93",
+  "inputSha256": "489e7f8f7948f2cc5ce16d1810951007d596c948f1797505e47a4eabd647ecfa",
+  "protocolSha256": "c5d162b55c471935d627df86ffd06f8ab4febbb86e200c0902278859f923c880",
+  "modelDigest": "6488c96fa5faab64bb65cbd30d4289e20e6130ef535a93ef9a49f42eda893ea7",
+  "modelUnchanged": true,
+  "targetDate": "2026-10-12",
+  "start": "2026-10-11T20:00:00Z",
+  "end": "2026-10-12T20:00:00Z",
+  "basePrice": 4195.23193,
+  "brierScore": null,
+  "logLoss": null,
+  "actualReturn": null,
+  "hit": null,
+  "outputs": [
+    {
+      "variant": "baseline",
+      "startedAt": "2026-10-11T15:18:20.1946114+08:00",
+      "completedAt": "2026-10-11T15:18:24.6110977+08:00",
+      "httpStatus": 200,
+      "candidateHash": "2d0a9b586249905ac40e42d9a389cba2b3910c776275821e03f522c763d7fcdd",
+      "request": {
+        "model": "qwen3.5:9b",
+        "messages": [
+          {
+            "role": "user",
+            "content": "你是个人黄金投资研究助手。请基于给定正式快照，\n预测黄金下一个有效交易日的方向。\n\n只能使用下列事实，不得修改、重新计算或补充外部数据。\n\n【正式快照】\n快照编号：64b8c2a6-8b67-4f1d-a31f-b0f1f0d37e93\n分析日期：2026-10-09\n黄金数据日期：2026-10-09\n实际利率数据日期：2026-10-08\n美元指数数据日期：2026-10-02\n研究版本：gold-multifactor-contiguous-v4\n黄金当前价格：4195.23193000\n黄金1期收益率：1.5324%\n黄金5期收益率：1.2967%\n黄金20期收益率：-3.5328%\n黄金20期波动率：21.1394\n实际利率因子：NEUTRAL\n实际利率解释：实际利率变化有限或长短周期方向不一致，单因子状态为中性。\n美元指数因子：PRESSURING\n美元指数解释：广义美元指数中期明显走强且短期继续走强，对黄金构成单因子压力。\n\n【方向合同】\n后续真实涨跌幅大于 0.5% 为 BULLISH；\n小于 -0.5% 为 BEARISH；\n其余包括两个边界值均为 NEUTRAL（中性）。\n\n【第二版校正规则】\n1. 预测的是下一个有效交易日，不是中长期趋势。\n2. 不得因为 20 期收益率为正就自动判断为 BULLISH。\n3. 1 期收益率为负时，必须说明短线转弱风险。\n4. 5 期和 1 期方向冲突时，必须降低方向确信度。\n5. 20 期涨幅很大但 1 期转负时，必须考虑高位回落或获利了结。\n6. 美元指数数据明显滞后时，必须降低美元指数因子的权重。\n7. 波动率较高时，优先考虑 NEUTRAL 或反转风险。\n8. 如果证据只支持轻微涨跌，不能判断为 BULLISH 或 BEARISH，应判断为 NEUTRAL。\n9. reasoning 必须说明短线动量、中期趋势、宏观因子和最终取舍。\n\n【安全边界】\n只返回 JSON，不要使用 Markdown 代码块。\n不得生成新闻、市场事件或任何未提供的事实。\n不得给出目标价、涨跌概率、止损位、仓位或买卖建议。\n\n严格返回：\n{\"direction\":\"BULLISH|NEUTRAL|BEARISH\",\"reasoning\":\"研究依据\",\"invalidationConditions\":[\"失效条件\"]}\n"
+          }
+        ],
+        "stream": false,
+        "think": false,
+        "keep_alive": "5m",
+        "options": {
+          "temperature": 0,
+          "seed": 42,
+          "num_ctx": 8192,
+          "num_predict": 2048
+        }
+      },
+      "rawResponse": "{\"model\":\"qwen3.5:9b\",\"created_at\":\"2026-10-11T07:18:24.6073095Z\",\"message\":{\"role\":\"assistant\",\"content\":\"{\\\"direction\\\":\\\"NEUTRAL\\\",\\\"reasoning\\\":\\\"短线动量方面，1 期收益率为正（1.53%），显示短期仍有惯性，但 20 期收益率为负（-3.53%）且波动率较高（21.14），表明中期趋势向下且市场处于高敏感状态。宏观因子中，实际利率为中性，不构成支撑或压制；美元指数虽显示压力（PRESSURING），但其数据日期（2026-10-02）明显滞后于分析日期（2026-10-09），根据校正规则需降低该因子权重。综合来看，短期正收益与中期负趋势及高波动率形成冲突，且缺乏明确的单边驱动信号，证据不足以支持大幅涨跌，故判断为中性。\\\",\\\"invalidationConditions\\\":[\\\"若下一交易日实际涨跌幅超过 0.5% 或低于 -0.5%，则方向判定失效\\\"]}\"},\"done\":true,\"done_reason\":\"stop\",\"total_duration\":4400634400,\"load_duration\":2571766500,\"prompt_eval_count\":618,\"prompt_eval_cached_count\":0,\"prompt_eval_duration\":163198000,\"eval_count\":200,\"eval_duration\":1662177000}",
+      "rawResponseHash": "f60229806bd1f17c546704a8b35f6db58bcf0dd8d741992a7fccbf601d75809c",
+      "response": {
+        "model": "qwen3.5:9b",
+        "created_at": "2026-10-11T07:18:24.6073095Z",
+        "message": {
+          "role": "assistant",
+          "content": "{\"direction\":\"NEUTRAL\",\"reasoning\":\"短线动量方面，1 期收益率为正（1.53%），显示短期仍有惯性，但 20 期收益率为负（-3.53%）且波动率较高（21.14），表明中期趋势向下且市场处于高敏感状态。宏观因子中，实际利率为中性，不构成支撑或压制；美元指数虽显示压力（PRESSURING），但其数据日期（2026-10-02）明显滞后于分析日期（2026-10-09），根据校正规则需降低该因子权重。综合来看，短期正收益与中期负趋势及高波动率形成冲突，且缺乏明确的单边驱动信号，证据不足以支持大幅涨跌，故判断为中性。\",\"invalidationConditions\":[\"若下一交易日实际涨跌幅超过 0.5% 或低于 -0.5%，则方向判定失效\"]}"
+        },
+        "done": true,
+        "done_reason": "stop",
+        "total_duration": 4400634400,
+        "load_duration": 2571766500,
+        "prompt_eval_count": 618,
+        "prompt_eval_cached_count": 0,
+        "prompt_eval_duration": 163198000,
+        "eval_count": 200,
+        "eval_duration": 1662177000
+      }
+    },
+    {
+      "variant": "candidate",
+      "startedAt": "2026-10-11T15:18:33.0597545+08:00",
+      "completedAt": "2026-10-11T15:18:35.9997630+08:00",
+      "httpStatus": 200,
+      "candidateHash": "9f65b20e79bc3b32cb53bc58b982234dff52de8501ec098c6aa6922b134649c7",
+      "request": {
+        "model": "qwen3.5:9b",
+        "messages": [
+          {
+            "role": "user",
+            "content": "你是个人黄金投资研究助手。请基于给定正式快照，\n预测黄金下一个有效交易日的方向。\n\n只能使用下列事实，不得修改、重新计算或补充外部数据。\n\n【正式快照】\n快照编号：64b8c2a6-8b67-4f1d-a31f-b0f1f0d37e93\n分析日期：2026-10-09\n黄金数据日期：2026-10-09\n实际利率数据日期：2026-10-08\n美元指数数据日期：2026-10-02\n研究版本：gold-multifactor-contiguous-v4\n黄金当前价格：4195.23193000\n黄金1期收益率：1.5324%\n黄金5期收益率：1.2967%\n黄金20期收益率：-3.5328%\n黄金20期波动率：21.1394\n实际利率因子：NEUTRAL\n实际利率解释：实际利率变化有限或长短周期方向不一致，单因子状态为中性。\n美元指数因子：PRESSURING\n美元指数解释：广义美元指数中期明显走强且短期继续走强，对黄金构成单因子压力。\n\n【方向合同】\n后续真实涨跌幅大于 0.5% 为 BULLISH；\n小于 -0.5% 为 BEARISH；\n其余包括两个边界值均为 NEUTRAL（中性）。\n\n【第二版校正规则】\n1. 预测的是下一个有效交易日，不是中长期趋势。\n2. 不得因为 20 期收益率为正就自动判断为 BULLISH。\n3. 1 期收益率为负时，必须说明短线转弱风险。\n4. 5 期和 1 期方向冲突时，必须降低方向确信度。\n5. 20 期涨幅很大但 1 期转负时，必须考虑高位回落或获利了结。\n6. 美元指数数据明显滞后时，必须降低美元指数因子的权重。\n7. 波动率较高只表示价格变动可能更大，不能因此优先选择 NEUTRAL；证据不确定不等于涨跌幅位于 [-0.5%, 0.5%]，仍须按三方向合同选择最有依据的类别，并在 reasoning 中说明不确定性。\n8. 如果证据只支持轻微涨跌，不能判断为 BULLISH 或 BEARISH，应判断为 NEUTRAL。\n9. reasoning 必须说明短线动量、中期趋势、宏观因子和最终取舍。\n\n【安全边界】\n只返回 JSON，不要使用 Markdown 代码块。\n不得生成新闻、市场事件或任何未提供的事实。\n不得给出目标价、涨跌概率、止损位、仓位或买卖建议。\n\n严格返回：\n{\"direction\":\"BULLISH|NEUTRAL|BEARISH\",\"reasoning\":\"研究依据\",\"invalidationConditions\":[\"失效条件\"]}\n"
+          }
+        ],
+        "stream": false,
+        "think": false,
+        "keep_alive": "5m",
+        "options": {
+          "temperature": 0,
+          "seed": 42,
+          "num_ctx": 8192,
+          "num_predict": 2048
+        }
+      },
+      "rawResponse": "{\"model\":\"qwen3.5:9b\",\"created_at\":\"2026-10-11T07:18:35.9957415Z\",\"message\":{\"role\":\"assistant\",\"content\":\"{\\\"direction\\\":\\\"BEARISH\\\",\\\"reasoning\\\":\\\"短线动量方面，1 期收益率为正（1.53%），显示当前有上涨惯性；但中期趋势上，20 期收益率为负（-3.53%），表明长期处于下行通道中。宏观因子方面，实际利率为中性，不构成支撑或压制；美元指数因子明确为 PRESSURING（压力），且解释指出其‘中期明显走强且短期继续走强’，这对黄金构成直接的单因子压力。根据校正规则 4，当 1 期（短线）与 5 期/20 期（中长线）方向冲突时，必须降低方向确信度；同时规则 6 指出美元指数数据滞后（2026-10-02 vs 分析日 2026-10-09），需降低其权重，但鉴于解释中强调‘短期继续走强’，仍保留其作为主要负面驱动。综合来看，尽管短线有反弹迹象，但在强美元压制和长期下跌趋势下，更可能延续调整或高位回落，符合 BEARISH 定义（跌幅\\u003e0.5%）。不确定性在于美元指数数据滞后可能导致短期压力被高估，但现有证据不足以支撑 NEUTRAL 或 BULLISH。\\\",\\\"invalidationConditions\\\":[\\\"若美元指数在下一个交易日出现显著回落（如单日跌幅超 1%）且实际利率转为负向，则 BEARISH 判断失效\\\"]}\"},\"done\":true,\"done_reason\":\"stop\",\"total_duration\":2922415700,\"load_duration\":1005200,\"prompt_eval_count\":658,\"prompt_eval_cached_count\":0,\"prompt_eval_duration\":367543000,\"eval_count\":309,\"eval_duration\":2550109000}",
+      "rawResponseHash": "e19795fe5f47503fbbd83eecff764714a6a551f9329c002fb7eec184ddc3b4d6",
+      "response": {
+        "model": "qwen3.5:9b",
+        "created_at": "2026-10-11T07:18:35.9957415Z",
+        "message": {
+          "role": "assistant",
+          "content": "{\"direction\":\"BEARISH\",\"reasoning\":\"短线动量方面，1 期收益率为正（1.53%），显示当前有上涨惯性；但中期趋势上，20 期收益率为负（-3.53%），表明长期处于下行通道中。宏观因子方面，实际利率为中性，不构成支撑或压制；美元指数因子明确为 PRESSURING（压力），且解释指出其‘中期明显走强且短期继续走强’，这对黄金构成直接的单因子压力。根据校正规则 4，当 1 期（短线）与 5 期/20 期（中长线）方向冲突时，必须降低方向确信度；同时规则 6 指出美元指数数据滞后（2026-10-02 vs 分析日 2026-10-09），需降低其权重，但鉴于解释中强调‘短期继续走强’，仍保留其作为主要负面驱动。综合来看，尽管短线有反弹迹象，但在强美元压制和长期下跌趋势下，更可能延续调整或高位回落，符合 BEARISH 定义（跌幅>0.5%）。不确定性在于美元指数数据滞后可能导致短期压力被高估，但现有证据不足以支撑 NEUTRAL 或 BULLISH。\",\"invalidationConditions\":[\"若美元指数在下一个交易日出现显著回落（如单日跌幅超 1%）且实际利率转为负向，则 BEARISH 判断失效\"]}"
+        },
+        "done": true,
+        "done_reason": "stop",
+        "total_duration": 2922415700,
+        "load_duration": 1005200,
+        "prompt_eval_count": 658,
+        "prompt_eval_cached_count": 0,
+        "prompt_eval_duration": 367543000,
+        "eval_count": 309,
+        "eval_duration": 2550109000
+      }
+    }
+  ]
+}
