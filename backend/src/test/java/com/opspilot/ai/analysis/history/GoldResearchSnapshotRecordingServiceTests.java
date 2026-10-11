@@ -47,6 +47,31 @@ class GoldResearchSnapshotRecordingServiceTests {
     }
 
     @Test
+    @DisplayName("并发序列化冲突应重做整次冻结，而不是丢失相同输入的幂等响应")
+    void retriesConflict() {
+        var snapshot = snapshot();
+        var result = saveResult(snapshot);
+        when(snapshotService.createSnapshot()).thenReturn(snapshot);
+        when(repository.saveIfAbsent(snapshot, CREATED_AT))
+                .thenThrow(new org.springframework.dao.CannotSerializeTransactionException("测试并发冲突"))
+                .thenReturn(result);
+        assertThat(service.recordCurrentSnapshot()).isSameAs(result);
+        verify(snapshotService, org.mockito.Mockito.times(2)).createSnapshot();
+    }
+
+    @Test
+    @DisplayName("并发冲突只重试三次，持续失败必须原样传播而不是无限循环")
+    void limitsRetries() {
+        var snapshot = snapshot();
+        when(snapshotService.createSnapshot()).thenReturn(snapshot);
+        when(repository.saveIfAbsent(snapshot, CREATED_AT))
+                .thenThrow(new org.springframework.dao.CannotSerializeTransactionException("测试持续冲突"));
+        org.assertj.core.api.Assertions.assertThatThrownBy(service::recordCurrentSnapshot)
+                .isInstanceOf(org.springframework.dao.CannotSerializeTransactionException.class);
+        verify(snapshotService, org.mockito.Mockito.times(3)).createSnapshot();
+    }
+
+    @Test
     @DisplayName("生成当前快照后使用统一时钟正式留痕")
     void recordsCurrentSnapshot() {
         GoldResearchSnapshot snapshot = snapshot();

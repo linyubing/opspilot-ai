@@ -9,6 +9,7 @@ import com.opspilot.ai.analysis.RealRateChangeMetrics;
 import com.opspilot.ai.analysis.GoldFactorStatus;
 import com.opspilot.ai.analysis.ResearchFactorAssessment;
 import com.opspilot.ai.analysis.GoldSnapshotInput;
+import com.opspilot.ai.analysis.GoldSnapshotKey;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -192,6 +193,21 @@ public class JdbcGoldResearchSnapshotRepository
                 snapshot.latestGoldDate(), snapshot.gold(), createdAt)) {
             throw new IllegalArgumentException("黄金快照窗口依据与指标或保存时刻不匹配");
         }
+        boolean completeInput = snapshot.input() != null && snapshot.input().macro() != null;
+        if (completeInput && (snapshot.realRate() == null || snapshot.dollarIndex() == null
+                || snapshot.realRate().currentRate() == null || snapshot.dollarIndex().currentIndex() == null
+                || snapshot.realRate().currentRate().stripTrailingZeros().scale() > 6
+                || snapshot.dollarIndex().currentIndex().stripTrailingZeros().scale() > 6
+                || snapshot.realRate().collectedAt() == null || snapshot.dollarIndex().collectedAt() == null
+                || snapshot.realRate().collectedAt().getNano() % 1000 != 0
+                || snapshot.dollarIndex().collectedAt().getNano() % 1000 != 0)) {
+            throw new IllegalArgumentException("宏观快照值或时刻无法按数据库精度无损保存");
+        }
+        if (completeInput && !snapshot.input().macro().matches(snapshot, snapshot.input().checkedAt())) {
+            throw new IllegalArgumentException("宏观原始输入与快照指标或冻结时刻不匹配");
+        }
+        String inputHash = completeInput ? GoldSnapshotKey.hash(snapshot) : null;
+        String protocol = completeInput ? GoldSnapshotKey.PROTOCOL : null;
         UUID id = UUID.randomUUID();
         DollarIndexChangeMetrics dollarIndex = snapshot.dollarIndex();
         ResearchFactorAssessment dollarAssessment =
@@ -229,17 +245,17 @@ public class JdbcGoldResearchSnapshotRepository
                     research_version,
                     disclaimer,
                     created_at,
-                    gold_input
+                    gold_input, identity_protocol, input_hash
                 )
                 values (
                     ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
                     ?,
                     ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?::jsonb
+                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?::jsonb, ?, ?
                 )
-                on conflict (analysis_date, research_version)
-                do nothing
-                """;
+                """ + (completeInput
+                ? "on conflict (analysis_date, research_version, identity_protocol, input_hash) where input_hash is not null do nothing"
+                : "on conflict (analysis_date, research_version) where input_hash is null do nothing");
 
         int inserted = jdbcTemplate.update(
                 sql,
@@ -283,14 +299,14 @@ public class JdbcGoldResearchSnapshotRepository
                 snapshot.researchVersion(),
                 snapshot.disclaimer(),
                 createdAt,
-                writeInput(snapshot.input())
+                writeInput(snapshot.input()), protocol, inputHash
         );
 
         boolean created = inserted == 1;
 
         StoredGoldResearchSnapshot record = findByKey(
                 snapshot.analysisDate(),
-                snapshot.researchVersion()
+                snapshot.researchVersion(), protocol, inputHash
         ).orElseThrow(() -> new IllegalStateException(
                 "黄金研究快照保存后未能读取"
         ));
@@ -341,17 +357,18 @@ public class JdbcGoldResearchSnapshotRepository
      */
     private Optional<StoredGoldResearchSnapshot> findByKey(
             LocalDate analysisDate,
-            String researchVersion
+            String researchVersion, String protocol, String inputHash
     ) {
         List<StoredGoldResearchSnapshot> records = jdbcTemplate.query(
                 "select " + COLUMNS + """
                         from gold_research_snapshot
                         where analysis_date = ?
                           and research_version = ?
-                        """,
+                        """ + (inputHash == null ? " and input_hash is null"
+                        : " and identity_protocol = ? and input_hash = ?"),
                 rowMapper,
-                analysisDate,
-                researchVersion
+                inputHash == null ? new Object[]{analysisDate, researchVersion}
+                        : new Object[]{analysisDate, researchVersion, protocol, inputHash}
         );
 
         return records.stream().findFirst();

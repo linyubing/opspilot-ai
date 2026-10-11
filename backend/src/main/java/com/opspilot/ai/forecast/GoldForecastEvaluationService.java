@@ -65,7 +65,8 @@ public class GoldForecastEvaluationService {
                 calculateRolling20Accuracy(resolvedForecasts),
                 calculateNeutralBaselineAccuracy(resolvedForecasts),
                 evaluateVersions(resolvedForecasts),
-                GoldForecastTimingEvaluation.from(resolvedForecasts)
+                GoldForecastTimingEvaluation.from(resolvedForecasts),
+                GoldTargetEvaluation.from(allForecasts)
         );
     }
     /**

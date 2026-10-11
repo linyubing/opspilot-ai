@@ -10,7 +10,11 @@ import java.time.OffsetDateTime;
 import java.util.List;
 
 /** 留存快照实际使用的黄金窗口；闭市确认不等于历史当时可得性。 */
-public record GoldSnapshotInput(List<GoldDailyBar> bars, OffsetDateTime checkedAt) {
+public record GoldSnapshotInput(List<GoldDailyBar> bars, OffsetDateTime checkedAt, GoldMacroInput macro) {
+    /** 旧快照只留黄金窗口，不能事后伪造它的宏观原始输入。 */
+    public GoldSnapshotInput(List<GoldDailyBar> bars, OffsetDateTime checkedAt) {
+        this(bars, checkedAt, null);
+    }
     public GoldSnapshotInput {
         bars = bars == null ? List.of() : List.copyOf(bars);
     }

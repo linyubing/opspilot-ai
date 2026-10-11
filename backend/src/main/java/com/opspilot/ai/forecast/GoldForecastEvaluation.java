@@ -15,8 +15,16 @@ public record GoldForecastEvaluation(
         BigDecimal rolling20Accuracy,
         BigDecimal neutralBaselineAccuracy,
         List<ForecastVersionEvaluation> versions,
-        GoldForecastTimingEvaluation timing
+        GoldForecastTimingEvaluation timing,
+        GoldTargetEvaluation independent
 ) {
+    public GoldForecastEvaluation(int totalCount, int pendingCount, int resolvedCount,
+            BigDecimal overallAccuracy, DirectionEvaluation bullish, DirectionEvaluation neutral,
+            DirectionEvaluation bearish, BigDecimal rolling20Accuracy, BigDecimal neutralBaselineAccuracy,
+            List<ForecastVersionEvaluation> versions, GoldForecastTimingEvaluation timing) {
+        this(totalCount, pendingCount, resolvedCount, overallAccuracy, bullish, neutral, bearish,
+                rolling20Accuracy, neutralBaselineAccuracy, versions, timing, GoldTargetEvaluation.from(List.of()));
+    }
     public GoldForecastEvaluation(int totalCount, int pendingCount, int resolvedCount,
             BigDecimal overallAccuracy, DirectionEvaluation bullish, DirectionEvaluation neutral,
             DirectionEvaluation bearish, BigDecimal rolling20Accuracy, BigDecimal neutralBaselineAccuracy,

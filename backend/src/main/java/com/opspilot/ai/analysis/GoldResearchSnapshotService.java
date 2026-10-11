@@ -353,7 +353,9 @@ public class GoldResearchSnapshotService {
                 dollarIndexAssessment,
                 RESEARCH_VERSION,
                 DISCLAIMER,
-                new GoldSnapshotInput(sortedGold.subList(0, REQUIRED_OBSERVATION_COUNT), checkedAt)
+                new GoldSnapshotInput(sortedGold.subList(0, REQUIRED_OBSERVATION_COUNT), checkedAt,
+                        new GoldMacroInput(List.of(currentRealRate, realRate1, realRate5, realRate20),
+                                List.of(currentDollarIndex, dollarIndex1, dollarIndex5, dollarIndex20)))
         );
     }
 

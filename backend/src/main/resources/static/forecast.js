@@ -182,8 +182,23 @@ async function loadAccuracy() {
         text("timingBefore", timing?.beforeSession?.sampleCount ?? "暂无");
         text("timingDuring", timing?.inSession?.sampleCount ?? "暂无");
         text("timingInvalid", timing?.invalid?.sampleCount ?? "暂无");
+        const box = document.getElementById("independentStats");
+        if (box) {
+            box.replaceChildren();
+            const groups = data.independent?.groups ?? [];
+            if (!groups.length) box.textContent = "暂无具备候选发布合同的独立目标；旧记录不补造资格。";
+            for (const group of groups) {
+                const row = document.createElement("p");
+                const phase = group.phase === "BEFORE_SESSION" ? "候选开盘前" : "候选盘中";
+                row.textContent = `${group.modelName} · ${group.promptVersion} · ${group.forecastRuleVersion} · ${phase}：`
+                    + `独立目标 ${group.selectedCount}，已结算 ${group.resolvedCount}，未结算 ${group.unresolvedCount}，`
+                    + `重复记录排除 ${group.duplicatesIgnored}，候选命中率 ${percent(group.accuracy)}。`;
+                box.appendChild(row);
+            }
+        }
     } catch (error) {
         text("overallAccuracy", "读取失败");
+        text("independentStats", "独立目标统计读取失败，不能据此判断准确率。");
     }
 
     const backtestId = localStorage.getItem("goldBacktestId");

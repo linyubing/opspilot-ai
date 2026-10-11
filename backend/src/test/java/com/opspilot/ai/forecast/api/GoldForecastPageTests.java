@@ -32,6 +32,8 @@ class GoldForecastPageTests {
                 .contains("未命中原因")
                 .contains("id=\"missReasonPanel\"")
                 .contains("数据新鲜度")
+                .contains("独立目标统计")
+                .contains("id=\"independentStats\"")
                 .contains("id=\"dataStatusOverall\"")
                 .contains("forecast.js");
         assertThat(script)
