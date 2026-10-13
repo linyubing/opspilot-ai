@@ -1,0 +1,29 @@
+{
+  "purpose": "还原异常发布日，不是持仓模型效果验收",
+  "retrievedOn": "2026-10-13",
+  "sourceArchive": "2026-10-13-cot-source-record.json",
+  "officialAnnouncements": "https://www.cftc.gov/MarketReports/CommitmentsofTraders/HistoricalSpecialAnnouncements/index.htm",
+  "announcementReceipt": "backend/target/oct13-cot-special-announcements.html",
+  "announcementReceiptSha256": "1a6c48aa3ef66332c9407db7d2311a356af58b9f91e1dc7cfd9c2d0916e9c2b3",
+  "reportDateIndex": "https://www.cftc.gov/MarketReports/CommitmentsofTraders/HistoricalViewable/index.htm",
+  "releaseDateVerifiedCount": 7,
+  "remainingReleaseDateUnverifiedCount": 45,
+  "positionDateIsPublicationDate": false,
+  "calendarPolicy": "官方实际发布日期只精确到日；研究最早输入日期保守取实际发布日期加2个UTC日，不假造小时",
+  "matchedPositionFields": ["Open_Interest_All", "M_Money_Positions_Long_All", "M_Money_Positions_Short_All", "M_Money_Positions_Spread_All"],
+  "rows": [
+    {"positionDate":"2023-01-31","originalPlannedDate":"2023-02-03","actualPublicationDate":"2023-02-24","actualPublicationTime":null,"conservativeInputDate":"2023-02-26","reportUrl":"https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf013123.htm","localReceipt":"backend/target/oct13-cot-013123.html","receiptSha256":"45f7727cb9c8c009cfe1e475502f25ecd94eeb656b62121d8e3cbbc2fdf5c6ac"},
+    {"positionDate":"2023-02-07","originalPlannedDate":"2023-02-10","actualPublicationDate":"2023-03-03","actualPublicationTime":null,"conservativeInputDate":"2023-03-05","reportUrl":"https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf020723.htm","localReceipt":"backend/target/oct13-cot-020723.html","receiptSha256":"722d4b0c4e95b58ad581625e0e2b0353a73890a0fec848b769b1cc7868d1961b"},
+    {"positionDate":"2023-02-14","originalPlannedDate":"2023-02-17","actualPublicationDate":"2023-03-08","actualPublicationTime":null,"conservativeInputDate":"2023-03-10","reportUrl":"https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf021423.htm","localReceipt":"backend/target/oct13-cot-021423.html","receiptSha256":"1f1d698bb4188a6bb4b2b04d617b94c29ab7bb548a754882bcee58cb33852b49"},
+    {"positionDate":"2023-02-21","originalPlannedDate":"2023-02-24","actualPublicationDate":"2023-03-10","actualPublicationTime":null,"conservativeInputDate":"2023-03-12","reportUrl":"https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf022123.htm","localReceipt":"backend/target/oct13-cot-022123.html","receiptSha256":"64344d5501d92e962d124800a2f5523e5aad57d6e87f9519d96ec39c3d7209fa"},
+    {"positionDate":"2023-02-28","originalPlannedDate":"2023-03-03","actualPublicationDate":"2023-03-14","actualPublicationTime":null,"conservativeInputDate":"2023-03-16","reportUrl":"https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf022823.htm","localReceipt":"backend/target/oct13-cot-022823.html","receiptSha256":"76802a64869a2cb9fc7ea5db62e73fe7978af5d4fd708ac2393894ac45496022"},
+    {"positionDate":"2023-03-07","originalPlannedDate":"2023-03-10","actualPublicationDate":"2023-03-16","actualPublicationTime":null,"conservativeInputDate":"2023-03-18","reportUrl":"https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf030723.htm","localReceipt":"backend/target/oct13-cot-030723.html","receiptSha256":"e423478eaa9add959df185fafcfb98c228fc03be0f76d9907f7c5d1f0324144e"},
+    {"positionDate":"2023-03-14","originalPlannedDate":"2023-03-17","actualPublicationDate":"2023-03-21","actualPublicationTime":null,"conservativeInputDate":"2023-03-23","reportUrl":"https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf031423.htm","localReceipt":"backend/target/oct13-cot-031423.html","receiptSha256":"2fee6be3c0e319f12544b04d167b528966502c9918d5b2877bf10c90b3880dca"}
+  ],
+  "wholeYearHistoricalTrainingReady": false,
+  "firstPublishedBytesAuthenticated": false,
+  "goldPositionsMatchCurrentAnnualArchive": true,
+  "trainingPerformed": false,
+  "holdoutGoldPricesRead": false,
+  "productionChanged": false
+}
