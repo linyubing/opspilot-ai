@@ -1,0 +1,41 @@
+{
+  "protocol": "2026-10-13-event-2023-protocol.md",
+  "kind": "RETROSPECTIVE_DEVELOPMENT_DIAGNOSTIC",
+  "retrievedOn": "2026-10-13",
+  "strictPitVerified": false,
+  "trainingPerformed": false,
+  "holdoutRead": false,
+  "promotionAllowed": false,
+  "brierScore": null,
+  "logLoss": null,
+  "pairVerificationAt": "2026-10-13T06:13:02.1547836Z",
+  "pairVerification": "9 pairs passed GoldDailyBar.isConfirmedAt, GoldBarWindow.isContinuous and GoldForecastRule; XAUUSD/twelve_data; cutoff 2024-11-11",
+  "baselineInput": "2026-10-11-prior-compare-input.json",
+  "summary": {"opportunities":12,"sourceMissing":2,"versionRejected":1,"scoreable":9,"noSignal":4,"signals":5,"hits":2,"signalAccuracy":0.4,"opportunityCoverage":0.4166666666666667,"priorMatchedHits":2,"priorMatchedAccuracy":0.4,"priorAllHits":5,"priorAllAccuracy":0.5555555555555556,"fixed":2,"regressed":2},
+  "sources": {
+    "20230106": {"url":"https://www.desjardins.com/content/dam/pdf/en/personal/savings-investment/economic-studies/rates-recession-recovery-6-january-2023.pdf","sha256":"ebb656523e683949b973cb1a6ff6d2a2096108ef9d80052098e6839991d1e612","createdAt":"2023-01-06T14:24:54-05:00","page":3},
+    "20230210": {"url":"https://www.desjardins.com/content/dam/pdf/en/personal/savings-investment/economic-studies/federal-finances-10-february-2023.pdf","sha256":"ec8638dc69c7744ccb5bcb92f4c9a8d98b75e38e03a26aac1d65a962ad7bae5f","createdAt":"2023-02-13T09:52:40-05:00","page":5},
+    "20230406": {"url":"https://www.desjardins.com/content/dam/pdf/en/personal/savings-investment/economic-studies/canada-bank-6-april-2023.pdf","sha256":"e4d827b77e79f6c8e80f84295addae5054b8e3525bfbecb31165a9db88dd26f4","createdAt":"2023-04-06T13:30:32-04:00","page":4},
+    "20230505": {"url":"https://www.desjardins.com/content/dam/pdf/en/personal/savings-investment/economic-studies/canada-housing-correction-5-may-2023.pdf","sha256":"f8ae5b24e1d0882ff12b21d961b5e984e23baee38703fc3cb88c4c2fd2b083b2","createdAt":"2023-05-05T12:16:52-04:00","page":3},
+    "20230609": {"url":"https://www.desjardins.com/content/dam/pdf/en/personal/savings-investment/economic-studies/inflation-bank-of-canada-9-june-2023.pdf","sha256":"8e0a42641c1c7c0559ef5d4fd46c12fb00c4f3fe4ef6583cf275d8940b9bcef7","createdAt":"2023-06-09T12:55:27-04:00","page":5},
+    "20230707": {"url":"https://www.desjardins.com/content/dam/pdf/en/personal/savings-investment/economic-studies/economic-indicators-week-july-10-14-2023.pdf","sha256":"3055a8bfac33cb611a27583d37782d5ca0cc47eae45cf5570f8005674e152142","createdAt":"2023-07-07T10:40:38-04:00","page":1},
+    "20230804": {"url":"https://www.desjardins.com/content/dam/pdf/en/personal/savings-investment/economic-studies/economic-indicators-week-7-11-august-2023.pdf","sha256":"c8e5d853d032bbba501ed509e205653a2e4ab53d0df8b31734d703258a95aee3","createdAt":"2023-08-04T14:18:22-04:00","page":1},
+    "20230908": {"url":"https://www.desjardins.com/content/dam/pdf/en/personal/savings-investment/economic-studies/canada-population-8-september-2023.pdf","sha256":"0e53f110555e0a41945fb2f526502bc6b5018c0e54ac446bfce2c9a61054a74f","createdAt":"2023-09-12T08:52:33-04:00","page":5},
+    "20231006": {"url":"https://www.desjardins.com/content/dam/pdf/en/personal/savings-investment/economic-studies/provincial-budget-update-october-2023.pdf","sha256":"8aad3723f07537ff3b0fd86312b90e4b6fccd46ef894521cf8c82ec23738e769","createdAt":"2023-10-06T13:56:09-04:00","page":4},
+    "20231208": {"url":"https://www.desjardins.com/content/dam/pdf/en/personal/savings-investment/economic-studies/united-states-consumer-confidence-december-8-2023.pdf","sha256":"f97e703903e78ec63cca0c60b66f142c551a549e41852435ec907299b9d438cc","createdAt":"2023-12-12T10:12:46-05:00","page":5,"rejected":true}
+  },
+  "rows": [
+    {"releaseAt":"2023-01-12T13:30:00Z","sourceKey":"20230106","consensus":"0.0","archiveActual":"-0.1","surprisePp":"-0.1","actualSource":"https://www.bls.gov/news.release/archives/cpi_01122023.htm","status":"SCORED","base":"2023-01-13","target":"2023-01-16","direction":"BULLISH","actualReturn":"-0.1150577122305937836089549290745268","actual":"NEUTRAL","hit":false,"prior":"NEUTRAL","priorHit":true,"priorCount":444},
+    {"releaseAt":"2023-02-14T13:30:00Z","sourceKey":"20230210","consensus":"0.5","archiveActual":"0.5","surprisePp":"0.0","actualSource":"https://www.bls.gov/news.release/archives/cpi_02142023.htm","status":"NO_SIGNAL","base":"2023-02-15","target":"2023-02-16","direction":"NO_SIGNAL","actualReturn":"0.06807574602004409195270942394989921","actual":"NEUTRAL","hit":null,"prior":"NEUTRAL","priorHit":true,"priorCount":458},
+    {"releaseAt":"2023-03-14T12:30:00Z","status":"SOURCE_MISSING","consensus":null,"hit":null},
+    {"releaseAt":"2023-04-12T12:30:00Z","sourceKey":"20230406","consensus":"0.3","archiveActual":"0.1","surprisePp":"-0.2","actualSource":"https://www.bls.gov/news.release/archives/cpi_04122023.htm","status":"SCORED","base":"2023-04-13","target":"2023-04-14","direction":"BULLISH","actualReturn":"-1.799005811044110195903439397291508","actual":"BEARISH","hit":false,"prior":"NEUTRAL","priorHit":false,"priorCount":471},
+    {"releaseAt":"2023-05-10T12:30:00Z","sourceKey":"20230505","consensus":"0.4","archiveActual":"0.4","surprisePp":"0.0","actualSource":"https://www.bls.gov/news.release/archives/cpi_05102023.htm","status":"NO_SIGNAL","base":"2023-05-11","target":"2023-05-12","direction":"NO_SIGNAL","actualReturn":"-0.2182982388335078357498194053669511","actual":"NEUTRAL","hit":null,"prior":"NEUTRAL","priorHit":true,"priorCount":472},
+    {"releaseAt":"2023-06-13T12:30:00Z","sourceKey":"20230609","consensus":"0.2","archiveActual":"0.1","surprisePp":"-0.1","actualSource":"https://www.bls.gov/news.release/archives/cpi_06132023.htm","status":"SCORED","base":"2023-06-14","target":"2023-06-15","direction":"BULLISH","actualReturn":"0.7547350878261691427022828872913193","actual":"BULLISH","hit":true,"prior":"NEUTRAL","priorHit":false,"priorCount":483},
+    {"releaseAt":"2023-07-12T12:30:00Z","sourceKey":"20230707","consensus":"0.3","archiveActual":"0.2","surprisePp":"-0.1","actualSource":"https://www.bls.gov/news.release/archives/cpi_07122023.htm","status":"SCORED","base":"2023-07-13","target":"2023-07-14","direction":"BULLISH","actualReturn":"-0.2688019024398222204954094197368561","actual":"NEUTRAL","hit":false,"prior":"NEUTRAL","priorHit":true,"priorCount":493},
+    {"releaseAt":"2023-08-10T12:30:00Z","sourceKey":"20230804","consensus":"0.2","archiveActual":"0.2","surprisePp":"0.0","actualSource":"https://www.bls.gov/news.release/archives/cpi_08102023.htm","status":"NO_SIGNAL","base":"2023-08-11","target":"2023-08-14","direction":"NO_SIGNAL","actualReturn":"-0.2830501422492057568008132301085469","actual":"NEUTRAL","hit":null,"prior":"NEUTRAL","priorHit":true,"priorCount":497},
+    {"releaseAt":"2023-09-13T12:30:00Z","sourceKey":"20230908","consensus":"0.6","archiveActual":"0.6","surprisePp":"0.0","actualSource":"https://www.bls.gov/news.release/archives/cpi_09132023.htm","status":"NO_SIGNAL","base":"2023-09-14","target":"2023-09-15","direction":"NO_SIGNAL","actualReturn":"0.6939208080368363637305887443868336","actual":"BULLISH","hit":null,"prior":"NEUTRAL","priorHit":false,"priorCount":517},
+    {"releaseAt":"2023-10-12T12:30:00Z","sourceKey":"20231006","consensus":"0.3","archiveActual":"0.4","surprisePp":"0.1","actualSource":"https://www.bls.gov/news.release/archives/cpi_10122023.htm","status":"SCORED","base":"2023-10-13","target":"2023-10-16","direction":"BEARISH","actualReturn":"-0.6346123001421687394523793738285659","actual":"BEARISH","hit":true,"prior":"NEUTRAL","priorHit":false,"priorCount":528},
+    {"releaseAt":"2023-11-14T13:30:00Z","status":"SOURCE_MISSING","consensus":null,"hit":null},
+    {"releaseAt":"2023-12-12T13:30:00Z","sourceKey":"20231208","status":"VERSION_UNVERIFIED","consensus":null,"hit":null,"reason":"当前PDF创建晚于08:30发布，未证明共识属于当时可用版本"}
+  ]
+}
