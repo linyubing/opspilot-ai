@@ -1,0 +1,47 @@
+{
+  "purpose": "历史来源可得性记录，不是模型输入或预测结果",
+  "observedAt": "2026-10-13T05:37:50Z",
+  "country": "United States",
+  "referencePeriod": "2024-09",
+  "reportDate": "2024-10-04",
+  "releaseAt": "2024-10-10T12:30:00Z",
+  "source": {
+    "publisher": "Desjardins Economic Studies",
+    "url": "https://www.desjardins.com/content/dam/pdf/en/personal/savings-investment/economic-studies/canada-population-immigration-4-october-2024.pdf",
+    "page": 5,
+    "httpStatus": 200,
+    "rawSha256": "074277e075e606dc3472d76861ff714f8ed07973a8d3e8119b22d0888818ffdd",
+    "rawBytes": 398727,
+    "localArchive": "backend/target/oct13-desjardins-20241004.pdf",
+    "pdfCreationDate": "2024-10-04T13:01:06-04:00",
+    "pdfModificationDate": "2024-10-04T13:01:09-04:00",
+    "timeZonePrinted": "Eastern Daylight Time (GMT -4 hours)",
+    "provenance": "DATED_PUBLISHER_ARCHIVE",
+    "original2024BytesIndependentlyAuthenticated": false,
+    "lastPreReleaseConsensus": false
+  },
+  "actualSource": {
+    "publisher": "U.S. Bureau of Labor Statistics",
+    "url": "https://www.bls.gov/news.release/archives/cpi_10102024.htm",
+    "releaseId": "USDL-24-2101",
+    "access": "WEB_PRIMARY_ARCHIVE",
+    "directLocalDownloadHttpStatus": 403,
+    "rawSha256": null
+  },
+  "values": [
+    { "series": "headline_mom", "unit": "percent", "adjustment": "SA", "consensus": "0.1", "bankForecast": "0.1", "initialActual": "0.2", "surprisePp": "0.1" },
+    { "series": "core_mom", "unit": "percent", "adjustment": "SA", "consensus": "0.2", "bankForecast": "0.3", "initialActual": "0.3", "surprisePp": "0.1" },
+    { "series": "headline_yoy", "unit": "percent", "adjustment": "NSA", "consensus": "2.3", "bankForecast": "2.3", "initialActual": "2.4", "surprisePp": "0.1" },
+    { "series": "core_yoy", "unit": "percent", "adjustment": "NSA", "consensus": "3.2", "bankForecast": "3.2", "initialActual": "3.3", "surprisePp": "0.1" }
+  ],
+  "availability": {
+    "exactReportPublicationTimeVerified": false,
+    "strictPreReleaseSnapshotVerified": false,
+    "actualMayEnterPreReleasePrediction": false,
+    "earliestDMinusOneAsOfDate": "2024-10-11",
+    "historicalTrainingReady": false,
+    "reason": "仅一条发布事件，尚缺连续历史档案及统一可得性协议"
+  },
+  "holdoutRead": false,
+  "productionChanged": false
+}
