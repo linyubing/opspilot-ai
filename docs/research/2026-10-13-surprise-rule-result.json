@@ -1,0 +1,48 @@
+{
+  "protocol": "2026-10-13-surprise-rule-protocol.md",
+  "input": "2026-10-11-prior-compare-input.json",
+  "inputSha256": "0e72f54e73b78efb0c12c3a5c474976afadb4c163aba732f9c39e9b6b124d936",
+  "kind": "RETROSPECTIVE_DEVELOPMENT_DIAGNOSTIC",
+  "strictPitVerified": false,
+  "trainingPerformed": false,
+  "holdoutRead": false,
+  "promotionAllowed": false,
+  "brierScore": null,
+  "logLoss": null,
+  "summary": {
+    "opportunityCount": 10,
+    "inputMissing": 1,
+    "dataUnavailable": 2,
+    "noSignalCount": 3,
+    "scoreableCount": 7,
+    "signalCount": 4,
+    "signalHits": 2,
+    "signalAccuracy": 0.5,
+    "opportunityCoverage": 0.4,
+    "scoreableCoverage": 0.5714285714285714,
+    "priorHitsAllScoreable": 1,
+    "priorAccuracyAllScoreable": 0.14285714285714285,
+    "priorHitsMatchedSignals": 1,
+    "priorAccuracyMatchedSignals": 0.25,
+    "fixedRelativeToPrior": 2,
+    "regressedRelativeToPrior": 1
+  },
+  "rows": [
+    {"release":"2024-01-11","consensus":null,"archiveActual":null,"surprisePp":null,"status":"INPUT_MISSING","base":null,"target":null,"direction":null,"actual":null,"hit":null},
+    {"release":"2024-02-13","consensus":"0.2","archiveActual":"0.3","surprisePp":"0.1","actualSource":"https://www.bls.gov/news.release/archives/cpi_02132024.htm","status":"SCORED","base":"2024-02-14","target":"2024-02-15","direction":"BEARISH","actualReturn":"0.58710964927996200900","actual":"BULLISH","hit":false,"prior":"NEUTRAL","priorHit":false,"priorMajorityCount":559},
+    {"release":"2024-03-12","consensus":"0.4","archiveActual":"0.4","surprisePp":"0.0","actualSource":"https://www.bls.gov/news.release/archives/cpi_03122024.htm","status":"NO_SIGNAL","base":"2024-03-13","target":"2024-03-14","direction":"NO_SIGNAL","actualReturn":"-0.61557246208482625500","actual":"BEARISH","hit":null,"prior":"NEUTRAL","priorHit":false,"priorMajorityCount":570},
+    {"release":"2024-04-10","consensus":"0.3","archiveActual":"0.4","surprisePp":"0.1","actualSource":"https://www.bls.gov/news.release/archives/cpi_04102024.htm","status":"DATA_UNAVAILABLE","base":null,"target":null,"direction":"BEARISH","actual":null,"hit":null,"reason":"冻结1268条样本无发布日行，不能验证首个后续基准，不顺延"},
+    {"release":"2024-05-15","consensus":"0.4","archiveActual":"0.3","surprisePp":"-0.1","actualSource":"https://www.bls.gov/news.release/archives/cpi_05152024.htm","status":"SCORED","base":"2024-05-16","target":"2024-05-17","direction":"BULLISH","actualReturn":"1.54758617046916062400","actual":"BULLISH","hit":true,"prior":"NEUTRAL","priorHit":false,"priorMajorityCount":579},
+    {"release":"2024-06-12","consensus":"0.1","archiveActual":"0.0","surprisePp":"-0.1","actualSource":"https://www.bls.gov/news.release/archives/cpi_06122024.htm","actualSourceKind":"SAME_DAY_REISSUED_ARCHIVE","status":"SCORED","base":"2024-06-13","target":"2024-06-14","direction":"BULLISH","actualReturn":"1.25220712133667859400","actual":"BULLISH","hit":true,"prior":"NEUTRAL","priorHit":false,"priorMajorityCount":587},
+    {"release":"2024-07-11","consensus":"0.1","archiveActual":"-0.1","surprisePp":"-0.2","actualSource":"https://www.bls.gov/news.release/archives/cpi_07112024.htm","actualSourceKind":"SAME_DAY_REISSUED_ARCHIVE","status":"DATA_UNAVAILABLE","base":null,"target":null,"direction":"BULLISH","actual":null,"hit":null,"reason":"冻结1268条样本无发布日行，不能验证首个后续基准，不顺延"},
+    {"release":"2024-08-14","consensus":"0.2","archiveActual":"0.2","surprisePp":"0.0","actualSource":"https://www.bls.gov/news.release/archives/cpi_08142024.htm","status":"NO_SIGNAL","base":"2024-08-15","target":"2024-08-16","direction":"NO_SIGNAL","actualReturn":"2.08468018223025610600","actual":"BULLISH","hit":null,"prior":"NEUTRAL","priorHit":false,"priorMajorityCount":595},
+    {"release":"2024-09-11","consensus":"0.2","archiveActual":"0.2","surprisePp":"0.0","actualSource":"https://www.bls.gov/news.release/archives/cpi_09112024.htm","status":"NO_SIGNAL","base":"2024-09-12","target":"2024-09-13","direction":"NO_SIGNAL","actualReturn":"0.79179325842696629200","actual":"BULLISH","hit":null,"prior":"NEUTRAL","priorHit":false,"priorMajorityCount":607},
+    {"release":"2024-10-10","consensus":"0.1","archiveActual":"0.2","surprisePp":"0.1","actualSource":"https://www.bls.gov/news.release/archives/cpi_10102024.htm","status":"SCORED","base":"2024-10-11","target":"2024-10-14","direction":"BEARISH","actualReturn":"-0.13327560983415758300","actual":"NEUTRAL","hit":false,"prior":"NEUTRAL","priorHit":true,"priorMajorityCount":615}
+  ],
+  "missingSampleAudit": {
+    "aprilGoldBars": {"start":"2024-04-08","end":"2024-04-15","count":6},
+    "julyGoldBars": {"start":"2024-07-09","end":"2024-07-16","count":6},
+    "source":"gold_daily_bar; XAUUSD; twelve_data; read-only SQL",
+    "conclusion":"原始日线存在，冻结完整特征样本缺失原因待追踪，不等同市场休市或无行情"
+  }
+}
