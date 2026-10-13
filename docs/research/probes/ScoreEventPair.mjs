@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 
 // 只读验收冻结研究预测；不改输入/输出，不重跑模型，不写正式数据库。
-const [inputPath, resultPath, outputPath] = process.argv.slice(2);
+const [inputPath, resultPath, outputPath, baselinePath] = process.argv.slice(2);
 assert.ok(inputPath && resultPath && outputPath && !fs.existsSync(outputPath));
 assert.ok(!fs.existsSync(outputPath+'.source.json'),'来源归档已存在，拒绝重复取数或覆盖');
 const inputRaw=fs.readFileSync(inputPath), resultRaw=fs.readFileSync(resultPath);
@@ -27,6 +27,22 @@ const report={researchOnly:true,officialSessionCertified:false,inputHash:sha(inp
  outputs:pair.outputs.map(e=>({name:e.name,direction:e.content.direction,sampleCount:1,
   signalCount:e.content.direction==='NO_SIGNAL'?0:1,coverage:e.content.direction==='NO_SIGNAL'?0:1,
   hit:null,directionAccuracy:null,brierScore:null,logLoss:null}))};
+if(baselinePath){
+ const baselineRaw=fs.readFileSync(baselinePath),baseline=JSON.parse(baselineRaw);
+ assert.equal(baseline.version,'gold-frozen-frequency-forward-v1');assert.equal(baseline.trainingSamples,1268);
+ assert.equal(baseline.inputHash,'0e72f54e73b78efb0c12c3a5c474976afadb4c163aba732f9c39e9b6b124d936');
+ assert.equal(baseline.pairInputHash,sha(inputRaw));assert.equal(baseline.targetDate,pair.targetDate);
+ assert.equal(baseline.targetStart,pair.targetStart);assert.equal(baseline.targetEnd,pair.targetEnd);
+ assert.ok(Date.parse(baseline.createdAt)<Date.parse(pair.targetStart));assert.equal(baseline.settlementBasePrice,null);
+ const labels=['BULLISH','NEUTRAL','BEARISH'];
+ assert.equal(labels.reduce((n,k)=>n+baseline.counts[k],0),baseline.trainingSamples);
+ for(const key of labels){assert.ok(Number.isInteger(baseline.counts[key])&&baseline.counts[key]>0);assert.ok(Math.abs(baseline.probabilities[key]-baseline.counts[key]/baseline.trainingSamples)<1e-12);}
+ assert.equal(baseline.direction,['NEUTRAL','BULLISH','BEARISH'].reduce((best,k)=>baseline.counts[k]>baseline.counts[best]?k:best,'NEUTRAL'));
+ report.baselineHash=sha(baselineRaw);
+ report.baseline={direction:baseline.direction,probabilities:baseline.probabilities,labelAgeDays:baseline.labelAgeDays,
+  liveProbabilityCalibrated:false,confidenceThresholdApplied:false,sampleCount:1,signalCount:1,coverage:1,
+  hit:null,directionAccuracy:null,brierScore:null,logLoss:null};
+}
 if(Date.now()<Date.parse(pair.targetEnd)){
  report.status='WAITING_FOR_TARGET_CLOSE';
  report.reason='真实目标会话未结束；拒绝取未结束日线或提前评分';
@@ -64,6 +80,11 @@ if(Date.now()<Date.parse(pair.targetEnd)){
   report.returnPercent=Number(delta)/Number(base)*100;
   report.status='RESOLVED_RESEARCH_ONLY';report.reason='两日各24小时覆盖与原始日线OHLC一致，候选口径研究验收';
   for(const item of report.outputs){if(item.signalCount){item.hit=item.direction===report.actual;item.directionAccuracy=Number(item.hit);}else{item.hit=null;item.directionAccuracy=null;}}
+  if(report.baseline){
+   const b=report.baseline;b.hit=b.direction===report.actual;b.directionAccuracy=Number(b.hit);
+   b.brierScore=['BULLISH','NEUTRAL','BEARISH'].reduce((sum,k)=>sum+(b.probabilities[k]-Number(k===report.actual))**2,0);
+   b.logLoss=-Math.log(Math.max(1e-15,b.probabilities[report.actual]));
+  }
  }catch{report.status='SOURCE_NOT_VERIFIED';report.reason='真实来源或完整覆盖未通过；不填数据、不评分';report.actual=null;report.returnPercent=null;}
  // 原始供应商价格仅本地保存；即便失败也保留实际回执，不覆盖既有证据。
  fs.writeFileSync(outputPath+'.source.json',JSON.stringify({receipts},null,2)+'\n',{flag:'wx'});

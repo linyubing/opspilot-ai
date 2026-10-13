@@ -1,0 +1,32 @@
+{
+  "version": "gold-frozen-frequency-forward-v1",
+  "createdAt": "2026-10-13T02:03:11.052Z",
+  "inputHash": "0e72f54e73b78efb0c12c3a5c474976afadb4c163aba732f9c39e9b6b124d936",
+  "pairInputHash": "60b9537061d52d3a40ae4e71c2fc3e54adf752d789b1d8648a219fb0ee232a2e",
+  "targetDate": "2026-10-14",
+  "targetStart": "2026-10-13T20:00:00Z",
+  "targetEnd": "2026-10-14T20:00:00Z",
+  "settlementBaseDate": "2026-10-13",
+  "settlementBasePrice": null,
+  "trainingSamples": 1268,
+  "firstTrainingDate": "2019-02-05",
+  "lastTrainingTarget": "2024-11-08",
+  "labelAgeDays": 704,
+  "counts": {
+    "BULLISH": 351,
+    "NEUTRAL": 625,
+    "BEARISH": 292
+  },
+  "probabilities": {
+    "BULLISH": 0.27681388012618297,
+    "NEUTRAL": 0.49290220820189273,
+    "BEARISH": 0.2302839116719243
+  },
+  "direction": "NEUTRAL",
+  "researchOnly": true,
+  "officialSessionCertified": false,
+  "liveProbabilityCalibrated": false,
+  "actual": null,
+  "hit": null,
+  "accuracyImprovementProven": false
+}
