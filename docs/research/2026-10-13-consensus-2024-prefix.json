@@ -1,0 +1,101 @@
+{
+  "purpose": "2024年1至6月历史共识来源补齐，未训练或评分模型",
+  "retrievedOn": "2026-10-13",
+  "publisher": "Desjardins Economic Studies",
+  "provenance": "DATED_PUBLISHER_ARCHIVE",
+  "seriesOrder": ["headline_mom", "core_mom", "headline_yoy", "core_yoy"],
+  "units": "percent; mom=SA, yoy=NSA",
+  "strictPitVerified": false,
+  "historicalTrainingReady": false,
+  "holdoutRead": false,
+  "productionChanged": false,
+  "remaining2024MonthsRecord": "2026-10-13-consensus-coverage.json",
+  "events": [
+    {
+      "referencePeriod": "2023-12",
+      "plannedReleaseAt": "2024-01-11T13:30:00Z",
+      "reportDate": "2023-12-21",
+      "sourceUrl": "https://www.desjardins.com/content/dam/pdf/en/personal/savings-investment/economic-studies/canada-consumer-holidays-december-21-2023.pdf",
+      "localArchive": "backend/target/oct13-desjardins-20231221.pdf",
+      "rawSha256": "ecb73ce8b23d6738ecdb9238e1454be8e8bad285a210f4d025702c995519e112",
+      "pdfCreationDate": "2023-12-21T12:26:08-05:00",
+      "page": 9,
+      "consensus": [null, null, null, null],
+      "bankForecast": ["0.2", "0.3", "3.2", "3.8"],
+      "status": "CONSENSUS_MISSING",
+      "note": "原始共识栏全部n/a；银行预测不得替代。未确认存在更近的同出版方共识快照"
+    },
+    {
+      "referencePeriod": "2024-01",
+      "plannedReleaseAt": "2024-02-13T13:30:00Z",
+      "reportDate": "2024-02-09",
+      "sourceUrl": "https://www.desjardins.com/content/dam/pdf/en/personal/savings-investment/economic-studies/canada-housing-bank-canada-9-february-2024.pdf",
+      "localArchive": "backend/target/oct13-desjardins-20240209.pdf",
+      "rawSha256": "c84f8b34dc49cd8d88d657253a759a26f518831dadf17876347032f597529d78",
+      "pdfCreationDate": "2024-02-09T13:00:20-05:00",
+      "page": 5,
+      "consensus": ["0.2", "0.3", "2.9", "3.7"],
+      "bankForecast": ["0.1", "0.3", "2.9", "3.7"],
+      "status": "CONSENSUS_PRESENT"
+    },
+    {
+      "referencePeriod": "2024-02",
+      "plannedReleaseAt": "2024-03-12T12:30:00Z",
+      "reportDate": "2024-03-08",
+      "sourceUrl": "https://www.desjardins.com/content/dam/pdf/en/personal/savings-investment/economic-studies/canada-federal-budget-march-8-2024.pdf",
+      "localArchive": "backend/target/oct13-desjardins-20240308.pdf",
+      "rawSha256": "815861d81be836cc78a6086bde39b65edff906634508a9f67e1a296823ab8a44",
+      "pdfCreationDate": "2024-03-08T13:21:26-05:00",
+      "page": 5,
+      "consensus": ["0.4", "0.3", "3.1", "3.7"],
+      "bankForecast": ["0.5", "0.3", "3.2", "3.7"],
+      "status": "CONSENSUS_PRESENT"
+    },
+    {
+      "referencePeriod": "2024-03",
+      "plannedReleaseAt": "2024-04-10T12:30:00Z",
+      "reportDate": "2024-04-05",
+      "sourceUrl": "https://www.desjardins.com/content/dam/pdf/en/personal/savings-investment/economic-studies/canada-bank-monetary-policy-inflation-5-april-2024.pdf",
+      "localArchive": "backend/target/oct13-desjardins-20240405.pdf",
+      "rawSha256": "39e4a5caf91e36aff936543783616d983634f443534b1867552ec041321dbf67",
+      "pdfCreationDate": "2024-04-05T13:21:41-04:00",
+      "page": 5,
+      "consensus": ["0.3", "0.3", "3.5", null],
+      "bankForecast": ["0.4", "0.3", "3.5", null],
+      "status": "PARTIAL_LABEL_AMBIGUITY",
+      "rejectedRow": {
+        "printedLabel": "Excluding food and energy (m/m)",
+        "consensus": "3.7",
+        "bankForecast": "3.7",
+        "previous": "3.8",
+        "reason": "第四行仍打印m/m，与第二行核心环比重复；不擅自改为y/y"
+      }
+    },
+    {
+      "referencePeriod": "2024-04",
+      "plannedReleaseAt": "2024-05-15T12:30:00Z",
+      "reportDate": "2024-05-10",
+      "sourceUrl": "https://www.desjardins.com/content/dam/pdf/en/personal/savings-investment/economic-studies/united-states-credit-risks-may-10-2024.pdf",
+      "localArchive": "backend/target/oct13-desjardins-20240510.pdf",
+      "rawSha256": "868aa61491cba7e9ad20261f1168122b5278b829853ad651c72fd9af41418839",
+      "pdfCreationDate": "2024-05-10T12:00:38-04:00",
+      "page": 5,
+      "consensus": ["0.4", "0.3", "3.4", "3.6"],
+      "bankForecast": ["0.4", "0.3", "3.4", "3.7"],
+      "status": "CONSENSUS_PRESENT"
+    },
+    {
+      "referencePeriod": "2024-05",
+      "plannedReleaseAt": "2024-06-12T12:30:00Z",
+      "reportDate": "2024-06-07",
+      "sourceUrl": "https://www.desjardins.com/content/dam/pdf/en/personal/savings-investment/economic-studies/international-election-2024-7-june-2024.pdf",
+      "localArchive": "backend/target/oct13-desjardins-20240607.pdf",
+      "rawSha256": "fd72c5ad92672f0eb24d9faf95ab7fa412288cb974d175861683e6a3b90fc2d3",
+      "pdfCreationDate": "2024-06-07T12:54:40-04:00",
+      "page": 5,
+      "consensus": ["0.1", "0.3", "3.4", "3.5"],
+      "bankForecast": ["0.1", "0.3", "3.4", "3.6"],
+      "status": "CONSENSUS_PRESENT"
+    }
+  ]
+}
