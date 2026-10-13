@@ -1,0 +1,48 @@
+{
+  "protocol": "2026-10-13-event-timing-protocol.md",
+  "kind": "RETROSPECTIVE_TIMING_DIAGNOSTIC",
+  "strictPitVerified": false,
+  "trainingPerformed": false,
+  "holdoutRead": false,
+  "promotionAllowed": false,
+  "probabilityMetricsAvailable": false,
+  "verifiedAt": "2026-10-13T06:25:27.1264162Z",
+  "pairVerification": "32 pairs across 16 events passed current confirmation, configured continuity and production classification",
+  "delayedSources": ["2026-10-13-event-2023-result.json", "2026-10-13-surprise-rule-result.json", "2026-10-13-event-cohort-result.json"],
+  "baselineInput": "2026-10-11-prior-compare-input.json",
+  "rejected": [
+    {"release":"2023-03-14","reason":"SOURCE_MISSING"},
+    {"release":"2023-11-14","reason":"SOURCE_MISSING"},
+    {"release":"2023-12-12","reason":"VERSION_UNVERIFIED"},
+    {"release":"2024-01-11","reason":"CONSENSUS_MISSING"},
+    {"release":"2024-06-12","reason":"SAME_DAY_REISSUE_TIME_UNVERIFIED"},
+    {"release":"2024-07-11","reason":"SAME_DAY_REISSUE_TIME_UNVERIFIED"}
+  ],
+  "noSignalRows": [
+    {"release":"2023-02-14","earlyActual":"BEARISH","delayedActual":"NEUTRAL"},
+    {"release":"2023-05-10","earlyActual":"BEARISH","delayedActual":"NEUTRAL"},
+    {"release":"2023-08-10","earlyActual":"NEUTRAL","delayedActual":"NEUTRAL"},
+    {"release":"2023-09-13","earlyActual":"NEUTRAL","delayedActual":"BULLISH"},
+    {"release":"2024-03-12","earlyActual":"BULLISH","delayedActual":"BEARISH"},
+    {"release":"2024-08-14","earlyActual":"NEUTRAL","delayedActual":"BULLISH"},
+    {"release":"2024-09-11","earlyActual":"BULLISH","delayedActual":"BULLISH"}
+  ],
+  "signalRows": [
+    {"release":"2023-01-12","direction":"BULLISH","earlyTarget":"2023-01-13","earlyReturn":"1.23098015262581399100","earlyActual":"BULLISH","earlyHit":true,"earlyPriorCount":444,"earlyPriorHit":false,"delayedBase":"2023-01-13","delayedTarget":"2023-01-16","delayedActual":"NEUTRAL","delayedHit":false,"delayedPriorHit":true},
+    {"release":"2023-04-12","direction":"BULLISH","earlyTarget":"2023-04-13","earlyReturn":"1.24406656264505779300","earlyActual":"BULLISH","earlyHit":true,"earlyPriorCount":471,"earlyPriorHit":false,"delayedBase":"2023-04-13","delayedTarget":"2023-04-14","delayedActual":"BEARISH","delayedHit":false,"delayedPriorHit":false},
+    {"release":"2023-06-13","direction":"BULLISH","earlyTarget":"2023-06-14","earlyReturn":"-0.01739952878476041900","earlyActual":"NEUTRAL","earlyHit":false,"earlyPriorCount":483,"earlyPriorHit":true,"delayedBase":"2023-06-14","delayedTarget":"2023-06-15","delayedActual":"BULLISH","delayedHit":true,"delayedPriorHit":false},
+    {"release":"2023-07-12","direction":"BULLISH","earlyTarget":"2023-07-13","earlyReturn":"0.15870304272969615700","earlyActual":"NEUTRAL","earlyHit":false,"earlyPriorCount":493,"earlyPriorHit":true,"delayedBase":"2023-07-13","delayedTarget":"2023-07-14","delayedActual":"NEUTRAL","delayedHit":false,"delayedPriorHit":true},
+    {"release":"2023-10-12","direction":"BEARISH","earlyTarget":"2023-10-13","earlyReturn":"3.37401289985404161400","earlyActual":"BULLISH","earlyHit":false,"earlyPriorCount":527,"earlyPriorHit":false,"delayedBase":"2023-10-13","delayedTarget":"2023-10-16","delayedActual":"BEARISH","delayedHit":true,"delayedPriorHit":false},
+    {"release":"2024-02-13","direction":"BEARISH","earlyTarget":"2024-02-14","earlyReturn":"0.01289823481971631000","earlyActual":"NEUTRAL","earlyHit":false,"earlyPriorCount":559,"earlyPriorHit":true,"delayedBase":"2024-02-14","delayedTarget":"2024-02-15","delayedActual":"BULLISH","delayedHit":false,"delayedPriorHit":false},
+    {"release":"2024-04-10","direction":"BEARISH","earlyTarget":"2024-04-11","earlyReturn":"1.73368726707736523500","earlyActual":"BULLISH","earlyHit":false,"earlyPriorCount":576,"earlyPriorHit":false,"delayedBase":"2024-04-11","delayedTarget":"2024-04-12","delayedActual":"BEARISH","delayedHit":true,"delayedPriorHit":false},
+    {"release":"2024-05-15","direction":"BULLISH","earlyTarget":"2024-05-16","earlyReturn":"-0.34125880273514661000","earlyActual":"NEUTRAL","earlyHit":false,"earlyPriorCount":579,"earlyPriorHit":true,"delayedBase":"2024-05-16","delayedTarget":"2024-05-17","delayedActual":"BULLISH","delayedHit":true,"delayedPriorHit":false},
+    {"release":"2024-10-10","direction":"BEARISH","earlyTarget":"2024-10-11","earlyReturn":"1.02078236672685426600","earlyActual":"BULLISH","earlyHit":false,"earlyPriorCount":615,"earlyPriorHit":false,"delayedBase":"2024-10-11","delayedTarget":"2024-10-14","delayedActual":"NEUTRAL","delayedHit":false,"delayedPriorHit":true}
+  ],
+  "summary": {
+    "opportunities":22,"rejected":6,"eligible":16,"noSignal":7,"signals":9,"opportunityCoverage":0.4090909090909091,
+    "early":{"hits":2,"accuracy":0.2222222222222222,"priorHits":4,"priorAccuracy":0.4444444444444444},
+    "delayed":{"hits":4,"accuracy":0.4444444444444444,"priorHits":3,"priorAccuracy":0.3333333333333333},
+    "year2023":{"signals":5,"earlyHits":2,"earlyPriorHits":2,"delayedHits":2,"delayedPriorHits":2},
+    "year2024":{"signals":4,"earlyHits":0,"earlyPriorHits":2,"delayedHits":2,"delayedPriorHits":1}
+  }
+}
