@@ -1,0 +1,21 @@
+{
+  "sourceUrl": "https://tradingeconomics.com/united-states/calendar",
+  "sourceSha256": "9a0370d62e3582b3a470a12df380079bf2dac9cd03936ac45591991242e539f8",
+  "observedAt": "2026-10-13T01:41:04.851Z",
+  "eventId": "398220",
+  "event": "US CPI index",
+  "reference": "2026-09",
+  "timezone": "UTC",
+  "plannedReleaseAt": "2026-10-14T12:30:00Z",
+  "candidateTargetStart": "2026-10-13T20:00:00Z",
+  "previous": "334.98",
+  "consensus": "336.67",
+  "providerProjection": "336.5",
+  "actual": null,
+  "surprise": null,
+  "currentSnapshotVerified": true,
+  "historicalPitVerified": false,
+  "forecastGenerated": false,
+  "accuracyImprovementProven": false,
+  "researchOnly": true
+}
