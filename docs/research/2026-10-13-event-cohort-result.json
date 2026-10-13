@@ -1,0 +1,49 @@
+{
+  "protocol": "2026-10-13-event-cohort-protocol.md",
+  "kind": "RETROSPECTIVE_DEVELOPMENT_DIAGNOSTIC",
+  "unchangedPreviousResult": "2026-10-13-surprise-rule-result.json",
+  "reusePreviousStatuses": ["SCORED", "NO_SIGNAL", "INPUT_MISSING"],
+  "replacedDataUnavailableOnlyInNewCohort": ["2024-04-10", "2024-07-11"],
+  "currentPairVerificationAt": "2026-10-13T06:04:13.8270393Z",
+  "pairVerification": "GoldDailyBar.isConfirmedAt + GoldBarWindow.isContinuous + GoldForecastRule; 9 pairs passed",
+  "source": "gold_daily_bar; XAUUSD; twelve_data; read-only SQL; price_date < 2024-11-11",
+  "strictPitVerified": false,
+  "supplierCalendarCertified": false,
+  "trainingPerformed": false,
+  "holdoutRead": false,
+  "promotionAllowed": false,
+  "brierScore": null,
+  "logLoss": null,
+  "additionalRows": [
+    {"release":"2024-04-10","consensus":"0.3","archiveActual":"0.4","surprisePp":"0.1","status":"SCORED","base":"2024-04-11","target":"2024-04-12","direction":"BEARISH","actualReturn":"-1.25618469946915854600","actual":"BEARISH","hit":true,"prior":"NEUTRAL","priorHit":false,"priorMajorityCount":576},
+    {"release":"2024-07-11","consensus":"0.1","archiveActual":"-0.1","surprisePp":"-0.2","actualSourceKind":"SAME_DAY_REISSUED_ARCHIVE","status":"SCORED","base":"2024-07-12","target":"2024-07-15","direction":"BULLISH","actualReturn":"0.46326876378117795700","actual":"NEUTRAL","hit":false,"prior":"NEUTRAL","priorHit":true,"priorMajorityCount":592}
+  ],
+  "summary": {
+    "opportunityCount": 10,
+    "inputMissing": 1,
+    "dataUnavailable": 0,
+    "scoreableCount": 9,
+    "noSignalCount": 3,
+    "signalCount": 6,
+    "signalHits": 3,
+    "signalAccuracy": 0.5,
+    "opportunityCoverage": 0.6,
+    "scoreableCoverage": 0.6666666666666666,
+    "priorHitsAllScoreable": 2,
+    "priorAccuracyAllScoreable": 0.2222222222222222,
+    "priorHitsMatchedSignals": 2,
+    "priorAccuracyMatchedSignals": 0.3333333333333333,
+    "fixedRelativeToPrior": 3,
+    "regressedRelativeToPrior": 2
+  },
+  "goldWindowRootCause": {
+    "configuredHolidays": ["--01-01", "--07-04", "--12-25"],
+    "checkedBaseDates": ["2024-04-10", "2024-04-11", "2024-07-11", "2024-07-12"],
+    "allFourWindowsConfirmed": true,
+    "allFourWindowsContinuous": false,
+    "aprilFailure": {"previous":"2024-03-28","calendarExpected":"2024-03-29","nextActualRow":"2024-04-01"},
+    "julyFailure": {"row":"2024-07-04","calendarClassifiesAsNonTrading":true},
+    "gate": "GoldDatasetBuilder checks 22-row window before macro snapshot",
+    "productionCalendarChanged": false
+  }
+}
