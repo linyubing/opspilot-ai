@@ -1,0 +1,58 @@
+{
+  "version": "gold-prospective-event-pair-v1",
+  "inputHash": "60b9537061d52d3a40ae4e71c2fc3e54adf752d789b1d8648a219fb0ee232a2e",
+  "targetDate": "2026-10-14",
+  "targetStart": "2026-10-13T20:00:00Z",
+  "targetEnd": "2026-10-14T20:00:00Z",
+  "settlementBaseDate": "2026-10-13",
+  "settlementBasePrice": null,
+  "researchOnly": true,
+  "officialSessionCertified": false,
+  "modelDigest": "6488c96fa5faab64bb65cbd30d4289e20e6130ef535a93ef9a49f42eda893ea7",
+  "actual": null,
+  "hit": null,
+  "outputs": [
+    {
+      "name": "control",
+      "startedAt": "2026-10-13T01:50:20.653Z",
+      "promptHash": "31f488ed1cdb89124c7cf1ef985bbb8986740d4f37d73531c8f33476357a2d56",
+      "httpStatus": 200,
+      "rawResponse": "{\"model\":\"qwen3.5:9b\",\"created_at\":\"2026-10-13T01:50:27.5025466Z\",\"message\":{\"role\":\"assistant\",\"content\":\"{\\\"direction\\\":\\\"NO_SIGNAL\\\",\\\"reasoning\\\":\\\"缺乏 2026-10-13 真实收盘基准及当日实时数据，仅凭历史配置收益无法推断次日方向；宏观指标观测日期早于目标会话且存在缺失，不足以支撑预测。\\\",\\\"supportingKeys\\\":[\\\"gold1\\\",\\\"gold5\\\",\\\"gold20\\\",\\\"range1\\\",\\\"DFII10\\\",\\\"DTWEXBGS\\\"]}\"},\"done\":true,\"done_reason\":\"stop\",\"total_duration\":6846846800,\"load_duration\":5901343600,\"prompt_eval_count\":715,\"prompt_eval_cached_count\":0,\"prompt_eval_duration\":219394000,\"eval_count\":86,\"eval_duration\":719874000}",
+      "completedAt": "2026-10-13T01:50:27.503Z",
+      "content": {
+        "direction": "NO_SIGNAL",
+        "reasoning": "缺乏 2026-10-13 真实收盘基准及当日实时数据，仅凭历史配置收益无法推断次日方向；宏观指标观测日期早于目标会话且存在缺失，不足以支撑预测。",
+        "supportingKeys": [
+          "gold1",
+          "gold5",
+          "gold20",
+          "range1",
+          "DFII10",
+          "DTWEXBGS"
+        ]
+      },
+      "syntaxPassed": true
+    },
+    {
+      "name": "candidate",
+      "startedAt": "2026-10-13T01:50:27.504Z",
+      "promptHash": "d0014b9b345a7d499dea283bde2519fb8e7bde9fa276d072581a73565e1452a6",
+      "httpStatus": 200,
+      "rawResponse": "{\"model\":\"qwen3.5:9b\",\"created_at\":\"2026-10-13T01:50:32.9957499Z\",\"message\":{\"role\":\"assistant\",\"content\":\"{\\n\\\"direction\\\": \\\"NO_SIGNAL\\\",\\n\\\"reasoning\\\": \\\"目标会话 (2026-10-13 至 2026-10-14) 尚未结束，10 月 13 日收盘价为未知基准。新增的 US CPI 事件实际值 (actual) 和惊喜度 (surprise) 均为 null，无法判断市场反应方向。现有配置数据 gold1/5/20 为历史期收益，range1 仅为波幅指标，均不足以在缺乏实时收盘价和 CPI 实际数据的情况下预测当日收益率类别。\\\",\\n\\\"supportingKeys\\\": [\\\"gold1\\\", \\\"gold5\\\", \\\"gold20\\\", \\\"range1\\\", \\\"DFII10\\\", \\\"DTWEXBGS\\\"]\\n}\"},\"done\":true,\"done_reason\":\"stop\",\"total_duration\":5489684100,\"load_duration\":1004700,\"prompt_eval_count\":1030,\"prompt_eval_cached_count\":0,\"prompt_eval_duration\":4098197000,\"eval_count\":170,\"eval_duration\":1386967000}",
+      "completedAt": "2026-10-13T01:50:32.997Z",
+      "content": {
+        "direction": "NO_SIGNAL",
+        "reasoning": "目标会话 (2026-10-13 至 2026-10-14) 尚未结束，10 月 13 日收盘价为未知基准。新增的 US CPI 事件实际值 (actual) 和惊喜度 (surprise) 均为 null，无法判断市场反应方向。现有配置数据 gold1/5/20 为历史期收益，range1 仅为波幅指标，均不足以在缺乏实时收盘价和 CPI 实际数据的情况下预测当日收益率类别。",
+        "supportingKeys": [
+          "gold1",
+          "gold5",
+          "gold20",
+          "range1",
+          "DFII10",
+          "DTWEXBGS"
+        ]
+      },
+      "syntaxPassed": true
+    }
+  ]
+}

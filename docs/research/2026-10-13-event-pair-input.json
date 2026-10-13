@@ -1,0 +1,106 @@
+{
+  "version": "gold-prospective-event-pair-v1",
+  "preparedAt": "2026-10-13T01:50:20.583Z",
+  "targetDate": "2026-10-14",
+  "targetStart": "2026-10-13T20:00:00Z",
+  "targetEnd": "2026-10-14T20:00:00Z",
+  "settlementBaseDate": "2026-10-13",
+  "settlementBasePrice": null,
+  "lastKnownGoldDate": "2026-10-12",
+  "contextHash": "e9c753835b8a03cbf9011965209769f121b31dd114393815664e6a2b137b05a6",
+  "oldHourSourceHash": "090e5de5fc1ceb49fa1e5bddd21dfd62a6094a0cc8dfbc4c3a3e2424a45bf974",
+  "consensus": {
+    "sourceUrl": "https://tradingeconomics.com/united-states/calendar",
+    "sourceSha256": "9a0370d62e3582b3a470a12df380079bf2dac9cd03936ac45591991242e539f8",
+    "observedAt": "2026-10-13T01:41:04.851Z",
+    "eventId": "398220",
+    "event": "US CPI index",
+    "reference": "2026-09",
+    "timezone": "UTC",
+    "plannedReleaseAt": "2026-10-14T12:30:00Z",
+    "candidateTargetStart": "2026-10-13T20:00:00Z",
+    "previous": "334.98",
+    "consensus": "336.67",
+    "providerProjection": "336.5",
+    "actual": null,
+    "surprise": null,
+    "currentSnapshotVerified": true,
+    "historicalPitVerified": false,
+    "forecastGenerated": false,
+    "accuracyImprovementProven": false,
+    "researchOnly": true
+  },
+  "facts": {
+    "gold1": -0.61534762,
+    "gold5": 0.68511681,
+    "gold20": -2.99960009,
+    "range1": 1.42443543
+  },
+  "macro": {
+    "DFII10": {
+      "observationDate": "2026-10-08",
+      "value": 2.87,
+      "missingObservationDates": [
+        "2026-09-07"
+      ],
+      "changeBasis": "valid observations, not consecutive trading days",
+      "change1": -4.999999999999982,
+      "change5": -0.9999999999999787,
+      "change20": 32.00000000000003
+    },
+    "DTWEXBGS": {
+      "observationDate": "2026-10-02",
+      "value": 121.3848,
+      "missingObservationDates": [
+        "2026-09-07"
+      ],
+      "changeBasis": "valid observations, not consecutive trading days",
+      "change1": -0.33123077605220486,
+      "change5": 0.8765893792071822,
+      "change20": 2.757879231674387
+    }
+  },
+  "weekendRowsExcluded": 12,
+  "modelDigest": "6488c96fa5faab64bb65cbd30d4289e20e6130ef535a93ef9a49f42eda893ea7",
+  "actual": null,
+  "hit": null,
+  "eventBlock": "新增已观察事件信息：{\"sourceUrl\":\"https://tradingeconomics.com/united-states/calendar\",\"sourceSha256\":\"9a0370d62e3582b3a470a12df380079bf2dac9cd03936ac45591991242e539f8\",\"observedAt\":\"2026-10-13T01:41:04.851Z\",\"eventId\":\"398220\",\"event\":\"US CPI index\",\"reference\":\"2026-09\",\"timezone\":\"UTC\",\"plannedReleaseAt\":\"2026-10-14T12:30:00Z\",\"candidateTargetStart\":\"2026-10-13T20:00:00Z\",\"previous\":\"334.98\",\"consensus\":\"336.67\",\"providerProjection\":\"336.5\",\"actual\":null,\"surprise\":null,\"currentSnapshotVerified\":true,\"historicalPitVerified\":false,\"forecastGenerated\":false,\"accuracyImprovementProven\":false,\"researchOnly\":true}。此处consensus是发布前市场共识，providerProjection是供应商自身预测，actual和surprise未知。不能将预期上升说成实际超预期，也不能直接推定黄金涨跌。只可讨论未知实际值下的信息与局限。\n",
+  "controlRequest": {
+    "model": "qwen3.5:9b",
+    "stream": false,
+    "think": false,
+    "format": "json",
+    "messages": [
+      {
+        "role": "user",
+        "content": "你是黄金方向研究助手，仅使用提供的真实事实，不得编造新闻、DXY或未来价格。\n预测目标：2026-10-14候选会话收盘相对2026-10-13真实收盘的收益率类别。目标会话为[2026-10-13T20:00:00Z,2026-10-14T20:00:00Z)。悉尼07:00候选口径未被供应商正式认证。\n当前只知道10月12日已结束价格，10月13日收盘是未知结算基准，不要将12日价格冒充13日基准或给出目标价格。信息截止为本次请求前。\n已知黄金事实：{\"gold1\":-0.61534762,\"gold5\":0.68511681,\"gold20\":-2.99960009,\"range1\":1.42443543}。gold1/5/20为配置交易日1/5/20期百分比收益；range1是波幅，不是上涨信号。\n宏观D-1有效版本：{\"DFII10\":{\"observationDate\":\"2026-10-08\",\"value\":2.87,\"missingObservationDates\":[\"2026-09-07\"],\"changeBasis\":\"valid observations, not consecutive trading days\",\"change1\":-4.999999999999982,\"change5\":-0.9999999999999787,\"change20\":32.00000000000003},\"DTWEXBGS\":{\"observationDate\":\"2026-10-02\",\"value\":121.3848,\"missingObservationDates\":[\"2026-09-07\"],\"changeBasis\":\"valid observations, not consecutive trading days\",\"change1\":-0.33123077605220486,\"change5\":0.8765893792071822,\"change20\":2.757879231674387}}。DFII10单位百分比，change单位bp；DTWEXBGS是广义美元指数，不是DXY，其change为百分比；观测旧日期不得说成实时。\n分类：收益率>0.5%为BULLISH、<-0.5%为BEARISH，其余含边界NEUTRAL。中性表示落在该区间，不代表信心低；证据不足可NO_SIGNAL。高波幅不保证横盘。不能把缺少上涨证据当作中性或必然下跌。\n只输出JSON：{\"direction\":\"BULLISH|NEUTRAL|BEARISH|NO_SIGNAL\",\"reasoning\":\"简短中文证据和局限\",\"supportingKeys\":[\"gold1\"]}。supportingKeys只可引用gold1/gold5/gold20/range1/DFII10/DTWEXBGS；有新增事件块时可引用CPI_CONSENSUS。不要输出未经校准的概率。\n"
+      }
+    ],
+    "options": {
+      "num_ctx": 8192,
+      "temperature": 0,
+      "seed": 42,
+      "num_predict": 2048
+    }
+  },
+  "candidateRequest": {
+    "model": "qwen3.5:9b",
+    "stream": false,
+    "think": false,
+    "format": "json",
+    "messages": [
+      {
+        "role": "user",
+        "content": "你是黄金方向研究助手，仅使用提供的真实事实，不得编造新闻、DXY或未来价格。\n预测目标：2026-10-14候选会话收盘相对2026-10-13真实收盘的收益率类别。目标会话为[2026-10-13T20:00:00Z,2026-10-14T20:00:00Z)。悉尼07:00候选口径未被供应商正式认证。\n当前只知道10月12日已结束价格，10月13日收盘是未知结算基准，不要将12日价格冒充13日基准或给出目标价格。信息截止为本次请求前。\n已知黄金事实：{\"gold1\":-0.61534762,\"gold5\":0.68511681,\"gold20\":-2.99960009,\"range1\":1.42443543}。gold1/5/20为配置交易日1/5/20期百分比收益；range1是波幅，不是上涨信号。\n宏观D-1有效版本：{\"DFII10\":{\"observationDate\":\"2026-10-08\",\"value\":2.87,\"missingObservationDates\":[\"2026-09-07\"],\"changeBasis\":\"valid observations, not consecutive trading days\",\"change1\":-4.999999999999982,\"change5\":-0.9999999999999787,\"change20\":32.00000000000003},\"DTWEXBGS\":{\"observationDate\":\"2026-10-02\",\"value\":121.3848,\"missingObservationDates\":[\"2026-09-07\"],\"changeBasis\":\"valid observations, not consecutive trading days\",\"change1\":-0.33123077605220486,\"change5\":0.8765893792071822,\"change20\":2.757879231674387}}。DFII10单位百分比，change单位bp；DTWEXBGS是广义美元指数，不是DXY，其change为百分比；观测旧日期不得说成实时。\n分类：收益率>0.5%为BULLISH、<-0.5%为BEARISH，其余含边界NEUTRAL。中性表示落在该区间，不代表信心低；证据不足可NO_SIGNAL。高波幅不保证横盘。不能把缺少上涨证据当作中性或必然下跌。\n只输出JSON：{\"direction\":\"BULLISH|NEUTRAL|BEARISH|NO_SIGNAL\",\"reasoning\":\"简短中文证据和局限\",\"supportingKeys\":[\"gold1\"]}。supportingKeys只可引用gold1/gold5/gold20/range1/DFII10/DTWEXBGS；有新增事件块时可引用CPI_CONSENSUS。不要输出未经校准的概率。\n新增已观察事件信息：{\"sourceUrl\":\"https://tradingeconomics.com/united-states/calendar\",\"sourceSha256\":\"9a0370d62e3582b3a470a12df380079bf2dac9cd03936ac45591991242e539f8\",\"observedAt\":\"2026-10-13T01:41:04.851Z\",\"eventId\":\"398220\",\"event\":\"US CPI index\",\"reference\":\"2026-09\",\"timezone\":\"UTC\",\"plannedReleaseAt\":\"2026-10-14T12:30:00Z\",\"candidateTargetStart\":\"2026-10-13T20:00:00Z\",\"previous\":\"334.98\",\"consensus\":\"336.67\",\"providerProjection\":\"336.5\",\"actual\":null,\"surprise\":null,\"currentSnapshotVerified\":true,\"historicalPitVerified\":false,\"forecastGenerated\":false,\"accuracyImprovementProven\":false,\"researchOnly\":true}。此处consensus是发布前市场共识，providerProjection是供应商自身预测，actual和surprise未知。不能将预期上升说成实际超预期，也不能直接推定黄金涨跌。只可讨论未知实际值下的信息与局限。\n"
+      }
+    ],
+    "options": {
+      "num_ctx": 8192,
+      "temperature": 0,
+      "seed": 42,
+      "num_predict": 2048
+    }
+  },
+  "controlPromptHash": "31f488ed1cdb89124c7cf1ef985bbb8986740d4f37d73531c8f33476357a2d56",
+  "candidatePromptHash": "d0014b9b345a7d499dea283bde2519fb8e7bde9fa276d072581a73565e1452a6"
+}
