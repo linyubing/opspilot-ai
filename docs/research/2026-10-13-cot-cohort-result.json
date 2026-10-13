@@ -1,0 +1,2901 @@
+{
+  "protocol": "2026-10-13-cot-cohort-protocol.md",
+  "kind": "RETROSPECTIVE_COVERAGE_DIAGNOSTIC_NOT_STRICT_PIT",
+  "priceReceiptSha256": "438fde19c8d6bc3d7e41554acef7b0680a8300d097a87b9f40e9dbc294cfa7c7",
+  "priceVerifiedAt": "2026-10-13T07:19:24.8775496Z",
+  "legacyLabelsVerified": 36,
+  "strictPitVerified": false,
+  "trainingPerformed": false,
+  "holdoutRead": false,
+  "promotionAllowed": false,
+  "brierScore": null,
+  "logLoss": null,
+  "summary": {
+    "opportunities": 52,
+    "noPrevious": 1,
+    "stale": 5,
+    "rejectedPrice": 0,
+    "coverage": 0.8846153846153846,
+    "signals": 46,
+    "hits": 13,
+    "accuracy": 0.2826086956521739,
+    "priorHits": 20,
+    "priorAccuracy": 0.43478260869565216,
+    "fixed": 13,
+    "regressed": 20
+  },
+  "relationship": {
+    "samePair": 35,
+    "newEligible": 10,
+    "changedPair": 1
+  },
+  "samePair": {
+    "signals": 35,
+    "hits": 8,
+    "accuracy": 0.22857142857142856,
+    "priorHits": 16,
+    "priorAccuracy": 0.45714285714285713,
+    "fixed": 8,
+    "regressed": 16
+  },
+  "newEligible": {
+    "signals": 10,
+    "hits": 4,
+    "accuracy": 0.4,
+    "priorHits": 4,
+    "priorAccuracy": 0.4,
+    "fixed": 4,
+    "regressed": 4
+  },
+  "confusion": {
+    "BULLISH": {
+      "BULLISH": 7,
+      "NEUTRAL": 0,
+      "BEARISH": 6
+    },
+    "NEUTRAL": {
+      "BULLISH": 9,
+      "NEUTRAL": 0,
+      "BEARISH": 11
+    },
+    "BEARISH": {
+      "BULLISH": 7,
+      "NEUTRAL": 0,
+      "BEARISH": 6
+    }
+  },
+  "months": [
+    {
+      "month": "2023-01",
+      "signals": 3,
+      "hits": 0,
+      "accuracy": 0,
+      "priorHits": 2,
+      "priorAccuracy": 0.6666666666666666,
+      "fixed": 0,
+      "regressed": 2
+    },
+    {
+      "month": "2023-03",
+      "signals": 3,
+      "hits": 2,
+      "accuracy": 0.6666666666666666,
+      "priorHits": 0,
+      "priorAccuracy": 0,
+      "fixed": 2,
+      "regressed": 0
+    },
+    {
+      "month": "2023-04",
+      "signals": 4,
+      "hits": 2,
+      "accuracy": 0.5,
+      "priorHits": 1,
+      "priorAccuracy": 0.25,
+      "fixed": 2,
+      "regressed": 1
+    },
+    {
+      "month": "2023-05",
+      "signals": 5,
+      "hits": 3,
+      "accuracy": 0.6,
+      "priorHits": 1,
+      "priorAccuracy": 0.2,
+      "fixed": 3,
+      "regressed": 1
+    },
+    {
+      "month": "2023-06",
+      "signals": 4,
+      "hits": 1,
+      "accuracy": 0.25,
+      "priorHits": 2,
+      "priorAccuracy": 0.5,
+      "fixed": 1,
+      "regressed": 2
+    },
+    {
+      "month": "2023-07",
+      "signals": 5,
+      "hits": 2,
+      "accuracy": 0.4,
+      "priorHits": 2,
+      "priorAccuracy": 0.4,
+      "fixed": 2,
+      "regressed": 2
+    },
+    {
+      "month": "2023-08",
+      "signals": 4,
+      "hits": 1,
+      "accuracy": 0.25,
+      "priorHits": 2,
+      "priorAccuracy": 0.5,
+      "fixed": 1,
+      "regressed": 2
+    },
+    {
+      "month": "2023-09",
+      "signals": 4,
+      "hits": 0,
+      "accuracy": 0,
+      "priorHits": 2,
+      "priorAccuracy": 0.5,
+      "fixed": 0,
+      "regressed": 2
+    },
+    {
+      "month": "2023-10",
+      "signals": 5,
+      "hits": 0,
+      "accuracy": 0,
+      "priorHits": 4,
+      "priorAccuracy": 0.8,
+      "fixed": 0,
+      "regressed": 4
+    },
+    {
+      "month": "2023-11",
+      "signals": 4,
+      "hits": 1,
+      "accuracy": 0.25,
+      "priorHits": 2,
+      "priorAccuracy": 0.5,
+      "fixed": 1,
+      "regressed": 2
+    },
+    {
+      "month": "2023-12",
+      "signals": 4,
+      "hits": 0,
+      "accuracy": 0,
+      "priorHits": 2,
+      "priorAccuracy": 0.5,
+      "fixed": 0,
+      "regressed": 2
+    },
+    {
+      "month": "2024-01",
+      "signals": 1,
+      "hits": 1,
+      "accuracy": 1,
+      "priorHits": 0,
+      "priorAccuracy": 0,
+      "fixed": 1,
+      "regressed": 0
+    }
+  ],
+  "rows": [
+    {
+      "positionDate": "2023-01-03",
+      "baseDate": "2023-01-09",
+      "targetDate": "2023-01-10",
+      "positionAgeDays": 6,
+      "status": "NO_PREVIOUS_REPORT"
+    },
+    {
+      "positionDate": "2023-01-10",
+      "baseDate": "2023-01-16",
+      "targetDate": "2023-01-17",
+      "positionAgeDays": 6,
+      "bars": [
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-01-16",
+          "open": 1920.38501,
+          "high": 1929.24219,
+          "low": 1910.73999,
+          "close": 1918.00061035,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        },
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-01-17",
+          "open": 1917.81494,
+          "high": 1919.82996,
+          "low": 1903.505,
+          "close": 1908.39001,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        }
+      ],
+      "actualReturn": "-0.501073894248982609558636212662350200",
+      "actual": "BEARISH",
+      "status": "SCORED",
+      "direction": "BULLISH",
+      "hit": false,
+      "prior": "NEUTRAL",
+      "priorCounts": {
+        "BULLISH": 254,
+        "NEUTRAL": 444,
+        "BEARISH": 210
+      },
+      "priorHit": false,
+      "oldRelationship": "SAME_PAIR",
+      "evidence": "ARCHIVE_UPDATED_ONLY"
+    },
+    {
+      "positionDate": "2023-01-17",
+      "baseDate": "2023-01-23",
+      "targetDate": "2023-01-24",
+      "positionAgeDays": 6,
+      "bars": [
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-01-23",
+          "open": 1926.20496,
+          "high": 1935.69055,
+          "low": 1911.43506,
+          "close": 1931.30005,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        },
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-01-24",
+          "open": 1931.35498,
+          "high": 1942.92505,
+          "low": 1916.82495,
+          "close": 1937.44995,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        }
+      ],
+      "actualReturn": "0.318433171479491237003799590850732900",
+      "actual": "NEUTRAL",
+      "status": "SCORED",
+      "direction": "BULLISH",
+      "hit": false,
+      "prior": "NEUTRAL",
+      "priorCounts": {
+        "BULLISH": 255,
+        "NEUTRAL": 447,
+        "BEARISH": 211
+      },
+      "priorHit": true,
+      "oldRelationship": "SAME_PAIR",
+      "evidence": "ARCHIVE_UPDATED_ONLY"
+    },
+    {
+      "positionDate": "2023-01-24",
+      "baseDate": "2023-01-30",
+      "targetDate": "2023-01-31",
+      "positionAgeDays": 6,
+      "bars": [
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-01-30",
+          "open": 1928.39502,
+          "high": 1934.61499,
+          "low": 1920.58496,
+          "close": 1922.51733,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        },
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-01-31",
+          "open": 1922.81995,
+          "high": 1931.15417,
+          "low": 1900.745,
+          "close": 1927.88,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        }
+      ],
+      "actualReturn": "0.278940008306713157170864098270573200",
+      "actual": "NEUTRAL",
+      "status": "SCORED",
+      "direction": "BULLISH",
+      "hit": false,
+      "prior": "NEUTRAL",
+      "priorCounts": {
+        "BULLISH": 255,
+        "NEUTRAL": 451,
+        "BEARISH": 212
+      },
+      "priorHit": true,
+      "oldRelationship": "SAME_PAIR",
+      "evidence": "ARCHIVE_UPDATED_ONLY"
+    },
+    {
+      "positionDate": "2023-01-31",
+      "baseDate": "2023-02-27",
+      "targetDate": "2023-02-28",
+      "positionAgeDays": 27,
+      "status": "STALE_POSITION"
+    },
+    {
+      "positionDate": "2023-02-07",
+      "baseDate": "2023-03-06",
+      "targetDate": "2023-03-07",
+      "positionAgeDays": 27,
+      "status": "STALE_POSITION"
+    },
+    {
+      "positionDate": "2023-02-14",
+      "baseDate": "2023-03-10",
+      "targetDate": "2023-03-13",
+      "positionAgeDays": 24,
+      "status": "STALE_POSITION"
+    },
+    {
+      "positionDate": "2023-02-21",
+      "baseDate": "2023-03-13",
+      "targetDate": "2023-03-14",
+      "positionAgeDays": 20,
+      "status": "STALE_POSITION"
+    },
+    {
+      "positionDate": "2023-02-28",
+      "baseDate": "2023-03-16",
+      "targetDate": "2023-03-17",
+      "positionAgeDays": 16,
+      "status": "STALE_POSITION"
+    },
+    {
+      "positionDate": "2023-03-07",
+      "baseDate": "2023-03-20",
+      "targetDate": "2023-03-21",
+      "positionAgeDays": 13,
+      "bars": [
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-03-20",
+          "open": 1987.59497,
+          "high": 2010.19495,
+          "low": 1965.77002,
+          "close": 1978.71216,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        },
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-03-21",
+          "open": 1979.17004,
+          "high": 1985.30139,
+          "low": 1935.41077,
+          "close": 1940.14612,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        }
+      ],
+      "actualReturn": "-1.94904750572715942676574039955361700",
+      "actual": "BEARISH",
+      "status": "SCORED",
+      "direction": "BEARISH",
+      "hit": true,
+      "prior": "NEUTRAL",
+      "priorCounts": {
+        "BULLISH": 264,
+        "NEUTRAL": 468,
+        "BEARISH": 221
+      },
+      "priorHit": false,
+      "oldRelationship": "SAME_PAIR",
+      "evidence": "NOTICE_AND_ARCHIVE"
+    },
+    {
+      "positionDate": "2023-03-14",
+      "baseDate": "2023-03-23",
+      "targetDate": "2023-03-24",
+      "positionAgeDays": 9,
+      "bars": [
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-03-23",
+          "open": 1967.91003,
+          "high": 2003.43457,
+          "low": 1964.38501,
+          "close": 1993.5033,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        },
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-03-24",
+          "open": 1993.995,
+          "high": 2003.19495,
+          "low": 1975.17505,
+          "close": 1977.21716,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        }
+      ],
+      "actualReturn": "-0.816960774531950862584476283535622900",
+      "actual": "BEARISH",
+      "status": "SCORED",
+      "direction": "BULLISH",
+      "hit": false,
+      "prior": "NEUTRAL",
+      "priorCounts": {
+        "BULLISH": 265,
+        "NEUTRAL": 469,
+        "BEARISH": 222
+      },
+      "priorHit": false,
+      "oldRelationship": "SAME_PAIR",
+      "evidence": "NOTICE_AND_ARCHIVE"
+    },
+    {
+      "positionDate": "2023-03-21",
+      "baseDate": "2023-03-27",
+      "targetDate": "2023-03-28",
+      "positionAgeDays": 6,
+      "bars": [
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-03-27",
+          "open": 1977.66003,
+          "high": 1979.89001,
+          "low": 1943.67505,
+          "close": 1956.55945,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        },
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-03-28",
+          "open": 1957.22998,
+          "high": 1975.44995,
+          "low": 1948.66003,
+          "close": 1973.69275,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        }
+      ],
+      "actualReturn": "0.875685121655771819251390495698967900",
+      "actual": "BULLISH",
+      "status": "SCORED",
+      "direction": "BULLISH",
+      "hit": true,
+      "prior": "NEUTRAL",
+      "priorCounts": {
+        "BULLISH": 266,
+        "NEUTRAL": 469,
+        "BEARISH": 223
+      },
+      "priorHit": false,
+      "oldRelationship": "SAME_PAIR",
+      "evidence": "ARCHIVE_UPDATED_ONLY"
+    },
+    {
+      "positionDate": "2023-03-28",
+      "baseDate": "2023-04-03",
+      "targetDate": "2023-04-04",
+      "positionAgeDays": 6,
+      "bars": [
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-04-03",
+          "open": 1970.84497,
+          "high": 1990.64001,
+          "low": 1949.82288,
+          "close": 1984.10571,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        },
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-04-04",
+          "open": 1984.59497,
+          "high": 2025.18994,
+          "low": 1977.012939,
+          "close": 2019.97021,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        }
+      ],
+      "actualReturn": "1.80759018127113801814521263587311600",
+      "actual": "BULLISH",
+      "status": "SCORED",
+      "direction": "BULLISH",
+      "hit": true,
+      "prior": "NEUTRAL",
+      "priorCounts": {
+        "BULLISH": 268,
+        "NEUTRAL": 470,
+        "BEARISH": 225
+      },
+      "priorHit": false,
+      "oldRelationship": "SAME_PAIR",
+      "evidence": "ARCHIVE_UPDATED_ONLY"
+    },
+    {
+      "positionDate": "2023-04-04",
+      "baseDate": "2023-04-10",
+      "targetDate": "2023-04-11",
+      "positionAgeDays": 6,
+      "bars": [
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-04-10",
+          "open": 2008.29504,
+          "high": 2011.17383,
+          "low": 1981.59497,
+          "close": 1989.65247,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        },
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-04-11",
+          "open": 1990.36499,
+          "high": 2007.57971,
+          "low": 1988.72095,
+          "close": 2003.14087,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        }
+      ],
+      "actualReturn": "0.677927437247370139972233442355890400",
+      "actual": "BULLISH",
+      "status": "SCORED",
+      "direction": "BULLISH",
+      "hit": true,
+      "prior": "NEUTRAL",
+      "priorCounts": {
+        "BULLISH": 270,
+        "NEUTRAL": 471,
+        "BEARISH": 226
+      },
+      "priorHit": false,
+      "oldRelationship": "NEW_ELIGIBLE",
+      "evidence": "ARCHIVE_UPDATED_ONLY"
+    },
+    {
+      "positionDate": "2023-04-11",
+      "baseDate": "2023-04-17",
+      "targetDate": "2023-04-18",
+      "positionAgeDays": 6,
+      "bars": [
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-04-17",
+          "open": 2001.84998,
+          "high": 2015.13,
+          "low": 1981.34497,
+          "close": 1994.77112,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        },
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-04-18",
+          "open": 1995.19495,
+          "high": 2011.97998,
+          "low": 1991.32837,
+          "close": 2004.92603,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        }
+      ],
+      "actualReturn": "0.509076449833502702806324968249991500",
+      "actual": "BULLISH",
+      "status": "SCORED",
+      "direction": "BEARISH",
+      "hit": false,
+      "prior": "NEUTRAL",
+      "priorCounts": {
+        "BULLISH": 270,
+        "NEUTRAL": 471,
+        "BEARISH": 226
+      },
+      "priorHit": false,
+      "oldRelationship": "NEW_ELIGIBLE",
+      "evidence": "ARCHIVE_UPDATED_ONLY"
+    },
+    {
+      "positionDate": "2023-04-18",
+      "baseDate": "2023-04-24",
+      "targetDate": "2023-04-25",
+      "positionAgeDays": 6,
+      "bars": [
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-04-24",
+          "open": 1981.33997,
+          "high": 1990.96997,
+          "low": 1974.18506,
+          "close": 1988.87573,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        },
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-04-25",
+          "open": 1991.44995,
+          "high": 2003.90002,
+          "low": 1976.14453,
+          "close": 1997.87231,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        }
+      ],
+      "actualReturn": "0.452345003978705094862814782299143400",
+      "actual": "NEUTRAL",
+      "status": "SCORED",
+      "direction": "BEARISH",
+      "hit": false,
+      "prior": "NEUTRAL",
+      "priorCounts": {
+        "BULLISH": 270,
+        "NEUTRAL": 471,
+        "BEARISH": 226
+      },
+      "priorHit": true,
+      "oldRelationship": "NEW_ELIGIBLE",
+      "evidence": "ARCHIVE_UPDATED_ONLY"
+    },
+    {
+      "positionDate": "2023-04-25",
+      "baseDate": "2023-05-01",
+      "targetDate": "2023-05-02",
+      "positionAgeDays": 6,
+      "bars": [
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-05-01",
+          "open": 1991.34497,
+          "high": 2006.045044,
+          "low": 1977.050049,
+          "close": 1982.045288,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        },
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-05-02",
+          "open": 1982.81006,
+          "high": 2019.53503,
+          "low": 1978.38342,
+          "close": 2016.27795,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        }
+      ],
+      "actualReturn": "1.72713823479496599676081669835184900",
+      "actual": "BULLISH",
+      "status": "SCORED",
+      "direction": "BULLISH",
+      "hit": true,
+      "prior": "NEUTRAL",
+      "priorCounts": {
+        "BULLISH": 270,
+        "NEUTRAL": 471,
+        "BEARISH": 226
+      },
+      "priorHit": false,
+      "oldRelationship": "NEW_ELIGIBLE",
+      "evidence": "ARCHIVE_UPDATED_ONLY"
+    },
+    {
+      "positionDate": "2023-05-02",
+      "baseDate": "2023-05-08",
+      "targetDate": "2023-05-09",
+      "positionAgeDays": 6,
+      "bars": [
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-05-08",
+          "open": 2015.94995,
+          "high": 2029.625,
+          "low": 2014.10498,
+          "close": 2021.39001,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        },
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-05-09",
+          "open": 2022.23999,
+          "high": 2037.70496,
+          "low": 2019.5,
+          "close": 2034.17004,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        }
+      ],
+      "actualReturn": "0.632239693318757422769691040473678800",
+      "actual": "BULLISH",
+      "status": "SCORED",
+      "direction": "BULLISH",
+      "hit": true,
+      "prior": "NEUTRAL",
+      "priorCounts": {
+        "BULLISH": 270,
+        "NEUTRAL": 471,
+        "BEARISH": 226
+      },
+      "priorHit": false,
+      "oldRelationship": "SAME_PAIR",
+      "evidence": "ARCHIVE_UPDATED_ONLY"
+    },
+    {
+      "positionDate": "2023-05-09",
+      "baseDate": "2023-05-15",
+      "targetDate": "2023-05-16",
+      "positionAgeDays": 6,
+      "bars": [
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-05-15",
+          "open": 2011.71997,
+          "high": 2022.20325,
+          "low": 2007.27588,
+          "close": 2018.41003,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        },
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-05-16",
+          "open": 2015.89502,
+          "high": 2018.94495,
+          "low": 1985.47498,
+          "close": 1988.60339,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        }
+      ],
+      "actualReturn": "-1.47673859904471441811057587738998700",
+      "actual": "BEARISH",
+      "status": "SCORED",
+      "direction": "BEARISH",
+      "hit": true,
+      "prior": "NEUTRAL",
+      "priorCounts": {
+        "BULLISH": 271,
+        "NEUTRAL": 473,
+        "BEARISH": 227
+      },
+      "priorHit": false,
+      "oldRelationship": "SAME_PAIR",
+      "evidence": "ARCHIVE_UPDATED_ONLY"
+    },
+    {
+      "positionDate": "2023-05-16",
+      "baseDate": "2023-05-22",
+      "targetDate": "2023-05-23",
+      "positionAgeDays": 6,
+      "bars": [
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-05-22",
+          "open": 1977.79504,
+          "high": 1982.65723,
+          "low": 1968.40002,
+          "close": 1969.43164,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        },
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-05-23",
+          "open": 1971.995,
+          "high": 1977.79504,
+          "low": 1954.28589,
+          "close": 1974.72754,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        }
+      ],
+      "actualReturn": "0.268904992305292708712651737432226900",
+      "actual": "NEUTRAL",
+      "status": "SCORED",
+      "direction": "BEARISH",
+      "hit": false,
+      "prior": "NEUTRAL",
+      "priorCounts": {
+        "BULLISH": 272,
+        "NEUTRAL": 475,
+        "BEARISH": 229
+      },
+      "priorHit": true,
+      "oldRelationship": "SAME_PAIR",
+      "evidence": "ARCHIVE_UPDATED_ONLY"
+    },
+    {
+      "positionDate": "2023-05-23",
+      "baseDate": "2023-05-29",
+      "targetDate": "2023-05-30",
+      "positionAgeDays": 6,
+      "bars": [
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-05-29",
+          "open": 1944.094971,
+          "high": 1949.74988,
+          "low": 1940.29504,
+          "close": 1942.83997,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        },
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-05-30",
+          "open": 1944.19495,
+          "high": 1963.63281,
+          "low": 1932.081909,
+          "close": 1959.14453,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        }
+      ],
+      "actualReturn": "0.839212711894124764171904492988169300",
+      "actual": "BULLISH",
+      "status": "SCORED",
+      "direction": "BEARISH",
+      "hit": false,
+      "prior": "NEUTRAL",
+      "priorCounts": {
+        "BULLISH": 272,
+        "NEUTRAL": 478,
+        "BEARISH": 231
+      },
+      "priorHit": false,
+      "oldRelationship": "SAME_PAIR",
+      "evidence": "ARCHIVE_UPDATED_ONLY"
+    },
+    {
+      "positionDate": "2023-05-30",
+      "baseDate": "2023-06-05",
+      "targetDate": "2023-06-06",
+      "positionAgeDays": 6,
+      "bars": [
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-06-05",
+          "open": 1947.59497,
+          "high": 1964.13049,
+          "low": 1938.14465,
+          "close": 1961.45276,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        },
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-06-06",
+          "open": 1962.10999,
+          "high": 1966.84998,
+          "low": 1954,
+          "close": 1962.84753,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        }
+      ],
+      "actualReturn": "0.0711090283917926221174962174465012400",
+      "actual": "NEUTRAL",
+      "status": "SCORED",
+      "direction": "BEARISH",
+      "hit": false,
+      "prior": "NEUTRAL",
+      "priorCounts": {
+        "BULLISH": 274,
+        "NEUTRAL": 480,
+        "BEARISH": 232
+      },
+      "priorHit": true,
+      "oldRelationship": "SAME_PAIR",
+      "evidence": "ARCHIVE_UPDATED_ONLY"
+    },
+    {
+      "positionDate": "2023-06-06",
+      "baseDate": "2023-06-12",
+      "targetDate": "2023-06-13",
+      "positionAgeDays": 6,
+      "bars": [
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-06-12",
+          "open": 1960.25,
+          "high": 1967.54504,
+          "low": 1948.80005,
+          "close": 1956.92175,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        },
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-06-13",
+          "open": 1957.69495,
+          "high": 1970.745,
+          "low": 1939.995,
+          "close": 1943.32849,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        }
+      ],
+      "actualReturn": "-0.694624606221480240587034203079402600",
+      "actual": "BEARISH",
+      "status": "SCORED",
+      "direction": "BULLISH",
+      "hit": false,
+      "prior": "NEUTRAL",
+      "priorCounts": {
+        "BULLISH": 276,
+        "NEUTRAL": 482,
+        "BEARISH": 233
+      },
+      "priorHit": false,
+      "oldRelationship": "SAME_PAIR",
+      "evidence": "ARCHIVE_UPDATED_ONLY"
+    },
+    {
+      "positionDate": "2023-06-13",
+      "baseDate": "2023-06-19",
+      "targetDate": "2023-06-20",
+      "positionAgeDays": 6,
+      "bars": [
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-06-19",
+          "open": 1957.995,
+          "high": 1958.92505,
+          "low": 1947.80005,
+          "close": 1950.12,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        },
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-06-20",
+          "open": 1950.89502,
+          "high": 1956.86865,
+          "low": 1929.77014,
+          "close": 1935.91394,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        }
+      ],
+      "actualReturn": "-0.728471068447069923902118843968576300",
+      "actual": "BEARISH",
+      "status": "SCORED",
+      "direction": "BEARISH",
+      "hit": true,
+      "prior": "NEUTRAL",
+      "priorCounts": {
+        "BULLISH": 277,
+        "NEUTRAL": 485,
+        "BEARISH": 234
+      },
+      "priorHit": false,
+      "oldRelationship": "SAME_PAIR",
+      "evidence": "ARCHIVE_UPDATED_ONLY"
+    },
+    {
+      "positionDate": "2023-06-20",
+      "baseDate": "2023-06-26",
+      "targetDate": "2023-06-27",
+      "positionAgeDays": 6,
+      "bars": [
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-06-26",
+          "open": 1924.29504,
+          "high": 1933.47998,
+          "low": 1921.59497,
+          "close": 1922.85327,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        },
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-06-27",
+          "open": 1923.20996,
+          "high": 1930.84998,
+          "low": 1911.18506,
+          "close": 1913.35254,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        }
+      ],
+      "actualReturn": "-0.494095423100068368711253771329104100",
+      "actual": "NEUTRAL",
+      "status": "SCORED",
+      "direction": "BULLISH",
+      "hit": false,
+      "prior": "NEUTRAL",
+      "priorCounts": {
+        "BULLISH": 277,
+        "NEUTRAL": 488,
+        "BEARISH": 236
+      },
+      "priorHit": true,
+      "oldRelationship": "SAME_PAIR",
+      "evidence": "ARCHIVE_UPDATED_ONLY"
+    },
+    {
+      "positionDate": "2023-06-27",
+      "baseDate": "2023-07-03",
+      "targetDate": "2023-07-05",
+      "positionAgeDays": 6,
+      "bars": [
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-07-03",
+          "open": 1919.39502,
+          "high": 1931.094971,
+          "low": 1910.099976,
+          "close": 1921.42847,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        },
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-07-05",
+          "open": 1925.90002,
+          "high": 1935.16504,
+          "low": 1914.48254,
+          "close": 1917.32239,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        }
+      ],
+      "actualReturn": "-0.213699342135801703822989569838111100",
+      "actual": "NEUTRAL",
+      "status": "SCORED",
+      "direction": "BEARISH",
+      "hit": false,
+      "prior": "NEUTRAL",
+      "priorCounts": {
+        "BULLISH": 278,
+        "NEUTRAL": 492,
+        "BEARISH": 236
+      },
+      "priorHit": true,
+      "oldRelationship": "NEW_ELIGIBLE",
+      "evidence": "ARCHIVE_UPDATED_ONLY"
+    },
+    {
+      "positionDate": "2023-07-03",
+      "baseDate": "2023-07-10",
+      "targetDate": "2023-07-11",
+      "positionAgeDays": 7,
+      "bars": [
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-07-10",
+          "open": 1925.19495,
+          "high": 1928.31152,
+          "low": 1912.67932,
+          "close": 1924.99365,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        },
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-07-11",
+          "open": 1925.39502,
+          "high": 1938.69495,
+          "low": 1924.3988,
+          "close": 1931.995,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        }
+      ],
+      "actualReturn": "0.363707693269533642357729335886380700",
+      "actual": "NEUTRAL",
+      "status": "SCORED",
+      "direction": "BULLISH",
+      "hit": false,
+      "prior": "NEUTRAL",
+      "priorCounts": {
+        "BULLISH": 278,
+        "NEUTRAL": 493,
+        "BEARISH": 236
+      },
+      "priorHit": true,
+      "oldRelationship": "NEW_ELIGIBLE",
+      "evidence": "ARCHIVE_UPDATED_ONLY"
+    },
+    {
+      "positionDate": "2023-07-11",
+      "baseDate": "2023-07-17",
+      "targetDate": "2023-07-18",
+      "positionAgeDays": 6,
+      "bars": [
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-07-17",
+          "open": 1954.89502,
+          "high": 1959.91003,
+          "low": 1945.82446,
+          "close": 1954.73547,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        },
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-07-18",
+          "open": 1954.59497,
+          "high": 1984.39331,
+          "low": 1954.44495,
+          "close": 1978.71497,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        }
+      ],
+      "actualReturn": "1.22673887940448535473702740964740400",
+      "actual": "BULLISH",
+      "status": "SCORED",
+      "direction": "BEARISH",
+      "hit": false,
+      "prior": "NEUTRAL",
+      "priorCounts": {
+        "BULLISH": 278,
+        "NEUTRAL": 493,
+        "BEARISH": 236
+      },
+      "priorHit": false,
+      "oldRelationship": "NEW_ELIGIBLE",
+      "evidence": "ARCHIVE_UPDATED_ONLY"
+    },
+    {
+      "positionDate": "2023-07-18",
+      "baseDate": "2023-07-24",
+      "targetDate": "2023-07-25",
+      "positionAgeDays": 6,
+      "bars": [
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-07-24",
+          "open": 1962.094971,
+          "high": 1967.97009,
+          "low": 1953.4187,
+          "close": 1954.51257,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        },
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-07-25",
+          "open": 1955.19995,
+          "high": 1966.029907,
+          "low": 1953.20764,
+          "close": 1964.5824,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        }
+      ],
+      "actualReturn": "0.515209272867454620667903916320169800",
+      "actual": "BULLISH",
+      "status": "SCORED",
+      "direction": "BULLISH",
+      "hit": true,
+      "prior": "NEUTRAL",
+      "priorCounts": {
+        "BULLISH": 278,
+        "NEUTRAL": 493,
+        "BEARISH": 236
+      },
+      "priorHit": false,
+      "oldRelationship": "NEW_ELIGIBLE",
+      "evidence": "ARCHIVE_UPDATED_ONLY"
+    },
+    {
+      "positionDate": "2023-07-25",
+      "baseDate": "2023-07-31",
+      "targetDate": "2023-08-01",
+      "positionAgeDays": 6,
+      "bars": [
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-07-31",
+          "open": 1959.495,
+          "high": 1972.44495,
+          "low": 1951,
+          "close": 1964.18835,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        },
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-08-01",
+          "open": 1965.099976,
+          "high": 1966.245,
+          "low": 1941.20496,
+          "close": 1944.079346,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        }
+      ],
+      "actualReturn": "-1.02378185880188119433658182526131000",
+      "actual": "BEARISH",
+      "status": "SCORED",
+      "direction": "BEARISH",
+      "hit": true,
+      "prior": "NEUTRAL",
+      "priorCounts": {
+        "BULLISH": 278,
+        "NEUTRAL": 493,
+        "BEARISH": 236
+      },
+      "priorHit": false,
+      "oldRelationship": "CHANGED_PAIR",
+      "evidence": "ARCHIVE_UPDATED_ONLY"
+    },
+    {
+      "positionDate": "2023-08-01",
+      "baseDate": "2023-08-07",
+      "targetDate": "2023-08-08",
+      "positionAgeDays": 6,
+      "bars": [
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-08-07",
+          "open": 1942.59497,
+          "high": 1946.81458,
+          "low": 1931.52502,
+          "close": 1936.38708,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        },
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-08-08",
+          "open": 1936.76001,
+          "high": 1938.1532,
+          "low": 1922.5,
+          "close": 1924.81506,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        }
+      ],
+      "actualReturn": "-0.597608821062780484984438132070164400",
+      "actual": "BEARISH",
+      "status": "SCORED",
+      "direction": "BEARISH",
+      "hit": true,
+      "prior": "NEUTRAL",
+      "priorCounts": {
+        "BULLISH": 278,
+        "NEUTRAL": 495,
+        "BEARISH": 236
+      },
+      "priorHit": false,
+      "oldRelationship": "SAME_PAIR",
+      "evidence": "ARCHIVE_UPDATED_ONLY"
+    },
+    {
+      "positionDate": "2023-08-08",
+      "baseDate": "2023-08-14",
+      "targetDate": "2023-08-15",
+      "positionAgeDays": 6,
+      "bars": [
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-08-14",
+          "open": 1913.66992,
+          "high": 1916.54504,
+          "low": 1902.19995,
+          "close": 1907.90259,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        },
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-08-15",
+          "open": 1907.39502,
+          "high": 1912.19495,
+          "low": 1896.15002,
+          "close": 1901.55713,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        }
+      ],
+      "actualReturn": "-0.332588258607060227325337401004314400",
+      "actual": "NEUTRAL",
+      "status": "SCORED",
+      "direction": "BEARISH",
+      "hit": false,
+      "prior": "NEUTRAL",
+      "priorCounts": {
+        "BULLISH": 278,
+        "NEUTRAL": 498,
+        "BEARISH": 238
+      },
+      "priorHit": true,
+      "oldRelationship": "SAME_PAIR",
+      "evidence": "ARCHIVE_UPDATED_ONLY"
+    },
+    {
+      "positionDate": "2023-08-15",
+      "baseDate": "2023-08-21",
+      "targetDate": "2023-08-22",
+      "positionAgeDays": 6,
+      "bars": [
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-08-21",
+          "open": 1889.40002,
+          "high": 1899.045044,
+          "low": 1884.5,
+          "close": 1893.94495,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        },
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-08-22",
+          "open": 1895.094971,
+          "high": 1905.045044,
+          "low": 1888.59998,
+          "close": 1897.0026855,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        }
+      ],
+      "actualReturn": "0.161447960776262266757014241623020800",
+      "actual": "NEUTRAL",
+      "status": "SCORED",
+      "direction": "BEARISH",
+      "hit": false,
+      "prior": "NEUTRAL",
+      "priorCounts": {
+        "BULLISH": 278,
+        "NEUTRAL": 502,
+        "BEARISH": 239
+      },
+      "priorHit": true,
+      "oldRelationship": "SAME_PAIR",
+      "evidence": "ARCHIVE_UPDATED_ONLY"
+    },
+    {
+      "positionDate": "2023-08-22",
+      "baseDate": "2023-08-28",
+      "targetDate": "2023-08-29",
+      "positionAgeDays": 6,
+      "bars": [
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-08-28",
+          "open": 1916.094971,
+          "high": 1926.18506,
+          "low": 1912.8335,
+          "close": 1919.65857,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        },
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-08-29",
+          "open": 1920.22998,
+          "high": 1938.41125,
+          "low": 1914,
+          "close": 1937.12219,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        }
+      ],
+      "actualReturn": "0.909725316413949591046286944662247900",
+      "actual": "BULLISH",
+      "status": "SCORED",
+      "direction": "BEARISH",
+      "hit": false,
+      "prior": "NEUTRAL",
+      "priorCounts": {
+        "BULLISH": 279,
+        "NEUTRAL": 506,
+        "BEARISH": 239
+      },
+      "priorHit": false,
+      "oldRelationship": "SAME_PAIR",
+      "evidence": "ARCHIVE_UPDATED_ONLY"
+    },
+    {
+      "positionDate": "2023-08-29",
+      "baseDate": "2023-09-04",
+      "targetDate": "2023-09-05",
+      "positionAgeDays": 6,
+      "bars": [
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-09-04",
+          "open": 1940.495,
+          "high": 1946.42004,
+          "low": 1936.15002,
+          "close": 1938.19128,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        },
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-09-05",
+          "open": 1938.59497,
+          "high": 1939.12561,
+          "low": 1925.21753,
+          "close": 1925.81116,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        }
+      ],
+      "actualReturn": "-0.638746037491201590794485464819550700",
+      "actual": "BEARISH",
+      "status": "SCORED",
+      "direction": "BULLISH",
+      "hit": false,
+      "prior": "NEUTRAL",
+      "priorCounts": {
+        "BULLISH": 280,
+        "NEUTRAL": 510,
+        "BEARISH": 239
+      },
+      "priorHit": false,
+      "oldRelationship": "SAME_PAIR",
+      "evidence": "ARCHIVE_UPDATED_ONLY"
+    },
+    {
+      "positionDate": "2023-09-05",
+      "baseDate": "2023-09-11",
+      "targetDate": "2023-09-12",
+      "positionAgeDays": 6,
+      "bars": [
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-09-11",
+          "open": 1919.16003,
+          "high": 1930.89502,
+          "low": 1916.89502,
+          "close": 1921.6626,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        },
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-09-12",
+          "open": 1922.89502,
+          "high": 1925.045044,
+          "low": 1907.15002,
+          "close": 1913.26135,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        }
+      ],
+      "actualReturn": "-0.437186527957613370838356327484335700",
+      "actual": "NEUTRAL",
+      "status": "SCORED",
+      "direction": "BULLISH",
+      "hit": false,
+      "prior": "NEUTRAL",
+      "priorCounts": {
+        "BULLISH": 280,
+        "NEUTRAL": 514,
+        "BEARISH": 240
+      },
+      "priorHit": true,
+      "oldRelationship": "SAME_PAIR",
+      "evidence": "ARCHIVE_UPDATED_ONLY"
+    },
+    {
+      "positionDate": "2023-09-12",
+      "baseDate": "2023-09-18",
+      "targetDate": "2023-09-19",
+      "positionAgeDays": 6,
+      "bars": [
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-09-18",
+          "open": 1924.19495,
+          "high": 1934.60754,
+          "low": 1922.15002,
+          "close": 1933.13965,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        },
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-09-19",
+          "open": 1933.68005,
+          "high": 1937.94495,
+          "low": 1929.71436,
+          "close": 1930.94495,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        }
+      ],
+      "actualReturn": "-0.113530339104058002224515957758147500",
+      "actual": "NEUTRAL",
+      "status": "SCORED",
+      "direction": "BEARISH",
+      "hit": false,
+      "prior": "NEUTRAL",
+      "priorCounts": {
+        "BULLISH": 281,
+        "NEUTRAL": 518,
+        "BEARISH": 240
+      },
+      "priorHit": true,
+      "oldRelationship": "SAME_PAIR",
+      "evidence": "ARCHIVE_UPDATED_ONLY"
+    },
+    {
+      "positionDate": "2023-09-19",
+      "baseDate": "2023-09-25",
+      "targetDate": "2023-09-26",
+      "positionAgeDays": 6,
+      "bars": [
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-09-25",
+          "open": 1925.23999,
+          "high": 1927.26001,
+          "low": 1915.0030518,
+          "close": 1915.65527,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        },
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-09-26",
+          "open": 1916.030029,
+          "high": 1916.89099,
+          "low": 1899.17371,
+          "close": 1900.48608,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        }
+      ],
+      "actualReturn": "-0.791853849570752883946598596520970100",
+      "actual": "BEARISH",
+      "status": "SCORED",
+      "direction": "BULLISH",
+      "hit": false,
+      "prior": "NEUTRAL",
+      "priorCounts": {
+        "BULLISH": 281,
+        "NEUTRAL": 522,
+        "BEARISH": 241
+      },
+      "priorHit": false,
+      "oldRelationship": "SAME_PAIR",
+      "evidence": "ARCHIVE_UPDATED_ONLY"
+    },
+    {
+      "positionDate": "2023-09-26",
+      "baseDate": "2023-10-02",
+      "targetDate": "2023-10-03",
+      "positionAgeDays": 6,
+      "bars": [
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-10-02",
+          "open": 1848.13,
+          "high": 1849.063965,
+          "low": 1826.59998,
+          "close": 1827.40332,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        },
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-10-03",
+          "open": 1827.96484,
+          "high": 1833.3634,
+          "low": 1814.69995,
+          "close": 1822.81165,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        }
+      ],
+      "actualReturn": "-0.251267465137362232656992217788025000",
+      "actual": "NEUTRAL",
+      "status": "SCORED",
+      "direction": "BEARISH",
+      "hit": false,
+      "prior": "NEUTRAL",
+      "priorCounts": {
+        "BULLISH": 281,
+        "NEUTRAL": 523,
+        "BEARISH": 245
+      },
+      "priorHit": true,
+      "oldRelationship": "SAME_PAIR",
+      "evidence": "ARCHIVE_UPDATED_ONLY"
+    },
+    {
+      "positionDate": "2023-10-03",
+      "baseDate": "2023-10-09",
+      "targetDate": "2023-10-10",
+      "positionAgeDays": 6,
+      "bars": [
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-10-09",
+          "open": 1832.73999,
+          "high": 1864.14502,
+          "low": 1832.63245,
+          "close": 1860.88147,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        },
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-10-10",
+          "open": 1861.27002,
+          "high": 1865.64502,
+          "low": 1852.65002,
+          "close": 1860.087402,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        }
+      ],
+      "actualReturn": "-0.0426716055160676085403762981206965300",
+      "actual": "NEUTRAL",
+      "status": "SCORED",
+      "direction": "BEARISH",
+      "hit": false,
+      "prior": "NEUTRAL",
+      "priorCounts": {
+        "BULLISH": 282,
+        "NEUTRAL": 526,
+        "BEARISH": 246
+      },
+      "priorHit": true,
+      "oldRelationship": "SAME_PAIR",
+      "evidence": "ARCHIVE_UPDATED_ONLY"
+    },
+    {
+      "positionDate": "2023-10-10",
+      "baseDate": "2023-10-16",
+      "targetDate": "2023-10-17",
+      "positionAgeDays": 6,
+      "bars": [
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-10-16",
+          "open": 1929.29504,
+          "high": 1931.79504,
+          "low": 1907.65002,
+          "close": 1919.43872,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        },
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-10-17",
+          "open": 1920.14001,
+          "high": 1931.5592,
+          "low": 1911.84998,
+          "close": 1922.45544,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        }
+      ],
+      "actualReturn": "0.157166778421558568954991175753712000",
+      "actual": "NEUTRAL",
+      "status": "SCORED",
+      "direction": "BEARISH",
+      "hit": false,
+      "prior": "NEUTRAL",
+      "priorCounts": {
+        "BULLISH": 285,
+        "NEUTRAL": 528,
+        "BEARISH": 246
+      },
+      "priorHit": true,
+      "oldRelationship": "SAME_PAIR",
+      "evidence": "ARCHIVE_UPDATED_ONLY"
+    },
+    {
+      "positionDate": "2023-10-17",
+      "baseDate": "2023-10-23",
+      "targetDate": "2023-10-24",
+      "positionAgeDays": 6,
+      "bars": [
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-10-23",
+          "open": 1972.89502,
+          "high": 1983.39502,
+          "low": 1964.35791,
+          "close": 1972.59326,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        },
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-10-24",
+          "open": 1972.96997,
+          "high": 1980.99353,
+          "low": 1953.5,
+          "close": 1970.10999,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        }
+      ],
+      "actualReturn": "-0.125888598037691764190657327907528200",
+      "actual": "NEUTRAL",
+      "status": "SCORED",
+      "direction": "BULLISH",
+      "hit": false,
+      "prior": "NEUTRAL",
+      "priorCounts": {
+        "BULLISH": 287,
+        "NEUTRAL": 530,
+        "BEARISH": 247
+      },
+      "priorHit": true,
+      "oldRelationship": "SAME_PAIR",
+      "evidence": "ARCHIVE_UPDATED_ONLY"
+    },
+    {
+      "positionDate": "2023-10-24",
+      "baseDate": "2023-10-30",
+      "targetDate": "2023-10-31",
+      "positionAgeDays": 6,
+      "bars": [
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-10-30",
+          "open": 2004.79504,
+          "high": 2007.37012,
+          "low": 1990.5,
+          "close": 1995.87842,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        },
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-10-31",
+          "open": 1996,
+          "high": 2007.79504,
+          "low": 1978.89502,
+          "close": 1982.70496,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        }
+      ],
+      "actualReturn": "-0.660033189797202176272841308640433100",
+      "actual": "BEARISH",
+      "status": "SCORED",
+      "direction": "BULLISH",
+      "hit": false,
+      "prior": "NEUTRAL",
+      "priorCounts": {
+        "BULLISH": 288,
+        "NEUTRAL": 534,
+        "BEARISH": 247
+      },
+      "priorHit": false,
+      "oldRelationship": "SAME_PAIR",
+      "evidence": "ARCHIVE_UPDATED_ONLY"
+    },
+    {
+      "positionDate": "2023-10-31",
+      "baseDate": "2023-11-06",
+      "targetDate": "2023-11-07",
+      "positionAgeDays": 6,
+      "bars": [
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-11-06",
+          "open": 1992.29504,
+          "high": 1993.29504,
+          "low": 1977.52051,
+          "close": 1977.68335,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        },
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-11-07",
+          "open": 1978.19495,
+          "high": 1978.75244,
+          "low": 1956.19995,
+          "close": 1968.40491,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        }
+      ],
+      "actualReturn": "-0.469157006352912866460649527134867200",
+      "actual": "NEUTRAL",
+      "status": "SCORED",
+      "direction": "BULLISH",
+      "hit": false,
+      "prior": "NEUTRAL",
+      "priorCounts": {
+        "BULLISH": 288,
+        "NEUTRAL": 538,
+        "BEARISH": 248
+      },
+      "priorHit": true,
+      "oldRelationship": "SAME_PAIR",
+      "evidence": "ARCHIVE_UPDATED_ONLY"
+    },
+    {
+      "positionDate": "2023-11-07",
+      "baseDate": "2023-11-15",
+      "targetDate": "2023-11-16",
+      "positionAgeDays": 8,
+      "bars": [
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-11-15",
+          "open": 1963.045044,
+          "high": 1975.59497,
+          "low": 1955.40503,
+          "close": 1959.091187,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        },
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-11-16",
+          "open": 1959.44495,
+          "high": 1988.034668,
+          "low": 1956.49451,
+          "close": 1980.8512,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        }
+      ],
+      "actualReturn": "1.11071976355126138393475402837387200",
+      "actual": "BULLISH",
+      "status": "SCORED",
+      "direction": "BULLISH",
+      "hit": true,
+      "prior": "NEUTRAL",
+      "priorCounts": {
+        "BULLISH": 289,
+        "NEUTRAL": 541,
+        "BEARISH": 251
+      },
+      "priorHit": false,
+      "oldRelationship": "SAME_PAIR",
+      "evidence": "ARCHIVE_UPDATED_ONLY"
+    },
+    {
+      "positionDate": "2023-11-14",
+      "baseDate": "2023-11-20",
+      "targetDate": "2023-11-21",
+      "positionAgeDays": 6,
+      "bars": [
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-11-20",
+          "open": 1980.39001,
+          "high": 1985.2627,
+          "low": 1965.19995,
+          "close": 1977.19409,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        },
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-11-21",
+          "open": 1977.495,
+          "high": 2007.51501,
+          "low": 1977.33655,
+          "close": 1998.36926,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        }
+      ],
+      "actualReturn": "1.07097073105250886118114989914824200",
+      "actual": "BULLISH",
+      "status": "SCORED",
+      "direction": "BEARISH",
+      "hit": false,
+      "prior": "NEUTRAL",
+      "priorCounts": {
+        "BULLISH": 290,
+        "NEUTRAL": 543,
+        "BEARISH": 251
+      },
+      "priorHit": false,
+      "oldRelationship": "SAME_PAIR",
+      "evidence": "ARCHIVE_UPDATED_ONLY"
+    },
+    {
+      "positionDate": "2023-11-21",
+      "baseDate": "2023-11-29",
+      "targetDate": "2023-11-30",
+      "positionAgeDays": 8,
+      "bars": [
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-11-29",
+          "open": 2041.245,
+          "high": 2052.094971,
+          "low": 2035.050049,
+          "close": 2044.58997,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        },
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-11-30",
+          "open": 2044.79504,
+          "high": 2047.59497,
+          "low": 2031.84497,
+          "close": 2035.75452,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        }
+      ],
+      "actualReturn": "-0.432137989995128460891354172103270200",
+      "actual": "NEUTRAL",
+      "status": "SCORED",
+      "direction": "BULLISH",
+      "hit": false,
+      "prior": "NEUTRAL",
+      "priorCounts": {
+        "BULLISH": 294,
+        "NEUTRAL": 546,
+        "BEARISH": 251
+      },
+      "priorHit": true,
+      "oldRelationship": "SAME_PAIR",
+      "evidence": "ARCHIVE_UPDATED_ONLY"
+    },
+    {
+      "positionDate": "2023-11-28",
+      "baseDate": "2023-12-04",
+      "targetDate": "2023-12-05",
+      "positionAgeDays": 6,
+      "bars": [
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-12-04",
+          "open": 2071.070068,
+          "high": 2135.71997,
+          "low": 2020.41003,
+          "close": 2030.060059,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        },
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-12-05",
+          "open": 2030.14502,
+          "high": 2041.32703,
+          "low": 2010.015015,
+          "close": 2019.42029,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        }
+      ],
+      "actualReturn": "-0.524111045524491056449084100718224100",
+      "actual": "BEARISH",
+      "status": "SCORED",
+      "direction": "BULLISH",
+      "hit": false,
+      "prior": "NEUTRAL",
+      "priorCounts": {
+        "BULLISH": 295,
+        "NEUTRAL": 548,
+        "BEARISH": 251
+      },
+      "priorHit": false,
+      "oldRelationship": "SAME_PAIR",
+      "evidence": "ARCHIVE_UPDATED_ONLY"
+    },
+    {
+      "positionDate": "2023-12-05",
+      "baseDate": "2023-12-11",
+      "targetDate": "2023-12-12",
+      "positionAgeDays": 6,
+      "bars": [
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-12-11",
+          "open": 2003.59998,
+          "high": 2008.71997,
+          "low": 1975.94995,
+          "close": 1981.30298,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        },
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-12-12",
+          "open": 1981.59497,
+          "high": 1996.79504,
+          "low": 1977.18506,
+          "close": 1979.4375,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        }
+      ],
+      "actualReturn": "-0.0941542014942106431394960098429771700",
+      "actual": "NEUTRAL",
+      "status": "SCORED",
+      "direction": "BEARISH",
+      "hit": false,
+      "prior": "NEUTRAL",
+      "priorCounts": {
+        "BULLISH": 295,
+        "NEUTRAL": 550,
+        "BEARISH": 254
+      },
+      "priorHit": true,
+      "oldRelationship": "SAME_PAIR",
+      "evidence": "ARCHIVE_UPDATED_ONLY"
+    },
+    {
+      "positionDate": "2023-12-12",
+      "baseDate": "2023-12-18",
+      "targetDate": "2023-12-19",
+      "positionAgeDays": 6,
+      "bars": [
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-12-18",
+          "open": 2020.094971,
+          "high": 2033.70911,
+          "low": 2015.995,
+          "close": 2026.99792,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        },
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-12-19",
+          "open": 2027.29504,
+          "high": 2047.074097,
+          "low": 2021.73657,
+          "close": 2040.12085,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        }
+      ],
+      "actualReturn": "0.647407176421769589186356935186198900",
+      "actual": "BULLISH",
+      "status": "SCORED",
+      "direction": "BEARISH",
+      "hit": false,
+      "prior": "NEUTRAL",
+      "priorCounts": {
+        "BULLISH": 296,
+        "NEUTRAL": 552,
+        "BEARISH": 256
+      },
+      "priorHit": false,
+      "oldRelationship": "SAME_PAIR",
+      "evidence": "ARCHIVE_UPDATED_ONLY"
+    },
+    {
+      "positionDate": "2023-12-19",
+      "baseDate": "2023-12-26",
+      "targetDate": "2023-12-27",
+      "positionAgeDays": 7,
+      "bars": [
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-12-26",
+          "open": 2055.7251,
+          "high": 2068.64502,
+          "low": 2053.59351,
+          "close": 2067.19995,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        },
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2023-12-27",
+          "open": 2066.69507,
+          "high": 2084.58789,
+          "low": 2061,
+          "close": 2076.99512,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        }
+      ],
+      "actualReturn": "0.473837569510390129411525962933580800",
+      "actual": "NEUTRAL",
+      "status": "SCORED",
+      "direction": "BULLISH",
+      "hit": false,
+      "prior": "NEUTRAL",
+      "priorCounts": {
+        "BULLISH": 298,
+        "NEUTRAL": 554,
+        "BEARISH": 257
+      },
+      "priorHit": true,
+      "oldRelationship": "NEW_ELIGIBLE",
+      "evidence": "ARCHIVE_UPDATED_ONLY"
+    },
+    {
+      "positionDate": "2023-12-26",
+      "baseDate": "2024-01-02",
+      "targetDate": "2024-01-03",
+      "positionAgeDays": 7,
+      "bars": [
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2024-01-02",
+          "open": 2062.90479,
+          "high": 2079.02002,
+          "low": 2056.044922,
+          "close": 2058.5105,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        },
+        {
+          "symbol": "XAUUSD",
+          "priceDate": "2024-01-03",
+          "open": 2059.14502,
+          "high": 2066.11865,
+          "low": 2030.67505,
+          "close": 2040.19031,
+          "currency": "usd",
+          "unit": "troy_ounce",
+          "provider": "twelve_data",
+          "collectedAt": "2026-10-03T17:54:35.415446Z",
+          "confirmation": {
+            "source": "twelve_data_quote_eod_v1",
+            "closedDay": "2026-10-02",
+            "checkedAt": "2026-10-03T17:54:35.415446Z",
+            "receiptHash": "e52827711aecf9bd8f1a3b622083bd05f1f78cbeb299e37fe31e35b78a5e20d9"
+          }
+        }
+      ],
+      "actualReturn": "-0.889973114055041254343856880982632800",
+      "actual": "BEARISH",
+      "status": "SCORED",
+      "direction": "BEARISH",
+      "hit": true,
+      "prior": "NEUTRAL",
+      "priorCounts": {
+        "BULLISH": 298,
+        "NEUTRAL": 554,
+        "BEARISH": 257
+      },
+      "priorHit": false,
+      "oldRelationship": "NEW_ELIGIBLE",
+      "evidence": "ARCHIVE_UPDATED_ONLY"
+    }
+  ]
+}
