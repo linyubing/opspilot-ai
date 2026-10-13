@@ -1,0 +1,40 @@
+{
+  "researchOnly": true,
+  "officialSessionCertified": false,
+  "inputHash": "60b9537061d52d3a40ae4e71c2fc3e54adf752d789b1d8648a219fb0ee232a2e",
+  "pairHash": "be92a5a2256ec7bfd34cfc999cf448fb8946b6e821ad6e61990582870e3874bc",
+  "checkedAt": "2026-10-13T01:58:48.570Z",
+  "targetDate": "2026-10-14",
+  "targetEnd": "2026-10-14T20:00:00Z",
+  "settlementBaseDate": "2026-10-13",
+  "actual": null,
+  "returnPercent": null,
+  "apiCalls": 0,
+  "outputs": [
+    {
+      "name": "control",
+      "direction": "NO_SIGNAL",
+      "sampleCount": 1,
+      "signalCount": 0,
+      "coverage": 0,
+      "hit": null,
+      "directionAccuracy": null,
+      "brierScore": null,
+      "logLoss": null
+    },
+    {
+      "name": "candidate",
+      "direction": "NO_SIGNAL",
+      "sampleCount": 1,
+      "signalCount": 0,
+      "coverage": 0,
+      "hit": null,
+      "directionAccuracy": null,
+      "brierScore": null,
+      "logLoss": null
+    }
+  ],
+  "status": "WAITING_FOR_TARGET_CLOSE",
+  "reason": "真实目标会话未结束；拒绝取未结束日线或提前评分",
+  "accuracyImprovementProven": false
+}
