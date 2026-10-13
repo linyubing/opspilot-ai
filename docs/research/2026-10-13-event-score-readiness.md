@@ -17,7 +17,7 @@
 手动复核入口（运行前在当前进程加载已有行情密钥，不打印或写入文件）：
 
 ```powershell
-node docs/research/probes/ScoreEventPair.mjs docs/research/2026-10-13-event-pair-input.json docs/research/2026-10-13-event-pair-result.json backend/target/event-pair-score-new.json
+node docs/research/probes/ScoreEventPair.mjs docs/research/2026-10-13-event-pair-input.json docs/research/2026-10-13-event-pair-result.json backend/target/event-pair-score-new.json docs/research/2026-10-13-forward-prior.json
 ```
 
 输出路径必须不存在。未来的供应商完整回执仅写同路径 `.source.json` 本地文件，不公开再分发。没有创建计划任务、后台市场监视或宣称已经在等待一个实时市场作业；研究用Ollama服务不是行情结算作业。
@@ -37,3 +37,13 @@ node docs/research/probes/ScoreEventPair.mjs docs/research/2026-10-13-event-pair
 下一项真实证据是闭市后的验收，而不是再造一轮成功测试。若进一步扩展模型，需先有明确的新信息假设与时点/历史版本证明；本轮不以“做成风险提示工具”替代原准确率目标，也不宣称目标完成。
 
 全量工程回归于北京时间10月13日09:59结束：996 tests，0 failures，0 errors，3 skipped，`BUILD SUCCESS`。日志 `backend/target/oct13-event-score-full.log`。这不验证尚未发生的市场结果或成功闭市验收分支。
+
+## 12:43验收身份修复
+
+并行只读审查发现：原程序仅检查基线次数与频率自洽，没有拒绝原分布被替换。例如内存损坏副本将上涨351改为352、中性625改为624并同步频率，仍能被接纳，未来会用错分布评分。
+
+已锁定原发布基线字节摘要 `61edb1aacaa69b0134e103e22b3f78e9fa0f913c593dd105a25952033b37df34`；原记录不改。回归先复现“应该拒绝但未拒绝”，修复后原记录通过、被替换分布在取数或输出前拒绝。测试只在内存中损坏元数据、固定测试时钟并隔离I/O，没有生成假行情、归档新预测或调用模型。
+
+`node docs/research/probes/ScoreEventPairChecks.mjs` 两项通过。现场原始记录仍返回等待闭市、零行情请求、实际值/命中为空；全量工程回归996项、0失败、0错误、3跳过，日志 `backend/target/oct13-score-seal-full.log`。正式预测表摘要未变。
+
+已将上面的未来验收命令补上第四个基线参数，避免只结算两组而遗漏独立基线。本次修复提高验收可信性，**不是准确率提升**，未来成功闭市取数分支仍未现场验证。

@@ -29,6 +29,8 @@ const report={researchOnly:true,officialSessionCertified:false,inputHash:sha(inp
   hit:null,directionAccuracy:null,brierScore:null,logLoss:null}))};
 if(baselinePath){
  const baselineRaw=fs.readFileSync(baselinePath),baseline=JSON.parse(baselineRaw);
+ // 自洽不代表是原基线；锁定已发布字节摘要，拒绝事后替换分布。
+ assert.equal(sha(baselineRaw),'61edb1aacaa69b0134e103e22b3f78e9fa0f913c593dd105a25952033b37df34','冻结基线被替换或改写');
  assert.equal(baseline.version,'gold-frozen-frequency-forward-v1');assert.equal(baseline.trainingSamples,1268);
  assert.equal(baseline.inputHash,'0e72f54e73b78efb0c12c3a5c474976afadb4c163aba732f9c39e9b6b124d936');
  assert.equal(baseline.pairInputHash,sha(inputRaw));assert.equal(baseline.targetDate,pair.targetDate);
