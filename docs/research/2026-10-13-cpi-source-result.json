@@ -1,0 +1,21 @@
+{
+  "series": "CPIAUCNS",
+  "sourceSha256": "f20d811214be3ec4f615522f899470f1b6f014f3646e078728732351654460a6",
+  "archiveSha256": "818a139ddf6056c8fe2b2a728b5d2a79ab76a36a798cc5d0070f90e051f39814",
+  "frozenInputSha256": "0e72f54e73b78efb0c12c3a5c474976afadb4c163aba732f9c39e9b6b124d936",
+  "versionRows": 188,
+  "sampleCount": 1268,
+  "covered": 1268,
+  "missingDates": [],
+  "distinctObservationMonths": 70,
+  "releaseDayExcluded": true,
+  "followingDayAvailable": true,
+  "independentSnapshotsMatched": true,
+  "availabilityPolicy": "fred-known-before-day-v1",
+  "intradayPublicationProven": false,
+  "consensusAvailable": false,
+  "trainingPerformed": false,
+  "probabilityOrAccuracyComputed": false,
+  "holdoutRead": false,
+  "productionChanged": false
+}
