@@ -1,0 +1,531 @@
+{
+  "retrievedOn": "2026-10-13",
+  "annualArchiveSha256": "9fe75dba0256819d476bb0d01f9e8e5ac6ec2c4390f609a7e3259e85796b79ce",
+  "verifiedReports": 52,
+  "noticeBackedPublicationDates": 7,
+  "archiveUpdatedOnly": 45,
+  "wholeYearHistoricalTrainingReady": false,
+  "firstPublishedBytesAuthenticated": false,
+  "rows": [
+    {
+      "positionDate": "2023-01-03",
+      "archiveUpdatedDate": "2023-01-06",
+      "actualPublicationDate": null,
+      "evidence": "ARCHIVE_UPDATED_ONLY",
+      "reportUrl": "https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf010323.htm",
+      "localReceipt": "backend/target/oct13-cot-010323.html",
+      "receiptSha256": "f737b352e125a8aedfe63e2bc9591ff2d8e86dc634d9f6dc9dd3944a9f6dec90",
+      "matchedFields": 4
+    },
+    {
+      "positionDate": "2023-01-10",
+      "archiveUpdatedDate": "2023-01-13",
+      "actualPublicationDate": null,
+      "evidence": "ARCHIVE_UPDATED_ONLY",
+      "reportUrl": "https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf011023.htm",
+      "localReceipt": "backend/target/oct13-cot-011023.html",
+      "receiptSha256": "dd91e5b87ff1b665ffb8f6bb41ba331293b1b41eae320641e0735ae84e6aaf53",
+      "matchedFields": 4
+    },
+    {
+      "positionDate": "2023-01-17",
+      "archiveUpdatedDate": "2023-01-20",
+      "actualPublicationDate": null,
+      "evidence": "ARCHIVE_UPDATED_ONLY",
+      "reportUrl": "https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf011723.htm",
+      "localReceipt": "backend/target/oct13-cot-011723.html",
+      "receiptSha256": "07611f22cf6da9edf04acc05642a87cfa15e584a889e2e371ab900b144f0142b",
+      "matchedFields": 4
+    },
+    {
+      "positionDate": "2023-01-24",
+      "archiveUpdatedDate": "2023-01-27",
+      "actualPublicationDate": null,
+      "evidence": "ARCHIVE_UPDATED_ONLY",
+      "reportUrl": "https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf012423.htm",
+      "localReceipt": "backend/target/oct13-cot-012423.html",
+      "receiptSha256": "26c7cad7f03d3502e789676d2e1c63574f77d28fed7fb475c5c99a0e96ac40ef",
+      "matchedFields": 4
+    },
+    {
+      "positionDate": "2023-01-31",
+      "archiveUpdatedDate": "2023-02-24",
+      "actualPublicationDate": "2023-02-24",
+      "evidence": "NOTICE_AND_ARCHIVE",
+      "reportUrl": "https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf013123.htm",
+      "localReceipt": "backend/target/oct13-cot-013123.html",
+      "receiptSha256": "45f7727cb9c8c009cfe1e475502f25ecd94eeb656b62121d8e3cbbc2fdf5c6ac",
+      "matchedFields": 4
+    },
+    {
+      "positionDate": "2023-02-07",
+      "archiveUpdatedDate": "2023-03-03",
+      "actualPublicationDate": "2023-03-03",
+      "evidence": "NOTICE_AND_ARCHIVE",
+      "reportUrl": "https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf020723.htm",
+      "localReceipt": "backend/target/oct13-cot-020723.html",
+      "receiptSha256": "722d4b0c4e95b58ad581625e0e2b0353a73890a0fec848b769b1cc7868d1961b",
+      "matchedFields": 4
+    },
+    {
+      "positionDate": "2023-02-14",
+      "archiveUpdatedDate": "2023-03-08",
+      "actualPublicationDate": "2023-03-08",
+      "evidence": "NOTICE_AND_ARCHIVE",
+      "reportUrl": "https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf021423.htm",
+      "localReceipt": "backend/target/oct13-cot-021423.html",
+      "receiptSha256": "1f1d698bb4188a6bb4b2b04d617b94c29ab7bb548a754882bcee58cb33852b49",
+      "matchedFields": 4
+    },
+    {
+      "positionDate": "2023-02-21",
+      "archiveUpdatedDate": "2023-03-10",
+      "actualPublicationDate": "2023-03-10",
+      "evidence": "NOTICE_AND_ARCHIVE",
+      "reportUrl": "https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf022123.htm",
+      "localReceipt": "backend/target/oct13-cot-022123.html",
+      "receiptSha256": "64344d5501d92e962d124800a2f5523e5aad57d6e87f9519d96ec39c3d7209fa",
+      "matchedFields": 4
+    },
+    {
+      "positionDate": "2023-02-28",
+      "archiveUpdatedDate": "2023-03-14",
+      "actualPublicationDate": "2023-03-14",
+      "evidence": "NOTICE_AND_ARCHIVE",
+      "reportUrl": "https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf022823.htm",
+      "localReceipt": "backend/target/oct13-cot-022823.html",
+      "receiptSha256": "76802a64869a2cb9fc7ea5db62e73fe7978af5d4fd708ac2393894ac45496022",
+      "matchedFields": 4
+    },
+    {
+      "positionDate": "2023-03-07",
+      "archiveUpdatedDate": "2023-03-16",
+      "actualPublicationDate": "2023-03-16",
+      "evidence": "NOTICE_AND_ARCHIVE",
+      "reportUrl": "https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf030723.htm",
+      "localReceipt": "backend/target/oct13-cot-030723.html",
+      "receiptSha256": "e423478eaa9add959df185fafcfb98c228fc03be0f76d9907f7c5d1f0324144e",
+      "matchedFields": 4
+    },
+    {
+      "positionDate": "2023-03-14",
+      "archiveUpdatedDate": "2023-03-21",
+      "actualPublicationDate": "2023-03-21",
+      "evidence": "NOTICE_AND_ARCHIVE",
+      "reportUrl": "https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf031423.htm",
+      "localReceipt": "backend/target/oct13-cot-031423.html",
+      "receiptSha256": "2fee6be3c0e319f12544b04d167b528966502c9918d5b2877bf10c90b3880dca",
+      "matchedFields": 4
+    },
+    {
+      "positionDate": "2023-03-21",
+      "archiveUpdatedDate": "2023-03-24",
+      "actualPublicationDate": null,
+      "evidence": "ARCHIVE_UPDATED_ONLY",
+      "reportUrl": "https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf032123.htm",
+      "localReceipt": "backend/target/oct13-cot-032123.html",
+      "receiptSha256": "3be00af0f7204fdc7d3c8c7739fc24fdf27b178f48a03933090f034b941700bc",
+      "matchedFields": 4
+    },
+    {
+      "positionDate": "2023-03-28",
+      "archiveUpdatedDate": "2023-03-31",
+      "actualPublicationDate": null,
+      "evidence": "ARCHIVE_UPDATED_ONLY",
+      "reportUrl": "https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf032823.htm",
+      "localReceipt": "backend/target/oct13-cot-032823.html",
+      "receiptSha256": "b9ec3e1d5eccb566db3cc481d48e27dd096181fd68f03b0d3ffd570bfa70eeb9",
+      "matchedFields": 4
+    },
+    {
+      "positionDate": "2023-04-04",
+      "archiveUpdatedDate": "2023-04-07",
+      "actualPublicationDate": null,
+      "evidence": "ARCHIVE_UPDATED_ONLY",
+      "reportUrl": "https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf040423.htm",
+      "localReceipt": "backend/target/oct13-cot-040423.html",
+      "receiptSha256": "db131efd34181c764421a1e0313abcc1ff64dc5dcb80233ae73e1d59d25d4adb",
+      "matchedFields": 4
+    },
+    {
+      "positionDate": "2023-04-11",
+      "archiveUpdatedDate": "2023-04-14",
+      "actualPublicationDate": null,
+      "evidence": "ARCHIVE_UPDATED_ONLY",
+      "reportUrl": "https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf041123.htm",
+      "localReceipt": "backend/target/oct13-cot-041123.html",
+      "receiptSha256": "f54ae2b7a803242062d5e8f1643a232607f2909d5d9d2521b7b4c410e3dd07af",
+      "matchedFields": 4
+    },
+    {
+      "positionDate": "2023-04-18",
+      "archiveUpdatedDate": "2023-04-21",
+      "actualPublicationDate": null,
+      "evidence": "ARCHIVE_UPDATED_ONLY",
+      "reportUrl": "https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf041823.htm",
+      "localReceipt": "backend/target/oct13-cot-041823.html",
+      "receiptSha256": "87f1e13830af9d25879a9b0da143549916bc006420bba26e0e25c3742c8f0620",
+      "matchedFields": 4
+    },
+    {
+      "positionDate": "2023-04-25",
+      "archiveUpdatedDate": "2023-04-28",
+      "actualPublicationDate": null,
+      "evidence": "ARCHIVE_UPDATED_ONLY",
+      "reportUrl": "https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf042523.htm",
+      "localReceipt": "backend/target/oct13-cot-042523.html",
+      "receiptSha256": "109d9234473983ac3ede4458d4e0b0bf64202d4a69d7b5bd3e5070b4c5f09b07",
+      "matchedFields": 4
+    },
+    {
+      "positionDate": "2023-05-02",
+      "archiveUpdatedDate": "2023-05-05",
+      "actualPublicationDate": null,
+      "evidence": "ARCHIVE_UPDATED_ONLY",
+      "reportUrl": "https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf050223.htm",
+      "localReceipt": "backend/target/oct13-cot-050223.html",
+      "receiptSha256": "3d337a5b5761bae501dc84bbdfe88f0ad993a0966c24475ca809b101efdfe9e0",
+      "matchedFields": 4
+    },
+    {
+      "positionDate": "2023-05-09",
+      "archiveUpdatedDate": "2023-05-12",
+      "actualPublicationDate": null,
+      "evidence": "ARCHIVE_UPDATED_ONLY",
+      "reportUrl": "https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf050923.htm",
+      "localReceipt": "backend/target/oct13-cot-050923.html",
+      "receiptSha256": "e31c8c3a88218f95e5dfda8a8bd08146eabfc8ca5438053fb1a50c1d938e1844",
+      "matchedFields": 4
+    },
+    {
+      "positionDate": "2023-05-16",
+      "archiveUpdatedDate": "2023-05-19",
+      "actualPublicationDate": null,
+      "evidence": "ARCHIVE_UPDATED_ONLY",
+      "reportUrl": "https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf051623.htm",
+      "localReceipt": "backend/target/oct13-cot-051623.html",
+      "receiptSha256": "1f2bca3dd1164e922f0f7ab5e46e8b1712fa4c449611e404bfaa2dde3adc28a9",
+      "matchedFields": 4
+    },
+    {
+      "positionDate": "2023-05-23",
+      "archiveUpdatedDate": "2023-05-26",
+      "actualPublicationDate": null,
+      "evidence": "ARCHIVE_UPDATED_ONLY",
+      "reportUrl": "https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf052323.htm",
+      "localReceipt": "backend/target/oct13-cot-052323.html",
+      "receiptSha256": "e4ae20183253261998414ff69c183fffba0be4ebeb2225bde170549b39d13131",
+      "matchedFields": 4
+    },
+    {
+      "positionDate": "2023-05-30",
+      "archiveUpdatedDate": "2023-06-02",
+      "actualPublicationDate": null,
+      "evidence": "ARCHIVE_UPDATED_ONLY",
+      "reportUrl": "https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf053023.htm",
+      "localReceipt": "backend/target/oct13-cot-053023.html",
+      "receiptSha256": "02c068d33f25fcf71e09ce1aa892c87a5bfac03ed64768e9967cac56ef5c455d",
+      "matchedFields": 4
+    },
+    {
+      "positionDate": "2023-06-06",
+      "archiveUpdatedDate": "2023-06-09",
+      "actualPublicationDate": null,
+      "evidence": "ARCHIVE_UPDATED_ONLY",
+      "reportUrl": "https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf060623.htm",
+      "localReceipt": "backend/target/oct13-cot-060623.html",
+      "receiptSha256": "70b2ab7820ff39fb6024e807a1a10e2384c72684a4d691065e172779cbbba808",
+      "matchedFields": 4
+    },
+    {
+      "positionDate": "2023-06-13",
+      "archiveUpdatedDate": "2023-06-16",
+      "actualPublicationDate": null,
+      "evidence": "ARCHIVE_UPDATED_ONLY",
+      "reportUrl": "https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf061323.htm",
+      "localReceipt": "backend/target/oct13-cot-061323.html",
+      "receiptSha256": "4d2b687f40ae1f77c440b2a8c25154027ee363c71fe7c0be8bf1da4186dc6d6b",
+      "matchedFields": 4
+    },
+    {
+      "positionDate": "2023-06-20",
+      "archiveUpdatedDate": "2023-06-23",
+      "actualPublicationDate": null,
+      "evidence": "ARCHIVE_UPDATED_ONLY",
+      "reportUrl": "https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf062023.htm",
+      "localReceipt": "backend/target/oct13-cot-062023.html",
+      "receiptSha256": "6be9f6579e734a8b32e6e3421d5c845d59f48a6731dba7b99586ed9de852335a",
+      "matchedFields": 4
+    },
+    {
+      "positionDate": "2023-06-27",
+      "archiveUpdatedDate": "2023-06-30",
+      "actualPublicationDate": null,
+      "evidence": "ARCHIVE_UPDATED_ONLY",
+      "reportUrl": "https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf062723.htm",
+      "localReceipt": "backend/target/oct13-cot-062723.html",
+      "receiptSha256": "03f3ca0fd48e51f7061166afa83b27c89fc32b43cfa42218b7b7b948aa342218",
+      "matchedFields": 4
+    },
+    {
+      "positionDate": "2023-07-03",
+      "archiveUpdatedDate": "2023-07-07",
+      "actualPublicationDate": null,
+      "evidence": "ARCHIVE_UPDATED_ONLY",
+      "reportUrl": "https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf070323.htm",
+      "localReceipt": "backend/target/oct13-cot-070323.html",
+      "receiptSha256": "0c4715b9b011e27de39e363b270c4c3003cbdf592c0124edf26b58ae6b880288",
+      "matchedFields": 4
+    },
+    {
+      "positionDate": "2023-07-11",
+      "archiveUpdatedDate": "2023-07-14",
+      "actualPublicationDate": null,
+      "evidence": "ARCHIVE_UPDATED_ONLY",
+      "reportUrl": "https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf071123.htm",
+      "localReceipt": "backend/target/oct13-cot-071123.html",
+      "receiptSha256": "680985708b1b4bd045ca94f26c9f97b664ba8b80c089cba9396d6a30705edc5f",
+      "matchedFields": 4
+    },
+    {
+      "positionDate": "2023-07-18",
+      "archiveUpdatedDate": "2023-07-21",
+      "actualPublicationDate": null,
+      "evidence": "ARCHIVE_UPDATED_ONLY",
+      "reportUrl": "https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf071823.htm",
+      "localReceipt": "backend/target/oct13-cot-071823.html",
+      "receiptSha256": "6e2ceda505384e46369f240c0941c7a9fcb56e51dbb805cf9bee81fb914c0bb6",
+      "matchedFields": 4
+    },
+    {
+      "positionDate": "2023-07-25",
+      "archiveUpdatedDate": "2023-07-28",
+      "actualPublicationDate": null,
+      "evidence": "ARCHIVE_UPDATED_ONLY",
+      "reportUrl": "https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf072523.htm",
+      "localReceipt": "backend/target/oct13-cot-072523.html",
+      "receiptSha256": "f76bbae7309bea49edf540bcfdadcfbdc85cda3376d22b98f3ff0524bd676d5b",
+      "matchedFields": 4
+    },
+    {
+      "positionDate": "2023-08-01",
+      "archiveUpdatedDate": "2023-08-04",
+      "actualPublicationDate": null,
+      "evidence": "ARCHIVE_UPDATED_ONLY",
+      "reportUrl": "https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf080123.htm",
+      "localReceipt": "backend/target/oct13-cot-080123.html",
+      "receiptSha256": "deb42a2f3087a6583e7c997e1a65af2ed3dd25f6a8e3d8d9a7dab620fbe10abf",
+      "matchedFields": 4
+    },
+    {
+      "positionDate": "2023-08-08",
+      "archiveUpdatedDate": "2023-08-11",
+      "actualPublicationDate": null,
+      "evidence": "ARCHIVE_UPDATED_ONLY",
+      "reportUrl": "https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf080823.htm",
+      "localReceipt": "backend/target/oct13-cot-080823.html",
+      "receiptSha256": "040a51c1f1d707e68435eaeea6505b4433ec928b81e5dc119fa0b77da0612d67",
+      "matchedFields": 4
+    },
+    {
+      "positionDate": "2023-08-15",
+      "archiveUpdatedDate": "2023-08-18",
+      "actualPublicationDate": null,
+      "evidence": "ARCHIVE_UPDATED_ONLY",
+      "reportUrl": "https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf081523.htm",
+      "localReceipt": "backend/target/oct13-cot-081523.html",
+      "receiptSha256": "1e09465b4fafed551a68f71e922af13aab8746f4216e33f16765c3df304a60fc",
+      "matchedFields": 4
+    },
+    {
+      "positionDate": "2023-08-22",
+      "archiveUpdatedDate": "2023-08-25",
+      "actualPublicationDate": null,
+      "evidence": "ARCHIVE_UPDATED_ONLY",
+      "reportUrl": "https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf082223.htm",
+      "localReceipt": "backend/target/oct13-cot-082223.html",
+      "receiptSha256": "084397df5b60942fda8500c44ee5de8b66a75f4e164f3e681b0a69d0520fd2f9",
+      "matchedFields": 4
+    },
+    {
+      "positionDate": "2023-08-29",
+      "archiveUpdatedDate": "2023-09-01",
+      "actualPublicationDate": null,
+      "evidence": "ARCHIVE_UPDATED_ONLY",
+      "reportUrl": "https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf082923.htm",
+      "localReceipt": "backend/target/oct13-cot-082923.html",
+      "receiptSha256": "a7ad3a9f876d834b52ac07c96e6a59a948eff7c31ed24a934ff11f259d6de4bd",
+      "matchedFields": 4
+    },
+    {
+      "positionDate": "2023-09-05",
+      "archiveUpdatedDate": "2023-09-08",
+      "actualPublicationDate": null,
+      "evidence": "ARCHIVE_UPDATED_ONLY",
+      "reportUrl": "https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf090523.htm",
+      "localReceipt": "backend/target/oct13-cot-090523.html",
+      "receiptSha256": "785acb485d0f7c151fbe8bd026a7c85d88208c0aa15931d3882d34e6c3416d39",
+      "matchedFields": 4
+    },
+    {
+      "positionDate": "2023-09-12",
+      "archiveUpdatedDate": "2023-09-15",
+      "actualPublicationDate": null,
+      "evidence": "ARCHIVE_UPDATED_ONLY",
+      "reportUrl": "https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf091223.htm",
+      "localReceipt": "backend/target/oct13-cot-091223.html",
+      "receiptSha256": "8d912562438246ef406a993e0aa095326be9b978921c44428f2ed3d21d7e80f4",
+      "matchedFields": 4
+    },
+    {
+      "positionDate": "2023-09-19",
+      "archiveUpdatedDate": "2023-09-22",
+      "actualPublicationDate": null,
+      "evidence": "ARCHIVE_UPDATED_ONLY",
+      "reportUrl": "https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf091923.htm",
+      "localReceipt": "backend/target/oct13-cot-091923.html",
+      "receiptSha256": "74b9c0c27799ed9a7b7b924f6bb555f41973fe09813f5d7ae6d9e85ca0680a7a",
+      "matchedFields": 4
+    },
+    {
+      "positionDate": "2023-09-26",
+      "archiveUpdatedDate": "2023-09-29",
+      "actualPublicationDate": null,
+      "evidence": "ARCHIVE_UPDATED_ONLY",
+      "reportUrl": "https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf092623.htm",
+      "localReceipt": "backend/target/oct13-cot-092623.html",
+      "receiptSha256": "284f483411547fed5ceb9c7fb0e0cd56ca7eabc0a528b61363f549352b426a0c",
+      "matchedFields": 4
+    },
+    {
+      "positionDate": "2023-10-03",
+      "archiveUpdatedDate": "2023-10-06",
+      "actualPublicationDate": null,
+      "evidence": "ARCHIVE_UPDATED_ONLY",
+      "reportUrl": "https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf100323.htm",
+      "localReceipt": "backend/target/oct13-cot-100323.html",
+      "receiptSha256": "98a5aeb7179eed297a9b3faa0b75a94261ba964879472701430f68edfa993e58",
+      "matchedFields": 4
+    },
+    {
+      "positionDate": "2023-10-10",
+      "archiveUpdatedDate": "2023-10-13",
+      "actualPublicationDate": null,
+      "evidence": "ARCHIVE_UPDATED_ONLY",
+      "reportUrl": "https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf101023.htm",
+      "localReceipt": "backend/target/oct13-cot-101023.html",
+      "receiptSha256": "5956eb3e926a7cf41a945feb7d76f466f9850b1b5005ab9e2eb359bbffc653d1",
+      "matchedFields": 4
+    },
+    {
+      "positionDate": "2023-10-17",
+      "archiveUpdatedDate": "2023-10-20",
+      "actualPublicationDate": null,
+      "evidence": "ARCHIVE_UPDATED_ONLY",
+      "reportUrl": "https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf101723.htm",
+      "localReceipt": "backend/target/oct13-cot-101723.html",
+      "receiptSha256": "fb285e4524a0f62ce8fc290fe02d7eb6db16640c93d84f6675bb007d58041b3c",
+      "matchedFields": 4
+    },
+    {
+      "positionDate": "2023-10-24",
+      "archiveUpdatedDate": "2023-10-27",
+      "actualPublicationDate": null,
+      "evidence": "ARCHIVE_UPDATED_ONLY",
+      "reportUrl": "https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf102423.htm",
+      "localReceipt": "backend/target/oct13-cot-102423.html",
+      "receiptSha256": "8b0a07067cacf12dbe13c0eb85280a08fd621bbf5e2ca38adf711f82b13ea3ba",
+      "matchedFields": 4
+    },
+    {
+      "positionDate": "2023-10-31",
+      "archiveUpdatedDate": "2023-11-03",
+      "actualPublicationDate": null,
+      "evidence": "ARCHIVE_UPDATED_ONLY",
+      "reportUrl": "https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf103123.htm",
+      "localReceipt": "backend/target/oct13-cot-103123.html",
+      "receiptSha256": "f80100a57ad8800cdeff60efddb0ed517df47c1c28b9840155d6d184ebe5ebd7",
+      "matchedFields": 4
+    },
+    {
+      "positionDate": "2023-11-07",
+      "archiveUpdatedDate": "2023-11-13",
+      "actualPublicationDate": null,
+      "evidence": "ARCHIVE_UPDATED_ONLY",
+      "reportUrl": "https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf110723.htm",
+      "localReceipt": "backend/target/oct13-cot-110723.html",
+      "receiptSha256": "027d311b5fed974dd81bef3507b17bf1e4362e286e27032bbb754c1ccbf762e0",
+      "matchedFields": 4
+    },
+    {
+      "positionDate": "2023-11-14",
+      "archiveUpdatedDate": "2023-11-17",
+      "actualPublicationDate": null,
+      "evidence": "ARCHIVE_UPDATED_ONLY",
+      "reportUrl": "https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf111423.htm",
+      "localReceipt": "backend/target/oct13-cot-111423.html",
+      "receiptSha256": "b53a11b0a980393dc346f344bee9937a0138f4d98eca51d7873c7b3cdf134007",
+      "matchedFields": 4
+    },
+    {
+      "positionDate": "2023-11-21",
+      "archiveUpdatedDate": "2023-11-27",
+      "actualPublicationDate": null,
+      "evidence": "ARCHIVE_UPDATED_ONLY",
+      "reportUrl": "https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf112123.htm",
+      "localReceipt": "backend/target/oct13-cot-112123.html",
+      "receiptSha256": "28a4d3d58fff2fa23119fb342cf404328efbc69e6693646c4c0693a74342a563",
+      "matchedFields": 4
+    },
+    {
+      "positionDate": "2023-11-28",
+      "archiveUpdatedDate": "2023-12-01",
+      "actualPublicationDate": null,
+      "evidence": "ARCHIVE_UPDATED_ONLY",
+      "reportUrl": "https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf112823.htm",
+      "localReceipt": "backend/target/oct13-cot-112823.html",
+      "receiptSha256": "f05f1402eacc6eb7ed4981fd83547a726bc5f1f8c491b3d7f7c9de3b0f19ae28",
+      "matchedFields": 4
+    },
+    {
+      "positionDate": "2023-12-05",
+      "archiveUpdatedDate": "2023-12-08",
+      "actualPublicationDate": null,
+      "evidence": "ARCHIVE_UPDATED_ONLY",
+      "reportUrl": "https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf120523.htm",
+      "localReceipt": "backend/target/oct13-cot-120523.html",
+      "receiptSha256": "23ce1b6afa9ade57b99c95ea562d280d0e5c194ea2de2604e4ff687949054316",
+      "matchedFields": 4
+    },
+    {
+      "positionDate": "2023-12-12",
+      "archiveUpdatedDate": "2023-12-15",
+      "actualPublicationDate": null,
+      "evidence": "ARCHIVE_UPDATED_ONLY",
+      "reportUrl": "https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf121223.htm",
+      "localReceipt": "backend/target/oct13-cot-121223.html",
+      "receiptSha256": "0e5d11ec6e0f5baa421f80f687fa836d4f1544a94406b03120f89710a2e83779",
+      "matchedFields": 4
+    },
+    {
+      "positionDate": "2023-12-19",
+      "archiveUpdatedDate": "2023-12-22",
+      "actualPublicationDate": null,
+      "evidence": "ARCHIVE_UPDATED_ONLY",
+      "reportUrl": "https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf121923.htm",
+      "localReceipt": "backend/target/oct13-cot-121923.html",
+      "receiptSha256": "dc6bd7926bc1228be1ec9177cf1d18ad78208d4d6c09b365e486188b1c7c4021",
+      "matchedFields": 4
+    },
+    {
+      "positionDate": "2023-12-26",
+      "archiveUpdatedDate": "2023-12-29",
+      "actualPublicationDate": null,
+      "evidence": "ARCHIVE_UPDATED_ONLY",
+      "reportUrl": "https://www.cftc.gov/files/dea/cotarchives/2023/futures/other_lf122623.htm",
+      "localReceipt": "backend/target/oct13-cot-122623.html",
+      "receiptSha256": "b3c5b9ab7e4554ab66f0d8bdac9c16ed9d5e5c185692132ef82367d5e7150268",
+      "matchedFields": 4
+    }
+  ]
+}
