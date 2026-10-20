@@ -60,6 +60,22 @@ function lag(baseDate, sourceDate) {
     return days === 0 ? "与基准日一致" : `较基准日滞后 ${days} 天`;
 }
 
+function renderIdentity(forecast) {
+    const timing = forecast.timing;
+    text("targetLabel", timing ? "承诺目标交易日" : "预计目标交易日（非历史承诺）");
+    text("targetSession", timing?.targetDate || forecast.expectedTargetDate || "未知");
+    text("settlementDate", forecast.targetDate || "尚未结算");
+    text("forecastIdentity", `正式大模型记录：${forecast.modelName || "未知"}；提示词 ${forecast.promptVersion || "未知"}；方向规则 ${forecast.forecastRuleVersion || "未知"}；时段规则 ${timing?.ruleVersion || "未知"}。配置模型名不是供应商确认的不可变模型版本；统计实验成绩不代表本记录的表现。`);
+    text("promptHash", forecast.promptHash || "未知");
+    const local = instant => new Intl.DateTimeFormat("zh-CN", {
+        timeZone: "Asia/Shanghai", year: "numeric", month: "2-digit", day: "2-digit",
+        hour: "2-digit", minute: "2-digit", hourCycle: "h23"
+    }).format(new Date(instant));
+    text("localInterval", timing?.start && timing?.end
+        ? `北京时间（Asia/Shanghai）候选目标区间：${local(timing.start)} → ${local(timing.end)}；仅转换展示时区，不是官方时段认证。`
+        : "旧记录未保存目标候选时段，不能据预计日期补造发布资格。");
+}
+
 function renderForecast(forecast) {
     latestForecast = forecast;
     const direction = forecast.predictedDirection;
@@ -70,8 +86,7 @@ function renderForecast(forecast) {
     card.className = `direction-card ${direction === "BULLISH" ? "up" : direction === "BEARISH" ? "down" : "flat"}`;
     text("direction", directions[direction] || direction);
     text("baseDate", forecast.baseDate);
-    text("targetLabel", forecast.targetDate ? "真实结算日" : "预计目标交易日");
-    text("targetSession", forecast.targetDate || forecast.expectedTargetDate || `基准日 ${forecast.baseDate} 后的下一有效黄金交易日`);
+    renderIdentity(forecast);
     text("basePrice", money(forecast.basePrice));
     text("forecastStatus", statuses[forecast.status] || forecast.status);
     text("createdAt", forecast.createdAt ? new Date(forecast.createdAt).toLocaleString("zh-CN") : "-");

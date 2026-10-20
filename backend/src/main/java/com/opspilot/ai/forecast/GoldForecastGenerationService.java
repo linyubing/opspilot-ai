@@ -67,7 +67,7 @@ public class GoldForecastGenerationService {
         return forecastRepository.findByKey(
                         snapshot.id(),
                         modelName,
-                        GoldForecastPromptBuilder.PROMPT_VERSION,
+                        GoldForecastPromptBuilder.FORMAL_VERSION,
                         GoldForecastRule.RULE_VERSION
                 ).map(existing -> new SaveGoldForecastResult(existing, false))
                 .orElseGet(() -> generateAndSave(snapshot));
@@ -82,7 +82,7 @@ public class GoldForecastGenerationService {
         var timing = publication.plan(snapshot.snapshot().latestGoldDate());
         publication.check(snapshot.snapshot().latestGoldDate(), timing, clock);
 
-        GoldForecastPrompt prompt = promptBuilder.build(snapshot);
+        GoldForecastPrompt prompt = promptBuilder.build(snapshot, timing);
         GeneratedGoldForecast generated = gateway.generate(prompt);
 
         // 模型返回内容必须先通过安全边界校验，才能写入数据库。

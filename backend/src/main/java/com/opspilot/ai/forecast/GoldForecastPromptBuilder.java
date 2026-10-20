@@ -17,6 +17,7 @@ public class GoldForecastPromptBuilder {
 
     public static final String PROMPT_VERSION =
             "gold-direction-forecast-prompt-v2";
+    public static final String FORMAL_VERSION = "gold-direction-session-prompt-v1";
     public static final String CANDIDATE_VERSION = "gold-neutral-contract-candidate-v1";
     public static final String MACRO_VERSION = "gold-macro-values-candidate-v1";
     public static final String EVIDENCE_VERSION = "gold-evidence-candidate-v1";
@@ -54,6 +55,38 @@ public class GoldForecastPromptBuilder {
 
     public GoldForecastPrompt build(StoredGoldResearchSnapshot record) {
         return build(record, PROMPT_VERSION, BASE_RULE);
+    }
+
+    /** 正式入口传入已承诺时段；旧研究模板保持原文和摘要，不能追改历史实验。 */
+    public GoldForecastPrompt build(StoredGoldResearchSnapshot record, GoldForecastTiming timing) {
+        Objects.requireNonNull(record, "正式快照记录不能为空");
+        Objects.requireNonNull(timing, "正式预测必须提供承诺目标时段");
+        var snapshot = record.snapshot();
+        if (!timing.targetDate().isAfter(snapshot.latestGoldDate())) {
+            throw new IllegalArgumentException("承诺目标日必须晚于基准日");
+        }
+        var base = com.opspilot.ai.marketdata.GoldSession.forDate(snapshot.latestGoldDate());
+        String content = build(record).content() + """
+
+                【本次不可变的价格与时段合同】
+                基准标签日：%s
+                基准收盘价：%s
+                价格单位：美元/金衡盎司；来源为快照已保存的XAUUSD日线收盘，不是当前盘中报价。
+                基准候选开始（UTC）：%s
+                基准候选结束（UTC）：%s
+                目标标签日：%s
+                目标候选开始（UTC）：%s
+                目标候选结束（UTC）：%s
+                候选时段规则：%s
+                预测对象：(目标收盘价 / 基准收盘价 - 1) * 100，单位为百分比。
+                目标收盘价现在未知，禁止补造。不是预测盘中最高/最低，也不是从生成时刻报价算涨跌。
+                标签与区间已由服务确定，不按今天、明天或服务器当前时间重新推算。
+                若发布发生在目标候选区间内，仍是目标收盘相对基准收盘预测，不能称为开盘前预测。
+                上述候选区间不是官方交易时段证明，也不是历史当时可得性证明。
+                现有方向阈值及JSON安全边界不变，不输出目标价格或交易建议。
+                """.formatted(snapshot.latestGoldDate(), snapshot.gold().currentPrice().toPlainString(),
+                base.start(), base.end(), timing.targetDate(), timing.start(), timing.end(), timing.ruleVersion());
+        return new GoldForecastPrompt(FORMAL_VERSION, content, sha256(content));
     }
 
     /** 宏观数值研究候选；正式生成路径不调用。 */

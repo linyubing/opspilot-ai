@@ -26,6 +26,37 @@ class GoldForecastPromptBuilderTests {
             + "并在 reasoning 中说明不确定性。";
 
     @Test
+    @DisplayName("正式时段合同摘要包含目标，旧模板摘要不变")
+    void hashesCommittedTarget() {
+        var input = GoldForecastTestFixtures.snapshot("4520.00894962");
+        var first = builder.build(input, timing("2026-08-27"));
+        var changed = builder.build(input, timing("2026-08-28"));
+        assertThat(first.version()).isEqualTo(GoldForecastPromptBuilder.FORMAL_VERSION);
+        assertThat(first.sha256()).isEqualTo(builder.build(input, timing("2026-08-27")).sha256())
+                .isNotEqualTo(changed.sha256());
+        assertThat(first.content()).contains("基准候选结束（UTC）：2026-08-26T21:00:00Z",
+                "目标标签日：2026-08-27", "不是当前盘中报价", "不是官方交易时段证明");
+        assertThat(builder.build(input).sha256())
+                .isEqualTo("365f6f42689df76c50ecc6e863dd84ed64a3981867d5e188aea0ec89e9645d08");
+    }
+
+    @Test
+    @DisplayName("正式入口拒绝缺失或不晚于基准日的目标")
+    void rejectsInvalidCommittedTarget() {
+        var input = GoldForecastTestFixtures.snapshot("4520.00894962");
+        org.assertj.core.api.Assertions.assertThatThrownBy(() -> builder.build(input, null))
+                .isInstanceOf(NullPointerException.class).hasMessageContaining("承诺目标时段");
+        org.assertj.core.api.Assertions.assertThatThrownBy(() -> builder.build(input, timing("2026-08-26")))
+                .isInstanceOf(IllegalArgumentException.class).hasMessageContaining("晚于基准日");
+    }
+
+    private GoldForecastTiming timing(String date) {
+        var session = com.opspilot.ai.marketdata.GoldSession.forDate(java.time.LocalDate.parse(date));
+        return new GoldForecastTiming(session.date(), session.start(), session.end(),
+                com.opspilot.ai.marketdata.GoldSessionCheckResult.RULE_VERSION);
+    }
+
+    @Test
     @DisplayName("宏观候选保留正式版全文，只补充原快照的数值、单位及观测日期")
     void addsMacroFacts() {
         var input = GoldForecastTestFixtures.snapshot("4520.00894962");

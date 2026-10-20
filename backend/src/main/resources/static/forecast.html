@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="查看黄金下一有效交易日方向预测及其可信度">
     <title>黄金行情预测</title>
-    <link rel="stylesheet" href="/forecast.css?v=1">
+    <link rel="stylesheet" href="/forecast.css?v=2">
 </head>
 <body>
 <main class="shell">
@@ -35,6 +35,7 @@
             <dl>
                 <div><dt>黄金基准日</dt><dd id="baseDate">-</dd></div>
                 <div><dt id="targetLabel">预测目标</dt><dd id="targetSession">-</dd></div>
+                <div><dt>实际结算日</dt><dd id="settlementDate">尚未结算</dd></div>
                 <div><dt id="basePriceLabel">预测基准价</dt><dd id="basePrice">-</dd></div>
                 <div><dt>验证状态</dt><dd id="forecastStatus">-</dd></div>
                 <div><dt>生成时间</dt><dd id="createdAt">-</dd></div>
@@ -45,6 +46,7 @@
         <section class="panel">
             <div class="heading"><h2>预测发布时间与目标承诺</h2></div>
             <p id="targetInterval" class="reasoning">旧记录未保存候选时段。</p>
+            <p id="localInterval" class="reasoning">目标时段未确认。</p>
             <p id="publicationWarning" class="note">发布时间合同未知，不能证明事前预测。</p>
         </section>
 
@@ -79,6 +81,9 @@
                 <span id="modelName" class="pill"></span>
             </div>
             <p id="reasoning" class="reasoning"></p>
+            <p id="forecastIdentity" class="note">正式模型身份未知。</p>
+            <p class="note">提示词摘要：<span id="promptHash">未知</span></p>
+            <p class="note">中性只表示收益位于 [-0.5%, 0.5%]。不确定是证据状态；当前三方向协议尚未支持独立“不出信号”，不能把中性当作弃权。</p>
             <h3>预测失效条件</h3>
             <ul id="conditions"></ul>
         </section>
@@ -146,6 +151,6 @@
         <div id="independentStats" aria-live="polite">正在读取独立目标统计…</div>
     </section>
 </main>
-<script src="/forecast.js?v=9" defer></script>
+<script src="/forecast.js?v=10" defer></script>
 </body>
 </html>
