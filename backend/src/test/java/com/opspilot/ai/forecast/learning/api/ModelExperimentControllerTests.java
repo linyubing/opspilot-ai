@@ -15,6 +15,12 @@ import com.opspilot.ai.forecast.learning.ModelExperimentStatus;
 import com.opspilot.ai.forecast.learning.ModelType;
 import com.opspilot.ai.forecast.learning.WalkForwardReport;
 import com.opspilot.ai.forecast.learning.WalkForwardService;
+import com.opspilot.ai.forecast.learning.PairedForecastEvaluator;
+import com.opspilot.ai.forecast.learning.PairedMetrics;
+import com.opspilot.ai.forecast.learning.ForecastEvaluator;
+import com.opspilot.ai.forecast.learning.SettledPrediction;
+import com.opspilot.ai.forecast.learning.DirectionProbabilities;
+import com.opspilot.ai.forecast.learning.ConfidencePolicy;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.web.servlet.MockMvc;
@@ -43,6 +49,122 @@ class ModelExperimentControllerTests {
     private ModelExperimentService experimentService;
     private MockMvc mvc;
 
+    @Test
+    void historyPreservesLegacyScoresWithoutInventingFullScores() throws Exception {
+        var experiment = createExperiment();
+        when(experimentService.findRecent(20)).thenReturn(List.of(experiment));
+        when(experimentService.findMetrics(experiment.id())).thenReturn(List.copyOf(createMetricsMap().values()));
+        mvc.perform(get("/api/research/gold/model-experiments/history"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].balancedAccuracy").value(.6))
+                .andExpect(jsonPath("$[0].majorityBalancedAccuracy").value(.6))
+                .andExpect(jsonPath("$[0].fullBalancedAccuracy").doesNotExist())
+                .andExpect(jsonPath("$[0].fullMajorityBalancedAccuracy").doesNotExist())
+                .andExpect(jsonPath("$[0].relativeMajorityImprovement").doesNotExist())
+                .andExpect(jsonPath("$[0].relativeBase16Improvement").doesNotExist());
+    }
+
+    @Test
+    void historySeparatesSignalScoresAndFullScoreImprovements() throws Exception {
+        var experiment = createExperiment();
+        when(experimentService.findRecent(20)).thenReturn(List.of(experiment));
+        when(experimentService.findMetrics(experiment.id())).thenReturn(List.copyOf(pairedMetricsMap(false).values()));
+        mvc.perform(get("/api/research/gold/model-experiments/history"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].balancedAccuracy").doesNotExist())
+                .andExpect(jsonPath("$[0].fullBalancedAccuracy").value(.6667))
+                .andExpect(jsonPath("$[0].fullMajorityBalancedAccuracy").value(.3333))
+                .andExpect(jsonPath("$[0].relativeMajorityImprovement").value(1.0003));
+    }
+
+    @Test
+    void base16ImprovementUsesOnlyPairedFullScoresFromSameComparison() throws Exception {
+        var comparisonId = UUID.randomUUID();
+        var base = createExperimentWithProfile(FeatureProfile.BASE_16, comparisonId);
+        var current = createExperimentWithProfile(FeatureProfile.ALL_36, comparisonId);
+        var baseMetrics = pairedMetricsMap(false);
+        // BASE全样本平衡准确率1/3，当前2/3；原信号子集分别为1/3和不可计算。
+        var baseScore = baseMetrics.get(ModelType.MAJORITY);
+        baseMetrics.put(ModelType.LOGISTIC, new ModelExperimentMetric(baseScore.experimentId(), ModelType.LOGISTIC,
+                baseScore.sampleCount(), baseScore.coveredCount(), baseScore.coverage(), baseScore.accuracy(),
+                baseScore.balancedAccuracy(), baseScore.brierScore(), baseScore.logLoss(), baseScore.recalls(),
+                baseScore.confusionMatrix(), baseScore.paired()));
+        when(experimentService.findRecent(20)).thenReturn(List.of(current, base));
+        when(experimentService.findMetrics(current.id())).thenReturn(List.copyOf(pairedMetricsMap(false).values()));
+        when(experimentService.findMetrics(base.id())).thenReturn(List.copyOf(baseMetrics.values()));
+        mvc.perform(get("/api/research/gold/model-experiments/history"))
+                .andExpect(jsonPath("$[0].relativeBase16Improvement").value(1.0003))
+                .andExpect(jsonPath("$[0].fullBalancedAccuracy").value(.6667));
+        when(experimentService.findMetrics(base.id())).thenReturn(List.copyOf(createMetricsMap().values()));
+        mvc.perform(get("/api/research/gold/model-experiments/history"))
+                .andExpect(jsonPath("$[0].relativeBase16Improvement").doesNotExist());
+    }
+
+    @Test
+    void postAndDetailKeepFullScoresAndSameSignalDateBaseline() throws Exception {
+        var experiment = createExperiment();
+        var metrics = pairedMetricsMap(false);
+        when(experimentService.run(ForecastHorizon.NEXT_DAY, FeatureProfile.ALL_36))
+                .thenReturn(new ModelExperimentResult(experiment, metrics));
+        when(experimentService.findById(experiment.id())).thenReturn(experiment);
+        when(experimentService.findMetrics(experiment.id())).thenReturn(List.copyOf(metrics.values()));
+        for (var request : List.of(post("/api/research/gold/model-experiments"),
+                get("/api/research/gold/model-experiments/" + experiment.id()))) {
+            mvc.perform(request)
+                    .andExpect(status().is2xxSuccessful())
+                    .andExpect(jsonPath("$.xgboost.accuracy").value(.5))
+                    .andExpect(jsonPath("$.xgboost.paired.all.sampleCount").value(3))
+                    .andExpect(jsonPath("$.xgboost.paired.all.coveredCount").value(3))
+                    .andExpect(jsonPath("$.xgboost.paired.all.accuracy").value(.6667))
+                    .andExpect(jsonPath("$.xgboost.paired.baselineOnSignals.sampleCount").value(2))
+                    .andExpect(jsonPath("$.xgboost.paired.baselineOnSignals.accuracy").value(.5))
+                    .andExpect(jsonPath("$.xgboost.paired.signalDates.length()").value(2))
+                    .andExpect(jsonPath("$.xgboost.paired.signalDates[1][0]").value(2024))
+                    .andExpect(jsonPath("$.xgboost.paired.signalDates[1][1]").value(1))
+                    .andExpect(jsonPath("$.xgboost.paired.signalDates[1][2]").value(3));
+        }
+    }
+
+    @Test
+    void previewAndCompareKeepPairedMetrics() throws Exception {
+        var metrics = pairedMetricsMap(false);
+        when(service.run(ForecastHorizon.FIVE_DAYS, FeatureProfile.ALL_36)).thenReturn(pairedReport(metrics));
+        mvc.perform(get("/api/research/gold/model-experiments"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.logistic.paired.all.balancedAccuracy").value(.6667))
+                .andExpect(jsonPath("$.logistic.paired.signalDates.length()").value(2));
+        var comparisonId = UUID.randomUUID();
+        var results = java.util.Arrays.stream(FeatureProfile.values())
+                .map(p -> new ModelExperimentResult(createExperimentWithProfile(p, comparisonId), metrics)).toList();
+        when(experimentService.compare(ForecastHorizon.FIVE_DAYS)).thenReturn(new ModelComparisonResult(
+                comparisonId, ForecastHorizon.FIVE_DAYS, results, new Stage8Candidate(false, null, "测试")));
+        mvc.perform(post("/api/research/gold/model-experiments/compare"))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.experiments[0].xgboost.paired.all.sampleCount").value(3))
+                .andExpect(jsonPath("$.experiments[1].logistic.paired.baselineOnSignals.accuracy").value(.5))
+                .andExpect(jsonPath("$.experiments[2].xgboost.paired.signalDates.length()").value(2));
+    }
+
+    @Test
+    void zeroSignalsKeepFullScoresButNoBaselineInPostAndDetail() throws Exception {
+        var experiment = createExperiment();
+        var metrics = pairedMetricsMap(true);
+        when(experimentService.run(ForecastHorizon.NEXT_DAY, FeatureProfile.ALL_36))
+                .thenReturn(new ModelExperimentResult(experiment, metrics));
+        when(experimentService.findById(experiment.id())).thenReturn(experiment);
+        when(experimentService.findMetrics(experiment.id())).thenReturn(List.copyOf(metrics.values()));
+        for (var request : List.of(post("/api/research/gold/model-experiments"),
+                get("/api/research/gold/model-experiments/" + experiment.id()))) {
+            mvc.perform(request)
+                    .andExpect(status().is2xxSuccessful())
+                    .andExpect(jsonPath("$.xgboost.coveredCount").value(0))
+                    .andExpect(jsonPath("$.xgboost.paired.all.coveredCount").value(3))
+                    .andExpect(jsonPath("$.xgboost.paired.all.accuracy").value(.3333))
+                    .andExpect(jsonPath("$.xgboost.paired.baselineOnSignals").doesNotExist())
+                    .andExpect(jsonPath("$.xgboost.paired.signalDates").isEmpty());
+        }
+    }
+
     @BeforeEach
     void setUp() {
         service = mock(WalkForwardService.class);
@@ -70,6 +192,7 @@ class ModelExperimentControllerTests {
                 .andExpect(jsonPath("$.majority.logLoss").isNumber())
                 .andExpect(jsonPath("$.majority.recalls.BULLISH").isNumber())
                 .andExpect(jsonPath("$.majority.promotionReady").value(true))
+                .andExpect(jsonPath("$.majority.paired").doesNotExist())
                 .andExpect(jsonPath("$.logistic.sampleCount").value(240))
                 .andExpect(jsonPath("$.xgboost.sampleCount").value(240))
                 .andExpect(jsonPath("$.finalHoldout.samples").value(240))
@@ -130,7 +253,8 @@ class ModelExperimentControllerTests {
                 .andExpect(jsonPath("$.logistic.sampleCount").value(240))
                 .andExpect(jsonPath("$.logistic.accuracy").value(0.6000))
                 .andExpect(jsonPath("$.xgboost.sampleCount").value(240))
-                .andExpect(jsonPath("$.xgboost.accuracy").value(0.6000));
+                .andExpect(jsonPath("$.xgboost.accuracy").value(0.6000))
+                .andExpect(jsonPath("$.xgboost.paired").doesNotExist());
     }
 
     @Test
@@ -189,7 +313,8 @@ class ModelExperimentControllerTests {
                 .andExpect(jsonPath("$.logistic.sampleCount").value(240))
                 .andExpect(jsonPath("$.logistic.accuracy").isNumber())
                 .andExpect(jsonPath("$.xgboost.sampleCount").value(240))
-                .andExpect(jsonPath("$.xgboost.accuracy").isNumber());
+                .andExpect(jsonPath("$.xgboost.accuracy").isNumber())
+                .andExpect(jsonPath("$.xgboost.paired").doesNotExist());
     }
 
     @Test
@@ -211,7 +336,8 @@ class ModelExperimentControllerTests {
                 .andExpect(jsonPath("$[0].dataPolicy").value("legacy-latest-version"))
                 .andExpect(jsonPath("$[0].majorityAccuracy").value(0.6000))
                 .andExpect(jsonPath("$[0].logisticAccuracy").value(0.6000))
-                .andExpect(jsonPath("$[0].xgboostAccuracy").value(0.6000));
+                .andExpect(jsonPath("$[0].xgboostAccuracy").value(0.6000))
+                .andExpect(jsonPath("$[0].relativeMajorityImprovement").doesNotExist());
     }
 
     @Test
@@ -320,6 +446,63 @@ class ModelExperimentControllerTests {
                 240, 20, 12, metricsMap,
                 240, LocalDate.parse("2025-01-10"), LocalDate.parse("2025-12-31")
         );
+    }
+
+    private Map<ModelType, ModelExperimentMetric> pairedMetricsMap(boolean noSignals) {
+        var rows = java.util.stream.IntStream.range(0, 3).mapToObj(i -> {
+            var probabilities = noSignals ? new DirectionProbabilities(.34, .33, .33)
+                    : i == 1 ? new DirectionProbabilities(.3, .4, .3)
+                    : new DirectionProbabilities(.8, .1, .1);
+            return new SettledPrediction(LocalDate.of(2024, 1, 1).plusDays(i), probabilities,
+                    new ConfidencePolicy(.55).apply(probabilities), ForecastDirection.values()[i]);
+        }).toList();
+        var baseline = rows.stream().map(r -> {
+            var probabilities = new DirectionProbabilities(.8, .1, .1);
+            return new SettledPrediction(r.asOfDate(), probabilities,
+                    new ConfidencePolicy(.55).apply(probabilities), r.actual());
+        }).toList();
+        var evaluator = new ForecastEvaluator();
+        var pairedEvaluator = new PairedForecastEvaluator(evaluator);
+        Map<ModelType, ModelExperimentMetric> result = new EnumMap<>(ModelType.class);
+        for (var type : ModelType.values()) {
+            var source = type == ModelType.MAJORITY ? baseline : rows;
+            var score = evaluator.evaluate(source);
+            Map<String, Object> recalls = new java.util.LinkedHashMap<>();
+            score.recalls().forEach((direction, value) -> recalls.put(direction.name(), value));
+            Map<String, Map<String, Integer>> matrix = new java.util.LinkedHashMap<>();
+            score.confusionMatrix().forEach((direction, values) -> {
+                Map<String, Integer> row = new java.util.LinkedHashMap<>();
+                values.forEach((prediction, value) -> row.put(prediction.name(), value));
+                matrix.put(direction.name(), row);
+            });
+            result.put(type, new ModelExperimentMetric(UUID.randomUUID(), type, score.sampleCount(),
+                    score.coveredCount(), score.coverage(), score.accuracy(), score.balancedAccuracy(),
+                    score.brierScore(), score.logLoss(), recalls, matrix, pairedEvaluator.evaluate(source, baseline)));
+        }
+        return result;
+    }
+
+    private WalkForwardReport pairedReport(Map<ModelType, ModelExperimentMetric> metrics) {
+        Map<ModelType, ForecastMetrics> scores = new EnumMap<>(ModelType.class);
+        Map<ModelType, PairedMetrics> paired = new EnumMap<>(ModelType.class);
+        metrics.forEach((type, metric) -> {
+            Map<ForecastDirection, BigDecimal> recalls = new EnumMap<>(ForecastDirection.class);
+            metric.recalls().forEach((direction, value) -> recalls.put(ForecastDirection.valueOf(direction),
+                    (BigDecimal) value));
+            Map<ForecastDirection, Map<ForecastDirection, Integer>> matrix = new EnumMap<>(ForecastDirection.class);
+            metric.confusionMatrix().forEach((direction, values) -> {
+                Map<ForecastDirection, Integer> row = new EnumMap<>(ForecastDirection.class);
+                values.forEach((prediction, value) -> row.put(ForecastDirection.valueOf(prediction), value));
+                matrix.put(ForecastDirection.valueOf(direction), row);
+            });
+            scores.put(type, new ForecastMetrics(metric.sampleCount(), metric.coveredCount(), metric.coverage(),
+                    metric.accuracy(), metric.balancedAccuracy(), metric.brierScore(), metric.logLoss(),
+                    recalls, matrix, false));
+            paired.put(type, metric.paired());
+        });
+        return new WalkForwardReport(ForecastHorizon.FIVE_DAYS, LocalDate.of(2020, 1, 1),
+                LocalDate.of(2024, 1, 1), LocalDate.of(2024, 1, 3), 3, 20, 1, scores,
+                240, LocalDate.of(2025, 1, 10), LocalDate.of(2025, 12, 31), paired);
     }
 
     private ForecastMetrics metrics() {

@@ -1,5 +1,6 @@
 package com.opspilot.ai.forecast.learning;
 
+import com.opspilot.ai.forecast.ForecastDirection;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -128,6 +129,79 @@ class JdbcModelExperimentRepositoryTests {
         assertThat(metrics).hasSize(2);
         assertThat(metrics).extracting(m -> m.modelType())
                 .containsExactlyInAnyOrder(ModelType.MAJORITY, ModelType.LOGISTIC);
+        assertThat(metrics).allSatisfy(metric -> assertThat(metric.paired()).isNull());
+    }
+
+    @Test
+    void completesExperimentWithPairedMetricsRoundTrip() {
+        ModelExperiment experiment = createSampleExperiment();
+        repo.create(experiment);
+        ModelExperimentMetric metric = createPairedMetric(experiment.id(), ModelType.LOGISTIC);
+
+        repo.complete(experiment.id(), experiment, List.of(metric));
+
+        assertThat(repo.findMetrics(experiment.id())).singleElement().satisfies(stored ->
+                assertThat(stored.paired()).isEqualTo(metric.paired()));
+    }
+
+    @Test
+    void completesExperimentWithNoSignalsRoundTrip() {
+        ModelExperiment experiment = createSampleExperiment();
+        repo.create(experiment);
+        ModelExperimentMetric source = createMetric(experiment.id(), ModelType.XGBOOST);
+        PairedMetrics paired = new PairedMetrics(pairedForecastMetrics(3, "0.3333"), null, List.of());
+        ModelExperimentMetric metric = new ModelExperimentMetric(source.experimentId(), source.modelType(),
+                3, 0, BigDecimal.ZERO, source.accuracy(),
+                source.balancedAccuracy(), source.brierScore(), source.logLoss(), source.recalls(),
+                source.confusionMatrix(), paired);
+
+        repo.complete(experiment.id(), experiment, List.of(metric));
+
+        assertThat(repo.findMetrics(experiment.id())).singleElement().satisfies(stored ->
+                assertThat(stored.paired()).isEqualTo(paired));
+    }
+
+    @Test
+    void completesComparisonWithPairedMetricsRoundTrip() {
+        UUID comparisonId = UUID.randomUUID();
+        List<ModelExperiment> experiments = createComparison(comparisonId);
+        repo.createComparison(experiments);
+        List<ModelExperimentMetric> metrics = new ArrayList<>();
+        for (ModelExperiment experiment : experiments) {
+            metrics.add(createMetric(experiment.id(), ModelType.MAJORITY));
+            metrics.add(createPairedMetric(experiment.id(), ModelType.LOGISTIC));
+            metrics.add(createPairedMetric(experiment.id(), ModelType.XGBOOST));
+        }
+
+        repo.completeComparison(comparisonId, experiments, metrics);
+
+        for (ModelExperiment experiment : experiments) {
+            assertThat(repo.findMetrics(experiment.id())).allSatisfy(stored -> {
+                if (stored.modelType() == ModelType.MAJORITY) {
+                    assertThat(stored.paired()).isNull();
+                } else {
+                    assertThat(stored.paired()).isEqualTo(
+                            createPairedMetric(experiment.id(), stored.modelType()).paired());
+                }
+            });
+        }
+    }
+
+    @Test
+    void readsLegacyMetricInsertedWithoutPairedColumn() {
+        ModelExperiment experiment = createSampleExperiment();
+        repo.create(experiment);
+        jdbc.update("""
+                insert into gold_model_experiment_metric (
+                    experiment_id, model_type, sample_count, covered_count, coverage,
+                    accuracy, balanced_accuracy, brier_score, log_loss, recalls, confusion_matrix
+                ) values (?, 'MAJORITY', 3, 3, 1, 0.5, 0.5, 0.4, 1.1, '{}'::jsonb, '{}'::jsonb)
+                """, experiment.id());
+
+        assertThat(repo.findMetrics(experiment.id())).singleElement().satisfies(stored -> {
+            assertThat(stored.sampleCount()).isEqualTo(3);
+            assertThat(stored.paired()).isNull();
+        });
     }
 
     @Test
@@ -385,5 +459,25 @@ class JdbcModelExperimentRepositoryTests {
                 "select count(*) from gold_model_experiment",
                 Long.class
         );
+    }
+
+    private ModelExperimentMetric createPairedMetric(UUID experimentId, ModelType modelType) {
+        ModelExperimentMetric source = createMetric(experimentId, modelType);
+        ForecastMetrics all = pairedForecastMetrics(3, "0.3333");
+        ForecastMetrics baseline = pairedForecastMetrics(2, "0.5000");
+        PairedMetrics paired = new PairedMetrics(all, baseline, List.of(
+                LocalDate.of(2025, 1, 10), LocalDate.of(2025, 1, 14)));
+        return new ModelExperimentMetric(source.experimentId(), source.modelType(),
+                3, 2, new BigDecimal("0.6667"), source.accuracy(),
+                source.balancedAccuracy(), source.brierScore(), source.logLoss(), source.recalls(),
+                source.confusionMatrix(), paired);
+    }
+
+    private ForecastMetrics pairedForecastMetrics(int sampleCount, String accuracy) {
+        return new ForecastMetrics(sampleCount, sampleCount, BigDecimal.ONE,
+                new BigDecimal(accuracy), new BigDecimal("0.2500"),
+                new BigDecimal("0.4500"), new BigDecimal("1.2000"),
+                Map.of(ForecastDirection.BULLISH, new BigDecimal("0.5000")),
+                Map.of(ForecastDirection.BULLISH, Map.of(ForecastDirection.BULLISH, 1)), false);
     }
 }

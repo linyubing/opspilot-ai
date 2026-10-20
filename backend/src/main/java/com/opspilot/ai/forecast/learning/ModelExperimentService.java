@@ -126,7 +126,7 @@ public class ModelExperimentService {
                 Map<ModelType, ModelExperimentMetric> persistedMetrics = new EnumMap<>(ModelType.class);
                 List<ModelExperimentMetric> metricList = new ArrayList<>();
                 for (ModelType type : ModelType.values()) {
-                    ModelExperimentMetric metric = toMetric(experiment.id(), type, report.metric(type));
+                    ModelExperimentMetric metric = toMetric(experiment.id(), type, report.metric(type), report.paired().get(type));
                     persistedMetrics.put(type, metric);
                     metricList.add(metric);
                 }
@@ -229,7 +229,7 @@ public class ModelExperimentService {
             Map<ModelType, ModelExperimentMetric> persistedMetrics = new EnumMap<>(ModelType.class);
             List<ModelExperimentMetric> metricList = new ArrayList<>();
             for (ModelType type : ModelType.values()) {
-                ModelExperimentMetric metric = toMetric(experimentId, type, report.metric(type));
+                ModelExperimentMetric metric = toMetric(experimentId, type, report.metric(type), report.paired().get(type));
                 persistedMetrics.put(type, metric);
                 metricList.add(metric);
             }
@@ -292,7 +292,8 @@ public class ModelExperimentService {
     private ModelExperimentMetric toMetric(
             UUID experimentId,
             ModelType modelType,
-            ForecastMetrics metrics
+            ForecastMetrics metrics,
+            PairedMetrics paired
     ) {
         return new ModelExperimentMetric(
                 experimentId,
@@ -305,7 +306,8 @@ public class ModelExperimentService {
                 metrics.brierScore(),
                 metrics.logLoss(),
                 toRecallsMap(metrics.recalls()),
-                toConfusionMatrixMap(metrics.confusionMatrix())
+                toConfusionMatrixMap(metrics.confusionMatrix()),
+                paired
         );
     }
 
@@ -339,6 +341,7 @@ public class ModelExperimentService {
         params.put("featureCount", profile.featureNames().size());
         params.put("refitEvery", REFIT_EVERY);
         params.put("confidenceThreshold", CONFIDENCE_THRESHOLD);
+        params.put("evaluationVersion", PairedForecastEvaluator.VERSION);
         params.put("majorityTrainer", "MajorityGoldTrainer");
         params.put("logisticTrainer", "TribuoGoldTrainer");
         params.put("logisticVersion", walkForward.logisticVersion());

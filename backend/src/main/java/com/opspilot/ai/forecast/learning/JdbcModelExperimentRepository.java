@@ -95,15 +95,16 @@ public class JdbcModelExperimentRepository implements ModelExperimentRepository 
                     insert into gold_model_experiment_metric (
                         experiment_id, model_type, sample_count, covered_count,
                         coverage, accuracy, balanced_accuracy, brier_score, log_loss,
-                        recalls, confusion_matrix
-                    ) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?::jsonb, ?::jsonb)
+                        recalls, confusion_matrix, paired_metrics
+                    ) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?::jsonb, ?::jsonb, ?::jsonb)
                     """,
                     metric.experimentId(), metric.modelType().name(),
                     metric.sampleCount(), metric.coveredCount(),
                     metric.coverage(), metric.accuracy(),
                     metric.balancedAccuracy(), metric.brierScore(),
                     metric.logLoss(), toJson(metric.recalls()),
-                    toJson(metric.confusionMatrix())
+                    toJson(metric.confusionMatrix()),
+                    metric.paired() == null ? null : toJson(metric.paired())
             );
         }
     }
@@ -163,15 +164,16 @@ public class JdbcModelExperimentRepository implements ModelExperimentRepository 
                     insert into gold_model_experiment_metric (
                         experiment_id, model_type, sample_count, covered_count,
                         coverage, accuracy, balanced_accuracy, brier_score, log_loss,
-                        recalls, confusion_matrix
-                    ) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?::jsonb, ?::jsonb)
+                        recalls, confusion_matrix, paired_metrics
+                    ) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?::jsonb, ?::jsonb, ?::jsonb)
                     """,
                     metric.experimentId(), metric.modelType().name(),
                     metric.sampleCount(), metric.coveredCount(),
                     metric.coverage(), metric.accuracy(),
                     metric.balancedAccuracy(), metric.brierScore(),
                     metric.logLoss(), toJson(metric.recalls()),
-                    toJson(metric.confusionMatrix())
+                    toJson(metric.confusionMatrix()),
+                    metric.paired() == null ? null : toJson(metric.paired())
             );
         }
 
@@ -329,7 +331,8 @@ public class JdbcModelExperimentRepository implements ModelExperimentRepository 
                 rs.getBigDecimal("brier_score"),
                 rs.getBigDecimal("log_loss"),
                 parseJsonMap(rs.getString("recalls")),
-                parseJsonMapOfMaps(rs.getString("confusion_matrix"))
+                parseJsonMapOfMaps(rs.getString("confusion_matrix")),
+                parsePairedMetrics(rs.getString("paired_metrics"))
         );
     }
 
@@ -338,6 +341,17 @@ public class JdbcModelExperimentRepository implements ModelExperimentRepository 
             return objectMapper.writeValueAsString(object);
         } catch (JsonProcessingException e) {
             throw new RuntimeException("JSON序列化失败", e);
+        }
+    }
+
+    private PairedMetrics parsePairedMetrics(String json) {
+        if (json == null) {
+            return null;
+        }
+        try {
+            return objectMapper.readValue(json, PairedMetrics.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("配对指标反序列化失败", e);
         }
     }
 

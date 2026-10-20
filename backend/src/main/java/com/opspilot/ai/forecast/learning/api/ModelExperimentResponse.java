@@ -37,9 +37,9 @@ public record ModelExperimentResponse(
                 report.validationSamples(),
                 report.refitEvery(),
                 report.refitCount(),
-                MetricResponse.from(report.metric(ModelType.MAJORITY)),
-                MetricResponse.from(report.metric(ModelType.LOGISTIC)),
-                MetricResponse.from(report.metric(ModelType.XGBOOST)),
+                MetricResponse.from(report.metric(ModelType.MAJORITY), report.paired().get(ModelType.MAJORITY)),
+                MetricResponse.from(report.metric(ModelType.LOGISTIC), report.paired().get(ModelType.LOGISTIC)),
+                MetricResponse.from(report.metric(ModelType.XGBOOST), report.paired().get(ModelType.XGBOOST)),
                 new FinalHoldout(
                         report.finalHoldoutSamples(),
                         report.finalHoldoutStart(),

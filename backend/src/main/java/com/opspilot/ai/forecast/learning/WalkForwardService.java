@@ -136,8 +136,12 @@ public class WalkForwardService {
         List<GoldSample> validation = data.validation();
         List<GoldSample> holdout = data.finalHoldout();
         Map<ModelType, ForecastMetrics> metrics = new EnumMap<>(ModelType.class);
+        Map<ModelType, PairedMetrics> paired = new EnumMap<>(ModelType.class);
+        var pairedEvaluator = new PairedForecastEvaluator(evaluator);
         for (Map.Entry<ModelType, List<SettledPrediction>> entry : predictions.entrySet()) {
             metrics.put(entry.getKey(), evaluator.evaluate(entry.getValue()));
+            paired.put(entry.getKey(), pairedEvaluator.evaluate(
+                    entry.getValue(), predictions.get(ModelType.MAJORITY)));
         }
         return new WalkForwardReport(
                 horizon,
@@ -150,7 +154,8 @@ public class WalkForwardService {
                 metrics,
                 holdout.size(),
                 holdout.getFirst().asOfDate(),
-                holdout.getLast().asOfDate()
+                holdout.getLast().asOfDate(),
+                paired
         );
     }
 }

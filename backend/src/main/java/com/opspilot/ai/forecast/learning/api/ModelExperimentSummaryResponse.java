@@ -35,7 +35,9 @@ public record ModelExperimentSummaryResponse(
         BigDecimal majorityBalancedAccuracy,
         BigDecimal relativeMajorityImprovement,
         BigDecimal relativeBase16Improvement,
-        String dataPolicy
+        String dataPolicy,
+        BigDecimal fullBalancedAccuracy,
+        BigDecimal fullMajorityBalancedAccuracy
 ) {
     public static ModelExperimentSummaryResponse from(
             ModelExperiment experiment,
@@ -46,14 +48,19 @@ public record ModelExperimentSummaryResponse(
         ModelExperimentMetric xgboost = metrics.get(ModelType.XGBOOST);
 
         BigDecimal logAccuracy = logistic != null ? logistic.accuracy() : null;
+        // 保留既有信号子集字段；只有配对完整日期指标才能用于相对比较。
         BigDecimal logBalanced = logistic != null ? logistic.balancedAccuracy() : null;
+        BigDecimal logFullBalanced = logistic != null && logistic.paired() != null
+                ? logistic.paired().all().balancedAccuracy() : null;
         BigDecimal logCoverage = logistic != null ? logistic.coverage() : null;
         BigDecimal logBrier = logistic != null ? logistic.brierScore() : null;
         BigDecimal logLogLoss = logistic != null ? logistic.logLoss() : null;
         BigDecimal majBalanced = majority != null ? majority.balancedAccuracy() : null;
+        BigDecimal majFullBalanced = majority != null && majority.paired() != null
+                ? majority.paired().all().balancedAccuracy() : null;
         BigDecimal xgbAccuracy = xgboost != null ? xgboost.accuracy() : null;
 
-        BigDecimal relMajority = computeImprovement(logBalanced, majBalanced);
+        BigDecimal relMajority = computeImprovement(logFullBalanced, majFullBalanced);
 
         return new ModelExperimentSummaryResponse(
                 experiment.id(),
@@ -77,7 +84,9 @@ public record ModelExperimentSummaryResponse(
                 majBalanced,
                 relMajority,
                 null,
-                experiment.dataPolicy()
+                experiment.dataPolicy(),
+                logFullBalanced,
+                majFullBalanced
         );
     }
 
@@ -86,21 +95,21 @@ public record ModelExperimentSummaryResponse(
     ) {
         List<ModelExperimentSummaryResponse> result = new ArrayList<>();
         for (ModelExperimentSummaryResponse s : summaries) {
-            if ("BASE_16".equals(s.featureProfile()) || s.balancedAccuracy() == null) {
+            if ("BASE_16".equals(s.featureProfile()) || s.fullBalancedAccuracy() == null) {
                 result.add(s);
                 continue;
             }
             BigDecimal base16Balanced = summaries.stream()
                     .filter(other -> "BASE_16".equals(other.featureProfile())
-                            && other.balancedAccuracy() != null
+                            && other.fullBalancedAccuracy() != null
                             && other.comparisonId() != null
                             && other.comparisonId().equals(s.comparisonId()))
                     .findFirst()
-                    .map(ModelExperimentSummaryResponse::balancedAccuracy)
+                    .map(ModelExperimentSummaryResponse::fullBalancedAccuracy)
                     .orElse(null);
 
             if (base16Balanced != null) {
-                BigDecimal improvement = computeImprovement(s.balancedAccuracy(), base16Balanced);
+                BigDecimal improvement = computeImprovement(s.fullBalancedAccuracy(), base16Balanced);
                 result.add(new ModelExperimentSummaryResponse(
                         s.id(), s.comparisonId(), s.horizon(), s.status(),
                         s.featureProfile(), s.datasetHashPrefix(),
@@ -112,7 +121,9 @@ public record ModelExperimentSummaryResponse(
                         s.majorityBalancedAccuracy(),
                         s.relativeMajorityImprovement(),
                         improvement,
-                        s.dataPolicy()
+                        s.dataPolicy(),
+                        s.fullBalancedAccuracy(),
+                        s.fullMajorityBalancedAccuracy()
                 ));
             } else {
                 result.add(s);

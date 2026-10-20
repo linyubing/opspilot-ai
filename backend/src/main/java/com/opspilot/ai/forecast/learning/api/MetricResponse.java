@@ -3,6 +3,7 @@ package com.opspilot.ai.forecast.learning.api;
 import com.opspilot.ai.forecast.ForecastDirection;
 import com.opspilot.ai.forecast.learning.ForecastMetrics;
 import com.opspilot.ai.forecast.learning.ModelExperimentMetric;
+import com.opspilot.ai.forecast.learning.PairedMetrics;
 
 import java.math.BigDecimal;
 import java.util.Map;
@@ -17,9 +18,14 @@ public record MetricResponse(
         BigDecimal brierScore,
         BigDecimal logLoss,
         Map<String, Object> recalls,
-        boolean promotionReady
+        boolean promotionReady,
+        PairedMetrics paired
 ) {
     public static MetricResponse from(ForecastMetrics metrics) {
+        return from(metrics, null);
+    }
+
+    public static MetricResponse from(ForecastMetrics metrics, PairedMetrics paired) {
         Map<String, Object> recallMap = new java.util.LinkedHashMap<>();
         for (ForecastDirection direction : ForecastDirection.values()) {
             recallMap.put(direction.name(), metrics.recalls().get(direction));
@@ -33,7 +39,8 @@ public record MetricResponse(
                 metrics.brierScore(),
                 metrics.logLoss(),
                 recallMap,
-                metrics.promotionReady()
+                metrics.promotionReady(),
+                paired
         );
     }
 
@@ -47,7 +54,8 @@ public record MetricResponse(
                 metric.brierScore(),
                 metric.logLoss(),
                 metric.recalls(),
-                false
+                false,
+                metric.paired()
         );
     }
 }

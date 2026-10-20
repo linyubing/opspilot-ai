@@ -15,10 +15,22 @@ public record WalkForwardReport(
         Map<ModelType, ForecastMetrics> metrics,
         int finalHoldoutSamples,
         LocalDate finalHoldoutStart,
-        LocalDate finalHoldoutEnd
+        LocalDate finalHoldoutEnd,
+        Map<ModelType, PairedMetrics> paired
 ) {
     public WalkForwardReport {
         metrics = Map.copyOf(metrics);
+        paired = Map.copyOf(paired);
+    }
+
+    /** 旧记录没有逐日配对证据，不能从汇总指标补造。 */
+    public WalkForwardReport(ForecastHorizon horizon, LocalDate trainStart,
+            LocalDate validationStart, LocalDate validationEnd, int validationSamples,
+            int refitEvery, int refitCount, Map<ModelType, ForecastMetrics> metrics,
+            int finalHoldoutSamples, LocalDate finalHoldoutStart, LocalDate finalHoldoutEnd) {
+        this(horizon, trainStart, validationStart, validationEnd, validationSamples,
+                refitEvery, refitCount, metrics, finalHoldoutSamples,
+                finalHoldoutStart, finalHoldoutEnd, Map.of());
     }
 
     /** 读取指定模型的指标；找不到时抛出包含模型名称的中文异常。 */

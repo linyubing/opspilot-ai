@@ -16,6 +16,21 @@ import static org.mockito.Mockito.when;
 
 class WalkForwardServiceTests {
 
+    @Test
+    void reportsFullScoresWhenNoSignals() {
+        // 全部不出信号也必须保留完整日期评分，同信号基线则不存在。
+        var report = service.run(ForecastHorizon.NEXT_DAY);
+        var json = new com.fasterxml.jackson.databind.ObjectMapper().findAndRegisterModules()
+                .valueToTree(report);
+        var paired = json.path("paired").path("XGBOOST");
+        assertThat(paired.isMissingNode()).isFalse();
+        assertThat(paired.path("all").path("sampleCount").asInt()).isEqualTo(240);
+        assertThat(paired.path("all").path("coveredCount").asInt()).isEqualTo(240);
+        assertThat(paired.path("all").path("accuracy").asDouble()).isEqualTo(0.3333);
+        assertThat(paired.path("baselineOnSignals").isNull()).isTrue();
+        assertThat(paired.path("signalDates").size()).isZero();
+    }
+
     private GoldDatasetBuilder builder;
     private TemporalSplitter splitter;
     private RecordingTrainer majority;

@@ -25,9 +25,9 @@ public class Stage8CandidateEvaluator {
 
         for (ModelExperimentResult exp : experiments) {
             FeatureProfile profile = exp.experiment().featureProfile();
-            ModelExperimentMetric xgb = exp.metric(ModelType.XGBOOST);
-            ModelExperimentMetric log = exp.metric(ModelType.LOGISTIC);
-            ModelExperimentMetric maj = exp.metric(ModelType.MAJORITY);
+            ModelExperimentMetric xgb = exp.metrics().get(ModelType.XGBOOST);
+            ModelExperimentMetric log = exp.metrics().get(ModelType.LOGISTIC);
+            ModelExperimentMetric maj = exp.metrics().get(ModelType.MAJORITY);
 
             if (xgb == null || log == null || maj == null) {
                 reasons.put(profile, "缺少必要模型指标");
@@ -36,46 +36,60 @@ public class Stage8CandidateEvaluator {
 
             List<String> failed = new ArrayList<>();
 
-            if (xgb.balancedAccuracy() == null || log.balancedAccuracy() == null) {
+            if (xgb.paired() == null || log.paired() == null) {
+                reasons.put(profile, "缺少完整日期评分和同信号日期基线的配对证据");
+                continue;
+            }
+            var xgbAll = xgb.paired().all();
+            var logAll = log.paired().all();
+            var sameDateBaseline = xgb.paired().baselineOnSignals();
+            if (sameDateBaseline == null || xgb.coveredCount() == 0) {
+                reasons.put(profile, "没有可比较的信号日期，不能成为候选");
+                continue;
+            }
+            if (xgbAll.sampleCount() != logAll.sampleCount()) {
+                reasons.put(profile, "完整日期评分样本数不一致，不能比较候选");
+                continue;
+            }
+
+            if (xgbAll.balancedAccuracy() == null || logAll.balancedAccuracy() == null) {
                 failed.add("部分类别样本不足，无法比较平衡准确率");
             } else {
-                BigDecimal balancedDelta = xgb.balancedAccuracy().subtract(log.balancedAccuracy());
+                BigDecimal balancedDelta = xgbAll.balancedAccuracy().subtract(logAll.balancedAccuracy());
                 if (balancedDelta.compareTo(BALANCED_ACCURACY_DELTA) < 0) {
                     failed.add("平衡准确率未比Logistic高2个百分点（差值=" + balancedDelta.setScale(4, RoundingMode.HALF_UP) + "）");
                 }
             }
 
-            if (xgb.accuracy().compareTo(maj.accuracy()) <= 0) {
+            if (xgb.accuracy().compareTo(sameDateBaseline.accuracy()) <= 0) {
                 failed.add("已覆盖信号准确率(" + xgb.accuracy().setScale(4, RoundingMode.HALF_UP)
-                        + ")未高于Majority(" + maj.accuracy().setScale(4, RoundingMode.HALF_UP) + ")");
+                        + ")未高于同信号日期Majority(" + sameDateBaseline.accuracy().setScale(4, RoundingMode.HALF_UP) + ")");
             }
 
             if (xgb.coverage().compareTo(MIN_COVERAGE) < 0) {
                 failed.add("覆盖率(" + xgb.coverage().setScale(4, RoundingMode.HALF_UP) + ")低于30%");
             }
 
-            @SuppressWarnings("unchecked")
-            Map<String, Object> recallsMap = (Map<String, Object>) xgb.recalls();
             for (ForecastDirection dir : ForecastDirection.values()) {
-                Object recallObj = recallsMap.get(dir.name());
+                BigDecimal recallObj = xgbAll.recalls().get(dir);
                 if (recallObj == null) {
                     failed.add(dir + "方向召回率(null)低于25%");
                     continue;
                 }
-                BigDecimal recall = new BigDecimal(recallObj.toString());
+                BigDecimal recall = recallObj;
                 if (recall.compareTo(MIN_RECALL) < 0) {
                     failed.add(dir + "方向召回率(" + recall.setScale(4, RoundingMode.HALF_UP) + ")低于25%");
                 }
             }
 
-            if (xgb.brierScore().compareTo(log.brierScore()) > 0) {
-                failed.add("Brier Score(" + xgb.brierScore().setScale(4, RoundingMode.HALF_UP)
-                        + ")高于Logistic(" + log.brierScore().setScale(4, RoundingMode.HALF_UP) + ")");
+            if (xgbAll.brierScore().compareTo(logAll.brierScore()) > 0) {
+                failed.add("Brier Score(" + xgbAll.brierScore().setScale(4, RoundingMode.HALF_UP)
+                        + ")高于Logistic(" + logAll.brierScore().setScale(4, RoundingMode.HALF_UP) + ")");
             }
 
-            if (xgb.logLoss().compareTo(log.logLoss()) > 0) {
-                failed.add("Log Loss(" + xgb.logLoss().setScale(4, RoundingMode.HALF_UP)
-                        + ")高于Logistic(" + log.logLoss().setScale(4, RoundingMode.HALF_UP) + ")");
+            if (xgbAll.logLoss().compareTo(logAll.logLoss()) > 0) {
+                failed.add("Log Loss(" + xgbAll.logLoss().setScale(4, RoundingMode.HALF_UP)
+                        + ")高于Logistic(" + logAll.logLoss().setScale(4, RoundingMode.HALF_UP) + ")");
             }
 
             if (failed.isEmpty()) {
@@ -94,12 +108,12 @@ public class Stage8CandidateEvaluator {
         }
 
         passed.sort(Comparator
-                .comparing((FeatureProfile p) -> findMetric(experiments, p, ModelType.XGBOOST).balancedAccuracy(),
+                .comparing((FeatureProfile p) -> findMetric(experiments, p, ModelType.XGBOOST).paired().all().balancedAccuracy(),
                         Comparator.reverseOrder())
-                .thenComparing((FeatureProfile p) -> findMetric(experiments, p, ModelType.XGBOOST).accuracy(),
+                .thenComparing((FeatureProfile p) -> findMetric(experiments, p, ModelType.XGBOOST).paired().all().accuracy(),
                         Comparator.reverseOrder())
-                .thenComparing((FeatureProfile p) -> findMetric(experiments, p, ModelType.XGBOOST).brierScore())
-                .thenComparing((FeatureProfile p) -> findMetric(experiments, p, ModelType.XGBOOST).logLoss())
+                .thenComparing((FeatureProfile p) -> findMetric(experiments, p, ModelType.XGBOOST).paired().all().brierScore())
+                .thenComparing((FeatureProfile p) -> findMetric(experiments, p, ModelType.XGBOOST).paired().all().logLoss())
         );
 
         FeatureProfile winner = passed.getFirst();
