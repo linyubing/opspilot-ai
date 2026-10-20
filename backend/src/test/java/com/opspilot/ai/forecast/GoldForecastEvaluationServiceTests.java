@@ -159,7 +159,7 @@ class GoldForecastEvaluationServiceTests {
 
         GoldForecastEvaluation result = service.evaluate();
 
-        assertThat(result.versions()).containsExactly(
+        assertThat(result.versions()).usingRecursiveFieldByFieldElementComparatorIgnoringFields("signals").containsExactly(
                 new ForecastVersionEvaluation(
                         "glm-4.7", "prompt-v1", "rule-v1", 2, 1,
                         new BigDecimal("0.5000")

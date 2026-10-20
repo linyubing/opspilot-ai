@@ -38,6 +38,7 @@
                 <div><dt>实际结算日</dt><dd id="settlementDate">尚未结算</dd></div>
                 <div><dt id="basePriceLabel">预测基准价</dt><dd id="basePrice">-</dd></div>
                 <div><dt>验证状态</dt><dd id="forecastStatus">-</dd></div>
+                <div><dt>信号状态</dt><dd id="signalState">未知</dd></div>
                 <div><dt>生成时间</dt><dd id="createdAt">-</dd></div>
                 <div><dt>发布时间阶段</dt><dd id="publicationPhase">未知</dd></div>
             </dl>
@@ -83,7 +84,7 @@
             <p id="reasoning" class="reasoning"></p>
             <p id="forecastIdentity" class="note">正式模型身份未知。</p>
             <p class="note">提示词摘要：<span id="promptHash">未知</span></p>
-            <p class="note">中性只表示收益位于 [-0.5%, 0.5%]。不确定是证据状态；当前三方向协议尚未支持独立“不出信号”，不能把中性当作弃权。</p>
+            <p class="note">中性只表示收益位于 [-0.5%, 0.5%]；不确定是证据状态。新协议可以独立“不出信号”（弃权），不记作中性或方向错误；旧记录的信号协议保持未知。</p>
             <h3>预测失效条件</h3>
             <ul id="conditions"></ul>
         </section>
@@ -146,11 +147,14 @@
             <article><span>已结算·候选资格无效</span><strong id="timingInvalid">暂无</strong></article>
         </div>
         <p class="note">历史回测衡量方法过去的表现；历史混合命中率仅为描述，不能证明未来预测准确率。候选时段不是官方合同或历史可得性证明，未知、候选开盘前与盘中样本不能混算为可信率。</p>
+        <h3>信号覆盖与版本分层</h3>
+        <p id="signalStats" class="note">正在读取信号协议统计…</p>
+        <div id="versionStats"></div>
         <h3>独立目标统计（候选研究，非可信准确率）</h3>
         <p class="note">同一模型协议、目标日和发布层只选最早预测。首条未结算也不改选后来命中的记录；旧逐条统计保持不变。</p>
         <div id="independentStats" aria-live="polite">正在读取独立目标统计…</div>
     </section>
 </main>
-<script src="/forecast.js?v=10" defer></script>
+<script src="/forecast.js?v=11" defer></script>
 </body>
 </html>

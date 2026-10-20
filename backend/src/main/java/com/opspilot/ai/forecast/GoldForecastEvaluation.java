@@ -16,8 +16,17 @@ public record GoldForecastEvaluation(
         BigDecimal neutralBaselineAccuracy,
         List<ForecastVersionEvaluation> versions,
         GoldForecastTimingEvaluation timing,
-        GoldTargetEvaluation independent
+        GoldTargetEvaluation independent,
+        GoldSignalEvaluation signals
 ) {
+    /** 旧调用没有逐条信号证据，不补造覆盖率。 */
+    public GoldForecastEvaluation(int totalCount, int pendingCount, int resolvedCount,
+            BigDecimal overallAccuracy, DirectionEvaluation bullish, DirectionEvaluation neutral,
+            DirectionEvaluation bearish, BigDecimal rolling20Accuracy, BigDecimal neutralBaselineAccuracy,
+            List<ForecastVersionEvaluation> versions, GoldForecastTimingEvaluation timing, GoldTargetEvaluation independent) {
+        this(totalCount, pendingCount, resolvedCount, overallAccuracy, bullish, neutral, bearish,
+                rolling20Accuracy, neutralBaselineAccuracy, versions, timing, independent, null);
+    }
     public GoldForecastEvaluation(int totalCount, int pendingCount, int resolvedCount,
             BigDecimal overallAccuracy, DirectionEvaluation bullish, DirectionEvaluation neutral,
             DirectionEvaluation bearish, BigDecimal rolling20Accuracy, BigDecimal neutralBaselineAccuracy,

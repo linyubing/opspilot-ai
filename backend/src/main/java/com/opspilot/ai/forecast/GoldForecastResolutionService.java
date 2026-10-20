@@ -140,7 +140,7 @@ public class GoldForecastResolutionService {
         // 复用统一规则，不能在解析服务中重新编写方向阈值。
         ForecastDirection actualDirection = forecastRule.classify(actualReturn);
 
-        boolean hit = forecast.predictedDirection() == actualDirection;
+        Boolean hit = forecast.hasSignal() ? forecast.predictedDirection() == actualDirection : null;
 
         return new ForecastResolution(
                 target.priceDate(),

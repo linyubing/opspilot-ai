@@ -11,6 +11,24 @@ import org.junit.jupiter.api.Test;
 /** 验证方向预测结构和禁止内容的安全边界。 */
 class GoldForecastValidatorTests {
 
+    @Test
+    @DisplayName("弃权方向必须为空，不把证据不足伪装成中性")
+    void validatesAbstentionContract() {
+        var validator = new GoldForecastValidator();
+        assertThatCode(() -> validator.validateFormal(new GoldDirectionForecastContent(null,
+                "方向证据不足，暂不出信号。", List.of("取得更多已知数据后重新判断"), ForecastSignal.ABSTAINED)))
+                .doesNotThrowAnyException();
+        assertThatThrownBy(() -> validator.validateFormal(new GoldDirectionForecastContent(ForecastDirection.NEUTRAL,
+                "证据不足", List.of("条件"), ForecastSignal.ABSTAINED)))
+                .isInstanceOf(UnsafeGoldForecastException.class);
+        assertThatThrownBy(() -> validator.validateFormal(new GoldDirectionForecastContent(ForecastDirection.NEUTRAL,
+                "真实区间依据", List.of("条件"))))
+                .isInstanceOf(UnsafeGoldForecastException.class).hasMessageContaining("信号状态");
+        assertThatThrownBy(() -> validator.validateFormal(new GoldDirectionForecastContent(null,
+                "方向证据", List.of("条件"), ForecastSignal.PREDICTED)))
+                .isInstanceOf(UnsafeGoldForecastException.class);
+    }
+
     private final GoldForecastValidator validator = new GoldForecastValidator();
 
     @Test

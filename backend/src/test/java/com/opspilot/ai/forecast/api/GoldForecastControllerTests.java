@@ -30,6 +30,33 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /** 验证黄金方向预测 HTTP 状态码、字段安全边界和服务路由。 */
 @ExtendWith(MockitoExtension.class)
 class GoldForecastControllerTests {
+
+    @Test
+    void returnsAbstentionAndCoverageWithoutInventedAccuracy() throws Exception {
+        var source = record();
+        var abstained = new StoredGoldDirectionForecast(source.id(), source.snapshotId(), source.baseDate(),
+                source.basePrice(), null, "证据不足", List.of("取得更多真实输入"), source.modelName(),
+                GoldForecastPromptBuilder.FORMAL_VERSION, source.promptHash(), source.forecastRuleVersion(),
+                "{}", ForecastStatus.PENDING, null, null, null, null, null, null,
+                source.createdAt(), source.timing(), ForecastSignal.ABSTAINED);
+        when(generationService.generate(SNAPSHOT_ID)).thenReturn(new SaveGoldForecastResult(abstained, true));
+        mockMvc.perform(post("/api/research/gold/snapshots/{id}/forecasts", SNAPSHOT_ID))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.record.signal").value("ABSTAINED"))
+                .andExpect(jsonPath("$.record.predictedDirection").value(org.hamcrest.Matchers.nullValue()))
+                .andExpect(jsonPath("$.record.hit").value(org.hamcrest.Matchers.nullValue()));
+
+        var report = org.mockito.Mockito.mock(GoldForecastEvaluation.class);
+        when(report.signals()).thenReturn(GoldSignalEvaluation.from(List.of(abstained)));
+        when(evaluationService.evaluate()).thenReturn(report);
+        mockMvc.perform(get("/api/research/gold/forecasts/evaluation"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.signals.sampleCount").value(1))
+                .andExpect(jsonPath("$.signals.abstainedCount").value(1))
+                .andExpect(jsonPath("$.signals.coverage").value(0))
+                .andExpect(jsonPath("$.signals.signalAccuracy").value(org.hamcrest.Matchers.nullValue()))
+                .andExpect(jsonPath("$.signals.fullSampleAccuracy").value(org.hamcrest.Matchers.nullValue()));
+    }
     private static final UUID SNAPSHOT_ID = UUID.fromString("0da5c4c6-81e0-47e8-b016-b9c070830946");
     @Mock private GoldForecastGenerationService generationService;
     @Mock private GoldForecastResolutionService resolutionService;

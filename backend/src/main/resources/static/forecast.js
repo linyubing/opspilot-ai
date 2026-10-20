@@ -7,7 +7,7 @@ const reportBox = byId("report");
 let latestForecast = null;
 let latestBar = null;
 
-const directions = {BULLISH: "上涨", NEUTRAL: "中性", BEARISH: "下跌"};
+const directions = {BULLISH: "上涨", NEUTRAL: "中性", BEARISH: "下跌", ABSTAINED: "不出信号（弃权）"};
 const statuses = {PENDING: "等待验证", RESOLVED: "已验证", DATA_MISSING: "缺少结算数据", VOIDED: "已作废"};
 
 async function request(url, options = {}) {
@@ -65,6 +65,8 @@ function renderIdentity(forecast) {
     text("targetLabel", timing ? "承诺目标交易日" : "预计目标交易日（非历史承诺）");
     text("targetSession", timing?.targetDate || forecast.expectedTargetDate || "未知");
     text("settlementDate", forecast.targetDate || "尚未结算");
+    text("signalState", forecast.signal === "ABSTAINED" ? "不出信号（弃权），不是中性"
+        : forecast.signal === "PREDICTED" ? "已出信号" : "旧协议未声明信号状态");
     text("forecastIdentity", `正式大模型记录：${forecast.modelName || "未知"}；提示词 ${forecast.promptVersion || "未知"}；方向规则 ${forecast.forecastRuleVersion || "未知"}；时段规则 ${timing?.ruleVersion || "未知"}。配置模型名不是供应商确认的不可变模型版本；统计实验成绩不代表本记录的表现。`);
     text("promptHash", forecast.promptHash || "未知");
     const local = instant => new Intl.DateTimeFormat("zh-CN", {
@@ -78,7 +80,7 @@ function renderIdentity(forecast) {
 
 function renderForecast(forecast) {
     latestForecast = forecast;
-    const direction = forecast.predictedDirection;
+    const direction = forecast.signal === "ABSTAINED" ? "ABSTAINED" : forecast.predictedDirection;
 
     reportBox.hidden = false;
     emptyBox.hidden = true;
@@ -184,9 +186,27 @@ async function loadLatest() {
     }
 }
 
+function renderSignalStats(data) {
+    const s = data.signals;
+    text("signalStats", s ? `正式记录 ${s.sampleCount}；显式出信号 ${s.declaredSignalCount}；弃权 ${s.abstainedCount}；旧未知协议 ${s.legacyCount}；新协议覆盖率 ${percent(s.coverage)}。`
+        + `已结算信号准确率 ${percent(s.signalAccuracy)}；同信号日期中性基线 ${percent(s.neutralBaselineAccuracy)}；完整样本准确率 ${percent(s.fullSampleAccuracy)}。${s.note}`
+        : "缺少逐条信号协议证据，不能从历史方向反推覆盖率。");
+    const box = byId("versionStats");
+    box.replaceChildren();
+    for (const v of data.versions || []) {
+        const row = document.createElement("p");
+        row.className = "note";
+        row.textContent = `${v.modelName} · ${v.promptVersion} · ${v.forecastRuleVersion}：已结算信号 ${v.sampleCount}，信号准确率 ${percent(v.accuracy)}，`
+            + `覆盖率 ${percent(v.signals?.coverage)}，弃权 ${v.signals?.abstainedCount ?? "未知"}，旧协议 ${v.signals?.legacyCount ?? "未知"}，`
+            + `同信号日期中性基线 ${percent(v.signals?.neutralBaselineAccuracy)}，完整样本准确率 ${percent(v.signals?.fullSampleAccuracy)}。`;
+        box.appendChild(row);
+    }
+}
+
 async function loadAccuracy() {
     try {
         const data = await request("/api/research/gold/forecasts/evaluation");
+        renderSignalStats(data);
         text("resolvedCount", data.resolvedCount);
         text("overallAccuracy", percent(data.overallAccuracy));
         text("rollingAccuracy", percent(data.rolling20Accuracy));
@@ -207,7 +227,7 @@ async function loadAccuracy() {
                 const phase = group.phase === "BEFORE_SESSION" ? "候选开盘前" : "候选盘中";
                 row.textContent = `${group.modelName} · ${group.promptVersion} · ${group.forecastRuleVersion} · ${phase}：`
                     + `独立目标 ${group.selectedCount}，已结算 ${group.resolvedCount}，未结算 ${group.unresolvedCount}，`
-                    + `重复记录排除 ${group.duplicatesIgnored}，候选命中率 ${percent(group.accuracy)}。`;
+                    + `重复记录排除 ${group.duplicatesIgnored}，信号 ${group.signalCount ?? "未知"}，弃权 ${group.abstainedCount ?? "未知"}，覆盖率 ${percent(group.coverage)}，候选信号命中率 ${percent(group.accuracy)}。`;
                 box.appendChild(row);
             }
         }

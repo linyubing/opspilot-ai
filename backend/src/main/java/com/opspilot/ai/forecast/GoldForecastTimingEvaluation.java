@@ -33,12 +33,14 @@ public record GoldForecastTimingEvaluation(Group unknown, Group beforeSession,
     }
 
     private static Group group(List<StoredGoldDirectionForecast> records) {
-        if (records.isEmpty()) return new Group(0, null);
-        long hits = records.stream().filter(row -> Boolean.TRUE.equals(row.hit())).count();
-        return new Group(records.size(), BigDecimal.valueOf(hits)
-                .divide(BigDecimal.valueOf(records.size()), 4, RoundingMode.HALF_UP));
+        var signals = GoldSignalEvaluation.from(records);
+        return new Group(records.size(), signals.signalAccuracy(), signals);
     }
 
     /** 同一时间资格内的历史描述，仍不代表未来预测能力。 */
-    public record Group(int sampleCount, BigDecimal accuracy) {}
+    public record Group(int sampleCount, BigDecimal accuracy, GoldSignalEvaluation signals) {
+        public Group(int sampleCount, BigDecimal accuracy) {
+            this(sampleCount, accuracy, null);
+        }
+    }
 }

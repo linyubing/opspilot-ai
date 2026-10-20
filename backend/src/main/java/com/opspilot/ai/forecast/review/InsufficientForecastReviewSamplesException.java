@@ -1,6 +1,6 @@
 package com.opspilot.ai.forecast.review;
 
-/** 表示已验证的预测样本不足，暂时不能进行可靠的 AI 复盘。 */
+/** 可评分的已结算信号不足时拒绝复盘，弃权不能凑样本。 */
 public class InsufficientForecastReviewSamplesException
         extends RuntimeException {
 
@@ -11,7 +11,7 @@ public class InsufficientForecastReviewSamplesException
         super(
                 "黄金预测复盘至少需要 "
                         + requiredCount
-                        + " 条已解析样本，当前只有 "
+                        + " 条已结算评分信号，当前只有 "
                         + actualCount
                         + " 条"
         );

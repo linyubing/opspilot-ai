@@ -371,6 +371,28 @@ class GoldForecastResolutionServiceTests {
         verify(forecastRepository, never()).resolve(any(), any());
     }
 
+    @Test
+    @DisplayName("弃权仍保存真实结算结果但命中字段为空")
+    void resolvesAbstentionWithoutInventingDirectionHit() {
+        var source = pendingForecast("2500", null);
+        var forecast = new StoredGoldDirectionForecast(source.id(), source.snapshotId(), source.baseDate(),
+                source.basePrice(), null, source.reasoning(), source.invalidationConditions(), source.modelName(),
+                source.promptVersion(), source.promptHash(), source.forecastRuleVersion(), source.rawResponse(),
+                source.status(), null, null, null, null, null, null, source.createdAt(), null, ForecastSignal.ABSTAINED);
+        when(forecastRepository.findPending(10)).thenReturn(List.of(forecast));
+        when(goldRepository.findNext("XAUUSD", "twelve_data", FRIDAY))
+                .thenReturn(Optional.of(bar("2026-08-31", "2525")));
+        when(forecastRepository.resolve(any(), any()))
+                .thenAnswer(invocation -> resolvedForecast(forecast, invocation.getArgument(1)));
+        assertThat(service.resolvePending(10)).isEqualTo(new ResolveGoldForecastsResult(1, 1, 0));
+        var saved = ArgumentCaptor.forClass(ForecastResolution.class);
+        verify(forecastRepository).resolve(eq(forecast.id()), saved.capture());
+        assertThat(saved.getValue().targetDate()).isEqualTo("2026-08-31");
+        assertThat(saved.getValue().actualReturn()).isEqualByComparingTo("1");
+        assertThat(saved.getValue().actualDirection()).isEqualTo(ForecastDirection.BULLISH);
+        assertThat(saved.getValue().hit()).isNull();
+    }
+
     private StoredGoldDirectionForecast pendingForecast(
             String basePrice,
             ForecastDirection predictedDirection

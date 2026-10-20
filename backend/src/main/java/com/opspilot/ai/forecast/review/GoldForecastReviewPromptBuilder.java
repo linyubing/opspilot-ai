@@ -3,6 +3,7 @@ package com.opspilot.ai.forecast.review;
 import com.opspilot.ai.forecast.DirectionEvaluation;
 import com.opspilot.ai.forecast.ForecastVersionEvaluation;
 import com.opspilot.ai.forecast.GoldForecastEvaluation;
+import com.opspilot.ai.forecast.GoldSignalEvaluation;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -14,7 +15,7 @@ import java.util.stream.Collectors;
 public class GoldForecastReviewPromptBuilder {
 
     public static final String PROMPT_VERSION =
-            "gold-forecast-review-prompt-v2";
+            "gold-forecast-review-prompt-v3";
 
     private static final int MINIMUM_RESOLVED_COUNT = 30;
 
@@ -29,7 +30,8 @@ public class GoldForecastReviewPromptBuilder {
                 "黄金预测评测结果不能为空"
         );
 
-        validateSampleCount(evaluation.resolvedCount());
+        // 弃权虽已结算真实行情，仍不提供方向评分样本；旧汇总没有逐条协议时保留原门槛。
+        validateSampleCount(evaluation.signals() == null ? evaluation.resolvedCount() : evaluation.signals().scoredCount());
 
         String content = """
             你是黄金方向预测系统的评测分析助手。
@@ -44,6 +46,13 @@ public class GoldForecastReviewPromptBuilder {
             总体命中率：%s
             最近20条命中率：%s
             中性基线命中率：%s
+
+            【信号协议与分母】
+            %s
+            弃权不进入命中率分母；pending、无实际方向或无命中证据的记录也不进入方向评分。
+            已解析总数不等于已结算评分信号数，不得用弃权补足复盘评分样本门槛。
+            旧三方向协议保留原模型、提示词和方向规则身份，不能追认成新信号协议。
+            不同模型、提示词或规则的信号覆盖不同，不能将各自子集命中率差异称为准确率提高。
 
             【发布时间资格】
             未知发布时间样本：%d
@@ -115,6 +124,7 @@ public class GoldForecastReviewPromptBuilder {
                 formatAccuracy(evaluation.overallAccuracy()),
                 formatAccuracy(evaluation.rolling20Accuracy()),
                 formatAccuracy(evaluation.neutralBaselineAccuracy()),
+                formatSignals(evaluation.signals()),
                 evaluation.timing().unknown().sampleCount(),
                 evaluation.timing().beforeSession().sampleCount(),
                 evaluation.timing().inSession().sampleCount(),
@@ -172,7 +182,32 @@ public class GoldForecastReviewPromptBuilder {
                         version.sampleCount(),
                         version.hitCount(),
                         formatAccuracy(version.accuracy())
-                );
+                ) + "\n" + formatSignals(version.signals());
+    }
+
+    /** 如实提供覆盖分母及同信号基线，缺少方向/概率时不补造完整样本成绩。 */
+    private String formatSignals(GoldSignalEvaluation signals) {
+        if (signals == null) {
+            return "旧汇总缺少信号协议证据，覆盖率、弃权数和完整样本成绩不可得；沿用旧已解析样本门槛，不能追认新协议。";
+        }
+        return """
+                协议记录总数：%d
+                有方向信号数（包含旧协议历史方向）：%d
+                显式信号数：%d
+                已结算评分信号数：%d
+                弃权数：%d
+                旧未知协议数：%d
+                显式协议覆盖率：%s
+                同信号命中率：%s
+                同信号中性基线：%s
+                完整样本准确率：%s
+                口径说明：%s
+                """.formatted(signals.sampleCount(), signals.signalCount(), signals.declaredSignalCount(),
+                signals.scoredCount(), signals.abstainedCount(), signals.legacyCount(),
+                formatAccuracy(signals.coverage()), formatAccuracy(signals.signalAccuracy()),
+                formatAccuracy(signals.neutralBaselineAccuracy()), signals.fullSampleAccuracy() == null
+                        ? "不可得（无完整强制方向/概率或仍有未结算记录，不能补成中性）"
+                        : signals.fullSampleAccuracy().toPlainString(), signals.note());
     }
 
     /** 没有有效样本时保留真实语义，不能把未知错误显示为零。 */

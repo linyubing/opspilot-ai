@@ -23,6 +23,17 @@ import org.springframework.boot.test.system.OutputCaptureExtension;
 @ExtendWith(OutputCaptureExtension.class)
 class SpringAiGoldForecastGatewayTests {
 
+    @Test
+    @DisplayName("正式弃权JSON保留null方向，不强转为中性")
+    void parsesAbstention() {
+        var result = gateway(p -> response("""
+                {"signal":"ABSTAINED","direction":null,"reasoning":"证据不足", "invalidationConditions":["取得更多真实证据"]}
+                """)).generate(prompt());
+        assertThat(result.content().signal()).isEqualTo(ForecastSignal.ABSTAINED);
+        assertThat(result.content().direction()).isNull();
+        new GoldForecastValidator().validateFormal(result.content());
+    }
+
     private static final String VALID_JSON = """
             {"direction":"NEUTRAL","reasoning":"双因子信号不一致。","invalidationConditions":["实际利率明显上升"]}
             """;

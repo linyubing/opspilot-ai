@@ -6,6 +6,7 @@ import com.opspilot.ai.forecast.GoldForecastMissReason;
 import com.opspilot.ai.forecast.GoldTradingCalendar;
 import com.opspilot.ai.forecast.StoredGoldDirectionForecast;
 import com.opspilot.ai.forecast.GoldForecastTiming;
+import com.opspilot.ai.forecast.ForecastSignal;
 
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
@@ -26,7 +27,8 @@ public record GoldForecastResponse(
         Boolean hit, GoldForecastMissReason missReason,
         OffsetDateTime resolvedAt, OffsetDateTime createdAt,
         GoldForecastTiming timing, GoldForecastTiming.Phase publicationPhase,
-        String publicationWarning
+        String publicationWarning,
+        ForecastSignal signal
 ) {
     public static GoldForecastResponse from(StoredGoldDirectionForecast record) {
         return from(record, null);
@@ -55,7 +57,7 @@ public record GoldForecastResponse(
                 record.forecastRuleVersion(), record.status(), expectedTarget.toString(),
                 record.targetDate(), record.targetPrice(), record.actualReturn(),
                 record.actualDirection(), record.hit(), missReason,
-                record.resolvedAt(), record.createdAt(), record.timing(), phase, warning(phase)
+                record.resolvedAt(), record.createdAt(), record.timing(), phase, warning(phase), record.signal()
         );
     }
 

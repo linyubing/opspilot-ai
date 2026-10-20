@@ -27,7 +27,7 @@ public class JdbcGoldForecastRepository implements GoldForecastRepository {
             prompt_hash, forecast_rule_version, raw_response, status,
             target_date, target_price, actual_return, actual_direction,
             hit, resolved_at, created_at,
-            promised_target_date, target_start, target_end, timing_rule
+            promised_target_date, target_start, target_end, timing_rule, signal_status
             """;
     private static final TypeReference<List<String>> STRING_LIST = new TypeReference<>() {};
 
@@ -45,7 +45,8 @@ public class JdbcGoldForecastRepository implements GoldForecastRepository {
                     rs.getObject("target_date", LocalDate.class), rs.getBigDecimal("target_price"),
                     rs.getBigDecimal("actual_return"), direction(rs.getString("actual_direction")),
                     rs.getObject("hit", Boolean.class), rs.getObject("resolved_at", OffsetDateTime.class),
-                    rs.getObject("created_at", OffsetDateTime.class), readTiming(rs)
+                    rs.getObject("created_at", OffsetDateTime.class), readTiming(rs),
+                    signal(rs.getString("signal_status"))
             );
 
     public JdbcGoldForecastRepository(JdbcTemplate jdbcTemplate, ObjectMapper objectMapper) {
@@ -74,8 +75,8 @@ public class JdbcGoldForecastRepository implements GoldForecastRepository {
                     prompt_hash, forecast_rule_version, raw_response, status,
                     target_date, target_price, actual_return, actual_direction,
                     hit, resolved_at, created_at,
-                    promised_target_date, target_start, target_end, timing_rule
-                ) values (?, ?, ?, ?, ?, ?, cast(? as jsonb), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    promised_target_date, target_start, target_end, timing_rule, signal_status
+                ) values (?, ?, ?, ?, ?, ?, cast(? as jsonb), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 on conflict (snapshot_id, model_name, prompt_version, forecast_rule_version)
                 do nothing
                 """, c.id(), c.snapshotId(), c.baseDate(), c.basePrice(), lower(c.predictedDirection()),
@@ -85,7 +86,7 @@ public class JdbcGoldForecastRepository implements GoldForecastRepository {
                 c.timing() == null ? null : c.timing().targetDate(),
                 c.timing() == null ? null : OffsetDateTime.ofInstant(c.timing().start(), java.time.ZoneOffset.UTC),
                 c.timing() == null ? null : OffsetDateTime.ofInstant(c.timing().end(), java.time.ZoneOffset.UTC),
-                c.timing() == null ? null : c.timing().ruleVersion());
+                c.timing() == null ? null : c.timing().ruleVersion(), lower(c.signal()));
         StoredGoldDirectionForecast stored = findByKey(c.snapshotId(), c.modelName(),
                 c.promptVersion(), c.forecastRuleVersion())
                 .orElseThrow(() -> new IllegalStateException("黄金方向预测保存后未能读取"));
@@ -161,6 +162,9 @@ public class JdbcGoldForecastRepository implements GoldForecastRepository {
     }
     private ForecastDirection direction(String value) {
         return value == null ? null : ForecastDirection.valueOf(value.toUpperCase(Locale.ROOT));
+    }
+    private ForecastSignal signal(String value) {
+        return value == null ? null : ForecastSignal.valueOf(value.toUpperCase(Locale.ROOT));
     }
     private String lower(Enum<?> value) { return value == null ? null : value.name().toLowerCase(Locale.ROOT); }
     private List<String> readList(String json) throws SQLException {

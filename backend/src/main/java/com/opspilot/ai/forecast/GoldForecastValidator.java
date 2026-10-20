@@ -12,6 +12,18 @@ import org.springframework.stereotype.Component;
 @Component
 public class GoldForecastValidator {
 
+    /** 正式新协议校验入口，旧研究入口保留三方向语义。 */
+    public void validateFormal(GoldDirectionForecastContent content) {
+        if (content == null || content.signal() == null) {
+            throw unsafe("正式预测必须声明信号状态");
+        }
+        if (content.signal() == ForecastSignal.ABSTAINED ? content.direction() != null
+                : content.direction() == null) {
+            throw unsafe("弃权必须不含方向，出信号必须包含三方向之一");
+        }
+        validateBody(content);
+    }
+
     /** 研究候选入口；正式生成暂不调用。 */
     public void validateEvidence(com.opspilot.ai.analysis.GoldResearchSnapshot snapshot,
             GoldEvidenceForecast content) {
@@ -69,6 +81,13 @@ public class GoldForecastValidator {
         if (content.direction() == null) {
             throw unsafe("预测方向不能为空");
         }
+        if (content.signal() == ForecastSignal.ABSTAINED) {
+            throw unsafe("旧三方向研究协议不支持弃权，不能混用正式新协议");
+        }
+        validateBody(content);
+    }
+
+    private void validateBody(GoldDirectionForecastContent content) {
         validateText("研究依据", content.reasoning(), 2000);
         validateConditions(content.invalidationConditions());
 

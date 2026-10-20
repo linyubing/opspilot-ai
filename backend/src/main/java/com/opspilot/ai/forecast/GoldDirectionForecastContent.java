@@ -6,6 +6,12 @@ import java.util.List;
 public record GoldDirectionForecastContent(
         ForecastDirection direction,
         String reasoning,
-        List<String> invalidationConditions
+        List<String> invalidationConditions,
+        ForecastSignal signal
 ) {
+    /** 旧研究输出未声明信号协议，不能事后补成显式预测。 */
+    public GoldDirectionForecastContent(ForecastDirection direction, String reasoning,
+            List<String> invalidationConditions) {
+        this(direction, reasoning, invalidationConditions, null);
+    }
 }

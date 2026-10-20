@@ -86,7 +86,7 @@ public class GoldForecastGenerationService {
         GeneratedGoldForecast generated = gateway.generate(prompt);
 
         // 模型返回内容必须先通过安全边界校验，才能写入数据库。
-        validator.validate(generated.content());
+        validator.validateFormal(generated.content());
 
         // 模型耗时可能跨过截止线，最终核验与createdAt使用同一绝对时刻。
         OffsetDateTime publishedAt = publication.check(snapshot.snapshot().latestGoldDate(), timing, clock);
@@ -117,7 +117,8 @@ public class GoldForecastGenerationService {
                         null,
 
                         publishedAt,
-                        timing
+                        timing,
+                        content.signal()
                 );
 
         /*

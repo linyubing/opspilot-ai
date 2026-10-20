@@ -37,20 +37,22 @@ public class GoldForecastEvaluationService {
          * pending、data_missing、voided 都不能进入准确率分母。
          */
         List<StoredGoldDirectionForecast> resolvedForecasts = allForecasts.stream().filter(this::isResolved).toList();
+        List<StoredGoldDirectionForecast> scoredSignals = resolvedForecasts.stream()
+                .filter(GoldSignalEvaluation::isScoredSignal).toList();
 
         int pendingCount =(int) allForecasts.stream().filter(forecast->
                 forecast.status()==ForecastStatus.PENDING).count();
 
         DirectionEvaluation bullish = evaluateDirection(
-                resolvedForecasts,
+                scoredSignals,
                 ForecastDirection.BULLISH
         );
         DirectionEvaluation neutral = evaluateDirection(
-                resolvedForecasts,
+                scoredSignals,
                 ForecastDirection.NEUTRAL
         );
         DirectionEvaluation bearish = evaluateDirection(
-                resolvedForecasts,
+                scoredSignals,
                 ForecastDirection.BEARISH
         );
 
@@ -58,24 +60,25 @@ public class GoldForecastEvaluationService {
                 allForecasts.size(),
                 pendingCount,
                 resolvedForecasts.size(),
-                calculateAccuracy(resolvedForecasts),
+                calculateAccuracy(scoredSignals),
                 bullish,
                 neutral,
                 bearish,
-                calculateRolling20Accuracy(resolvedForecasts),
-                calculateNeutralBaselineAccuracy(resolvedForecasts),
-                evaluateVersions(resolvedForecasts),
+                calculateRolling20Accuracy(scoredSignals),
+                calculateNeutralBaselineAccuracy(scoredSignals),
+                evaluateVersions(allForecasts),
                 GoldForecastTimingEvaluation.from(resolvedForecasts),
-                GoldTargetEvaluation.from(allForecasts)
+                GoldTargetEvaluation.from(allForecasts),
+                GoldSignalEvaluation.from(allForecasts)
         );
     }
     /**
      * 严格按照模型、提示词和方向规则三个版本共同分组。
      */
 
-    private List<ForecastVersionEvaluation> evaluateVersions(List<StoredGoldDirectionForecast> resolvedForecasts) {
+    private List<ForecastVersionEvaluation> evaluateVersions(List<StoredGoldDirectionForecast> allForecasts) {
         Map<VersionKey, List<StoredGoldDirectionForecast>> grouped =
-                resolvedForecasts.stream()
+                allForecasts.stream()
                         .collect(Collectors.groupingBy(
                                 forecast -> new VersionKey(
                                         forecast.modelName(),
@@ -85,6 +88,8 @@ public class GoldForecastEvaluationService {
                         ));
 
         return grouped.entrySet().stream()
+                // 保留旧接口仅列已开始结算版本的行为，但覆盖率必须保留同版本待结算记录。
+                .filter(entry -> entry.getValue().stream().anyMatch(this::isResolved))
                 /*
                  * Map 本身没有稳定顺序，返回 API 前必须确定排序，
                  * 否则相同数据可能产生不同的 JSON 数组顺序。
@@ -94,14 +99,16 @@ public class GoldForecastEvaluationService {
                     VersionKey version = entry.getKey();
                     List<StoredGoldDirectionForecast> forecasts =
                             entry.getValue();
+                    var scored = forecasts.stream().filter(GoldSignalEvaluation::isScoredSignal).toList();
 
                     return new ForecastVersionEvaluation(
                             version.modelName(),
                             version.promptVersion(),
                             version.forecastRuleVersion(),
-                            forecasts.size(),
-                            countHits(forecasts),
-                            calculateAccuracy(forecasts)
+                            scored.size(),
+                            countHits(scored),
+                            calculateAccuracy(scored),
+                            GoldSignalEvaluation.from(forecasts)
                     );
                 })
                 .toList();

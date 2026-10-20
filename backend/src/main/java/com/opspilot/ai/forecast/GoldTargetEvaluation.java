@@ -31,13 +31,17 @@ public record GoldTargetEvaluation(String policy, boolean trusted, int excludedC
                 .thenComparing(StoredGoldDirectionForecast::id))
                 .forEach(row -> first.putIfAbsent(row.timing().targetDate(), row));
         var resolved = first.values().stream().filter(row -> row.status() == ForecastStatus.RESOLVED
-                && row.hit() != null && row.actualDirection() != null
+                && row.actualDirection() != null
                 && row.timing().canResolve(row.baseDate(), row.targetDate(), row.createdAt(), row.resolvedAt())).toList();
-        long hits = resolved.stream().filter(row -> Boolean.TRUE.equals(row.hit())).count();
-        long neutral = resolved.stream().filter(row -> row.actualDirection() == ForecastDirection.NEUTRAL).count();
+        var scored = resolved.stream().filter(GoldSignalEvaluation::isScoredSignal).toList();
+        long hits = scored.stream().filter(row -> Boolean.TRUE.equals(row.hit())).count();
+        long neutral = scored.stream().filter(row -> row.actualDirection() == ForecastDirection.NEUTRAL).count();
+        var signals = GoldSignalEvaluation.from(List.copyOf(first.values()));
         return new Group(key.model(), key.prompt(), key.rule(), key.timing(), key.phase(), first.size(),
                 resolved.size(), first.size() - resolved.size(), records.size() - first.size(),
-                divide(hits, resolved.size()), divide(neutral, resolved.size()));
+                divide(hits, scored.size()), divide(neutral, scored.size()), signals.signalCount(),
+                signals.declaredSignalCount(), signals.abstainedCount(), signals.legacyCount(), signals.coverage(),
+                resolved.size() == first.size() ? signals.fullSampleAccuracy() : null, signals.note());
     }
 
     private static boolean eligible(StoredGoldDirectionForecast row) {
@@ -57,5 +61,16 @@ public record GoldTargetEvaluation(String policy, boolean trusted, int excludedC
     /** 每个模型协议及发布层独立展示；未结算首条不进入准确率分母。 */
     public record Group(String modelName, String promptVersion, String forecastRuleVersion, String timingRule,
             GoldForecastTiming.Phase phase, int selectedCount, int resolvedCount, int unresolvedCount,
-            int duplicatesIgnored, BigDecimal accuracy, BigDecimal neutralBaselineAccuracy) { }
+            int duplicatesIgnored, BigDecimal accuracy, BigDecimal neutralBaselineAccuracy,
+            int signalCount, int declaredSignalCount, int abstainedCount, int legacyCount,
+            BigDecimal coverage, BigDecimal fullSampleAccuracy, String note) {
+        /** 兼容旧独立目标汇总，不能从数量反推新协议覆盖率。 */
+        public Group(String modelName, String promptVersion, String forecastRuleVersion, String timingRule,
+                GoldForecastTiming.Phase phase, int selectedCount, int resolvedCount, int unresolvedCount,
+                int duplicatesIgnored, BigDecimal accuracy, BigDecimal neutralBaselineAccuracy) {
+            this(modelName, promptVersion, forecastRuleVersion, timingRule, phase, selectedCount, resolvedCount,
+                    unresolvedCount, duplicatesIgnored, accuracy, neutralBaselineAccuracy, resolvedCount,
+                    0, 0, selectedCount, null, null, "旧汇总没有逐条信号协议证据，覆盖率与完整样本准确率不可得。");
+        }
+    }
 }

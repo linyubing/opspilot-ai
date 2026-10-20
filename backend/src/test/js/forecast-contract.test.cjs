@@ -9,13 +9,17 @@ function page() {
     const dir = path.resolve(__dirname, '../../main/resources/static');
     const html = fs.readFileSync(path.join(dir, 'forecast.html'), 'utf8');
     const nodes = Object.fromEntries([...html.matchAll(/id="([^"]+)"/g)]
-        .map(m => [m[1], {textContent: ''}]));
+        .map(m => [m[1], {textContent: '',children:[],replaceChildren(){this.children=[];},appendChild(row){this.children.push(row);}}]));
     const script = fs.readFileSync(path.join(dir, 'forecast.js'), 'utf8');
     const start = script.indexOf('function renderIdentity(');
     const end = script.indexOf('function renderForecast(', start);
-    const context = vm.createContext({text:(id,value)=> {nodes[id].textContent=value;}, Date, Intl});
+    const context = vm.createContext({text:(id,value)=> {nodes[id].textContent=value;}, Date, Intl,
+        byId:id=>nodes[id], document:{createElement:()=>({textContent:''})},
+        percent:value=>value==null?'暂无':`${(value*100).toFixed(1)}%`});
     assert.ok(start >= 0, '页面应有正式身份呈现入口');
     vm.runInContext(script.slice(start, end), context);
+    const stats = script.indexOf('function renderSignalStats(');
+    if(stats>=0) vm.runInContext(script.slice(stats,script.indexOf('async function loadAccuracy()',stats)),context);
     return {nodes, context};
 }
 
@@ -39,4 +43,25 @@ test('旧记录缺版本或时段时显示未知，不追认历史资格', () =>
     assert.match(nodes.forecastIdentity.textContent,/未知/);
     assert.match(nodes.localInterval.textContent,/未保存/);
     assert.equal(nodes.settlementDate.textContent,'尚未结算');
+});
+
+test('正式弃权与旧未知协议分开呈现', () => {
+    const {nodes,context} = page();
+    context.renderIdentity({signal:'ABSTAINED'});
+    assert.equal(nodes.signalState?.textContent,'不出信号（弃权），不是中性');
+    context.renderIdentity({});
+    assert.equal(nodes.signalState.textContent,'旧协议未声明信号状态');
+});
+
+test('覆盖率、同日期基线与版本成绩不可互相借用',()=>{
+    const {nodes,context}=page();
+    assert.equal(typeof context.renderSignalStats,'function');
+    context.renderSignalStats({signals:{sampleCount:2,declaredSignalCount:1,abstainedCount:1,
+        legacyCount:0,coverage:.5,signalAccuracy:1,neutralBaselineAccuracy:0,fullSampleAccuracy:null,note:'不补方向'},
+        versions:[{modelName:'model-a',promptVersion:'signal-v2',forecastRuleVersion:'rule-v1',accuracy:1,
+            sampleCount:1,signals:{coverage:.5,abstainedCount:1,legacyCount:0,fullSampleAccuracy:null}}]});
+    assert.match(nodes.signalStats.textContent,/50.0%/);
+    assert.match(nodes.signalStats.textContent,/完整样本准确率 暂无/);
+    assert.match(nodes.signalStats.textContent,/同信号日期中性基线 0.0%/);
+    assert.match(nodes.versionStats.children[0].textContent,/model-a.*signal-v2.*50.0%/);
 });

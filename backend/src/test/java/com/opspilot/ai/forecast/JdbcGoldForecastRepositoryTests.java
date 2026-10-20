@@ -27,6 +27,65 @@ class JdbcGoldForecastRepositoryTests {
     private UUID snapshotId;
 
     @Test
+    void preservesExplicitPredictedSignalAndLegacyUnknownSignal() {
+        var legacy = repository.saveIfAbsent(candidate("旧三方向协议")).record();
+        assertThat(legacy.signal()).isNull();
+        assertThat(legacy.predictedDirection()).isEqualTo(ForecastDirection.NEUTRAL);
+        var predicted = repository.saveIfAbsent(signalCandidate(ForecastSignal.PREDICTED)).record();
+        assertThat(predicted.signal()).isEqualTo(ForecastSignal.PREDICTED);
+        assertThat(predicted.predictedDirection()).isEqualTo(ForecastDirection.NEUTRAL);
+        assertThat(jdbcTemplate.queryForObject(
+                "select signal_status from gold_direction_forecast where id = ?", String.class, predicted.id()))
+                .isEqualTo("predicted");
+        assertThat(jdbcTemplate.queryForObject(
+                "select signal_status from gold_direction_forecast where id = ?", String.class, legacy.id()))
+                .isNull();
+    }
+
+    @Test
+    void abstentionRoundTripsAndResolvesActualPriceWithoutHit() {
+        var saved = repository.saveIfAbsent(signalCandidate(ForecastSignal.ABSTAINED)).record();
+        assertThat(saved.signal()).isEqualTo(ForecastSignal.ABSTAINED);
+        assertThat(saved.predictedDirection()).isNull();
+        assertThat(saved.hit()).isNull();
+        assertThat(jdbcTemplate.queryForObject(
+                "select signal_status from gold_direction_forecast where id = ?", String.class, saved.id()))
+                .isEqualTo("abstained");
+
+        var resolved = repository.resolve(saved.id(), new ForecastResolution(
+                LocalDate.parse("2026-08-27"), new BigDecimal("4550.00000000"),
+                new BigDecimal("0.663503"), ForecastDirection.BULLISH, null,
+                OffsetDateTime.parse("2026-08-28T01:00:00Z")));
+        assertThat(resolved.signal()).isEqualTo(ForecastSignal.ABSTAINED);
+        assertThat(resolved.status()).isEqualTo(ForecastStatus.RESOLVED);
+        assertThat(resolved.predictedDirection()).isNull();
+        assertThat(resolved.targetPrice()).isEqualByComparingTo("4550");
+        assertThat(resolved.actualDirection()).isEqualTo(ForecastDirection.BULLISH);
+        assertThat(resolved.hit()).isNull();
+    }
+
+    @Test
+    void databaseRejectsContradictorySignalStatesWithoutChangingLegacyRow() {
+        var saved = repository.saveIfAbsent(candidate("数据库信号约束")).record();
+        for (String assignments : List.of(
+                "signal_status = 'unknown'",
+                "signal_status = 'PREDICTED'",
+                "signal_status = 'predicted', predicted_direction = null",
+                "signal_status = 'abstained'",
+                "signal_status = 'abstained', predicted_direction = null, hit = true",
+                "signal_status = 'abstained', predicted_direction = null, hit = false",
+                "signal_status = null, predicted_direction = null")) {
+            org.assertj.core.api.Assertions.assertThatThrownBy(() -> jdbcTemplate.update(
+                    "update gold_direction_forecast set " + assignments + " where id = ?", saved.id()))
+                    .as(assignments)
+                    .isInstanceOf(org.springframework.dao.DataIntegrityViolationException.class);
+        }
+        var unchanged = repository.findLatestBySnapshotId(snapshotId).orElseThrow();
+        assertThat(unchanged.signal()).isNull();
+        assertThat(unchanged.predictedDirection()).isEqualTo(ForecastDirection.NEUTRAL);
+    }
+
+    @Test
     @org.springframework.transaction.annotation.Transactional
     @DisplayName("最老100条永久错日记录不阻塞第101条有效预测，且不移动原承诺")
     void advancesPastMismatch() {
@@ -180,6 +239,16 @@ class JdbcGoldForecastRepositoryTests {
                 "gold-direction-forecast-prompt-v1",
                 OffsetDateTime.parse("2026-08-27T08:00:00Z")
         );
+    }
+
+    private StoredGoldDirectionForecast signalCandidate(ForecastSignal signal) {
+        var source = candidate("显式信号协议", "signal-" + signal.name().toLowerCase(java.util.Locale.ROOT),
+                OffsetDateTime.parse("2026-08-27T08:00:00Z"));
+        return new StoredGoldDirectionForecast(source.id(), source.snapshotId(), source.baseDate(), source.basePrice(),
+                signal == ForecastSignal.ABSTAINED ? null : ForecastDirection.NEUTRAL,
+                source.reasoning(), source.invalidationConditions(), source.modelName(), source.promptVersion(),
+                source.promptHash(), source.forecastRuleVersion(), source.rawResponse(), source.status(),
+                null, null, null, null, null, null, source.createdAt(), null, signal);
     }
 
     private StoredGoldDirectionForecast candidate(

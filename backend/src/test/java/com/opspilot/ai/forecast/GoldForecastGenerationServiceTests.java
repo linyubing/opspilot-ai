@@ -56,6 +56,22 @@ class GoldForecastGenerationServiceTests {
     private GoldForecastGenerationService service;
 
     @Test
+    @org.junit.jupiter.api.DisplayName("正式弃权保留状态和空方向，不写成中性")
+    void savesExplicitAbstention() {
+        var snapshot = prepareNewForecast();
+        when(promptBuilder.build(org.mockito.ArgumentMatchers.eq(snapshot), any(GoldForecastTiming.class)))
+                .thenReturn(prompt());
+        var content = new GoldDirectionForecastContent(null, "证据不足", List.of("取得更多真实输入"), ForecastSignal.ABSTAINED);
+        when(gateway.generate(prompt())).thenReturn(new GeneratedGoldForecast(MODEL_NAME, "{}", content));
+        when(forecastRepository.saveIfAbsent(any())).thenAnswer(call -> new SaveGoldForecastResult(call.getArgument(0), true));
+        var result = service.generate(snapshot.id()).record();
+        assertThat(result.signal()).isEqualTo(ForecastSignal.ABSTAINED);
+        assertThat(result.predictedDirection()).isNull();
+        assertThat(result.hit()).isNull();
+        verify(validator).validateFormal(content);
+    }
+
+    @Test
     @org.junit.jupiter.api.DisplayName("正式提示词与保存记录使用同一基准和承诺目标时段")
     void sendsCommittedSessionToModel() {
         var snapshot = confirmed();
@@ -71,7 +87,7 @@ class GoldForecastGenerationServiceTests {
         var captor = ArgumentCaptor.forClass(GoldForecastPrompt.class);
         verify(gateway).generate(captor.capture());
         var prompt = captor.getValue();
-        assertThat(prompt.version()).isEqualTo("gold-direction-session-prompt-v1");
+        assertThat(prompt.version()).isEqualTo("gold-direction-session-prompt-v2");
         assertThat(prompt.content()).contains("基准收盘价：2515.75", "基准标签日：2026-08-26",
                 "目标标签日：" + stored.timing().targetDate(),
                 "目标候选开始（UTC）：" + stored.timing().start(),
@@ -80,7 +96,7 @@ class GoldForecastGenerationServiceTests {
                 "不是官方交易时段证明");
         assertThat(stored.promptVersion()).isEqualTo(prompt.version());
         verify(forecastRepository).findByKey(snapshot.id(), MODEL_NAME,
-                "gold-direction-session-prompt-v1", GoldForecastRule.RULE_VERSION);
+                "gold-direction-session-prompt-v2", GoldForecastRule.RULE_VERSION);
     }
 
     @Test
@@ -339,7 +355,7 @@ class GoldForecastGenerationServiceTests {
         );
         order.verify(promptBuilder).build(org.mockito.ArgumentMatchers.eq(snapshot), any(GoldForecastTiming.class));
         order.verify(gateway).generate(prompt);
-        order.verify(validator).validate(generated.content());
+        order.verify(validator).validateFormal(generated.content());
         order.verify(forecastRepository).saveIfAbsent(any());
 
         ArgumentCaptor<StoredGoldDirectionForecast> captor =
@@ -404,7 +420,7 @@ class GoldForecastGenerationServiceTests {
         when(promptBuilder.build(org.mockito.ArgumentMatchers.eq(snapshot), any(GoldForecastTiming.class))).thenReturn(prompt());
         when(gateway.generate(prompt())).thenReturn(generated());
         doThrow(new UnsafeGoldForecastException("包含交易建议"))
-                .when(validator).validate(generated().content());
+                .when(validator).validateFormal(generated().content());
 
         assertThatThrownBy(() -> service.generate(snapshot.id()))
                 .isInstanceOf(UnsafeGoldForecastException.class);
@@ -438,7 +454,7 @@ class GoldForecastGenerationServiceTests {
                 new GoldDirectionForecastContent(
                         ForecastDirection.BULLISH,
                         "双因子共同支持黄金。",
-                        List.of("实际利率转为持续上行")
+                        List.of("实际利率转为持续上行"), ForecastSignal.PREDICTED
                 )
         );
     }

@@ -17,7 +17,7 @@ public class GoldForecastPromptBuilder {
 
     public static final String PROMPT_VERSION =
             "gold-direction-forecast-prompt-v2";
-    public static final String FORMAL_VERSION = "gold-direction-session-prompt-v1";
+    public static final String FORMAL_VERSION = "gold-direction-session-prompt-v2";
     public static final String CANDIDATE_VERSION = "gold-neutral-contract-candidate-v1";
     public static final String MACRO_VERSION = "gold-macro-values-candidate-v1";
     public static final String EVIDENCE_VERSION = "gold-evidence-candidate-v1";
@@ -66,7 +66,19 @@ public class GoldForecastPromptBuilder {
             throw new IllegalArgumentException("承诺目标日必须晚于基准日");
         }
         var base = com.opspilot.ai.marketdata.GoldSession.forDate(snapshot.latestGoldDate());
-        String content = build(record).content() + """
+        // 正式新协议允许独立弃权；研究旧模板不改，避免重写其历史实验含义。
+        String content = build(record, FORMAL_VERSION,
+                "7. 高波动不等于中性，证据不足时应独立弃权，不得把无法判断伪装为NEUTRAL。")
+                .content().replace("{\"direction\":\"BULLISH|NEUTRAL|BEARISH\",\"reasoning\":\"研究依据\",\"invalidationConditions\":[\"失效条件\"]}",
+                        "{\"signal\":\"PREDICTED\",\"direction\":\"BULLISH|NEUTRAL|BEARISH\",\"reasoning\":\"研究依据\",\"invalidationConditions\":[\"失效条件\"]}") + """
+
+                【信号合同】
+                中性NEUTRAL仅表示预计收益位于[-0.5%%,0.5%%]，必须有区间依据。
+                不确定表示证据不足，不等于价格小幅波动，也不等于中性。
+                有依据时signal为PREDICTED，direction必须为BULLISH、NEUTRAL或BEARISH之一。
+                证据不足时signal为ABSTAINED，direction必须为JSON null（不是字符串"null"），reasoning解释缺口。
+                弃权JSON格式：{"signal":"ABSTAINED","direction":null,"reasoning":"说明证据缺口","invalidationConditions":["何种已知证据变化后重新评估"]}
+                弃权不是预测下跌或中性，不得通过编造新闻、概率或行情来避免弃权。
 
                 【本次不可变的价格与时段合同】
                 基准标签日：%s

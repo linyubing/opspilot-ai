@@ -5,6 +5,7 @@ import com.opspilot.ai.forecast.ForecastVersionEvaluation;
 import com.opspilot.ai.forecast.GoldForecastEvaluation;
 import com.opspilot.ai.forecast.GoldForecastTimingEvaluation;
 import com.opspilot.ai.forecast.GoldTargetEvaluation;
+import com.opspilot.ai.forecast.GoldSignalEvaluation;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -17,13 +18,14 @@ public record GoldForecastEvaluationResponse(
         BigDecimal rolling20Accuracy, BigDecimal neutralBaselineAccuracy,
         List<ForecastVersionEvaluation> versions,
         GoldForecastTimingEvaluation timing,
-        GoldTargetEvaluation independent
+        GoldTargetEvaluation independent,
+        GoldSignalEvaluation signals
 ) {
     public static GoldForecastEvaluationResponse from(GoldForecastEvaluation value) {
         return new GoldForecastEvaluationResponse(
                 value.totalCount(), value.pendingCount(), value.resolvedCount(),
                 value.overallAccuracy(), value.bullish(), value.neutral(), value.bearish(),
-                value.rolling20Accuracy(), value.neutralBaselineAccuracy(), value.versions(), value.timing(), value.independent()
+                value.rolling20Accuracy(), value.neutralBaselineAccuracy(), value.versions(), value.timing(), value.independent(), value.signals()
         );
     }
 }

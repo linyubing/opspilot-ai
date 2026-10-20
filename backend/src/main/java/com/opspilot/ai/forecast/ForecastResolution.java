@@ -10,7 +10,7 @@ public record ForecastResolution(
         BigDecimal targetPrice,
         BigDecimal actualReturn,
         ForecastDirection actualDirection,
-        boolean hit,
+        Boolean hit,
         OffsetDateTime resolvedAt
 ) {
 }
