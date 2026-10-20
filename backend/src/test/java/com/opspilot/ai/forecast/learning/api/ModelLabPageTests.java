@@ -21,7 +21,9 @@ class ModelLabPageTests {
                 .contains("20 个交易日")
                 .contains("多数类基线")
                 .contains("逻辑回归")
-                .contains("总体准确率")
+                .contains("完整样本准确率")
+                .contains("信号准确率")
+                .contains("同信号日期基线准确率")
                 .contains("平衡准确率")
                 .contains("覆盖率")
                 .contains("最终留出样本尚未启用");
@@ -84,6 +86,18 @@ class ModelLabPageTests {
         assertThat(js)
                 .contains("majority")
                 .contains("logistic");
+    }
+
+    @Test
+    void separatesFormalAndExperimentalResults() throws IOException {
+        assertThat(read("model-lab.html"))
+                .contains("不代表正式大模型预测的成绩")
+                .contains("不出信号不等于中性");
+        assertThat(read("model-lab.js"))
+                .contains("metric.paired?.all")
+                .contains("baselineOnSignals")
+                .contains("evaluationVersion")
+                .contains("缺少配对证据");
     }
 
     @Test

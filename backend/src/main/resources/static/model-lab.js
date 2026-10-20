@@ -36,17 +36,42 @@ function fillRecalls(id, values = {}) {
 }
 
 function fillMetrics(prefix, data) {
-    document.querySelector(`#${prefix}Accuracy`).textContent = percent(data.accuracy);
-    document.querySelector(`#${prefix}Balanced`).textContent = percent(data.balancedAccuracy);
-    document.querySelector(`#${prefix}Coverage`).textContent = percent(data.coverage);
-    document.querySelector(`#${prefix}Brier`).textContent = number(data.brierScore);
-    fillRecalls(`#${prefix}Recalls`, data.recalls);
+    const metric = data || {};
+    const full = metric.paired?.all;
+    const baseline = metric.paired?.baselineOnSignals;
+    const noSignal = metric.coveredCount === 0;
+    document.querySelector(`#${prefix}Accuracy`).textContent = noSignal ? "无信号" : percent(metric.accuracy);
+    document.querySelector(`#${prefix}Balanced`).textContent = noSignal ? "无信号" : percent(metric.balancedAccuracy);
+    document.querySelector(`#${prefix}Coverage`).textContent = percent(metric.coverage);
+    document.querySelector(`#${prefix}Brier`).textContent = number(metric.brierScore);
+    document.querySelector(`#${prefix}FullAccuracy`).textContent = full ? percent(full.accuracy) : "缺少配对证据";
+    document.querySelector(`#${prefix}FullBalanced`).textContent = full ? percent(full.balancedAccuracy) : "缺少配对证据";
+    document.querySelector(`#${prefix}Baseline`).textContent = !metric.paired ? "缺少配对证据"
+        : noSignal ? "无信号" : percent(baseline?.accuracy);
+    document.querySelector(`#${prefix}Population`).textContent =
+        `信号 ${metric.coveredCount ?? "未知"} / 全部 ${metric.sampleCount ?? "未知"}；下方为信号子集召回率`;
+    const loss = document.querySelector(`#${prefix}LogLoss`);
+    if (loss) loss.textContent = number(metric.logLoss);
+    fillRecalls(`#${prefix}Recalls`, metric.recalls || {});
 }
 
 let currentHorizon = "FIVE_DAYS";
 let currentProfile = "ALL_36";
+// 统一视图代次：迟到的预览或对比响应不得覆盖用户新选中的历史记录。
+let viewSeq = 0;
+
+function selectContext(horizon, profile) {
+    currentHorizon = horizon;
+    currentProfile = profile;
+    horizonButtons.forEach(button => button.classList.toggle("active", button.dataset.horizon === horizon));
+    profileButtons.forEach(button => button.classList.toggle("active", button.dataset.profile === profile));
+}
 
 function render(data) {
+    document.querySelector("#metricSource").textContent = "统计实验预览（未保存），不是正式大模型预测成绩";
+    document.querySelector("#candidateResult").hidden = true;
+    document.querySelector("#relativeMajority").textContent = "未进行同批比较";
+    document.querySelector("#relativeBase16").textContent = "未进行同批比较";
     document.querySelector("#activeProfile").textContent =
         profileNames[data.featureProfile] || data.featureProfile || "ALL_36";
     document.querySelector("#trainStart").textContent = data.trainStart;
@@ -59,21 +84,17 @@ function render(data) {
     fillMetrics("logistic", data.logistic);
     fillMetrics("xgboost", data.xgboost);
 
-    if (data.logistic && data.logistic.logLoss != null) {
-        document.querySelector("#logisticLogLoss").textContent = number(data.logistic.logLoss);
-    }
-    if (data.xgboost && data.xgboost.logLoss != null) {
-        document.querySelector("#xgboostLogLoss").textContent = number(data.xgboost.logLoss);
-    }
-
     result.hidden = false;
 }
 
 async function runComparison() {
+    const ticket = ++viewSeq;
     const button = document.querySelector("#runComparison");
     const candidateBox = document.querySelector("#candidateResult");
     button.disabled = true;
     errorBox.hidden = true;
+    document.querySelector("#experimentDetail").hidden = true;
+    candidateBox.hidden = true;
     statusText.textContent = `正在运行 ${horizonNames[currentHorizon]} 的三组真实对比实验...`;
     try {
         const response = await fetch(
@@ -81,6 +102,7 @@ async function runComparison() {
             { method: "POST" }
         );
         const data = await response.json();
+        if (ticket !== viewSeq) return;
         if (!response.ok) {
             throw new Error(data.message || "三组对比实验运行失败");
         }
@@ -98,8 +120,9 @@ async function runComparison() {
         fillMetrics("majority", selected.majority);
         fillMetrics("logistic", selected.logistic);
         fillMetrics("xgboost", selected.xgboost);
-        document.querySelector("#logisticLogLoss").textContent = number(selected.logistic.logLoss);
-        document.querySelector("#xgboostLogLoss").textContent = number(selected.xgboost.logLoss);
+        document.querySelector("#metricSource").textContent = `统计实验批次 ${data.comparisonId}，实验 ${selected.id}`;
+        document.querySelector("#relativeMajority").textContent = "见完整样本与同日期基线";
+        document.querySelector("#relativeBase16").textContent = "见实验历史";
 
         document.querySelector("#candidateTitle").textContent = data.stage8Candidate
             ? "阶段8候选通过"
@@ -111,6 +134,7 @@ async function runComparison() {
         statusText.textContent = `对比完成，批次 ID：${data.comparisonId}`;
         loadHistory();
     } catch (error) {
+        if (ticket !== viewSeq) return;
         errorBox.textContent = error.message;
         errorBox.hidden = false;
         statusText.textContent = "三组对比实验未完成";
@@ -120,10 +144,11 @@ async function runComparison() {
 }
 
 async function load(horizon, profile) {
-    currentHorizon = horizon;
-    currentProfile = profile;
+    const ticket = ++viewSeq;
+    selectContext(horizon, profile);
     errorBox.hidden = true;
     result.hidden = true;
+    document.querySelector("#experimentDetail").hidden = true;
     horizonButtons.forEach(button => {
         button.classList.toggle("active", button.dataset.horizon === horizon);
         button.disabled = true;
@@ -138,12 +163,14 @@ async function load(horizon, profile) {
             `/api/research/gold/model-experiments?horizon=${horizon}&featureProfile=${profile}`
         );
         const data = await response.json();
+        if (ticket !== viewSeq) return;
         if (!response.ok) {
             throw new Error(data.message || "模型实验运行失败");
         }
         render(data);
         statusText.textContent = `开发验证区间实验已完成：${horizonNames[horizon]} / ${profileNames[profile]}`;
     } catch (error) {
+        if (ticket !== viewSeq) return;
         errorBox.textContent = error.message;
         errorBox.hidden = false;
         statusText.textContent = "模型实验未完成";
@@ -154,6 +181,7 @@ async function load(horizon, profile) {
 }
 
 async function saveExperiment() {
+    const ticket = ++viewSeq;
     const saveBtn = document.querySelector("#saveExperiment");
     const saveStatus = document.querySelector("#saveStatus");
     saveBtn.disabled = true;
@@ -170,7 +198,7 @@ async function saveExperiment() {
         }
         saveStatus.textContent = `实验已保存，ID: ${data.id}`;
         loadHistory();
-        showDetail(data.id);
+        if (ticket === viewSeq) showDetail(data.id);
     } catch (error) {
         saveStatus.textContent = `保存失败: ${error.message}`;
     } finally {
@@ -202,8 +230,9 @@ async function loadHistory() {
                     <span class="exp-status">${exp.status}</span>
                     <span class="exp-policy">${policyName(exp.dataPolicy)}</span>
                     <span class="exp-metrics">
-                        准确率 ${percent(exp.logisticAccuracy)}
-                        | 平衡准确率 ${percent(exp.balancedAccuracy)}
+                        逻辑回归信号准确率 ${exp.coverage === 0 ? "无信号" : percent(exp.logisticAccuracy)}
+                        | 信号平衡准确率 ${percent(exp.balancedAccuracy)}
+                        | 完整样本平衡准确率 ${exp.fullBalancedAccuracy == null ? "缺少配对证据" : percent(exp.fullBalancedAccuracy)}
                         ${exp.relativeMajorityImprovement != null
                             ? ` | 基线提升 ${formatImprovement(exp.relativeMajorityImprovement)}`
                             : ""}
@@ -221,14 +250,33 @@ async function loadHistory() {
 }
 
 async function showDetail(id) {
+    const ticket = ++viewSeq;
     const detail = document.querySelector("#experimentDetail");
     detail.hidden = false;
     try {
         const response = await fetch(`/api/research/gold/model-experiments/${id}`);
         const data = await response.json();
+        if (ticket !== viewSeq) return;
         if (!response.ok) {
             throw new Error(data.message || "加载详情失败");
         }
+        // 历史详情必须切换成绩卡，不能继续展示上一条预览或另一个模型的成绩。
+        selectContext(data.horizon, data.featureProfile);
+        errorBox.hidden = true;
+        statusText.textContent = `已加载历史统计实验：${horizonNames[data.horizon] || data.horizon} / ${data.featureProfile}`;
+        for (const type of ["majority", "logistic", "xgboost"]) fillMetrics(type, data[type]);
+        document.querySelector("#metricSource").textContent =
+            `统计实验 ${data.id}｜${horizonNames[data.horizon] || data.horizon}｜Git ${data.gitCommit || "未知"}｜评估 ${data.parameters?.evaluationVersion || "旧版：缺少配对证据"}｜逻辑回归 ${data.parameters?.logisticVersion || "未记录"}`;
+        document.querySelector("#activeProfile").textContent = profileNames[data.featureProfile] || data.featureProfile;
+        document.querySelector("#trainStart").textContent = data.trainStart || "未知";
+        document.querySelector("#validationRange").textContent = `${data.validationStart} 至 ${data.validationEnd}`;
+        document.querySelector("#validationSamples").textContent = `${data.validationSamples ?? "未知"} 条`;
+        document.querySelector("#refitCount").textContent = data.parameters?.refitEvery ? `每 ${data.parameters.refitEvery} 条一次` : "未记录";
+        document.querySelector("#holdoutRange").textContent = `${data.holdoutSamples ?? "未知"} 条，${data.holdoutStart} 至 ${data.holdoutEnd}`;
+        document.querySelector("#candidateResult").hidden = true;
+        document.querySelector("#relativeMajority").textContent = "见完整样本与同日期基线";
+        document.querySelector("#relativeBase16").textContent = "见同批次实验历史";
+        result.hidden = false;
         document.querySelector("#detailId").textContent = data.id;
         document.querySelector("#detailStatus").textContent = data.status;
         document.querySelector("#detailFeatureProfile").textContent = data.featureProfile || "ALL_36";
@@ -244,6 +292,9 @@ async function showDetail(id) {
         document.querySelector("#detailValidationSamples").textContent = data.validationSamples;
         document.querySelector("#detailHoldoutSamples").textContent = data.holdoutSamples;
         document.querySelector("#detailGitCommit").textContent = data.gitCommit;
+        const params = data.parameters || {};
+        document.querySelector("#detailModels").textContent =
+            `多数类：${params.majorityTrainer || "未记录"}\n逻辑回归：${params.logisticVersion || params.logisticTrainer || "未记录"}\nXGBoost：${JSON.stringify(params.xgboostTrainer || "未记录")}\n评估版本：${params.evaluationVersion || "未记录，不能补造配对成绩"}`;
         document.querySelector("#detailCreatedAt").textContent = formatTime(data.createdAt);
         document.querySelector("#detailStartedAt").textContent = data.startedAt ? formatTime(data.startedAt) : "-";
         document.querySelector("#detailCompletedAt").textContent = data.completedAt ? formatTime(data.completedAt) : "-";
@@ -256,6 +307,7 @@ async function showDetail(id) {
             failureBox.hidden = true;
         }
     } catch (error) {
+        if (ticket !== viewSeq) return;
         detail.hidden = true;
         alert(`加载详情失败: ${error.message}`);
     }

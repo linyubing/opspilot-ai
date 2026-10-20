@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="比较黄金统计预测模型在开发验证区间的表现">
     <title>黄金模型实验室</title>
-    <link rel="stylesheet" href="/model-lab.css?v=2">
+    <link rel="stylesheet" href="/model-lab.css?v=3">
 </head>
 <body>
 <main class="shell">
@@ -13,7 +13,7 @@
         <div>
             <a class="back-link" href="/forecast.html">← 返回黄金预测</a>
             <h1>黄金模型实验室</h1>
-            <p>使用同一批真实历史样本，对比多数类基线和逻辑回归模型。</p>
+            <p>统计实验：比较多数类、逻辑回归和 XGBoost，不代表正式大模型预测的成绩。</p>
         </div>
         <nav class="horizon-tabs" aria-label="预测周期">
             <button data-horizon="NEXT_DAY" type="button">1 个交易日</button>
@@ -32,6 +32,8 @@
     <section id="error" class="error" role="alert" hidden></section>
 
     <section id="result" hidden>
+        <p id="metricSource" class="dev-notice">统计实验预览（未保存）</p>
+        <p class="dev-notice">完整样本按最高概率方向评分（并列采用固定顺序），仅用于诊断，不等于实际出信号；信号准确率只与同信号日期基线比较。中性是收益区间，不确定是证据状态，不出信号不等于中性。</p>
         <div class="profile-badge" id="activeProfile">ALL_36</div>
 
         <section class="scope-panel">
@@ -48,11 +50,15 @@
                     <p>每次只预测训练窗口中数量最多的方向，用来衡量最低可接受水平。</p>
                 </header>
                 <div class="metric-grid">
-                    <div><span>总体准确率</span><strong id="majorityAccuracy">-</strong></div>
-                    <div><span>平衡准确率</span><strong id="majorityBalanced">-</strong></div>
+                    <div><span>信号准确率</span><strong id="majorityAccuracy">-</strong></div>
+                    <div><span>信号平衡准确率</span><strong id="majorityBalanced">-</strong></div>
+                    <div><span>完整样本准确率</span><strong id="majorityFullAccuracy">-</strong></div>
+                    <div><span>完整样本平衡准确率</span><strong id="majorityFullBalanced">-</strong></div>
+                    <div><span>同信号日期基线准确率</span><strong id="majorityBaseline">-</strong></div>
                     <div><span>覆盖率</span><strong id="majorityCoverage">-</strong></div>
                     <div><span>Brier 分数</span><strong id="majorityBrier">-</strong></div>
                 </div>
+                <p class="population" id="majorityPopulation">-</p>
                 <div class="recall-row" id="majorityRecalls"></div>
             </article>
 
@@ -62,12 +68,16 @@
                     <p>根据所选特征输出三方向概率。</p>
                 </header>
                 <div class="metric-grid">
-                    <div><span>总体准确率</span><strong id="logisticAccuracy">-</strong></div>
-                    <div><span>平衡准确率</span><strong id="logisticBalanced">-</strong></div>
+                    <div><span>信号准确率</span><strong id="logisticAccuracy">-</strong></div>
+                    <div><span>信号平衡准确率</span><strong id="logisticBalanced">-</strong></div>
+                    <div><span>完整样本准确率</span><strong id="logisticFullAccuracy">-</strong></div>
+                    <div><span>完整样本平衡准确率</span><strong id="logisticFullBalanced">-</strong></div>
+                    <div><span>同信号日期基线准确率</span><strong id="logisticBaseline">-</strong></div>
                     <div><span>覆盖率</span><strong id="logisticCoverage">-</strong></div>
                     <div><span>Brier 分数</span><strong id="logisticBrier">-</strong></div>
                     <div><span>logLoss</span><strong id="logisticLogLoss">-</strong></div>
                 </div>
+                <p class="population" id="logisticPopulation">-</p>
                 <div class="recall-row" id="logisticRecalls"></div>
                 <div class="improvement-row">
                     <div><span>相对多数类基线提升</span><strong id="relativeMajority">-</strong></div>
@@ -82,11 +92,15 @@
                 </header>
                 <div class="metric-grid">
                     <div><span>信号准确率</span><strong id="xgboostAccuracy">-</strong></div>
-                    <div><span>平衡准确率</span><strong id="xgboostBalanced">-</strong></div>
+                    <div><span>信号平衡准确率</span><strong id="xgboostBalanced">-</strong></div>
+                    <div><span>完整样本准确率</span><strong id="xgboostFullAccuracy">-</strong></div>
+                    <div><span>完整样本平衡准确率</span><strong id="xgboostFullBalanced">-</strong></div>
+                    <div><span>同信号日期基线准确率</span><strong id="xgboostBaseline">-</strong></div>
                     <div><span>覆盖率</span><strong id="xgboostCoverage">-</strong></div>
                     <div><span>Brier 分数</span><strong id="xgboostBrier">-</strong></div>
                     <div><span>logLoss</span><strong id="xgboostLogLoss">-</strong></div>
                 </div>
+                <p class="population" id="xgboostPopulation">-</p>
                 <div class="recall-row" id="xgboostRecalls"></div>
             </article>
         </section>
@@ -112,7 +126,7 @@
 
     <section class="experiment-history">
         <h2>实验历史</h2>
-        <p class="history-hint">点击"保存实验"将当前预览结果持久化，可在下方查看历史记录。</p>
+        <p class="history-hint">点击历史记录查看该次统计实验的版本和成绩；“保存实验”会重新运行并保存，不是保存屏幕缓存。</p>
         <button id="saveExperiment" type="button" class="btn-save">保存实验</button>
         <div id="saveStatus" class="save-status" hidden></div>
         <ul id="experimentList" class="experiment-list"></ul>
@@ -120,6 +134,8 @@
 
     <section id="experimentDetail" class="experiment-detail" hidden>
         <h2>实验详情</h2>
+        <p>以下身份仅属于统计实验，不是正式大模型版本。</p>
+        <pre id="detailModels" class="model-identity"></pre>
         <div class="detail-grid">
             <div><span>实验 ID</span><strong id="detailId">-</strong></div>
             <div><span>状态</span><strong id="detailStatus">-</strong></div>
@@ -147,6 +163,6 @@
         <button id="closeDetail" type="button" class="btn-close">关闭</button>
     </section>
 </main>
-<script src="/model-lab.js?v=3" defer></script>
+<script src="/model-lab.js?v=4" defer></script>
 </body>
 </html>
