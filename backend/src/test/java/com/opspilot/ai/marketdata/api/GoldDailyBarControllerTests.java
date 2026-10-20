@@ -27,6 +27,15 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standal
 
 class GoldDailyBarControllerTests {
 
+    @Test
+    void recoversRecentWindowOnlyThroughExplicitPost() throws Exception {
+        when(sync.recoverRecent()).thenReturn(new GoldDailyBarSyncResult(8,8,0,LocalDate.parse("2026-10-20")));
+        mvc.perform(post("/api/market-data/gold/daily-bars/recover-recent"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.savedCount").value(8));
+        org.mockito.Mockito.verify(sync,org.mockito.Mockito.never()).syncRecent();
+    }
+
     private GoldDailyBarSyncService sync;
     private GoldDailyBarRepository repository;
     private MockMvc mvc;

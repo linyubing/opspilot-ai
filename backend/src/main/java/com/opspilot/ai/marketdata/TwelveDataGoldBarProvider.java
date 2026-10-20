@@ -156,6 +156,10 @@ public class TwelveDataGoldBarProvider {
                     .toList();
         } catch (MarketDataUnavailableException exception) {
             throw exception;
+        } catch (org.springframework.web.client.RestClientResponseException exception) {
+            // 只保留状态码以区分限流/授权/服务故障；URL和原文可能含密钥，不能挂作cause。
+            throw new MarketDataUnavailableException("Twelve Data 有界补缺请求失败：HTTP "
+                    + exception.getStatusCode().value());
         } catch (RestClientException exception) {
             // 不附带可能包含 apikey URL 或供应商正文的外部异常。
             throw new MarketDataUnavailableException("Twelve Data 有界补缺日线请求失败");

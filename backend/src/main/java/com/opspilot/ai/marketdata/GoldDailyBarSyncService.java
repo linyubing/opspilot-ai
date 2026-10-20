@@ -91,8 +91,17 @@ public class GoldDailyBarSyncService {
         return day != DayOfWeek.SATURDAY && day != DayOfWeek.SUNDAY;
     }
 
-    /** 最近21个配置交易日有界补缺；周末来源锚点只核验，不改名或落库。 */
+    /** 显式恢复最近21日窗口；分批读取，全部核验后才一次性写入。 */
+    public GoldDailyBarSyncResult recoverRecent() {
+        return syncRecent(21);
+    }
+
+    /** 自动准备仍保留最多5个缺日的限制，不隐式放大请求。 */
     public GoldDailyBarSyncResult syncRecent() {
+        return syncRecent(5);
+    }
+
+    private GoldDailyBarSyncResult syncRecent(int maxMissing) {
         GoldDailyBar latest = provider.fetchLatestBar();
         OffsetDateTime now = OffsetDateTime.now(clock);
         if (!latest.isConfirmedAt(now)) {
@@ -124,17 +133,27 @@ public class GoldDailyBarSyncService {
         }
         List<LocalDate> missing = expected.stream().filter(date -> !stored.containsKey(date))
                 .sorted().toList();
-        if (missing.size() > 5) {
-            throw new MarketDataUnavailableException("近期黄金缺日超过5个，拒绝自动挑选部分历史");
+        if (missing.size() > maxMissing) {
+            throw new MarketDataUnavailableException("近期黄金缺日超过" + maxMissing + "个，拒绝自动挑选部分历史");
         }
         // 周末/休市源日与窗口日分离；必须另外读取窗口日真实价格，不能借锚点改日期。
         List<LocalDate> requested = new ArrayList<>(missing);
         if (!sourceDay.equals(day) && !requested.contains(day)) requested.add(day);
         requested.sort(Comparator.naturalOrder());
-        if (requested.size() > 5) {
-            throw new MarketDataUnavailableException("黄金补缺与窗口日核验超过5个日期，拒绝部分同步");
+        if (requested.size() > maxMissing) {
+            throw new MarketDataUnavailableException("黄金补缺与窗口日核验超过" + maxMissing + "个日期，拒绝部分同步");
         }
-        List<GoldDailyBar> received = requested.isEmpty() ? List.of() : provider.fetchDays(requested);
+        List<GoldDailyBar> received = new ArrayList<>();
+        // 来源单次仍最多5日；批次间锚点必须相同，不能把早批成功当成整轮成功。
+        for (int start = 0; start < requested.size(); start += 5) {
+            var days = List.copyOf(requested.subList(start, Math.min(start + 5, requested.size())));
+            var rows = provider.fetchDays(days);
+            if (rows == null || rows.size() != days.size()
+                    || !rows.stream().map(GoldDailyBar::priceDate).sorted().toList().equals(days)) {
+                throw new MarketDataUnavailableException("黄金补缺返回日期与本批请求不一致");
+            }
+            received.addAll(rows);
+        }
         if (received.size() != requested.size()
                 || !received.stream().map(GoldDailyBar::priceDate).sorted().toList().equals(requested)) {
             throw new MarketDataUnavailableException("黄金补缺返回日期与请求不一致");

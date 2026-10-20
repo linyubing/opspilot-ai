@@ -32,6 +32,21 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 
 /** 验证有界补缺读取的 HTTP 合同；数学报价仅为测试，不连接真实行情或数据库。 */
 class TwelveDataGapFetchTests {
+
+    @Test
+    void reportsHttpStatusWithoutSecretOrResponseBody() {
+        server.expect(requestTo(startsWith("https://example.invalid/quote")))
+                .andRespond(org.springframework.test.web.client.response.MockRestResponseCreators
+                        .withStatus(org.springframework.http.HttpStatus.TOO_MANY_REQUESTS)
+                        .body("apikey=" + KEY + " confidential upstream response")
+                        .contentType(MediaType.TEXT_PLAIN));
+        assertThatThrownBy(() -> provider.fetchDays(List.of(FIRST)))
+                .isInstanceOf(MarketDataUnavailableException.class)
+                .hasMessageContaining("HTTP 429")
+                .hasMessageNotContaining(KEY).hasMessageNotContaining("confidential")
+                .hasNoCause();
+        server.verify();
+    }
     private static final String KEY = "gap-test-secret";
     private static final LocalDate CLOSED = LocalDate.parse("2026-10-09");
     private static final LocalDate FIRST = LocalDate.parse("2026-10-05");

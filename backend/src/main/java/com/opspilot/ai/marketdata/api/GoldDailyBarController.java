@@ -55,6 +55,12 @@ public class GoldDailyBarController {
         return GoldDailyBarSyncResponse.from(sync.syncRecent());
     }
 
+    /** 明确请求停机后窗口恢复；不改变自动生成入口的5日限制。 */
+    @PostMapping("/recover-recent")
+    public GoldDailyBarSyncResponse recoverRecent() {
+        return GoldDailyBarSyncResponse.from(sync.recoverRecent());
+    }
+
     @GetMapping("/latest")
     public ResponseEntity<GoldDailyBarResponse> latest() {
         OffsetDateTime asOf = OffsetDateTime.now(clock);
