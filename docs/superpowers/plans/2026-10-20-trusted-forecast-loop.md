@@ -154,3 +154,5 @@ Chromium真实1440x1050与390x844验证forecast.html：身份正确、非空、�
 2026-10-22每日结算接线：发现GoldSettlementService仍调用GoldPriceSyncService，仅更新旧单参考价表，而resolver固定读GoldDailyBarRepository/Twelve Data OHLC。新增真实Spring编排装配测试，隔离来源和解析服务，红测2运行2失败，证实旧服务被调用且OHLC失败不阻断。改为GoldDailyBarSyncService.syncRecent，沿用最多5个近期缺日与全量核验后写入的合同，不扫描全历史。结果领域类型及公开DTO改用已有OHLC同步类型；priceSync四个JSON键及yyyy-MM-dd日期不变。测试证明先OHLC后resolve、失败不使用旧表回退、不继续结算；装配不是实际外部来源端到端证明。
 
 首次全量1135运行0失败12错误5跳过，SQL状态53300确认新测试上下文连接池使PostgreSQL连接耗尽；不是通过排除测试解决。仅新增测试设置maximum-pool-size=2/minimum-idle=0，并在class结束DirtiesContext释放上下文，不改生产或数据库设置。再次全量oct22-settlement-wiring-final.log：1135运行0失败0错误5跳过，含真实PostgreSQL测试，FRED两live仍跳过，不能声称来源已恢复。独立只读审查无actionable findings。local-ai配置仍显式关闭结算/日报调度，本轮不启用无限后台调用，不把工程接线修复说成自动运行已交付。没有新真实预测、结算或成绩，未调整留出集，准确率提升仍未证明。
+
+2026-10-22宏观阻塞诊断产生新证据：官方FRED返回200但为HTML维护页，并非行情JSON；同一窗口Java真实接口1运行1错误。详见docs/research/2026-10-22-fred-availability.md及脱敏观察JSON，未保存原始正文或含key的URL，非原始HTTP可重放归档。决策改为停止本轮反复调用维护接口，不更换key碰运气，不放宽解析或给旧数据盖最新标签；密钥有效性及恢复时间仍未知。新增环境取key、无数据库写入、禁止重定向的单次复核脚本；只验证语法/JSON，不冒称新脚本已联网验证，也不把先前常规1135项结果作为本轮新验证。独立只读审查无actionable findings。没有生产代码、价格、预测或评分变更，无需重启服务；整体目标继续，外部源恢复和真实目标结束仍未满足。

@@ -1,0 +1,25 @@
+{
+  "kind": "sanitized_observation_not_raw_response",
+  "observationWindowStart": "2026-10-22T00:43:20.7308461+08:00",
+  "observationWindowEnd": "2026-10-22T00:45:23.3385054+08:00",
+  "sourceHost": "api.stlouisfed.org",
+  "series": "DFII10",
+  "httpStatus": 200,
+  "contentType": "text/html; charset=utf-8",
+  "jsonParsed": false,
+  "observedHtmlTitle": "Site Maintenance | St. Louis Fed<",
+  "dataAvailable": false,
+  "independentJavaCheck": {
+    "test": "FredRealRateProviderLiveTests",
+    "testsRun": 1,
+    "failures": 0,
+    "errors": 1,
+    "result": "BUILD FAILURE"
+  },
+  "limitations": [
+    "No raw response body or credential-bearing URL was archived.",
+    "This is a bounded current-availability diagnosis, not a permanent service status.",
+    "It does not establish when service will recover or prove the API key is valid.",
+    "No database prices, forecasts, scores, or evaluation boundaries were changed."
+  ]
+}
