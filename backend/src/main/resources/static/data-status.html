@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>黄金数据新鲜度</title>
+    <link rel="icon" href="data:,">
     <link rel="stylesheet" href="/forecast.css?v=1">
 </head>
 <body>
@@ -12,7 +13,7 @@
         <div>
             <p class="eyebrow">数据状态</p>
             <h1>黄金数据新鲜度</h1>
-            <p>检查黄金价格、实际利率和美元指数的最新观测日期。</p>
+            <p>仓库行情与研究快照分别展示；仓库更新不代表旧预测已重新生成。</p>
         </div>
         <a class="pill" href="/forecast.html">返回黄金预测</a>
     </header>
@@ -22,24 +23,34 @@
 
     <section class="panel">
         <div class="heading">
-            <h2>整体状态</h2>
+            <h2>仓库最新行情</h2>
+            <button id="refreshStatus" class="pill" type="button">重新读取状态</button>
+        </div>
+        <p>只读取已入库数据，不触发同步或生成预测。黄金为已确认日线收盘价，非实时伦敦金报价；宏观数据有发布延迟。</p>
+        <p id="warehouseStatus" class="status">正在读取仓库...</p>
+        <div id="warehouseItems" class="source-grid"></div>
+    </section>
+
+    <section class="panel">
+        <div class="heading">
+            <h2>最新已保存研究快照</h2>
             <span id="overall" class="pill">-</span>
         </div>
         <div class="source-grid">
             <article><span>分析基准日</span><strong id="analysisDate">-</strong></article>
-            <article><span>生成时间</span><strong id="generatedAt">-</strong></article>
+            <article><span>状态检查时间（北京时间，非快照生成时间）</span><strong id="generatedAt">-</strong></article>
             <article><span>说明</span><strong id="summary">-</strong></article>
         </div>
     </section>
 
     <section class="panel">
         <div class="heading">
-            <h2>数据源明细</h2>
-            <span>美元指数只作为辅助因子，过期不会拖累整体可用性</span>
+            <h2>快照输入明细</h2>
+            <span>快照不是当前仓库；广义美元指数不是DXY，且为可选因子</span>
         </div>
         <div id="items" class="source-grid"></div>
     </section>
 </main>
-<script src="/data-status.js?v=1" defer></script>
+<script src="/data-status.js?v=2" defer></script>
 </body>
 </html>
