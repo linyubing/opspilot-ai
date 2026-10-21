@@ -118,3 +118,15 @@ V31只扩展generation_base_checked类型。saveWithCheck事务仅包裹新预�
 独立审查无阻断，失败后请求丢失Minor已修复为发送前留档并记终止时刻；只编译，不重发原试验，也不回填原归档。Ruling：证据只是本次请求与前后服务端摘要观察，不认证执行中工件或全部默认参数，不证明长任务或准确率；下一步应把同类逐次观察接入真实新预测原子保存，旧记录保持未知。详细原始证据与边界见2026-10-21-model-run-check.md。工程/研究整体仍未完成。
 
 最终复审补充：新增.gitattributes时误替换既有换行保护被评为Important；已完整恢复原24行，只追加本次两条-text，历史协议/结果未改动。不得把初审无阻断表述当作最终差异已全部验证。
+
+2026-10-21逐次模型观察接入生产：GoldModelObserver/LocalGoldModelObserver仅在local-ai正式调用启用，调用前查version/tags，实际SDK HTTP出站绑定原提示词内容及SHA，记录显式参数，调用后查version/tags/ps一致才返回GoldModelRun。参数在发送前校验，禁止思考开关冲突、错模型、未声明控制字段、非空工具和额外消息。SDK空tools列表与无工具语义一致，仅移除这个已确认空字段，不放宽非空工具合同。线程状态在网关finally清理；元数据HTTP不进入数据库事务。记录明确仅为前后服务端观察，不认证观察间隙或执行工件、全部默认值、硬件、PIT及预测能力。
+
+红绿证据：修正首个网关夹具缺响应metadata造成的无关异常后，缺观察回调用正确响应复现“不抛异常”；rejectsMissingRequiredRun复现要求回执仍保存；separatesRunEvidence复现3组混成1组；出站错误think复现仍发出HTTP；页面新回执未呈现复现Node失败。随后均通过。GoldModelRun规范排序并防御复制参数，配置键含已存观察规则/模型/摘要/服务版本/显式参数，不含时刻或提示词，避免每条样本单独一组。V32新增nullable model_run及模型/响应/提示词摘要一致约束，原记录不更新；逐次观察在同一次预测insert内，与V31基准回执由原事务共同保存。生成服务要求观察时拒绝缺失/错绑定/超时序证据。配置record兼容构造器导致Spring默认构造器错误已实测并用主构造器ConstructorBinding修复，不以排除集成测试回避。
+
+正式版本和独立目标均按runKey再分组，策略为first-publication-per-target-layer-v3-run-observation；未知回执不借已知摘要成绩。API及页面原生details展示本次参数/时刻，旧记录明确未知，切换时清除旧内容；历史混合总览仍仅描述，不能借作当前模型成绩。Ruling：仍保留原混合总览兼容接口，但页面已有“历史混合命中率（未核验）”及跨模型警示；版本/独立目标是分别评估入口，错用总览的成本为错误推广结论，不能据此宣称准确率提升。
+
+独立审查1项Important：require-run=true而观察组件缺失时网关仍先调用模型，生成服务虽拒绝保存但已花资源；新增rejectsMissingRequiredObserver实测1运行1失败后，在网关发送前阻止，最终全量1113项0失败0错误3跳过。无Critical；未遗留Minor。审查set-aside裁定：前后观察不覆盖执行间隙、所有默认值/硬件/PIT/准确率，已在类/API/UI边界说明；不将这些观察升级为执行认证。审查未独立跑测试，运行结果由主执行者验证。完整SpringBoot local-ai加随机本机端口HTTP夹具证明真实自动配置客户端接上拦截器，不靠测试手工定制；这是工程连通证明，非真实模型样本。真实PostgreSQL测试验证JSONB含0.0等实际数值形态往返后key不变、结算保留、旧幂等不回填和约束拒绝错模型。
+
+最终验证日志oct21-model-run-full-verified.log：1113运行0失败0错误3跳过，Node22通过。local-ai已隐藏后台重启PID36428，health=UP、schema=32。首次状态比较脚本误把PowerShell Invoke-RestMethod数组整体送入管道，得到1条空投影，误报变化；已重现directPipelineObjects=1而展开后为4，修正为先接收再展开，缓存接口重放created=false，选定原字段前后一致。仍4条旧预测且modelRun全null，原弃权PENDING，WAITING_BAR仍1条，原3条已结算均未命中；不补填今天的运行资料。
+
+Chromium真实1440x1050与390x844验证forecast.html：身份正确、非空、无错误遮罩/JS异常/横向溢出，原记录details展开收起刷新正常；未注入虚构行情或新模型回执。Browser插件未提供，使用已有Playwright；daily-report/latest的404仍是既有回退。截图为用户临时目录oct21-model-run-desktop.png、oct21-model-run-mobile.png。新回执正向显示由Node夹具和HTTP/JDBC测试验证，生产尚无新真实记录可展示，不能据旧记录未知状态宣称逐次实证已完成。当前没有新增正式预测/模型成绩或重训；整体目标继续，准确率未证明提高。

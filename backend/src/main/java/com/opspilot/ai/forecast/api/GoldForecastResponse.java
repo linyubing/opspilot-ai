@@ -29,7 +29,8 @@ public record GoldForecastResponse(
         GoldForecastTiming timing, GoldForecastTiming.Phase publicationPhase,
         String publicationWarning,
         ForecastSignal signal,
-        String reportedModel
+        String reportedModel,
+        com.opspilot.ai.forecast.GoldModelRun modelRun
 ) {
     public static GoldForecastResponse from(StoredGoldDirectionForecast record) {
         return from(record, null);
@@ -58,7 +59,7 @@ public record GoldForecastResponse(
                 record.forecastRuleVersion(), record.status(), expectedTarget.toString(),
                 record.targetDate(), record.targetPrice(), record.actualReturn(),
                 record.actualDirection(), record.hit(), missReason,
-                record.resolvedAt(), record.createdAt(), record.timing(), phase, warning(phase), record.signal(), record.reportedModel()
+                record.resolvedAt(), record.createdAt(), record.timing(), phase, warning(phase), record.signal(), record.reportedModel(), record.modelRun()
         );
     }
 

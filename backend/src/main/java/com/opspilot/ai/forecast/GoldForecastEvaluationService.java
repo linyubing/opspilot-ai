@@ -83,7 +83,7 @@ public class GoldForecastEvaluationService {
                                 forecast -> new VersionKey(
                                         forecast.modelName(),
                                         forecast.promptVersion(),
-                                        forecast.forecastRuleVersion(), forecast.reportedModel()
+                                        forecast.forecastRuleVersion(), forecast.reportedModel(), forecast.runKey()
                                 )
                         ));
 
@@ -108,7 +108,7 @@ public class GoldForecastEvaluationService {
                             scored.size(),
                             countHits(scored),
                             calculateAccuracy(scored),
-                            GoldSignalEvaluation.from(forecasts), version.reportedModel()
+                            GoldSignalEvaluation.from(forecasts), version.reportedModel(), version.runKey()
                     );
                 })
                 .toList();
@@ -215,7 +215,7 @@ public class GoldForecastEvaluationService {
     private record VersionKey(
             String modelName,
             String promptVersion,
-            String forecastRuleVersion, String reportedModel
+            String forecastRuleVersion, String reportedModel, String runKey
     ) implements Comparable<VersionKey> {
 
         @Override
@@ -235,8 +235,10 @@ public class GoldForecastEvaluationService {
             }
 
             int ruleComparison = forecastRuleVersion.compareTo(other.forecastRuleVersion);
-            return ruleComparison != 0 ? ruleComparison
-                    : Comparator.nullsFirst(String::compareTo).compare(reportedModel, other.reportedModel);
+            if (ruleComparison != 0) return ruleComparison;
+            int reportedComparison = Comparator.nullsFirst(String::compareTo).compare(reportedModel, other.reportedModel);
+            return reportedComparison != 0 ? reportedComparison
+                    : Comparator.nullsFirst(String::compareTo).compare(runKey, other.runKey);
         }
     }
 }

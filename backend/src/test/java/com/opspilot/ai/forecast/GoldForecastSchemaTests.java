@@ -25,7 +25,7 @@ class GoldForecastSchemaTests {
                   and table_name = 'gold_direction_forecast'
                 """, String.class);
         assertThat(columns).contains("base_date", "base_price", "predicted_direction", "signal_status",
-                "promised_target_date", "target_start", "target_end", "timing_rule", "reported_model");
+                "promised_target_date", "target_start", "target_end", "timing_rule", "reported_model", "model_run");
     }
 
     @Test

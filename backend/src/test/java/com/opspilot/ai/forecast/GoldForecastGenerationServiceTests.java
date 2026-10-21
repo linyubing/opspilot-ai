@@ -57,6 +57,19 @@ class GoldForecastGenerationServiceTests {
 
     private GoldForecastGenerationService service;
 
+    @Test @org.junit.jupiter.api.DisplayName("要求运行回执时，网关只返回模型名仍不得保存")
+    void rejectsMissingRequiredRun() {
+        service = new GoldForecastGenerationService(snapshotRepository, forecastRepository, promptBuilder, gateway, validator,
+                new GoldForecastDataFreshnessPolicy(Clock.fixed(NOW, ZoneOffset.UTC)),
+                new GoldForecastProperties(MODEL_NAME, true), Clock.fixed(NOW, ZoneOffset.UTC), publication(), baseCheck(Clock.fixed(NOW, ZoneOffset.UTC)));
+        var snapshot = prepareNewForecast();
+        when(promptBuilder.build(org.mockito.ArgumentMatchers.eq(snapshot), any(GoldForecastTiming.class))).thenReturn(prompt());
+        when(gateway.generate(prompt())).thenReturn(generated());
+        lenient().when(forecastRepository.saveWithCheck(any(), any())).thenAnswer(call -> new SaveGoldForecastResult(call.getArgument(0), true));
+        assertThatThrownBy(() -> service.generate(snapshot.id())).isInstanceOf(InvalidGoldForecastAiResponseException.class);
+        verify(forecastRepository, never()).saveWithCheck(any(), any());
+    }
+
     @Test @org.junit.jupiter.api.DisplayName("小时核验期间跨过截止线，不得继续调用模型")
     void rejectsSlowBaseCheck() {
         var time = new java.util.concurrent.atomic.AtomicReference<>(NOW);

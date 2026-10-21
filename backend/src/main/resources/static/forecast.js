@@ -70,7 +70,11 @@ function renderIdentity(forecast) {
         : forecast.signal === "PREDICTED" ? "已出信号" : "旧协议未声明信号状态");
     text("forecastIdentity", `正式大模型记录：${forecast.modelName || "未知"}；提示词 ${forecast.promptVersion || "未知"}；方向规则 ${forecast.forecastRuleVersion || "未知"}；时段规则 ${timing?.ruleVersion || "未知"}。`
         + (forecast.reportedModel ? `响应模型标识已核对：${forecast.reportedModel}。` : "旧记录未保存响应模型标识，身份核对状态未知。")
-        + "模型名称与响应标识都不是不可变工件版本；模型摘要和完整推理参数尚未留存。统计实验成绩不代表本记录的表现。");
+        + (forecast.modelRun ? `本次服务端模型摘要：${forecast.modelRun.digest}；服务版本：${forecast.modelRun.serverVersion}；${runLabel(forecast.modelRun.key)}。前后观察不认证执行中工件，也未固定所有服务端默认值。`
+            : "模型名称与响应标识都不是不可变工件版本；本条未保存逐次运行依据，完整推理参数尚未留存。")
+        + "统计实验成绩不代表本记录的表现。");
+    text("modelRunDetails", forecast.modelRun ? JSON.stringify(forecast.modelRun, null, 2)
+        : "本条未保存逐次运行依据；不使用当前模型资料补写历史。");
     text("promptHash", forecast.promptHash || "未知");
     const local = instant => new Intl.DateTimeFormat("zh-CN", {
         timeZone: "Asia/Shanghai", year: "numeric", month: "2-digit", day: "2-digit",
@@ -79,6 +83,11 @@ function renderIdentity(forecast) {
     text("localInterval", timing?.start && timing?.end
         ? `北京时间（Asia/Shanghai）候选目标区间：${local(timing.start)} → ${local(timing.end)}；仅转换展示时区，不是官方时段认证。`
         : "旧记录未保存目标候选时段，不能据预计日期补造发布资格。");
+}
+
+// 同模型摘要、显式参数和服务版本才共用运行配置键，未知依据独立展示。
+function runLabel(key) {
+    return key ? `逐次运行配置键 ${String(key).slice(0, 12)}` : "逐次运行依据未知";
 }
 
 function renderForecast(forecast) {
@@ -244,7 +253,7 @@ function renderSignalStats(data) {
     for (const v of data.versions || []) {
         const row = document.createElement("p");
         row.className = "note";
-        row.textContent = `${v.modelName} · ${v.promptVersion} · ${v.forecastRuleVersion} · 响应标识${v.reportedModel ? "已核对" : "未知"}：已结算信号 ${v.sampleCount}，信号准确率 ${percent(v.accuracy)}，`
+        row.textContent = `${v.modelName} · ${v.promptVersion} · ${v.forecastRuleVersion} · 响应标识${v.reportedModel ? "已核对" : "未知"} · ${runLabel(v.runKey)}：已结算信号 ${v.sampleCount}，信号准确率 ${percent(v.accuracy)}，`
             + `覆盖率 ${percent(v.signals?.coverage)}，弃权 ${v.signals?.abstainedCount ?? "未知"}，旧协议 ${v.signals?.legacyCount ?? "未知"}，`
             + `同信号日期中性基线 ${percent(v.signals?.neutralBaselineAccuracy)}，完整样本准确率 ${percent(v.signals?.fullSampleAccuracy)}。`;
         box.appendChild(row);
@@ -273,7 +282,7 @@ async function loadAccuracy() {
             for (const group of groups) {
                 const row = document.createElement("p");
                 const phase = group.phase === "BEFORE_SESSION" ? "候选开盘前" : "候选盘中";
-                row.textContent = `${group.modelName} · ${group.promptVersion} · ${group.forecastRuleVersion} · 响应标识${group.reportedModel ? "已核对" : "未知"} · ${phase}：`
+                row.textContent = `${group.modelName} · ${group.promptVersion} · ${group.forecastRuleVersion} · 响应标识${group.reportedModel ? "已核对" : "未知"} · ${runLabel(group.runKey)} · ${phase}：`
                     + `独立目标 ${group.selectedCount}，已结算 ${group.resolvedCount}，未结算 ${group.unresolvedCount}，`
                     + `重复记录排除 ${group.duplicatesIgnored}，信号 ${group.signalCount ?? "未知"}，弃权 ${group.abstainedCount ?? "未知"}，覆盖率 ${percent(group.coverage)}，候选信号命中率 ${percent(group.accuracy)}。`;
                 box.appendChild(row);

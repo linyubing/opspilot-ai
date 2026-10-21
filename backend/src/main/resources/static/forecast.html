@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="查看黄金下一有效交易日方向预测及其可信度">
     <title>黄金行情预测</title>
-    <link rel="stylesheet" href="/forecast.css?v=2">
+    <link rel="stylesheet" href="/forecast.css?v=3">
 </head>
 <body>
 <main class="shell">
@@ -91,6 +91,10 @@
             </div>
             <p id="reasoning" class="reasoning"></p>
             <p id="forecastIdentity" class="note">正式模型身份未知。</p>
+            <details class="note">
+                <summary>查看本次模型运行观察（参数与时刻，不是执行认证）</summary>
+                <pre id="modelRunDetails">本条未保存逐次运行依据。</pre>
+            </details>
             <p class="note">提示词摘要：<span id="promptHash">未知</span></p>
             <p class="note">中性只表示收益位于 [-0.5%, 0.5%]；不确定是证据状态。新协议可以独立“不出信号”（弃权），不记作中性或方向错误；旧记录的信号协议保持未知。</p>
             <h3>预测失效条件</h3>
@@ -164,6 +168,6 @@
         <div id="independentStats" aria-live="polite">正在读取独立目标统计…</div>
     </section>
 </main>
-<script src="/forecast.js?v=13" defer></script>
+<script src="/forecast.js?v=14" defer></script>
 </body>
 </html>

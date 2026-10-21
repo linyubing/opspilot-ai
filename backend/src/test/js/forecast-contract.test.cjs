@@ -56,6 +56,19 @@ test('响应标识与不可变模型工件明确区分，切回旧记录不保�
     assert.doesNotMatch(nodes.forecastIdentity.textContent,/响应模型标识已核对/);
 });
 
+test('逐次观察展示实际摘要参数，切回旧记录不遗留新运行依据', () => {
+    const {nodes,context} = page();
+    context.renderIdentity({modelName:'qwen3.5:9b',reportedModel:'qwen3.5:9b',modelRun:{
+        digest:'a'.repeat(64),serverVersion:'0.33.3',key:'b'.repeat(64),
+        parameters:{think:false,options:{num_ctx:8192,num_predict:2048,temperature:0}}}});
+    assert.match(nodes.forecastIdentity.textContent,/本次服务端模型摘要.*aaaa/);
+    assert.match(nodes.forecastIdentity.textContent,/不认证执行中工件/);
+    assert.match(nodes.modelRunDetails.textContent,/8192/);
+    context.renderIdentity({modelName:'qwen3.5:9b'});
+    assert.match(nodes.modelRunDetails.textContent,/未保存逐次运行依据/);
+    assert.doesNotMatch(nodes.modelRunDetails.textContent,/8192|aaaa/);
+});
+
 test('正式弃权与旧未知协议分开呈现', () => {
     const {nodes,context} = page();
     context.renderIdentity({signal:'ABSTAINED'});

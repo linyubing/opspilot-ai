@@ -15,13 +15,14 @@ public record GoldTargetEvaluation(String policy, boolean trusted, int excludedC
         var eligible = records.stream().filter(GoldTargetEvaluation::eligible).toList();
         Map<Key, List<StoredGoldDirectionForecast>> protocols = eligible.stream()
                 .collect(Collectors.groupingBy(row -> new Key(row.modelName(), row.promptVersion(),
-                        row.forecastRuleVersion(), row.timing().ruleVersion(), row.timing().phase(row.createdAt()), row.reportedModel())));
+                        row.forecastRuleVersion(), row.timing().ruleVersion(), row.timing().phase(row.createdAt()), row.reportedModel(), row.runKey())));
         Comparator<Key> order = Comparator.comparing(Key::model).thenComparing(Key::prompt)
                 .thenComparing(Key::rule).thenComparing(Key::timing).thenComparing(Key::phase)
-                .thenComparing(Key::reported, Comparator.nullsFirst(String::compareTo));
+                .thenComparing(Key::reported, Comparator.nullsFirst(String::compareTo))
+                .thenComparing(Key::runKey, Comparator.nullsFirst(String::compareTo));
         var groups = protocols.entrySet().stream().sorted(Map.Entry.comparingByKey(order))
                 .map(entry -> group(entry.getKey(), entry.getValue())).toList();
-        return new GoldTargetEvaluation("first-publication-per-target-layer-v2-response-model", false,
+        return new GoldTargetEvaluation("first-publication-per-target-layer-v3-run-observation", false,
                 records.size() - eligible.size(), groups);
     }
 
@@ -42,7 +43,7 @@ public record GoldTargetEvaluation(String policy, boolean trusted, int excludedC
                 resolved.size(), first.size() - resolved.size(), records.size() - first.size(),
                 divide(hits, scored.size()), divide(neutral, scored.size()), signals.signalCount(),
                 signals.declaredSignalCount(), signals.abstainedCount(), signals.legacyCount(), signals.coverage(),
-                resolved.size() == first.size() ? signals.fullSampleAccuracy() : null, signals.note(), key.reported());
+                resolved.size() == first.size() ? signals.fullSampleAccuracy() : null, signals.note(), key.reported(), key.runKey());
     }
 
     private static boolean eligible(StoredGoldDirectionForecast row) {
@@ -57,21 +58,21 @@ public record GoldTargetEvaluation(String policy, boolean trusted, int excludedC
         return total == 0 ? null : BigDecimal.valueOf(count).divide(BigDecimal.valueOf(total), 4, RoundingMode.HALF_UP);
     }
 
-    private record Key(String model, String prompt, String rule, String timing, GoldForecastTiming.Phase phase, String reported) { }
+    private record Key(String model, String prompt, String rule, String timing, GoldForecastTiming.Phase phase, String reported, String runKey) { }
 
     /** 每个模型协议及发布层独立展示；未结算首条不进入准确率分母。 */
     public record Group(String modelName, String promptVersion, String forecastRuleVersion, String timingRule,
             GoldForecastTiming.Phase phase, int selectedCount, int resolvedCount, int unresolvedCount,
             int duplicatesIgnored, BigDecimal accuracy, BigDecimal neutralBaselineAccuracy,
             int signalCount, int declaredSignalCount, int abstainedCount, int legacyCount,
-            BigDecimal coverage, BigDecimal fullSampleAccuracy, String note, String reportedModel) {
+            BigDecimal coverage, BigDecimal fullSampleAccuracy, String note, String reportedModel, String runKey) {
         /** 兼容旧独立目标汇总，不能从数量反推新协议覆盖率。 */
         public Group(String modelName, String promptVersion, String forecastRuleVersion, String timingRule,
                 GoldForecastTiming.Phase phase, int selectedCount, int resolvedCount, int unresolvedCount,
                 int duplicatesIgnored, BigDecimal accuracy, BigDecimal neutralBaselineAccuracy) {
             this(modelName, promptVersion, forecastRuleVersion, timingRule, phase, selectedCount, resolvedCount,
                     unresolvedCount, duplicatesIgnored, accuracy, neutralBaselineAccuracy, resolvedCount,
-                    0, 0, selectedCount, null, null, "旧汇总没有逐条信号协议证据，覆盖率与完整样本准确率不可得。", null);
+                    0, 0, selectedCount, null, null, "旧汇总没有逐条信号协议证据，覆盖率与完整样本准确率不可得。", null, null);
         }
     }
 }

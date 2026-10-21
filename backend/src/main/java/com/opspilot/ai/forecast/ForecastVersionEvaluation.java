@@ -11,8 +11,13 @@ public record ForecastVersionEvaluation(
         int hitCount,
         BigDecimal accuracy,
         GoldSignalEvaluation signals,
-        String reportedModel
+        String reportedModel,
+        String runKey
 ) {
+    public ForecastVersionEvaluation(String modelName, String promptVersion, String forecastRuleVersion,
+            int sampleCount, int hitCount, BigDecimal accuracy, GoldSignalEvaluation signals, String reportedModel) {
+        this(modelName,promptVersion,forecastRuleVersion,sampleCount,hitCount,accuracy,signals,reportedModel,null);
+    }
     public ForecastVersionEvaluation(String modelName, String promptVersion, String forecastRuleVersion,
             int sampleCount, int hitCount, BigDecimal accuracy, GoldSignalEvaluation signals) {
         this(modelName, promptVersion, forecastRuleVersion, sampleCount, hitCount, accuracy, signals, null);

@@ -23,6 +23,40 @@ import org.springframework.boot.test.system.OutputCaptureExtension;
 @ExtendWith(OutputCaptureExtension.class)
 class SpringAiGoldForecastGatewayTests {
 
+    @Test @DisplayName("要求逐次观察但组件缺失时，网关在发送前拒绝")
+    void rejectsMissingRequiredObserver() {
+        var calls = new java.util.concurrent.atomic.AtomicInteger();
+        ChatModel model = p -> {
+            calls.incrementAndGet();
+            return new ChatResponse(List.of(new Generation(new AssistantMessage(VALID_JSON))),
+                    org.springframework.ai.chat.metadata.ChatResponseMetadata.builder().model("glm-4.7").build());
+        };
+        var gateway = new SpringAiGoldForecastGateway(ChatClient.builder(model),new ObjectMapper(),
+                new GoldForecastProperties("glm-4.7",true));
+        assertThatThrownBy(() -> gateway.generate(new GoldForecastPrompt(GoldForecastPromptBuilder.FORMAL_VERSION,
+                "缺组件不应发出请求", "a".repeat(64)))).isInstanceOf(GoldForecastAiUnavailableException.class);
+        assertThat(calls.get()).isZero();
+    }
+
+    @Test @DisplayName("生成前身份观察失败时不调用模型，且清理本线程状态")
+    void blocksUnobservedRun() {
+        var observer = org.mockito.Mockito.mock(GoldModelObserver.class);
+        var calls = new java.util.concurrent.atomic.AtomicInteger();
+        ChatModel model = p -> {
+            calls.incrementAndGet();
+            return new ChatResponse(List.of(new Generation(new AssistantMessage(VALID_JSON))),
+                    org.springframework.ai.chat.metadata.ChatResponseMetadata.builder().model("glm-4.7").build());
+        };
+        var formal = new GoldForecastPrompt(GoldForecastPromptBuilder.FORMAL_VERSION, "无行情身份测试", "a".repeat(64));
+        org.mockito.Mockito.doThrow(new GoldForecastAiUnavailableException("身份来源不可用", null))
+                .when(observer).start("glm-4.7", formal);
+        var gateway = new SpringAiGoldForecastGateway(ChatClient.builder(model), new ObjectMapper(),
+                new GoldForecastProperties("glm-4.7"), java.util.Optional.of(observer));
+        assertThatThrownBy(() -> gateway.generate(formal)).isInstanceOf(GoldForecastAiUnavailableException.class);
+        assertThat(calls.get()).isZero();
+        org.mockito.Mockito.verify(observer).clear();
+    }
+
     @org.junit.jupiter.params.ParameterizedTest
     @org.junit.jupiter.params.provider.ValueSource(strings = {"other-model", ""})
     @DisplayName("正式预测缺少响应模型或与请求不一致时不能冒用配置名")

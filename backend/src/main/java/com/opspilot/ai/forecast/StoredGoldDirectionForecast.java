@@ -18,8 +18,25 @@ public record StoredGoldDirectionForecast(
         OffsetDateTime resolvedAt, OffsetDateTime createdAt,
         GoldForecastTiming timing,
         ForecastSignal signal,
-        String reportedModel
+        String reportedModel,
+        GoldModelRun modelRun
 ) {
+    /** 旧记录不事后补写逐次运行依据。 */
+    public StoredGoldDirectionForecast(
+            UUID id, UUID snapshotId, LocalDate baseDate, BigDecimal basePrice,
+            ForecastDirection predictedDirection, String reasoning,
+            List<String> invalidationConditions, String modelName,
+            String promptVersion, String promptHash, String forecastRuleVersion,
+            String rawResponse, ForecastStatus status, LocalDate targetDate,
+            BigDecimal targetPrice, BigDecimal actualReturn,
+            ForecastDirection actualDirection, Boolean hit,
+            OffsetDateTime resolvedAt, OffsetDateTime createdAt, GoldForecastTiming timing, ForecastSignal signal,
+            String reportedModel) {
+        this(id, snapshotId, baseDate, basePrice, predictedDirection, reasoning,
+                invalidationConditions, modelName, promptVersion, promptHash, forecastRuleVersion,
+                rawResponse, status, targetDate, targetPrice, actualReturn, actualDirection, hit,
+                resolvedAt, createdAt, timing, signal, reportedModel, null);
+    }
     /** 旧保存调用未留存响应模型标识，不事后升级为已核对。 */
     public StoredGoldDirectionForecast(
             UUID id, UUID snapshotId, LocalDate baseDate, BigDecimal basePrice,
@@ -55,6 +72,8 @@ public record StoredGoldDirectionForecast(
     public boolean hasSignal() {
         return signal != ForecastSignal.ABSTAINED && predictedDirection != null;
     }
+    /** 未保存逐次运行依据时保持独立未知分组，不从配置名推断摘要。 */
+    public String runKey() { return modelRun == null ? null : modelRun.key(); }
     /** 旧记录没有发布合同，保持未知，不能事后回填证据。 */
     public StoredGoldDirectionForecast(
             UUID id, UUID snapshotId, LocalDate baseDate, BigDecimal basePrice,

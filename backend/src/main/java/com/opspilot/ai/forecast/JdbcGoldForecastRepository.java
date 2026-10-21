@@ -27,7 +27,7 @@ public class JdbcGoldForecastRepository implements GoldForecastRepository {
             prompt_hash, forecast_rule_version, raw_response, status,
             target_date, target_price, actual_return, actual_direction,
             hit, resolved_at, created_at,
-            promised_target_date, target_start, target_end, timing_rule, signal_status, reported_model
+            promised_target_date, target_start, target_end, timing_rule, signal_status, reported_model, model_run
             """;
     private static final TypeReference<List<String>> STRING_LIST = new TypeReference<>() {};
 
@@ -46,7 +46,7 @@ public class JdbcGoldForecastRepository implements GoldForecastRepository {
                     rs.getBigDecimal("actual_return"), direction(rs.getString("actual_direction")),
                     rs.getObject("hit", Boolean.class), rs.getObject("resolved_at", OffsetDateTime.class),
                     rs.getObject("created_at", OffsetDateTime.class), readTiming(rs),
-                    signal(rs.getString("signal_status")), rs.getString("reported_model")
+                    signal(rs.getString("signal_status")), rs.getString("reported_model"), readRun(rs.getString("model_run"))
             );
 
     public JdbcGoldForecastRepository(JdbcTemplate jdbcTemplate, ObjectMapper objectMapper) {
@@ -81,6 +81,13 @@ public class JdbcGoldForecastRepository implements GoldForecastRepository {
                 || check.targetCheck() != null || check.checkedAt().isAfter(candidate.createdAt())) {
             throw new IllegalArgumentException("预测与生成前基准依据不匹配");
         }
+        var run = candidate.modelRun();
+        if (run != null && (!candidate.modelName().equals(run.model()) || !run.model().equals(candidate.reportedModel())
+                || !candidate.promptHash().equals(run.promptHash())
+                || run.checkedBefore().isBefore(check.checkedAt().toInstant())
+                || run.checkedAfter().isAfter(candidate.createdAt().toInstant()))) {
+            throw new IllegalArgumentException("模型运行依据与本次预测或基准核验不匹配");
+        }
         var saved = saveIfAbsent(candidate);
         // 唯一键竞争的失败方不能把自己的后查依据附到胜出方原预测上。
         if (saved.created()) recordCheck(check);
@@ -97,8 +104,8 @@ public class JdbcGoldForecastRepository implements GoldForecastRepository {
                     prompt_hash, forecast_rule_version, raw_response, status,
                     target_date, target_price, actual_return, actual_direction,
                     hit, resolved_at, created_at,
-                    promised_target_date, target_start, target_end, timing_rule, signal_status, reported_model
-                ) values (?, ?, ?, ?, ?, ?, cast(? as jsonb), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    promised_target_date, target_start, target_end, timing_rule, signal_status, reported_model, model_run
+                ) values (?, ?, ?, ?, ?, ?, cast(? as jsonb), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, cast(? as jsonb))
                 on conflict (snapshot_id, model_name, prompt_version, forecast_rule_version)
                 do nothing
                 """, c.id(), c.snapshotId(), c.baseDate(), c.basePrice(), lower(c.predictedDirection()),
@@ -108,7 +115,7 @@ public class JdbcGoldForecastRepository implements GoldForecastRepository {
                 c.timing() == null ? null : c.timing().targetDate(),
                 c.timing() == null ? null : OffsetDateTime.ofInstant(c.timing().start(), java.time.ZoneOffset.UTC),
                 c.timing() == null ? null : OffsetDateTime.ofInstant(c.timing().end(), java.time.ZoneOffset.UTC),
-                c.timing() == null ? null : c.timing().ruleVersion(), lower(c.signal()), c.reportedModel());
+                c.timing() == null ? null : c.timing().ruleVersion(), lower(c.signal()), c.reportedModel(), writeRun(c.modelRun()));
         StoredGoldDirectionForecast stored = findByKey(c.snapshotId(), c.modelName(),
                 c.promptVersion(), c.forecastRuleVersion())
                 .orElseThrow(() -> new IllegalStateException("黄金方向预测保存后未能读取"));
@@ -203,6 +210,16 @@ public class JdbcGoldForecastRepository implements GoldForecastRepository {
         if (date == null && start == null && end == null && rule == null) return null;
         return new GoldForecastTiming(date, start == null ? null : start.toInstant(),
                 end == null ? null : end.toInstant(), rule);
+    }
+    private GoldModelRun readRun(String value) throws SQLException {
+        if (value == null) return null;
+        try { return objectMapper.readValue(value, GoldModelRun.class); }
+        catch (JsonProcessingException error) { throw new SQLException("模型运行依据JSON无效", error); }
+    }
+    private String writeRun(GoldModelRun run) {
+        if (run == null) return null;
+        try { return objectMapper.writeValueAsString(run); }
+        catch (JsonProcessingException error) { throw new IllegalArgumentException("模型运行依据无法转换为JSON", error); }
     }
     private void validateLimit(int limit) {
         if (limit < 1 || limit > 100) throw new IllegalArgumentException("limit 必须在 1 到 100 之间");

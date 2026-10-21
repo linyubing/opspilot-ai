@@ -22,20 +22,46 @@ public class SpringAiGoldForecastGateway implements GoldForecastGateway {
     private final ChatClient chatClient;
     private final ObjectMapper objectMapper;
     private final String modelName;
+    private final GoldModelObserver observer;
+    private final boolean requireRun;
 
     public SpringAiGoldForecastGateway(
             ChatClient.Builder builder,
             ObjectMapper objectMapper,
             GoldForecastProperties properties
     ) {
+        this(builder, objectMapper, properties, java.util.Optional.empty());
+    }
+
+    @org.springframework.beans.factory.annotation.Autowired
+    public SpringAiGoldForecastGateway(ChatClient.Builder builder, ObjectMapper objectMapper,
+            GoldForecastProperties properties, java.util.Optional<GoldModelObserver> observer) {
         this.chatClient = builder.build();
         this.objectMapper = objectMapper;
         this.modelName = properties.modelName();
+        this.observer = observer.orElse(null);
+        this.requireRun = properties.requireRun();
     }
 
     @Override
     public GeneratedGoldForecast generate(GoldForecastPrompt prompt) {
         Objects.requireNonNull(prompt, "黄金方向预测提示词不能为空");
+        boolean formal = prompt.version() != null && prompt.version().startsWith("gold-direction-session-prompt-");
+        if (formal && requireRun && observer == null) {
+            throw new GoldForecastAiUnavailableException("正式预测要求逐次运行观察，但观察组件未配置，未调用模型", null);
+        }
+        boolean observe = observer != null && formal;
+        if (!observe) return generateResponse(prompt, false);
+        try {
+            observer.start(modelName, prompt);
+            return generateResponse(prompt, true);
+        } finally {
+            // 线程池会复用线程；失败、解析错误也必须清掉本次提示词和参数。
+            observer.clear();
+        }
+    }
+
+    private GeneratedGoldForecast generateResponse(GoldForecastPrompt prompt, boolean observe) {
         long startTime = System.nanoTime();
 
         ChatResponse response = callModel(prompt, startTime);
@@ -52,13 +78,14 @@ public class SpringAiGoldForecastGateway implements GoldForecastGateway {
         }
         String rawResponse = response.getResult().getOutput().getText();
         GoldDirectionForecastContent content = parse(rawResponse);
+        GoldModelRun run = observe ? observer.finish(reported) : null;
         log.info(
                 "黄金方向预测模型调用完成，模型={}，提示词长度={}，响应长度={}，耗时={}毫秒",
                 modelName, prompt.content().length(), rawResponse.length(),
                 elapsedMillis(startTime)
         );
         return new GeneratedGoldForecast(modelName, rawResponse, content,
-                reported == null || reported.isBlank() ? null : reported);
+                reported == null || reported.isBlank() ? null : reported, run);
     }
 
     /** 隔离远程调用，避免把本地 JSON 解析错误误判为上游不可用。 */

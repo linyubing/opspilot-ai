@@ -24,6 +24,8 @@ opspilot:
     gold:
       # 幂等键与历史结果按实际模型隔离，不得继续标成 glm-4.7。
       model-name: qwen3.5:9b
+      # 正式新预测必须保留本次出站参数与前后服务端摘要，旧记录不补写。
+      require-run: true
       settlement-schedule:
         enabled: false
   research:

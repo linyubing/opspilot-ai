@@ -26,6 +26,35 @@ class JdbcGoldForecastRepositoryTests {
     @Autowired private JdbcTemplate jdbcTemplate;
     private UUID snapshotId;
 
+    @Test @DisplayName("逐次模型观察往返和结算保留，旧记录不被幂等重放升级")
+    void preservesModelRun() throws Exception {
+        var old = candidate("旧运行未知");
+        repository.saveIfAbsent(old);
+        assertThat(repository.saveIfAbsent(withRun(old)).record().modelRun()).isNull();
+        var candidate = withRun(candidate("逐次观察数学样例", "model-run", old.createdAt()));
+        var saved = repository.saveWithCheck(candidate, admission(candidate, UUID.randomUUID())).record();
+        assertThat(saved.modelRun()).isEqualTo(candidate.modelRun());
+        assertThat(saved.modelRun().parameters().has("messages")).isFalse();
+        var resolved = repository.resolve(saved.id(), new ForecastResolution(LocalDate.parse("2026-08-27"),
+                new BigDecimal("4550"), new BigDecimal("0.663503"), ForecastDirection.BULLISH, false,
+                OffsetDateTime.parse("2026-08-28T01:00:00Z")));
+        assertThat(resolved.modelRun().key()).isEqualTo(saved.modelRun().key());
+        org.assertj.core.api.Assertions.assertThatThrownBy(() -> jdbcTemplate.update(
+                "update gold_direction_forecast set model_run = jsonb_set(model_run, '{model}', '\"wrong\"') where id = ?", saved.id()))
+                .isInstanceOf(org.springframework.dao.DataIntegrityViolationException.class);
+    }
+
+    private StoredGoldDirectionForecast withRun(StoredGoldDirectionForecast s) throws Exception {
+        var parameters = new com.fasterxml.jackson.databind.ObjectMapper().readTree(
+                "{\"model\":\"glm-4.7\",\"think\":false,\"stream\":false,\"options\":{\"num_ctx\":8192,\"num_predict\":2048,\"temperature\":0.0,\"think\":false}}");
+        var time = s.createdAt().toInstant();
+        var run = new GoldModelRun(s.modelName(), "a".repeat(64), "0.33.3", s.promptHash(), parameters, time,time,time,time);
+        return new StoredGoldDirectionForecast(s.id(),s.snapshotId(),s.baseDate(),s.basePrice(),s.predictedDirection(),
+                s.reasoning(),s.invalidationConditions(),s.modelName(),s.promptVersion(),s.promptHash(),s.forecastRuleVersion(),
+                s.rawResponse(),s.status(),s.targetDate(),s.targetPrice(),s.actualReturn(),s.actualDirection(),s.hit(),s.resolvedAt(),
+                s.createdAt(),s.timing(),s.signal(),s.modelName(),run);
+    }
+
     @Test @DisplayName("预测和准入回执一起保存，幂等重放不补写另一份依据")
     void savesAdmissionAtomically() {
         var first = candidate("准入原预测");

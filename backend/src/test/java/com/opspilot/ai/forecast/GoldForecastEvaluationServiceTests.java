@@ -25,6 +25,34 @@ class GoldForecastEvaluationServiceTests {
 
     private GoldForecastEvaluationService service;
 
+    @Test @DisplayName("同响应模型下不同工件或缺运行依据的成绩各自分组")
+    void separatesRunEvidence() throws Exception {
+        var source = resolved(ForecastDirection.BULLISH, ForecastDirection.BULLISH, true,
+                "glm-4.7", "prompt-v1", "rule-v1", 26);
+        var timing = new GoldForecastTiming(LocalDate.parse("2026-08-27"),
+                java.time.Instant.parse("2026-08-26T21:00:00Z"), java.time.Instant.parse("2026-08-27T21:00:00Z"),
+                "sydney-0700-candidate-v1");
+        var unknown = copyReported(source,timing,"glm-4.7");
+        var a = withRun(unknown,"a");
+        var b = withRun(unknown,"b");
+        when(forecastRepository.findAllForEvaluation()).thenReturn(List.of(unknown,a,b));
+        var result = service.evaluate();
+        assertThat(result.versions()).hasSize(3);
+        assertThat(result.independent().groups()).hasSize(3);
+        assertThat(result.independent().groups()).allSatisfy(group -> assertThat(group.selectedCount()).isEqualTo(1));
+    }
+
+    private StoredGoldDirectionForecast withRun(StoredGoldDirectionForecast s, String digit) throws Exception {
+        var parameters = new com.fasterxml.jackson.databind.ObjectMapper().readTree(
+                "{\"model\":\"glm-4.7\",\"think\":false,\"stream\":false,\"options\":{\"num_ctx\":8192}}");
+        var time=s.createdAt().toInstant();
+        var run=new GoldModelRun(s.modelName(),digit.repeat(64),"0.33.3",s.promptHash(),parameters,time,time,time,time);
+        return new StoredGoldDirectionForecast(UUID.randomUUID(),s.snapshotId(),s.baseDate(),s.basePrice(),s.predictedDirection(),
+                s.reasoning(),s.invalidationConditions(),s.modelName(),s.promptVersion(),s.promptHash(),s.forecastRuleVersion(),
+                s.rawResponse(),s.status(),s.targetDate(),s.targetPrice(),s.actualReturn(),s.actualDirection(),s.hit(),s.resolvedAt(),
+                s.createdAt(),s.timing(),s.signal(),s.reportedModel(),run);
+    }
+
     @Test @DisplayName("同配置名的未知响应与已核对响应成绩分开，不共用命中率")
     void separatesReportedModelEvidence() {
         var old = resolved(ForecastDirection.BULLISH, ForecastDirection.BULLISH, true,

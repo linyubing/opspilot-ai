@@ -30,6 +30,7 @@ public class GoldForecastGenerationService {
     private final Clock clock;
     private final GoldForecastPublicationPolicy publication;
     private final GoldBaseCheck baseCheck;
+    private final boolean requireRun;
 
     public GoldForecastGenerationService(
             GoldResearchSnapshotRepository snapshotRepository,
@@ -53,6 +54,7 @@ public class GoldForecastGenerationService {
         this.clock = clock;
         this.publication = publication;
         this.baseCheck = baseCheck;
+        this.requireRun = properties.requireRun();
     }
 
     /**
@@ -96,6 +98,14 @@ public class GoldForecastGenerationService {
             throw new InvalidGoldForecastAiResponseException("正式预测响应模型身份未核对，未保存结果", null);
         }
 
+        var run = generated.modelRun();
+        if ((requireRun && run == null) || (run != null && (!modelName.equals(run.model())
+                || !prompt.sha256().equals(run.promptHash())
+                || run.checkedBefore().isBefore(baseProof.checkedAt())
+                || run.checkedAfter().isAfter(clock.instant())))) {
+            throw new InvalidGoldForecastAiResponseException("逐次模型运行依据缺失或未绑定本次预测", null);
+        }
+
         // 模型返回内容必须先通过安全边界校验，才能写入数据库。
         validator.validateFormal(generated.content());
 
@@ -130,7 +140,8 @@ public class GoldForecastGenerationService {
                         publishedAt,
                         timing,
                         content.signal(),
-                        generated.reportedModel()
+                        generated.reportedModel(),
+                        generated.modelRun()
                 );
 
         /*
