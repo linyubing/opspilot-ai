@@ -29,6 +29,7 @@ public class GoldForecastGenerationService {
     private final String modelName;
     private final Clock clock;
     private final GoldForecastPublicationPolicy publication;
+    private final GoldBaseCheck baseCheck;
 
     public GoldForecastGenerationService(
             GoldResearchSnapshotRepository snapshotRepository,
@@ -39,7 +40,8 @@ public class GoldForecastGenerationService {
             GoldForecastDataFreshnessPolicy freshnessPolicy,
             GoldForecastProperties properties,
             Clock clock,
-            GoldForecastPublicationPolicy publication
+            GoldForecastPublicationPolicy publication,
+            GoldBaseCheck baseCheck
     ) {
         this.snapshotRepository = snapshotRepository;
         this.forecastRepository = forecastRepository;
@@ -50,6 +52,7 @@ public class GoldForecastGenerationService {
         this.modelName = properties.modelName();
         this.clock = clock;
         this.publication = publication;
+        this.baseCheck = baseCheck;
     }
 
     /**
@@ -80,6 +83,10 @@ public class GoldForecastGenerationService {
         // 新鲜度只约束新预测，已经保存的历史预测仍可按幂等键读取。
         freshnessPolicy.validate(snapshot.snapshot());
         var timing = publication.plan(snapshot.snapshot().latestGoldDate());
+        publication.check(snapshot.snapshot().latestGoldDate(), timing, clock);
+
+        var baseProof = baseCheck.check(snapshot);
+        // 行情核验也可能耗时；过期后不能继续调用模型。
         publication.check(snapshot.snapshot().latestGoldDate(), timing, clock);
 
         GoldForecastPrompt prompt = promptBuilder.build(snapshot, timing);
@@ -130,7 +137,10 @@ public class GoldForecastGenerationService {
          * 前面的查询主要用于避免重复调用模型；
          * 数据库唯一约束负责处理并发情况下的最终幂等。
          */
-        return forecastRepository.saveIfAbsent(candidate);
+        var receipt = new GoldResolutionCheck(UUID.randomUUID(), candidate.id(),
+                OffsetDateTime.ofInstant(baseProof.checkedAt(), java.time.ZoneOffset.UTC),
+                GoldResolutionCheck.Code.GENERATION_BASE_CHECKED, baseProof, null);
+        return forecastRepository.saveWithCheck(candidate, receipt);
 
     }
 

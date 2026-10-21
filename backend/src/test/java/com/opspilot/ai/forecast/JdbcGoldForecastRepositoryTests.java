@@ -26,6 +26,42 @@ class JdbcGoldForecastRepositoryTests {
     @Autowired private JdbcTemplate jdbcTemplate;
     private UUID snapshotId;
 
+    @Test @DisplayName("预测和准入回执一起保存，幂等重放不补写另一份依据")
+    void savesAdmissionAtomically() {
+        var first = candidate("准入原预测");
+        var receipt = admission(first, UUID.randomUUID());
+        assertThat(repository.saveWithCheck(first, receipt).created()).isTrue();
+        assertThat(repository.findChecks(first.id(), 10)).containsExactly(receipt);
+        var repeated = candidate("不能覆盖");
+        assertThat(repository.saveWithCheck(repeated, admission(repeated, UUID.randomUUID())).created()).isFalse();
+        assertThat(repository.findChecks(first.id(), 10)).containsExactly(receipt);
+        assertThat(repository.findChecks(repeated.id(), 10)).isEmpty();
+    }
+
+    @Test @DisplayName("回执插入失败时预测回滚，已有预测和回执保持不变")
+    void rollsBackAdmissionFailure() {
+        var old = candidate("原记录");
+        var receipt = admission(old, UUID.randomUUID());
+        repository.saveWithCheck(old, receipt);
+        var next = candidate("应回滚", "rollback-admission", old.createdAt());
+        org.assertj.core.api.Assertions.assertThatThrownBy(() -> repository.saveWithCheck(next,
+                admission(next, receipt.id()))).isInstanceOf(org.springframework.dao.DuplicateKeyException.class);
+        assertThat(repository.findByKey(next.snapshotId(), next.modelName(), next.promptVersion(), next.forecastRuleVersion())).isEmpty();
+        assertThat(repository.findChecks(old.id(), 10)).containsExactly(receipt);
+    }
+
+    private GoldResolutionCheck admission(StoredGoldDirectionForecast f, UUID id) {
+        var day = new com.opspilot.ai.marketdata.GoldDailyBar("XAUUSD", f.baseDate(),
+                f.basePrice(), f.basePrice(), f.basePrice(), f.basePrice(), "usd", "troy_ounce", "twelve_data", f.createdAt());
+        var session = com.opspilot.ai.marketdata.GoldSession.forDate(f.baseDate());
+        var hours = java.util.stream.LongStream.range(0, 24).mapToObj(i -> new com.opspilot.ai.marketdata.GoldHourBar(
+                session.start().plusSeconds(i * 3600), f.basePrice(), f.basePrice(), f.basePrice(), f.basePrice())).toList();
+        var proof = new com.opspilot.ai.marketdata.GoldSessionCheckResult(session, f.createdAt().toInstant(),
+                com.opspilot.ai.marketdata.GoldSessionCheckResult.Status.MATCHED, 24, 24, List.of(), "数学准入样例",
+                new com.opspilot.ai.marketdata.GoldSessionCheckResult.Input(day, hours, "REQUEST_ONLY_UTC"));
+        return new GoldResolutionCheck(id, f.id(), f.createdAt(), GoldResolutionCheck.Code.GENERATION_BASE_CHECKED, proof, null);
+    }
+
     @Test @DisplayName("响应模型标识入库结算后保留，未知旧记录不被幂等重放回填")
     void preservesReportedModel() {
         var old = candidate("旧身份资料");

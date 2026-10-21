@@ -66,6 +66,28 @@ public class JdbcGoldForecastRepository implements GoldForecastRepository {
     }
 
     @Override
+    @org.springframework.transaction.annotation.Transactional
+    public SaveGoldForecastResult saveWithCheck(StoredGoldDirectionForecast candidate, GoldResolutionCheck check) {
+        Objects.requireNonNull(candidate);
+        Objects.requireNonNull(check);
+        if (!candidate.id().equals(check.forecastId())
+                || check.code() != GoldResolutionCheck.Code.GENERATION_BASE_CHECKED
+                || check.baseCheck() == null || !check.baseCheck().matched()
+                || check.baseCheck().input() == null
+                || check.baseCheck().input().day() == null
+                || !candidate.baseDate().equals(check.baseCheck().input().day().priceDate())
+                || candidate.basePrice().compareTo(check.baseCheck().input().day().close()) != 0
+                || !check.checkedAt().toInstant().equals(check.baseCheck().checkedAt())
+                || check.targetCheck() != null || check.checkedAt().isAfter(candidate.createdAt())) {
+            throw new IllegalArgumentException("预测与生成前基准依据不匹配");
+        }
+        var saved = saveIfAbsent(candidate);
+        // 唯一键竞争的失败方不能把自己的后查依据附到胜出方原预测上。
+        if (saved.created()) recordCheck(check);
+        return saved;
+    }
+
+    @Override
     public SaveGoldForecastResult saveIfAbsent(StoredGoldDirectionForecast c) {
         Objects.requireNonNull(c, "待保存的黄金预测不能为空");
         int inserted = jdbcTemplate.update("""

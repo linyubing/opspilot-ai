@@ -19,6 +19,7 @@ public record GoldResolutionCheck(UUID id, UUID forecastId, OffsetDateTime check
 
     /** 固定中文原因，不保存供应商异常原文，避免密钥和URL进入记录。 */
     public enum Code {
+        GENERATION_BASE_CHECKED("生成前基准候选小时核验通过；目标尚未核验，不代表官方认证或历史可得性证明"),
         WAITING_BAR("尚无基准日后的下一根真实日线"),
         INVALID_TIME("目标日线时间尚不可用或无效"),
         UNCONFIRMED_BAR("目标日线尚无可用的闭市凭证"),

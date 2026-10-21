@@ -52,8 +52,42 @@ class GoldForecastGenerationServiceTests {
     private GoldForecastValidator validator;
     @Mock
     private com.opspilot.ai.marketdata.GoldDailyBarRepository bars;
+    @Mock
+    private com.opspilot.ai.marketdata.GoldSessionCheckService sessions;
 
     private GoldForecastGenerationService service;
+
+    @Test @org.junit.jupiter.api.DisplayName("小时核验期间跨过截止线，不得继续调用模型")
+    void rejectsSlowBaseCheck() {
+        var time = new java.util.concurrent.atomic.AtomicReference<>(NOW);
+        Clock clock = org.mockito.Mockito.mock(Clock.class);
+        when(clock.getZone()).thenReturn(ZoneOffset.UTC);
+        when(clock.instant()).thenAnswer(call -> time.get());
+        service = serviceAt(clock);
+        var snapshot = prepareNewForecast();
+        when(sessions.check(any(com.opspilot.ai.marketdata.GoldDailyBar.class)))
+                .thenAnswer(call -> {
+                    var proof = matchingProof(call.getArgument(0));
+                    time.set(Instant.parse("2026-08-27T21:00:00Z"));
+                    return proof;
+                });
+        assertThatThrownBy(() -> service.generate(snapshot.id())).isInstanceOf(InvalidGoldPublicationException.class);
+        verifyNoInteractions(gateway);
+        verify(forecastRepository, never()).saveWithCheck(any(), any());
+    }
+
+    @Test @org.junit.jupiter.api.DisplayName("基准日线缺少生成前小时核验时不得调用模型或保存预测")
+    void rejectsUncheckedBase() {
+        var snapshot = prepareNewForecast();
+        lenient().when(promptBuilder.build(org.mockito.ArgumentMatchers.eq(snapshot), any(GoldForecastTiming.class)))
+                .thenReturn(prompt());
+        lenient().when(gateway.generate(prompt())).thenReturn(generated());
+        lenient().when(forecastRepository.saveWithCheck(any(), any())).thenAnswer(call -> new SaveGoldForecastResult(call.getArgument(0), true));
+        when(sessions.check(any(com.opspilot.ai.marketdata.GoldDailyBar.class))).thenReturn(null);
+        assertThatThrownBy(() -> service.generate(snapshot.id()))
+                .isInstanceOf(com.opspilot.ai.marketdata.MarketDataUnavailableException.class);
+        verifyNoInteractions(gateway);
+    }
 
     @Test
     @org.junit.jupiter.api.DisplayName("网关报告其他模型时不能保存到当前模型的正式协议")
@@ -64,7 +98,7 @@ class GoldForecastGenerationServiceTests {
         when(gateway.generate(prompt())).thenReturn(new GeneratedGoldForecast("other-model", "{}", generated().content()));
         assertThatThrownBy(() -> service.generate(snapshot.id()))
                 .isInstanceOf(InvalidGoldForecastAiResponseException.class);
-        verify(forecastRepository, never()).saveIfAbsent(any());
+        verify(forecastRepository, never()).saveWithCheck(any(), any());
     }
 
     @Test
@@ -75,7 +109,7 @@ class GoldForecastGenerationServiceTests {
         when(gateway.generate(prompt())).thenReturn(new GeneratedGoldForecast(MODEL_NAME, "{}", generated().content()));
         assertThatThrownBy(() -> service.generate(snapshot.id()))
                 .isInstanceOf(InvalidGoldForecastAiResponseException.class);
-        verify(forecastRepository, never()).saveIfAbsent(any());
+        verify(forecastRepository, never()).saveWithCheck(any(), any());
     }
 
     @Test
@@ -86,12 +120,18 @@ class GoldForecastGenerationServiceTests {
                 .thenReturn(prompt());
         var content = new GoldDirectionForecastContent(null, "证据不足", List.of("取得更多真实输入"), ForecastSignal.ABSTAINED);
         when(gateway.generate(prompt())).thenReturn(new GeneratedGoldForecast(MODEL_NAME, "{}", content, MODEL_NAME));
-        when(forecastRepository.saveIfAbsent(any())).thenAnswer(call -> new SaveGoldForecastResult(call.getArgument(0), true));
+        when(forecastRepository.saveWithCheck(any(), any())).thenAnswer(call -> new SaveGoldForecastResult(call.getArgument(0), true));
         var result = service.generate(snapshot.id()).record();
         assertThat(result.signal()).isEqualTo(ForecastSignal.ABSTAINED);
         assertThat(result.predictedDirection()).isNull();
         assertThat(result.hit()).isNull();
         assertThat(result.reportedModel()).isEqualTo(MODEL_NAME);
+        var receipt = ArgumentCaptor.forClass(GoldResolutionCheck.class);
+        verify(forecastRepository).saveWithCheck(any(), receipt.capture());
+        assertThat(receipt.getValue().forecastId()).isEqualTo(result.id());
+        assertThat(receipt.getValue().code()).isEqualTo(GoldResolutionCheck.Code.GENERATION_BASE_CHECKED);
+        assertThat(receipt.getValue().baseCheck().input().day()).isEqualTo(snapshot.snapshot().input().bars().getFirst());
+        assertThat(receipt.getValue().targetCheck()).isNull();
         verify(validator).validateFormal(content);
     }
 
@@ -101,12 +141,12 @@ class GoldForecastGenerationServiceTests {
         var snapshot = confirmed();
         when(snapshotRepository.findById(snapshot.id())).thenReturn(Optional.of(snapshot));
         when(gateway.generate(any())).thenReturn(generated());
-        when(forecastRepository.saveIfAbsent(any())).thenAnswer(call ->
+        when(forecastRepository.saveWithCheck(any(), any())).thenAnswer(call ->
                 new SaveGoldForecastResult(call.getArgument(0), true));
         var real = new GoldForecastGenerationService(snapshotRepository, forecastRepository,
                 new GoldForecastPromptBuilder(), gateway, validator,
                 new GoldForecastDataFreshnessPolicy(Clock.fixed(NOW, ZoneOffset.UTC)),
-                new GoldForecastProperties(MODEL_NAME), Clock.fixed(NOW, ZoneOffset.UTC), publication());
+                new GoldForecastProperties(MODEL_NAME), Clock.fixed(NOW, ZoneOffset.UTC), publication(), baseCheck(Clock.fixed(NOW, ZoneOffset.UTC)));
         var stored = real.generate(snapshot.id()).record();
         var captor = ArgumentCaptor.forClass(GoldForecastPrompt.class);
         verify(gateway).generate(captor.capture());
@@ -147,7 +187,7 @@ class GoldForecastGenerationServiceTests {
         var queries = new java.util.concurrent.atomic.AtomicInteger();
         when(bars.findNext("XAUUSD", "twelve_data", LocalDate.parse("2026-08-26")))
                 .thenAnswer(call -> {
-                    if (queries.incrementAndGet() == 1) return Optional.empty();
+                    if (queries.incrementAndGet() <= 2) return Optional.empty();
                     time.set(known ? NOW.plusSeconds(1) : Instant.parse("2026-08-27T21:00:00Z"));
                     if (!known) return Optional.empty();
                     var receipt = OffsetDateTime.ofInstant(time.get(), ZoneOffset.UTC);
@@ -158,13 +198,13 @@ class GoldForecastGenerationServiceTests {
                                     com.opspilot.ai.marketdata.GoldBarConfirmation.SOURCE,
                                     LocalDate.parse("2026-08-27"), receipt, "a".repeat(64))));
                 });
-        lenient().when(forecastRepository.saveIfAbsent(any())).thenAnswer(call ->
+        lenient().when(forecastRepository.saveWithCheck(any(), any())).thenAnswer(call ->
                 new SaveGoldForecastResult(call.getArgument(0), true));
         assertThatThrownBy(() -> service.generate(snapshot.id()))
                 .isInstanceOf(InvalidGoldPublicationException.class)
                 .hasMessageContaining(known ? "已知" : "结束");
         verify(gateway).generate(prompt());
-        verify(forecastRepository, never()).saveIfAbsent(any());
+        verify(forecastRepository, never()).saveWithCheck(any(), any());
     }
 
     @Test
@@ -174,13 +214,13 @@ class GoldForecastGenerationServiceTests {
         StoredGoldResearchSnapshot snapshot = prepareNewForecast();
         lenient().when(promptBuilder.build(org.mockito.ArgumentMatchers.eq(snapshot), any(GoldForecastTiming.class))).thenReturn(prompt());
         lenient().when(gateway.generate(prompt())).thenReturn(generated());
-        lenient().when(forecastRepository.saveIfAbsent(any())).thenAnswer(invocation ->
+        lenient().when(forecastRepository.saveWithCheck(any(), any())).thenAnswer(invocation ->
                 new SaveGoldForecastResult(invocation.getArgument(0), true));
 
         assertThatThrownBy(() -> service.generate(snapshot.id()))
                 .hasMessageContaining("目标").hasMessageContaining("结束");
         verifyNoInteractions(promptBuilder, gateway, validator);
-        verify(forecastRepository, never()).saveIfAbsent(any());
+        verify(forecastRepository, never()).saveWithCheck(any(), any());
     }
 
     @Test
@@ -189,29 +229,35 @@ class GoldForecastGenerationServiceTests {
         Clock clock = org.mockito.Mockito.mock(Clock.class);
         when(clock.getZone()).thenReturn(ZoneOffset.UTC);
         // 快照核验、初次查询前后均未过期，模型返回后的核验恰好到截止线。
-        when(clock.instant()).thenReturn(NOW, NOW, NOW, Instant.parse("2026-08-27T21:00:00Z"));
+        var time = new java.util.concurrent.atomic.AtomicReference<>(NOW);
+        when(clock.instant()).thenAnswer(call -> time.get());
         service = serviceAt(clock);
         StoredGoldResearchSnapshot snapshot = prepareNewForecast();
         when(promptBuilder.build(org.mockito.ArgumentMatchers.eq(snapshot), any(GoldForecastTiming.class))).thenReturn(prompt());
-        when(gateway.generate(prompt())).thenReturn(generated());
-        lenient().when(forecastRepository.saveIfAbsent(any())).thenAnswer(invocation ->
+        when(gateway.generate(prompt())).thenAnswer(call -> {
+            time.set(Instant.parse("2026-08-27T21:00:00Z"));
+            return generated();
+        });
+        lenient().when(forecastRepository.saveWithCheck(any(), any())).thenAnswer(invocation ->
                 new SaveGoldForecastResult(invocation.getArgument(0), true));
 
         assertThatThrownBy(() -> service.generate(snapshot.id()))
                 .hasMessageContaining("目标").hasMessageContaining("结束");
         verify(gateway).generate(prompt());
-        verify(forecastRepository, never()).saveIfAbsent(any());
+        verify(forecastRepository, never()).saveWithCheck(any(), any());
     }
 
     private GoldForecastGenerationService serviceAt(Clock clock) {
         return new GoldForecastGenerationService(snapshotRepository, forecastRepository,
                 promptBuilder, gateway, validator,
                 new GoldForecastDataFreshnessPolicy(Clock.fixed(NOW, ZoneOffset.UTC)),
-                new GoldForecastProperties(MODEL_NAME), clock, publication());
+                new GoldForecastProperties(MODEL_NAME), clock, publication(), baseCheck(clock));
     }
 
     @BeforeEach
     void setUp() {
+        lenient().when(sessions.check(any(com.opspilot.ai.marketdata.GoldDailyBar.class)))
+                .thenAnswer(call -> matchingProof(call.getArgument(0)));
         service = new GoldForecastGenerationService(
                 snapshotRepository,
                 forecastRepository,
@@ -223,8 +269,22 @@ class GoldForecastGenerationServiceTests {
                 ),
                 new GoldForecastProperties(MODEL_NAME),
                 Clock.fixed(NOW, ZoneOffset.UTC),
-                publication()
+                publication(), baseCheck(Clock.fixed(NOW, ZoneOffset.UTC))
         );
+    }
+
+    private com.opspilot.ai.marketdata.GoldSessionCheckResult matchingProof(com.opspilot.ai.marketdata.GoldDailyBar day) {
+        var session = com.opspilot.ai.marketdata.GoldSession.forDate(day.priceDate());
+        var hours = java.util.stream.LongStream.range(0, 24).mapToObj(i ->
+                new com.opspilot.ai.marketdata.GoldHourBar(session.start().plusSeconds(i * 3600),
+                        day.open(), day.high(), day.low(), day.close())).toList();
+        return new com.opspilot.ai.marketdata.GoldSessionCheckResult(session, NOW,
+                com.opspilot.ai.marketdata.GoldSessionCheckResult.Status.MATCHED,
+                24, 24, List.of(), "测试核验", new com.opspilot.ai.marketdata.GoldSessionCheckResult.Input(day, hours, "REQUEST_ONLY_UTC"));
+    }
+
+    private GoldBaseCheck baseCheck(Clock clock) {
+        return new GoldBaseCheck(sessions, clock);
     }
 
     private GoldForecastPublicationPolicy publication() {
@@ -352,8 +412,8 @@ class GoldForecastGenerationServiceTests {
         SaveGoldForecastResult result = service.generate(snapshot.id());
 
         assertThat(result).isEqualTo(new SaveGoldForecastResult(existing, false));
-        verifyNoInteractions(promptBuilder, gateway, validator);
-        verify(forecastRepository, never()).saveIfAbsent(any());
+        verifyNoInteractions(promptBuilder, gateway, validator, sessions);
+        verify(forecastRepository, never()).saveWithCheck(any(), any());
     }
 
     @Test
@@ -363,7 +423,7 @@ class GoldForecastGenerationServiceTests {
         GeneratedGoldForecast generated = generated();
         when(promptBuilder.build(org.mockito.ArgumentMatchers.eq(snapshot), any(GoldForecastTiming.class))).thenReturn(prompt);
         when(gateway.generate(prompt)).thenReturn(generated);
-        when(forecastRepository.saveIfAbsent(any())).thenAnswer(invocation ->
+        when(forecastRepository.saveWithCheck(any(), any())).thenAnswer(invocation ->
                 new SaveGoldForecastResult(invocation.getArgument(0), true)
         );
 
@@ -380,11 +440,11 @@ class GoldForecastGenerationServiceTests {
         order.verify(promptBuilder).build(org.mockito.ArgumentMatchers.eq(snapshot), any(GoldForecastTiming.class));
         order.verify(gateway).generate(prompt);
         order.verify(validator).validateFormal(generated.content());
-        order.verify(forecastRepository).saveIfAbsent(any());
+        order.verify(forecastRepository).saveWithCheck(any(), any());
 
         ArgumentCaptor<StoredGoldDirectionForecast> captor =
                 ArgumentCaptor.forClass(StoredGoldDirectionForecast.class);
-        verify(forecastRepository).saveIfAbsent(captor.capture());
+        verify(forecastRepository).saveWithCheck(captor.capture(), any());
         StoredGoldDirectionForecast candidate = captor.getValue();
         assertThat(result.created()).isTrue();
         assertThat(candidate.snapshotId()).isEqualTo(snapshot.id());
@@ -421,7 +481,7 @@ class GoldForecastGenerationServiceTests {
         assertThatThrownBy(() -> service.generate(snapshot.id()))
                 .isInstanceOf(GoldForecastAiUnavailableException.class);
 
-        verify(forecastRepository, never()).saveIfAbsent(any());
+        verify(forecastRepository, never()).saveWithCheck(any(), any());
     }
 
     @Test
@@ -435,7 +495,7 @@ class GoldForecastGenerationServiceTests {
         assertThatThrownBy(() -> service.generate(snapshot.id()))
                 .isInstanceOf(InvalidGoldForecastAiResponseException.class);
 
-        verify(forecastRepository, never()).saveIfAbsent(any());
+        verify(forecastRepository, never()).saveWithCheck(any(), any());
     }
 
     @Test
@@ -449,7 +509,7 @@ class GoldForecastGenerationServiceTests {
         assertThatThrownBy(() -> service.generate(snapshot.id()))
                 .isInstanceOf(UnsafeGoldForecastException.class);
 
-        verify(forecastRepository, never()).saveIfAbsent(any());
+        verify(forecastRepository, never()).saveWithCheck(any(), any());
     }
 
     private StoredGoldResearchSnapshot prepareNewForecast() {

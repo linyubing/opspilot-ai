@@ -104,3 +104,11 @@ V30新增nullable reported_model和与model_name匹配的约束，旧记录不�
 Chromium 1440x1050/390x844验证旧身份未知提示、非工件说明、JSON链接与刷新，无JS异常或横向溢出；Browser插件未提供，沿用已有Playwright。daily-report/latest的404仍是既有回退，不是新字段故障。官方metadata接口依据：https://docs.spring.io/spring-ai/docs/current/api/org/springframework/ai/chat/model/ChatResponse.html；实际实现与合并验证以本项目Spring AI 1.1.8为准，不据新版文档推断依赖行为。
 
 2026-10-21当前基准实证：预先固定已有正式预测及10/20原仓库基准、原20:00UTC窗口，唯一1h请求获得24/24且四价精确MATCHED。原归档SHA b846bca9122fd983b2e77f5cf5f339945b1d59847f311b1c4081f652b04c79bf；空凭据离线复算与错误摘要/同路径重取拒绝共3项通过。此证据否定“此前两日失败意味着所有日期都不能匹配”的泛化，下一步仍按原规则检查当前预测的真实目标，不换窗口或重训。仅REQUEST_ONLY_UTC，且复核晚于生成，不升级为PIT/官方时段/可信样本。无数据库或成绩写入，旧冻结配对仍不评分。只读审查无阻断；操作及暂缓Minor见`docs/research/2026-10-21-current-base-session-check.md`。目标尚未完成。
+
+2026-10-21生成前准入闭环：先用行为红测复现“无小时依据仍调用模型”（1运行1失败，oct21-admission-red-v2.log），再增加GoldBaseCheck。直接核验冻结快照首根原始日线，不再查一份可能变化的仓库价格来替代。限定本次请求开始至返回时刻的checkedAt、绑定原日线/session/UTC依据，并独立重放小时计算，不能只相信MATCHED标志。核验后再次执行发布时间检查；行情核验耗时跨截止也不得调用模型。来源异常仅向外给固定中文错误，无原始异常路径和凭据。
+
+V31只扩展generation_base_checked类型。saveWithCheck事务仅包裹新预测和事前基准回执；任一写入失败回滚，不在HTTP调用外包长事务。唯一键命中原记录时不补写本次依据，不把旧预测升级为生成前已核验。生成回执只含baseCheck、targetCheck=null，明确不是两端结算通过，也不是官方/PIT证明。保留原saveIfAbsent供历史路径与兼容测试使用；正式生成入口已改走原子方法。仓储不重复执行全部小时算法，由准入层负责；仓储额外检查预测ID、基准日期/价格和回执时间一致性。
+
+验证：定向40项通过，随后增加“小时检查跨截止”和“替换原价拒绝”测试；最终全量1100项0失败0错误3跳过，Node21项通过。真实PostgreSQL测试覆盖回执主键冲突导致新预测回滚、旧预测/旧回执保留以及幂等不追加。独立只读审查无Critical/Important/Minor；未独立运行测试，运行结果由主执行者确认。数学小时样例不计作真实行情或预测样本。
+
+运行核验：仅停止已核对身份的本项目8080进程，隐藏后台启动local-ai（PID29472），health=UP，Flyway schema=31。对已有snapshot 3e65dc23-7f99-4327-b6c0-aba5b2384364实际重放生成接口，created=false；仍4条预测，978b5294-fd31-4ff1-ad40-a7e422ee0ff6仍PENDING且仅1条原WAITING_BAR回执。没有新正式预测、行情请求、结算或成绩写入；没有给旧预测补事前依据。下一步仍需等待真实目标可结算，并继续补足不可变模型工件/运行参数和隔离评估证据；本轮是可信流程修复，不证明准确率提高。
