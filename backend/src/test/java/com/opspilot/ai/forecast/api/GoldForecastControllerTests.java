@@ -66,6 +66,23 @@ class GoldForecastControllerTests {
     @Mock private GoldForecastReviewService reviewService;
     private MockMvc mockMvc;
 
+    @Test @DisplayName("没有历史核验记录时返回空列表，不能事后编造证据")
+    void returnsEmptyChecks() throws Exception {
+        mockMvc.perform(get("/api/research/gold/forecasts/{id}/checks", UUID.randomUUID()))
+                .andExpect(status().isOk()).andExpect(jsonPath("$").isEmpty());
+    }
+
+    @Test
+    void returnsSafeCheckReason() throws Exception {
+        var id = UUID.randomUUID();
+        when(resolutionService.checks(id, 1)).thenReturn(List.of(new GoldResolutionCheck(UUID.randomUUID(), id,
+                OffsetDateTime.parse("2026-10-21T06:00:00Z"), GoldResolutionCheck.Code.SOURCE_UNAVAILABLE, null, null)));
+        mockMvc.perform(get("/api/research/gold/forecasts/{id}/checks?limit=1", id))
+                .andExpect(status().isOk()).andExpect(jsonPath("$[0].code").value("SOURCE_UNAVAILABLE"))
+                .andExpect(jsonPath("$[0].reason").value("小时行情来源暂不可核验，未写入实际方向和命中"))
+                .andExpect(jsonPath("$[0].apiKey").doesNotExist());
+    }
+
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(new GoldForecastController(

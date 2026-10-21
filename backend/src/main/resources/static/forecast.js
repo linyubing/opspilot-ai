@@ -6,6 +6,7 @@ const emptyBox = byId("emptyBox");
 const reportBox = byId("report");
 let latestForecast = null;
 let latestBar = null;
+let checksSeq = 0;
 
 const directions = {BULLISH: "上涨", NEUTRAL: "中性", BEARISH: "下跌", ABSTAINED: "不出信号（弃权）"};
 const statuses = {PENDING: "等待验证", RESOLVED: "已验证", DATA_MISSING: "缺少结算数据", VOIDED: "已作废"};
@@ -102,6 +103,7 @@ function renderForecast(forecast) {
     text("reasoning", forecast.reasoning);
     renderPriceBasis();
     renderMissReason(forecast.missReason);
+    loadChecks(forecast);
 
     const conditions = byId("conditions");
     conditions.replaceChildren(...(forecast.invalidationConditions || []).map(item => {
@@ -109,6 +111,50 @@ function renderForecast(forecast) {
         li.textContent = item;
         return li;
     }));
+}
+
+async function loadChecks(forecast) {
+    // 页面多次刷新时，较早响应不得覆盖当前预测的检查记录。
+    const seq = ++checksSeq;
+    const link = byId("checkLink");
+    link.hidden = true;
+    text("checkTime", "尚未读取");
+    text("checkReason", "正在读取已保存检查...");
+    text("checkEvidence", "");
+    if (!forecast.id) {
+        text("checkReason", "预测编号未知，不能读取核验记录。");
+        return;
+    }
+    const url = `/api/research/gold/forecasts/${encodeURIComponent(forecast.id)}/checks?limit=10`;
+    try {
+        const checks = await request(url);
+        if (seq !== checksSeq) return;
+        if (!Array.isArray(checks)) throw new Error("核验记录格式错误");
+        link.href = url;
+        link.hidden = false;
+        if (checks.length === 0) {
+            text("checkReason", "未留存结算检查，不能据此判断核验通过或失败。");
+            text("checkEvidence", "旧证据不补造；须在实际结算尝试后查看记录。");
+            return;
+        }
+        const check = checks[0];
+        text("checkTime", check.checkedAt ? new Date(check.checkedAt).toLocaleString("zh-CN", {timeZone: "Asia/Shanghai"}) + "（北京时间）" : "未知");
+        text("checkReason", check.reason || "检查原因未知，查看原始记录。");
+        const states = {MATCHED:"开高低收一致", OHLC_MISMATCH:"开高低收不一致", MISSING_HOURS:"缺少小时线",
+            NOT_ENDED:"时段未结束", INVALID_INPUT:"输入无效"};
+        const describe = (name, proof) => {
+            if (!proof) return `${name}：尚无小时核验输入`;
+            const zone = proof.input?.timezoneBasis === "RESPONSE_UTC" ? "响应确认UTC"
+                : proof.input?.timezoneBasis === "REQUEST_ONLY_UTC" ? "仅请求UTC，响应未确认" : "时区依据未知";
+            return `${name}：${states[proof.status] || "未知"}，${proof.receivedRows}/${proof.expectedHours}小时；${zone}`;
+        };
+        text("checkEvidence", `${describe("基准", check.baseCheck)}。${describe("目标", check.targetCheck)}。`);
+    } catch (error) {
+        if (seq !== checksSeq) return;
+        link.hidden = true;
+        text("checkReason", "结算检查读取失败，不能据此判断数据缺失或核验通过。");
+        text("checkEvidence", "请稍后刷新；预测及原有成绩未改变。");
+    }
 }
 
 function renderMissReason(missReason) {

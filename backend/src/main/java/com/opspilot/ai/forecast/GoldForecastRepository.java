@@ -16,4 +16,7 @@ public interface GoldForecastRepository {
     List<StoredGoldDirectionForecast> findAllForEvaluation();
     Optional<StoredGoldDirectionForecast> findLatestBySnapshotId(UUID snapshotId);
     StoredGoldDirectionForecast resolve(UUID id, ForecastResolution resolution);
+    /** 追加检查，不覆盖先前结果或预测合同。 */
+    void recordCheck(GoldResolutionCheck check);
+    List<GoldResolutionCheck> findChecks(UUID forecastId, int limit);
 }

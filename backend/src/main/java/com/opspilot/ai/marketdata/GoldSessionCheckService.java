@@ -94,7 +94,11 @@ public class GoldSessionCheckService {
                 day = new GoldDailyBar(day.symbol(), date, day.open(), day.high(), day.low(), day.close(),
                         day.currency(), day.unit(), day.provider(), checkedAt.atOffset(ZoneOffset.UTC));
             }
-            return checker.check(day, bars, checkedAt);
+            var result = checker.check(day, bars, checkedAt);
+            return new GoldSessionCheckResult(result.session(), checkedAt, result.status(), result.expectedHours(),
+                    result.receivedRows(), result.missingHours(), result.reason(),
+                    new GoldSessionCheckResult.Input(day, bars,
+                            outputZone.isMissingNode() || outputZone.isNull() ? "REQUEST_ONLY_UTC" : "RESPONSE_UTC"));
         } catch (MarketDataUnavailableException exception) {
             throw exception;
         } catch (RestClientException exception) {

@@ -65,6 +65,12 @@ public class GoldForecastController {
         return ResolveGoldForecastsResponse.from(resolutionService.resolvePending(limit));
     }
 
+    @GetMapping("/forecasts/{id}/checks")
+    public List<com.opspilot.ai.forecast.GoldResolutionCheck> checks(@PathVariable UUID id,
+            @RequestParam(defaultValue = "10") int limit) {
+        return resolutionService.checks(id, limit);
+    }
+
     @PostMapping("/forecasts/daily-settlement")
     public GoldSettlementResponse settleDaily() {
         return GoldSettlementResponse.from(settlementService.settleDaily());

@@ -26,6 +26,57 @@ class JdbcGoldForecastRepositoryTests {
     @Autowired private JdbcTemplate jdbcTemplate;
     private UUID snapshotId;
 
+    @Test @DisplayName("检查追加排序隔离且小时输入可离线复验，不改变预测状态")
+    void roundTripsChecks() {
+        var forecast = repository.saveIfAbsent(candidate("检查回执数学样例")).record();
+        var other = repository.saveIfAbsent(candidate("隔离样例", "other-check", OffsetDateTime.parse("2026-08-27T08:00:00Z"))).record();
+        assertThat(repository.findChecks(forecast.id(), 10)).isEmpty();
+        var time = OffsetDateTime.parse("2026-08-28T00:00:00Z");
+        var first = new GoldResolutionCheck(UUID.randomUUID(), forecast.id(), time,
+                GoldResolutionCheck.Code.WAITING_BAR, null, null);
+        repository.recordCheck(first);
+        var day = new com.opspilot.ai.marketdata.GoldDailyBar("XAUUSD", LocalDate.parse("2026-08-26"),
+                new BigDecimal("10.00000001"), new BigDecimal("12"), new BigDecimal("8"), new BigDecimal("11"),
+                "usd", "troy_ounce", "twelve_data", time);
+        var hours = new java.util.ArrayList<com.opspilot.ai.marketdata.GoldHourBar>();
+        for (int i = 0; i < 24; i++) hours.add(new com.opspilot.ai.marketdata.GoldHourBar(
+                java.time.Instant.parse("2026-08-25T21:00:00Z").plusSeconds(i * 3600L),
+                day.open(), day.high(), day.low(), day.close()));
+        var checker = new com.opspilot.ai.marketdata.GoldSessionCheck();
+        var proof = checker.check(day, hours, time.toInstant());
+        var receipt = new com.opspilot.ai.marketdata.GoldSessionCheckResult(proof.session(), proof.checkedAt(), proof.status(),
+                proof.expectedHours(), proof.receivedRows(), proof.missingHours(), proof.reason(),
+                new com.opspilot.ai.marketdata.GoldSessionCheckResult.Input(day, hours, "REQUEST_ONLY_UTC"));
+        var second = new GoldResolutionCheck(UUID.randomUUID(), forecast.id(), time.plusSeconds(1),
+                GoldResolutionCheck.Code.CHECK_PASSED, receipt, receipt);
+        repository.recordCheck(second);
+        assertThat(repository.findChecks(forecast.id(), 10)).extracting(GoldResolutionCheck::id)
+                .containsExactly(second.id(), first.id());
+        assertThat(repository.findChecks(other.id(), 10)).isEmpty();
+        var loaded = repository.findChecks(forecast.id(), 1).getFirst();
+        assertThat(loaded.baseCheck().input().day().open()).isEqualByComparingTo("10.00000001");
+        assertThat(loaded.baseCheck().input().hours()).hasSize(24);
+        assertThat(loaded.baseCheck().input().timezoneBasis()).isEqualTo("REQUEST_ONLY_UTC");
+        var input = loaded.targetCheck().input();
+        assertThat(checker.check(input.day(), input.hours(), loaded.targetCheck().checkedAt()).status())
+                .isEqualTo(com.opspilot.ai.marketdata.GoldSessionCheckResult.Status.MATCHED);
+        assertThat(repository.findLatestBySnapshotId(snapshotId).orElseThrow().status()).isEqualTo(ForecastStatus.PENDING);
+        org.assertj.core.api.Assertions.assertThatThrownBy(() -> repository.recordCheck(first))
+                .isInstanceOf(org.springframework.dao.DuplicateKeyException.class);
+        assertThat(repository.findChecks(forecast.id(), 10)).hasSize(2);
+    }
+
+    @Test
+    void rejectsInvalidCheckLimitAndOrphan() {
+        org.assertj.core.api.Assertions.assertThatIllegalArgumentException()
+                .isThrownBy(() -> repository.findChecks(UUID.randomUUID(), 0));
+        org.assertj.core.api.Assertions.assertThatIllegalArgumentException()
+                .isThrownBy(() -> repository.findChecks(UUID.randomUUID(), 101));
+        org.assertj.core.api.Assertions.assertThatThrownBy(() -> repository.recordCheck(new GoldResolutionCheck(
+                UUID.randomUUID(), UUID.randomUUID(), OffsetDateTime.now(), GoldResolutionCheck.Code.WAITING_BAR, null, null)))
+                .isInstanceOf(org.springframework.dao.DataIntegrityViolationException.class);
+    }
+
     @Test
     void preservesExplicitPredictedSignalAndLegacyUnknownSignal() {
         var legacy = repository.saveIfAbsent(candidate("旧三方向协议")).record();

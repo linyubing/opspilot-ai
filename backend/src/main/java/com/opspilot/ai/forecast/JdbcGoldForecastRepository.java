@@ -148,6 +148,31 @@ public class JdbcGoldForecastRepository implements GoldForecastRepository {
         return jdbcTemplate.query("select " + COLUMNS
                 + "from gold_direction_forecast where id = ?", rowMapper, id).stream().findFirst();
     }
+
+    @Override public void recordCheck(GoldResolutionCheck check) {
+        Objects.requireNonNull(check, "结算检查不能为空");
+        try {
+            jdbcTemplate.update("""
+                    insert into gold_forecast_check(id, forecast_id, checked_at, code, details)
+                    values (?, ?, ?, ?, cast(? as jsonb))
+                    """, check.id(), check.forecastId(), check.checkedAt(),
+                    lower(check.code()), objectMapper.writeValueAsString(check));
+        } catch (JsonProcessingException exception) {
+            throw new IllegalArgumentException("结算检查无法转换为JSON", exception);
+        }
+    }
+
+    @Override public List<GoldResolutionCheck> findChecks(UUID forecastId, int limit) {
+        Objects.requireNonNull(forecastId, "预测编号不能为空");
+        validateLimit(limit);
+        return jdbcTemplate.query("""
+                select details from gold_forecast_check where forecast_id = ?
+                order by checked_at desc, id desc limit ?
+                """, (rs, row) -> {
+                    try { return objectMapper.readValue(rs.getString(1), GoldResolutionCheck.class); }
+                    catch (JsonProcessingException exception) { throw new SQLException("结算检查JSON无效", exception); }
+                }, forecastId, limit);
+    }
     private GoldForecastTiming readTiming(ResultSet rs) throws SQLException {
         LocalDate date = rs.getObject("promised_target_date", LocalDate.class);
         OffsetDateTime start = rs.getObject("target_start", OffsetDateTime.class);

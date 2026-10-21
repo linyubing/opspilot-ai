@@ -14,6 +14,8 @@ import java.time.Clock;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
+import static com.opspilot.ai.forecast.GoldResolutionCheck.Code.*;
 
 /** 使用后续真实黄金价格确定性解析待验证预测，不调用大模型。 */
 @Service
@@ -84,6 +86,12 @@ public class GoldForecastResolutionService {
         );
     }
 
+    /** 只读查看已有检查，不发HTTP、不触发结算。 */
+    public List<GoldResolutionCheck> checks(UUID id, int limit) {
+        validateLimit(limit);
+        return forecastRepository.findChecks(id, limit);
+    }
+
     /**
      * 尝试解析一条预测；没有后续有效工作日价格时保持待验证。
      */
@@ -95,31 +103,39 @@ public class GoldForecastResolutionService {
         );
 
         if (target.isEmpty()) {
-            return false;
+            return waitFor(forecast, WAITING_BAR, null, null);
         }
         // 同一次校验和落库使用同一时刻，避免跨日或时钟变化造成口径不一致。
         OffsetDateTime asOf = OffsetDateTime.now(clock);
-        if (!hasValidTime(forecast, target.get(), asOf)
-                || !target.get().isConfirmedAt(asOf)
-                || (forecast.timing() != null && !forecast.timing().canResolve(
-                        forecast.baseDate(), target.get().priceDate(), forecast.createdAt(), asOf))) {
-            return false;
+        if (!hasValidTime(forecast, target.get(), asOf)) return waitFor(forecast, INVALID_TIME, null, null);
+        if (!target.get().isConfirmedAt(asOf)) return waitFor(forecast, UNCONFIRMED_BAR, null, null);
+        if (forecast.timing() != null && !forecast.timing().canResolve(
+                forecast.baseDate(), target.get().priceDate(), forecast.createdAt(), asOf)) {
+            return waitFor(forecast, asOf.toInstant().isBefore(forecast.timing().end())
+                    ? WAITING_END : INVALID_TIMING, null, null);
         }
         // 新正式合同缺少承诺时段时必须等待，不能退回旧协议评分。
         if (forecast.timing() == null && forecast.promptVersion() != null
-                && forecast.promptVersion().startsWith("gold-direction-session-prompt-")) return false;
+                && forecast.promptVersion().startsWith("gold-direction-session-prompt-")) {
+            return waitFor(forecast, INVALID_TIMING, null, null);
+        }
+        GoldSessionCheckResult baseProof = null, targetProof = null;
         if (forecast.timing() != null) {
             var bases = goldRepository.findRecent(GOLD_SYMBOL, GOLD_PROVIDER, forecast.baseDate(), 1);
-            if (bases.size() != 1) return false;
+            if (bases.size() != 1) return waitFor(forecast, BASE_UNAVAILABLE, null, null);
             GoldDailyBar base = bases.getFirst();
-            if (!forecast.baseDate().equals(base.priceDate()) || !base.isConfirmedAt(asOf)
-                    || base.close().compareTo(forecast.basePrice()) != 0) return false;
+            if (!forecast.baseDate().equals(base.priceDate()) || !base.isConfirmedAt(asOf)) {
+                return waitFor(forecast, BASE_UNAVAILABLE, null, null);
+            }
+            if (base.close().compareTo(forecast.basePrice()) != 0) {
+                return waitFor(forecast, BASE_CHANGED, null, null);
+            }
             try {
                 // 两端均绑定仓库原价格，不能用最新重下载版本替换冻结基准。
-                var baseProof = sessionCheck.check(base);
-                if (!matches(baseProof, base)) return false;
-                var targetProof = sessionCheck.check(target.get());
-                if (!matches(targetProof, target.get())) return false;
+                baseProof = sessionCheck.check(base);
+                if (!matches(baseProof, base)) return waitFor(forecast, BASE_SESSION_FAILED, baseProof, null);
+                targetProof = sessionCheck.check(target.get());
+                if (!matches(targetProof, target.get())) return waitFor(forecast, TARGET_SESSION_FAILED, baseProof, targetProof);
                 // HTTP节流可能跨越时刻；写入时必须晚于两份核验，而非沿用请求前时间。
                 asOf = OffsetDateTime.now(clock);
                 if (baseProof.checkedAt().isAfter(asOf.toInstant())
@@ -127,10 +143,10 @@ public class GoldForecastResolutionService {
                         || !hasValidTime(forecast, target.get(), asOf)
                         || !target.get().isConfirmedAt(asOf)
                         || !forecast.timing().canResolve(forecast.baseDate(), target.get().priceDate(),
-                                forecast.createdAt(), asOf)) return false;
+                                forecast.createdAt(), asOf)) return waitFor(forecast, INVALID_TIME, baseProof, targetProof);
             } catch (MarketDataUnavailableException exception) {
                 // 来源不可核验时不写实际方向/命中；其他待验证记录仍可继续扫描。
-                return false;
+                return waitFor(forecast, SOURCE_UNAVAILABLE, baseProof, targetProof);
             }
         }
         ForecastResolution resolution = createResolution(
@@ -138,6 +154,10 @@ public class GoldForecastResolutionService {
                 target.get(),
                 asOf
         );
+
+        // 记录“检查通过”，不将其伪装成数据库结算成功；写入失败时不得继续评分。
+        forecastRepository.recordCheck(new GoldResolutionCheck(UUID.randomUUID(), forecast.id(), asOf,
+                forecast.timing() == null ? LEGACY_PRICE_ONLY : CHECK_PASSED, baseProof, targetProof));
 
         StoredGoldDirectionForecast resolved = forecastRepository.resolve(
                 forecast.id(),
@@ -148,6 +168,13 @@ public class GoldForecastResolutionService {
          * 如果并发请求已经先完成解析，仓储会返回数据库中的最终记录。
          */
         return resolved.status() == ForecastStatus.RESOLVED;
+    }
+
+    private boolean waitFor(StoredGoldDirectionForecast forecast, GoldResolutionCheck.Code code,
+            GoldSessionCheckResult baseProof, GoldSessionCheckResult targetProof) {
+        forecastRepository.recordCheck(new GoldResolutionCheck(UUID.randomUUID(), forecast.id(),
+                OffsetDateTime.now(clock), code, baseProof, targetProof));
+        return false;
     }
 
     private boolean matches(GoldSessionCheckResult proof, GoldDailyBar day) {

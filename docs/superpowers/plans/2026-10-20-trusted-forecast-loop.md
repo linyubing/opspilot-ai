@@ -80,3 +80,13 @@ Java全量1018项（0失败、0错误、3跳过），Node页面11项通过；Chr
 本轮82项定向测试通过，包含真实小时核验器+模拟HTTP的基准错价/目标错价/匹配三种贯通情况；全量1077项（0失败、0错误、3跳过），Node17项通过。独立只读审查无Critical/Important；Minor（暂缓）：显式基准缺失/未确认、HTTP期间时钟前进后resolvedAt、timing+ABSTAINED组合测试。已有旧无timing弃权hit=null及未来proof拒绝测试，不把它们冒充新增组合覆盖。
 
 新代码local-ai服务启动、health=UP；真实resolve扫描1、结算0、等待1，目标10/21尚无下一根可用行情，未调用LLM或改写旧价格/成绩。本轮没有证明真实来源小时匹配，也未解决来源合同；小时核验回执尚未持久化，真实到期闭环及准确率改进仍未完成。
+
+2026-10-21检查留痕：V29新增独立追加表与`(forecast_id, checked_at desc, id desc)`索引，不改变原预测结构或回填旧证据。每次resolve保存固定中文原因和可用的两端核验结果；解析成功的小时输入连同原OHLC/闭市凭证、核验时刻、请求UTC或响应确认UTC的区别一起保存。数据库往返测试用加载后的输入重新执行纯checker，价格精度保留。这里只提供解析输入离线复算，不宣称是原始HTTP认证或历史PIT证明；未来核验器版本变更仍须另行固定版本。
+
+Ruling: `CHECK_PASSED`是检查结果，不是结算成功。先保存检查、再条件写入预测结算，证据写入失败不能继续评分；结算失败时检查记录仍可保留，但原因文案明确以预测最终状态为准。HTTP仍在数据库事务外。来源异常只存固定原因，不保存异常原文；具体输入缺失保持null。旧无时段协议仅记录LEGACY_PRICE_ONLY，不借用新证据。
+
+新增只读`GET /api/research/gold/forecasts/{id}/checks?limit=1..100`；页面显示最近已存检查及输入JSON链接，空记录与读取失败分开，较早响应不能串到新预测。不通过GET发起行情请求或结算。HTTP红测404→200、两项Node呈现断言红→绿；96项定向、全量1081项0失败0错误3跳过、Node20项通过。独立审查无Critical/Important；Minor暂缓：证据写入失败阻断评分的显式测试、来源异常保留已有baseProof且不存敏感原文的捕获断言、逐项早退code断言。
+
+真实运行：V29已应用，local-ai启动health=UP。新正式弃权记录`978b5294-fd31-4ff1-ad40-a7e422ee0ff6`原先无检查；实际resolve后新增`6176533b-b9dd-4be2-a719-f2d3ba05ca0e`，code=WAITING_BAR，两端输入null，仍PENDING、targetDate/hit=null。没有调用LLM、没有新增行情或篡改旧成绩。Chromium真实1440x1050和390x844检查页面标题/非空/无覆盖层/无JS异常/无横向溢出；打开JSON链接并刷新后内容一致。Browser插件未提供，使用已有Playwright；daily-report/latest的404是既有回退路径，非检查接口故障。截图在用户临时目录`oct21-forecast-checks-desktop.png`和`oct21-forecast-checks-mobile.png`。
+
+当前未完成：真实两端小时核验匹配与到期结算、来源合同、正式模型实际参数/工件身份、独立改进验收。准确率未证明提高，不将留痕与测试通过视作预测成功。

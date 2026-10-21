@@ -62,6 +62,14 @@
         </section>
 
         <section class="panel">
+            <div class="heading"><h2>结算检查与等待原因</h2><span id="checkTime">尚未读取</span></div>
+            <p id="checkReason" class="reasoning">正在读取已保存检查...</p>
+            <p id="checkEvidence" class="note"></p>
+            <p class="note">这里只显示已保存检查，不会自动结算。候选小时匹配不是官方时段或历史可得性认证；未命中归因与数据阻塞分开展示。</p>
+            <a id="checkLink" hidden target="_blank" rel="noopener">查看已保存检查及核验输入（JSON）</a>
+        </section>
+
+        <section class="panel">
             <div class="heading">
                 <h2>真实黄金日线</h2>
                 <span id="barProvider">Twelve Data</span>
@@ -156,6 +164,6 @@
         <div id="independentStats" aria-live="polite">正在读取独立目标统计…</div>
     </section>
 </main>
-<script src="/forecast.js?v=11" defer></script>
+<script src="/forecast.js?v=12" defer></script>
 </body>
 </html>

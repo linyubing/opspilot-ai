@@ -192,6 +192,18 @@ class GoldForecastResolutionServiceTests {
         assertThat(service.resolvePending(10)).isEqualTo(issue.equals("matched")
                 ? new ResolveGoldForecastsResult(1, 1, 0) : new ResolveGoldForecastsResult(1, 0, 1));
         if (!issue.equals("matched")) verify(forecastRepository, never()).resolve(any(), any());
+        var check = ArgumentCaptor.forClass(GoldResolutionCheck.class);
+        verify(forecastRepository).recordCheck(check.capture());
+        assertThat(check.getValue().code()).isEqualTo(switch (issue) {
+            case "base" -> GoldResolutionCheck.Code.BASE_SESSION_FAILED;
+            case "target" -> GoldResolutionCheck.Code.TARGET_SESSION_FAILED;
+            default -> GoldResolutionCheck.Code.CHECK_PASSED;
+        });
+        assertThat(check.getValue().baseCheck().input().hours()).hasSize(24);
+        assertThat(check.getValue().baseCheck().input().day().close()).isEqualByComparingTo("2500");
+        if (!issue.equals("base")) {
+            assertThat(check.getValue().targetCheck().input().day().close()).isEqualByComparingTo("2525");
+        }
         server.verify();
     }
 
