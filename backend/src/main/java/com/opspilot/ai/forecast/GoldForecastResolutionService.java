@@ -2,6 +2,10 @@ package com.opspilot.ai.forecast;
 
 import com.opspilot.ai.marketdata.GoldDailyBar;
 import com.opspilot.ai.marketdata.GoldDailyBarRepository;
+import com.opspilot.ai.marketdata.GoldSessionCheckService;
+import com.opspilot.ai.marketdata.GoldSessionCheckResult;
+import com.opspilot.ai.marketdata.GoldSession;
+import com.opspilot.ai.marketdata.MarketDataUnavailableException;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -26,17 +30,20 @@ public class GoldForecastResolutionService {
     private final GoldDailyBarRepository goldRepository;
     private final GoldForecastRule forecastRule;
     private final Clock clock;
+    private final GoldSessionCheckService sessionCheck;
 
     public GoldForecastResolutionService(
             GoldForecastRepository forecastRepository,
             GoldDailyBarRepository goldRepository,
             GoldForecastRule forecastRule,
-            Clock clock
+            Clock clock,
+            GoldSessionCheckService sessionCheck
     ) {
         this.forecastRepository = forecastRepository;
         this.goldRepository = goldRepository;
         this.forecastRule = forecastRule;
         this.clock = clock;
+        this.sessionCheck = sessionCheck;
     }
 
     /**
@@ -98,6 +105,34 @@ public class GoldForecastResolutionService {
                         forecast.baseDate(), target.get().priceDate(), forecast.createdAt(), asOf))) {
             return false;
         }
+        // 新正式合同缺少承诺时段时必须等待，不能退回旧协议评分。
+        if (forecast.timing() == null && forecast.promptVersion() != null
+                && forecast.promptVersion().startsWith("gold-direction-session-prompt-")) return false;
+        if (forecast.timing() != null) {
+            var bases = goldRepository.findRecent(GOLD_SYMBOL, GOLD_PROVIDER, forecast.baseDate(), 1);
+            if (bases.size() != 1) return false;
+            GoldDailyBar base = bases.getFirst();
+            if (!forecast.baseDate().equals(base.priceDate()) || !base.isConfirmedAt(asOf)
+                    || base.close().compareTo(forecast.basePrice()) != 0) return false;
+            try {
+                // 两端均绑定仓库原价格，不能用最新重下载版本替换冻结基准。
+                var baseProof = sessionCheck.check(base);
+                if (!matches(baseProof, base)) return false;
+                var targetProof = sessionCheck.check(target.get());
+                if (!matches(targetProof, target.get())) return false;
+                // HTTP节流可能跨越时刻；写入时必须晚于两份核验，而非沿用请求前时间。
+                asOf = OffsetDateTime.now(clock);
+                if (baseProof.checkedAt().isAfter(asOf.toInstant())
+                        || targetProof.checkedAt().isAfter(asOf.toInstant())
+                        || !hasValidTime(forecast, target.get(), asOf)
+                        || !target.get().isConfirmedAt(asOf)
+                        || !forecast.timing().canResolve(forecast.baseDate(), target.get().priceDate(),
+                                forecast.createdAt(), asOf)) return false;
+            } catch (MarketDataUnavailableException exception) {
+                // 来源不可核验时不写实际方向/命中；其他待验证记录仍可继续扫描。
+                return false;
+            }
+        }
         ForecastResolution resolution = createResolution(
                 forecast,
                 target.get(),
@@ -113,6 +148,11 @@ public class GoldForecastResolutionService {
          * 如果并发请求已经先完成解析，仓储会返回数据库中的最终记录。
          */
         return resolved.status() == ForecastStatus.RESOLVED;
+    }
+
+    private boolean matches(GoldSessionCheckResult proof, GoldDailyBar day) {
+        return proof != null && proof.matched() && proof.checkedAt() != null
+                && GoldSession.forDate(day.priceDate()).equals(proof.session());
     }
 
     /** 时间一致性是必要条件，不等同于已经确认供应商日线收盘。 */

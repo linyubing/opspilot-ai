@@ -97,6 +97,32 @@ class GoldSessionCheckServiceTests {
         assertThat(clock.calls).isEqualTo(1);
     }
 
+    @ParameterizedTest @ValueSource(strings = {"open", "high", "low", "close"})
+    void bindsStoredPrices(String field) {
+        // 小时线固定，已保存日线任一OHLC有差异必须失败；不能重下载日线替换它。
+        var day = new GoldDailyBar("XAUUSD", DATE,
+                new java.math.BigDecimal(field.equals("open") ? "10.01" : "10"),
+                new java.math.BigDecimal(field.equals("high") ? "12.01" : "12"),
+                new java.math.BigDecimal(field.equals("low") ? "7.99" : "8"),
+                new java.math.BigDecimal(field.equals("close") ? "11.01" : "11"),
+                "usd", "troy_ounce", "twelve_data", NOW.minusSeconds(1).atOffset(ZoneOffset.UTC));
+        expectHourly();
+        assertThat(service.check(day).status()).isEqualTo(OHLC_MISMATCH);
+        server.verify();
+    }
+
+    @Test
+    void acceptsExactStoredPrices() {
+        var day = new GoldDailyBar("XAUUSD", DATE, new java.math.BigDecimal("10"),
+                new java.math.BigDecimal("12"), new java.math.BigDecimal("8"), new java.math.BigDecimal("11"),
+                "usd", "troy_ounce", "twelve_data", NOW.minusSeconds(1).atOffset(ZoneOffset.UTC));
+        expectHourly();
+        var proof = service.check(day);
+        assertThat(proof.status()).isEqualTo(MATCHED);
+        assertThat(proof.checkedAt()).isEqualTo(NOW);
+        server.verify();
+    }
+
     @ParameterizedTest
     @ValueSource(booleans = {false, true})
     void selectsUniqueTargetWithEndLabel(boolean reverse) {

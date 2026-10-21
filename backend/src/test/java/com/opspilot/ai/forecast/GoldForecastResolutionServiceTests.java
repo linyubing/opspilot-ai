@@ -3,6 +3,10 @@ package com.opspilot.ai.forecast;
 import com.opspilot.ai.marketdata.GoldDailyBar;
 import com.opspilot.ai.marketdata.GoldBarConfirmation;
 import com.opspilot.ai.marketdata.GoldDailyBarRepository;
+import com.opspilot.ai.marketdata.GoldSessionCheckService;
+import com.opspilot.ai.marketdata.GoldSessionCheckResult;
+import com.opspilot.ai.marketdata.GoldSession;
+import com.opspilot.ai.marketdata.MarketDataUnavailableException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -46,8 +50,190 @@ class GoldForecastResolutionServiceTests {
     private GoldForecastRepository forecastRepository;
     @Mock
     private GoldDailyBarRepository goldRepository;
+    @Mock
+    private GoldSessionCheckService sessionCheck;
 
     private GoldForecastResolutionService service;
+
+    @Test @DisplayName("新时段合同不能仅凭同日期的闭市标志结算")
+    void waitsForSessionProof() {
+        var forecast = timedForecast("2026-08-31");
+        when(forecastRepository.findPending(10)).thenReturn(List.of(forecast));
+        when(goldRepository.findNext("XAUUSD", "twelve_data", FRIDAY))
+                .thenReturn(Optional.of(bar("2026-08-31", "2525")));
+        org.mockito.Mockito.lenient().when(forecastRepository.resolve(any(), any()))
+                .thenAnswer(invocation -> resolvedForecast(forecast, invocation.getArgument(1)));
+
+        assertThat(service.resolvePending(10)).isEqualTo(new ResolveGoldForecastsResult(1, 0, 1));
+        verify(forecastRepository, never()).resolve(any(), any());
+    }
+
+    @ParameterizedTest @ValueSource(strings = {"NOT_ENDED", "MISSING_HOURS", "INVALID_INPUT", "OHLC_MISMATCH", "unavailable"})
+    @DisplayName("目标小时核验未通过或来源不可用时保持待验证")
+    void rejectsBadTargetSession(String status) {
+        var forecast = prepareSession();
+        var base = bar("2026-08-28", "2500");
+        var target = bar("2026-08-31", "2525");
+        when(sessionCheck.check(base)).thenReturn(proof(base, "MATCHED"));
+        if (status.equals("unavailable")) {
+            when(sessionCheck.check(target)).thenThrow(new MarketDataUnavailableException("来源暂不可用"));
+        } else {
+            when(sessionCheck.check(target)).thenReturn(proof(target, status));
+        }
+        assertThat(service.resolvePending(10)).isEqualTo(new ResolveGoldForecastsResult(1, 0, 1));
+        verify(forecastRepository, never()).resolve(any(), any());
+        verify(forecastRepository).markScanned(forecast.id());
+    }
+
+    @Test @DisplayName("基准小时聚合不匹配，不能仅核验目标就评分")
+    void rejectsBadBaseSession() {
+        prepareSession();
+        var base = bar("2026-08-28", "2500");
+        when(sessionCheck.check(base)).thenReturn(proof(base, "OHLC_MISMATCH"));
+        assertThat(service.resolvePending(10).resolvedCount()).isZero();
+        verify(forecastRepository, never()).resolve(any(), any());
+        verify(sessionCheck, never()).check(bar("2026-08-31", "2525"));
+    }
+
+    @Test @DisplayName("两端原价均匹配承诺小时窗口才允许结算")
+    void resolvesCheckedSessions() {
+        var forecast = prepareSession();
+        var base = bar("2026-08-28", "2500");
+        var target = bar("2026-08-31", "2525");
+        when(sessionCheck.check(base)).thenReturn(proof(base, "MATCHED"));
+        when(sessionCheck.check(target)).thenReturn(proof(target, "MATCHED"));
+        assertThat(service.resolvePending(10)).isEqualTo(new ResolveGoldForecastsResult(1, 1, 0));
+        var saved = ArgumentCaptor.forClass(ForecastResolution.class);
+        verify(forecastRepository).resolve(eq(forecast.id()), saved.capture());
+        assertThat(saved.getValue().actualReturn()).isEqualByComparingTo("1");
+        assertThat(saved.getValue().hit()).isTrue();
+    }
+
+    @Test @DisplayName("仓库基准已换价时不能替换预测冻结价")
+    void rejectsRevisedBase() {
+        prepareSession();
+        when(goldRepository.findRecent("XAUUSD", "twelve_data", FRIDAY, 1))
+                .thenReturn(List.of(bar("2026-08-28", "2501")));
+        assertThat(service.resolvePending(10).resolvedCount()).isZero();
+        verifyNoInteractions(sessionCheck);
+        verify(forecastRepository, never()).resolve(any(), any());
+    }
+
+    @Test @DisplayName("匹配结果属于另一标签日时不能结算")
+    void rejectsWrongProofDate() {
+        prepareSession();
+        when(sessionCheck.check(bar("2026-08-28", "2500")))
+                .thenReturn(proof(bar("2026-08-27", "2500"), "MATCHED"));
+        assertThat(service.resolvePending(10).resolvedCount()).isZero();
+        verify(forecastRepository, never()).resolve(any(), any());
+    }
+
+    @Test @DisplayName("核验后的结算时间不得早于来源核验时刻")
+    void rejectsFutureProof() {
+        prepareSession();
+        var base = bar("2026-08-28", "2500");
+        var target = bar("2026-08-31", "2525");
+        when(sessionCheck.check(base)).thenReturn(proof(base, "MATCHED"));
+        when(sessionCheck.check(target)).thenReturn(new GoldSessionCheckResult(
+                GoldSession.forDate(target.priceDate()), NOW.plusSeconds(1),
+                GoldSessionCheckResult.Status.MATCHED, 24, 24, List.of(), "数学样例"));
+        assertThat(service.resolvePending(10).resolvedCount()).isZero();
+        verify(forecastRepository, never()).resolve(any(), any());
+    }
+
+    @Test @DisplayName("正式新版本缺少时段时不得降级为旧日期结算")
+    void rejectsMissingFormalTiming() {
+        var old = pendingForecast("2500", ForecastDirection.BULLISH);
+        var forecast = new StoredGoldDirectionForecast(old.id(), old.snapshotId(), old.baseDate(), old.basePrice(),
+                old.predictedDirection(), old.reasoning(), old.invalidationConditions(), old.modelName(),
+                GoldForecastPromptBuilder.FORMAL_VERSION, old.promptHash(), old.forecastRuleVersion(),
+                old.rawResponse(), old.status(), null, null, null, null, null, null, old.createdAt());
+        when(forecastRepository.findPending(10)).thenReturn(List.of(forecast));
+        when(goldRepository.findNext("XAUUSD", "twelve_data", FRIDAY))
+                .thenReturn(Optional.of(bar("2026-08-31", "2525")));
+        org.mockito.Mockito.lenient().when(forecastRepository.resolve(any(), any()))
+                .thenAnswer(invocation -> resolvedForecast(forecast, invocation.getArgument(1)));
+        assertThat(service.resolvePending(10).resolvedCount()).isZero();
+        verify(forecastRepository, never()).resolve(any(), any());
+        verifyNoInteractions(sessionCheck);
+    }
+
+    @Test @DisplayName("来源故障只保留当前记录，后续旧协议记录仍可扫描")
+    void continuesAfterSourceFailure() {
+        var timed = prepareSession();
+        var legacy = pendingForecast("2500", ForecastDirection.BULLISH);
+        when(forecastRepository.findPending(10)).thenReturn(List.of(timed, legacy));
+        when(sessionCheck.check(bar("2026-08-28", "2500")))
+                .thenThrow(new MarketDataUnavailableException("来源暂不可用"));
+        org.mockito.Mockito.doAnswer(invocation -> resolvedForecast(legacy, invocation.getArgument(1)))
+                .when(forecastRepository).resolve(eq(legacy.id()), any());
+        assertThat(service.resolvePending(10)).isEqualTo(new ResolveGoldForecastsResult(2, 1, 1));
+        verify(forecastRepository, never()).resolve(eq(timed.id()), any());
+        verify(forecastRepository).markScanned(timed.id());
+        verify(forecastRepository).markScanned(legacy.id());
+    }
+
+    @ParameterizedTest @ValueSource(strings = {"matched", "base", "target"})
+    @DisplayName("正式解析通过真实小时核验器绑定两端价格，而非只相信匹配标志")
+    void checksHttpPrices(String issue) {
+        prepareSession();
+        var builder = org.springframework.web.client.RestClient.builder().baseUrl("https://example.invalid");
+        var server = org.springframework.test.web.client.MockRestServiceServer.bindTo(builder).build();
+        var realCheck = new GoldSessionCheckService(builder.build(),
+                new com.opspilot.ai.marketdata.TwelveDataProperties(java.net.URI.create("https://example.invalid"),
+                        "test-only-key", java.time.Duration.ofSeconds(1), java.time.Duration.ofSeconds(1)),
+                Clock.fixed(NOW, ZoneOffset.UTC), new com.opspilot.ai.marketdata.GoldSessionCheck());
+        service = new GoldForecastResolutionService(forecastRepository, goldRepository, new GoldForecastRule(),
+                Clock.fixed(NOW, ZoneOffset.UTC), realCheck);
+        expectHours(server, "2026-08-27T21:00:00", "2026-08-28T21:00:00", issue.equals("base") ? "2501" : "2500");
+        if (!issue.equals("base")) {
+            expectHours(server, "2026-08-30T21:00:00", "2026-08-31T21:00:00", issue.equals("target") ? "2526" : "2525");
+        }
+        assertThat(service.resolvePending(10)).isEqualTo(issue.equals("matched")
+                ? new ResolveGoldForecastsResult(1, 1, 0) : new ResolveGoldForecastsResult(1, 0, 1));
+        if (!issue.equals("matched")) verify(forecastRepository, never()).resolve(any(), any());
+        server.verify();
+    }
+
+    private void expectHours(org.springframework.test.web.client.MockRestServiceServer server,
+            String start, String end, String price) {
+        // 仅为离线数学测试构造整齐小时线，不进入行情仓库或模型实验。
+        var mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+        var root = mapper.createObjectNode().put("status", "ok");
+        root.putObject("meta").put("symbol", "XAU/USD").put("interval", "1h").put("timezone", "UTC");
+        var rows = root.putArray("values");
+        var value = new BigDecimal(price);
+        var first = java.time.LocalDateTime.parse(start);
+        for (int i = 0; i < 24; i++) {
+            rows.addObject().put("datetime", first.plusHours(i).toString().replace('T', ' ') + ":00")
+                    .put("open", price).put("high", value.add(BigDecimal.TEN).toPlainString())
+                    .put("low", value.subtract(BigDecimal.TEN).toPlainString()).put("close", price);
+        }
+        server.expect(org.springframework.test.web.client.match.MockRestRequestMatchers.anything())
+                .andExpect(org.springframework.test.web.client.match.MockRestRequestMatchers.queryParam("interval", "1h"))
+                .andExpect(org.springframework.test.web.client.match.MockRestRequestMatchers.queryParam("timezone", "UTC"))
+                .andExpect(org.springframework.test.web.client.match.MockRestRequestMatchers.queryParam("start_date", start))
+                .andExpect(org.springframework.test.web.client.match.MockRestRequestMatchers.queryParam("end_date", end))
+                .andRespond(org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess(
+                        root.toString(), org.springframework.http.MediaType.APPLICATION_JSON));
+    }
+
+    private StoredGoldDirectionForecast prepareSession() {
+        var forecast = timedForecast("2026-08-31");
+        when(forecastRepository.findPending(10)).thenReturn(List.of(forecast));
+        when(goldRepository.findNext("XAUUSD", "twelve_data", FRIDAY))
+                .thenReturn(Optional.of(bar("2026-08-31", "2525")));
+        when(goldRepository.findRecent("XAUUSD", "twelve_data", FRIDAY, 1))
+                .thenReturn(List.of(bar("2026-08-28", "2500")));
+        org.mockito.Mockito.lenient().when(forecastRepository.resolve(any(), any()))
+                .thenAnswer(invocation -> resolvedForecast(forecast, invocation.getArgument(1)));
+        return forecast;
+    }
+
+    private GoldSessionCheckResult proof(GoldDailyBar bar, String status) {
+        return new GoldSessionCheckResult(GoldSession.forDate(bar.priceDate()), NOW,
+                GoldSessionCheckResult.Status.valueOf(status), 24, 24, List.of(), "数学样例");
+    }
 
     @Test @DisplayName("真实下一根日线与承诺日不一致时保持等待，不能移动目标")
     void rejectsPromisedDateMismatch() {
@@ -64,7 +250,7 @@ class GoldForecastResolutionServiceTests {
     @Test @DisplayName("即使收到确认标志，候选目标时段尚未结束也不能结算")
     void waitsForPromisedEnd() {
         service = new GoldForecastResolutionService(forecastRepository, goldRepository, new GoldForecastRule(),
-                Clock.fixed(Instant.parse("2026-08-31T15:00:00Z"), ZoneOffset.UTC));
+                Clock.fixed(Instant.parse("2026-08-31T15:00:00Z"), ZoneOffset.UTC), sessionCheck);
         var forecast = timedForecast("2026-08-31");
         when(forecastRepository.findPending(10)).thenReturn(List.of(forecast));
         when(goldRepository.findNext("XAUUSD", "twelve_data", FRIDAY))
@@ -92,7 +278,7 @@ class GoldForecastResolutionServiceTests {
                 forecastRepository,
                 goldRepository,
                 new GoldForecastRule(),
-                Clock.fixed(NOW, ZoneOffset.UTC)
+                Clock.fixed(NOW, ZoneOffset.UTC), sessionCheck
         );
     }
 
@@ -295,7 +481,7 @@ class GoldForecastResolutionServiceTests {
 
         GoldForecastResolutionService later = new GoldForecastResolutionService(
                 forecastRepository, goldRepository, new GoldForecastRule(),
-                Clock.fixed(Instant.parse("2026-09-02T14:00:00Z"), ZoneOffset.UTC));
+                Clock.fixed(Instant.parse("2026-09-02T14:00:00Z"), ZoneOffset.UTC), sessionCheck);
         assertThat(later.resolvePending(10)).isEqualTo(new ResolveGoldForecastsResult(1, 1, 0));
         ArgumentCaptor<ForecastResolution> saved = ArgumentCaptor.forClass(ForecastResolution.class);
         verify(forecastRepository).resolve(eq(forecast.id()), saved.capture());
@@ -315,7 +501,7 @@ class GoldForecastResolutionServiceTests {
             }
         };
         GoldForecastResolutionService changingService = new GoldForecastResolutionService(
-                forecastRepository, goldRepository, new GoldForecastRule(), changing);
+                forecastRepository, goldRepository, new GoldForecastRule(), changing, sessionCheck);
         StoredGoldDirectionForecast forecast = pendingForecast("2500", ForecastDirection.BULLISH);
         when(forecastRepository.findPending(10)).thenReturn(List.of(forecast));
         when(goldRepository.findNext("XAUUSD", "twelve_data", FRIDAY))

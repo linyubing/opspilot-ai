@@ -37,19 +37,35 @@ public class GoldSessionCheckService {
     }
 
     public GoldSessionCheckResult check(LocalDate date) {
+        return check(date, null);
+    }
+
+    /** 核验待结算的原始价格，不重新下载日线替换已冻结的价格版本。 */
+    public GoldSessionCheckResult check(GoldDailyBar day) {
+        if (day == null) throw new IllegalArgumentException("待核验黄金日线不能为空");
+        return check(day.priceDate(), day);
+    }
+
+    private GoldSessionCheckResult check(LocalDate date, GoldDailyBar expected) {
         if (date == null) throw new IllegalArgumentException("黄金标签日期不能为空");
         if (properties.apiKey() == null || properties.apiKey().isBlank()) {
             throw new MarketDataUnavailableException("Twelve Data API Key 未配置");
         }
         try {
             GoldSession session = GoldSession.forDate(date);
-            JsonNode daily = fetch("1day", date.toString(), date.plusDays(1).toString(), 2, false);
-            validateRoot(daily, "1day");
-            JsonNode row = selectDay(daily, date);
-            BigDecimal open = decimal(row, "open"), high = decimal(row, "high");
-            BigDecimal low = decimal(row, "low"), close = decimal(row, "close");
-            if (!GoldHourBar.validPrices(open, high, low, close)) {
-                throw new MarketDataUnavailableException("黄金原生日线价格关系无效");
+            GoldDailyBar day = expected;
+            if (day == null) {
+                JsonNode daily = fetch("1day", date.toString(), date.plusDays(1).toString(), 2, false);
+                validateRoot(daily, "1day");
+                JsonNode row = selectDay(daily, date);
+                BigDecimal open = decimal(row, "open"), high = decimal(row, "high");
+                BigDecimal low = decimal(row, "low"), close = decimal(row, "close");
+                if (!GoldHourBar.validPrices(open, high, low, close)) {
+                    throw new MarketDataUnavailableException("黄金原生日线价格关系无效");
+                }
+                // 诊断入口的采集时刻在请求完成后统一填写。
+                day = new GoldDailyBar("XAUUSD", date, open, high, low, close,
+                        "usd", "troy_ounce", "twelve_data", null);
             }
             JsonNode hourly = fetch("1h", REQUEST_TIME.format(session.start()), REQUEST_TIME.format(session.end()), 64, true);
             validateRoot(hourly, "1h");
@@ -74,8 +90,10 @@ public class GoldSessionCheckService {
                 }
             }
             Instant checkedAt = clock.instant();
-            var day = new GoldDailyBar("XAUUSD", date, open, high, low, close,
-                    "usd", "troy_ounce", "twelve_data", checkedAt.atOffset(ZoneOffset.UTC));
+            if (expected == null) {
+                day = new GoldDailyBar(day.symbol(), date, day.open(), day.high(), day.low(), day.close(),
+                        day.currency(), day.unit(), day.provider(), checkedAt.atOffset(ZoneOffset.UTC));
+            }
             return checker.check(day, bars, checkedAt);
         } catch (MarketDataUnavailableException exception) {
             throw exception;

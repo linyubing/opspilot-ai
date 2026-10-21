@@ -116,8 +116,19 @@ class JdbcGoldForecastRepositoryTests {
                         LocalDate.parse("2026-08-27"), received, "a".repeat(64)));
         org.mockito.Mockito.when(bars.findNext("XAUUSD", "twelve_data", LocalDate.parse("2026-08-26")))
                 .thenReturn(java.util.Optional.of(bar));
+        var base = new com.opspilot.ai.marketdata.GoldDailyBar(bar.symbol(), LocalDate.parse("2026-08-26"),
+                new BigDecimal("4520.00894962"), new BigDecimal("4550"), new BigDecimal("4400"), new BigDecimal("4520.00894962"),
+                bar.currency(), bar.unit(), bar.provider(), received, bar.confirmation());
+        org.mockito.Mockito.when(bars.findRecent("XAUUSD", "twelve_data", LocalDate.parse("2026-08-26"), 1))
+                .thenReturn(java.util.List.of(base));
+        var checker = org.mockito.Mockito.mock(com.opspilot.ai.marketdata.GoldSessionCheckService.class);
+        org.mockito.Mockito.when(checker.check(org.mockito.ArgumentMatchers.any(com.opspilot.ai.marketdata.GoldDailyBar.class)))
+                .thenAnswer(inv -> new com.opspilot.ai.marketdata.GoldSessionCheckResult(
+                        com.opspilot.ai.marketdata.GoldSession.forDate(((com.opspilot.ai.marketdata.GoldDailyBar) inv.getArgument(0)).priceDate()),
+                        java.time.Instant.parse("2026-09-02T12:00:00Z"),
+                        com.opspilot.ai.marketdata.GoldSessionCheckResult.Status.MATCHED, 24, 24, java.util.List.of(), "数学样例"));
         var resolver = new GoldForecastResolutionService(repository, bars, new GoldForecastRule(),
-                java.time.Clock.fixed(java.time.Instant.parse("2026-09-02T12:00:00Z"), java.time.ZoneOffset.UTC));
+                java.time.Clock.fixed(java.time.Instant.parse("2026-09-02T12:00:00Z"), java.time.ZoneOffset.UTC), checker);
         assertThat(resolver.resolvePending(100).resolvedCount()).isZero();
         resolver.resolvePending(100);
         assertThat(repository.findByKey(snapshotId, last.modelName(), last.promptVersion(), last.forecastRuleVersion())
