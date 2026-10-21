@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.stereotype.Component;
 
 /** 通过 Spring AI 调用模型并解析结构化黄金方向预测。 */
@@ -37,20 +38,34 @@ public class SpringAiGoldForecastGateway implements GoldForecastGateway {
         Objects.requireNonNull(prompt, "黄金方向预测提示词不能为空");
         long startTime = System.nanoTime();
 
-        String rawResponse = callModel(prompt, startTime);
+        ChatResponse response = callModel(prompt, startTime);
+        String reported = response == null || response.getMetadata() == null ? null : response.getMetadata().getModel();
+        boolean formal = prompt.version() != null && prompt.version().startsWith("gold-direction-session-prompt-");
+        if ((formal && (reported == null || reported.isBlank()))
+                || (reported != null && !reported.isBlank() && !modelName.equals(reported))) {
+            // 不回显供应商原文；身份不一致不能继续按配置名保存并计算成绩。
+            throw new InvalidGoldForecastAiResponseException("模型响应标识缺失或与请求模型不一致，未保存正式预测", null);
+        }
+        if (response == null || response.getResult() == null || response.getResult().getOutput() == null
+                || response.getResult().getOutput().getText() == null) {
+            throw new InvalidGoldForecastAiResponseException("模型响应缺少预测正文", null);
+        }
+        String rawResponse = response.getResult().getOutput().getText();
         GoldDirectionForecastContent content = parse(rawResponse);
         log.info(
                 "黄金方向预测模型调用完成，模型={}，提示词长度={}，响应长度={}，耗时={}毫秒",
                 modelName, prompt.content().length(), rawResponse.length(),
                 elapsedMillis(startTime)
         );
-        return new GeneratedGoldForecast(modelName, rawResponse, content);
+        return new GeneratedGoldForecast(modelName, rawResponse, content,
+                reported == null || reported.isBlank() ? null : reported);
     }
 
     /** 隔离远程调用，避免把本地 JSON 解析错误误判为上游不可用。 */
-    private String callModel(GoldForecastPrompt prompt, long startTime) {
+    private ChatResponse callModel(GoldForecastPrompt prompt, long startTime) {
         try {
-            return chatClient.prompt().user(prompt.content()).call().content();
+            // 沿用配置好的完整选项；通用model-only运行选项会丢失Ollama的关闭思考开关。
+            return chatClient.prompt().user(prompt.content()).call().chatResponse();
         } catch (RuntimeException exception) {
             log.warn(
                     "黄金方向预测模型调用失败，模型={}，提示词长度={}，耗时={}毫秒，异常类型={}",

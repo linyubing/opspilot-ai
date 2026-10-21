@@ -17,8 +17,24 @@ public record StoredGoldDirectionForecast(
         ForecastDirection actualDirection, Boolean hit,
         OffsetDateTime resolvedAt, OffsetDateTime createdAt,
         GoldForecastTiming timing,
-        ForecastSignal signal
+        ForecastSignal signal,
+        String reportedModel
 ) {
+    /** 旧保存调用未留存响应模型标识，不事后升级为已核对。 */
+    public StoredGoldDirectionForecast(
+            UUID id, UUID snapshotId, LocalDate baseDate, BigDecimal basePrice,
+            ForecastDirection predictedDirection, String reasoning,
+            List<String> invalidationConditions, String modelName,
+            String promptVersion, String promptHash, String forecastRuleVersion,
+            String rawResponse, ForecastStatus status, LocalDate targetDate,
+            BigDecimal targetPrice, BigDecimal actualReturn,
+            ForecastDirection actualDirection, Boolean hit,
+            OffsetDateTime resolvedAt, OffsetDateTime createdAt, GoldForecastTiming timing, ForecastSignal signal) {
+        this(id, snapshotId, baseDate, basePrice, predictedDirection, reasoning,
+                invalidationConditions, modelName, promptVersion, promptHash, forecastRuleVersion,
+                rawResponse, status, targetDate, targetPrice, actualReturn, actualDirection, hit,
+                resolvedAt, createdAt, timing, signal, null);
+    }
     /** 兼容旧发布合同，信号状态未知。 */
     public StoredGoldDirectionForecast(
             UUID id, UUID snapshotId, LocalDate baseDate, BigDecimal basePrice,

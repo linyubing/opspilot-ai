@@ -23,6 +23,56 @@ import org.springframework.boot.test.system.OutputCaptureExtension;
 @ExtendWith(OutputCaptureExtension.class)
 class SpringAiGoldForecastGatewayTests {
 
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.ValueSource(strings = {"other-model", ""})
+    @DisplayName("正式预测缺少响应模型或与请求不一致时不能冒用配置名")
+    void rejectsUnverifiedModel(String reported) {
+        var response = new ChatResponse(List.of(new Generation(new AssistantMessage(VALID_JSON))),
+                org.springframework.ai.chat.metadata.ChatResponseMetadata.builder().model(reported).build());
+        var formal = new GoldForecastPrompt(GoldForecastPromptBuilder.FORMAL_VERSION, "身份核验数学样例", "a".repeat(64));
+        assertThatThrownBy(() -> gateway(p -> response).generate(formal))
+                .isInstanceOf(InvalidGoldForecastAiResponseException.class);
+    }
+
+    @Test @DisplayName("从响应元数据保留模型标识，不从正文或配置补造")
+    void preservesReportedModel() {
+        AtomicReference<Prompt> sent = new AtomicReference<>();
+        var response = new ChatResponse(List.of(new Generation(new AssistantMessage(VALID_JSON))),
+                org.springframework.ai.chat.metadata.ChatResponseMetadata.builder().model("glm-4.7").build());
+        var result = gateway(p -> { sent.set(p); return response; }).generate(
+                new GoldForecastPrompt(GoldForecastPromptBuilder.FORMAL_VERSION, "响应身份样例", "a".repeat(64)));
+        assertThat(sent.get().getContents()).isEqualTo("响应身份样例");
+        assertThat(result.reportedModel()).isEqualTo("glm-4.7");
+        assertThat(result.content().direction()).isEqualTo(ForecastDirection.NEUTRAL);
+    }
+
+    @Test @DisplayName("真实Ollama SDK请求保留关闭思考及本地模型的上下文输出温度参数")
+    void preservesOllamaOptions() throws Exception {
+        var builder = org.springframework.web.client.RestClient.builder();
+        var server = org.springframework.test.web.client.MockRestServiceServer.bindTo(builder).build();
+        var api = org.springframework.ai.ollama.api.OllamaApi.builder().baseUrl("http://localhost:11435")
+                .restClientBuilder(builder).build();
+        var model = org.springframework.ai.ollama.OllamaChatModel.builder().ollamaApi(api)
+                .defaultOptions(org.springframework.ai.ollama.api.OllamaChatOptions.builder()
+                        .model("qwen3.5:9b").numCtx(8192).numPredict(2048).temperature(0.0).build()).build();
+        var clientBuilder = ChatClient.builder(model).defaultOptions(
+                org.springframework.ai.ollama.api.OllamaChatOptions.builder().disableThinking().build());
+        var json = new ObjectMapper().createObjectNode().put("model", "qwen3.5:9b").put("done", true);
+        json.putObject("message").put("role", "assistant").put("content", VALID_JSON);
+        server.expect(org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo("http://localhost:11435/api/chat"))
+                .andExpect(org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath("$.model").value("qwen3.5:9b"))
+                .andExpect(org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath("$.think").value(false))
+                .andExpect(org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath("$.options.num_ctx").value(8192))
+                .andExpect(org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath("$.options.num_predict").value(2048))
+                .andExpect(org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath("$.options.temperature").value(0.0))
+                .andRespond(org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess(
+                        json.toString(), org.springframework.http.MediaType.APPLICATION_JSON));
+        var gateway = new SpringAiGoldForecastGateway(clientBuilder, new ObjectMapper(), new GoldForecastProperties("qwen3.5:9b"));
+        var result = gateway.generate(new GoldForecastPrompt(GoldForecastPromptBuilder.FORMAL_VERSION, "SDK参数测试，不含行情", "a".repeat(64)));
+        assertThat(result.reportedModel()).isEqualTo("qwen3.5:9b");
+        server.verify();
+    }
+
     @Test
     @DisplayName("正式弃权JSON保留null方向，不强转为中性")
     void parsesAbstention() {

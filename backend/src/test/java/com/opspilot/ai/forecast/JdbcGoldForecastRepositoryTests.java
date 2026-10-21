@@ -26,6 +26,31 @@ class JdbcGoldForecastRepositoryTests {
     @Autowired private JdbcTemplate jdbcTemplate;
     private UUID snapshotId;
 
+    @Test @DisplayName("响应模型标识入库结算后保留，未知旧记录不被幂等重放回填")
+    void preservesReportedModel() {
+        var old = candidate("旧身份资料");
+        repository.saveIfAbsent(old);
+        var known = withReported(old, "glm-4.7");
+        assertThat(repository.saveIfAbsent(known).record().reportedModel()).isNull();
+        var newSource = candidate("新响应资料", "new-reported", OffsetDateTime.parse("2026-08-27T08:00:00Z"));
+        var saved = repository.saveIfAbsent(withReported(newSource, "glm-4.7")).record();
+        assertThat(saved.reportedModel()).isEqualTo("glm-4.7");
+        var resolved = repository.resolve(saved.id(), new ForecastResolution(LocalDate.parse("2026-08-27"),
+                new BigDecimal("4550"), new BigDecimal("0.663503"), ForecastDirection.BULLISH, false,
+                OffsetDateTime.parse("2026-08-28T01:00:00Z")));
+        assertThat(resolved.reportedModel()).isEqualTo("glm-4.7");
+        org.assertj.core.api.Assertions.assertThatThrownBy(() -> jdbcTemplate.update(
+                "update gold_direction_forecast set reported_model = ? where id = ?", "other-model", old.id()))
+                .isInstanceOf(org.springframework.dao.DataIntegrityViolationException.class);
+    }
+
+    private StoredGoldDirectionForecast withReported(StoredGoldDirectionForecast s, String reported) {
+        return new StoredGoldDirectionForecast(s.id(), s.snapshotId(), s.baseDate(), s.basePrice(),
+                s.predictedDirection(), s.reasoning(), s.invalidationConditions(), s.modelName(), s.promptVersion(),
+                s.promptHash(), s.forecastRuleVersion(), s.rawResponse(), s.status(), s.targetDate(), s.targetPrice(),
+                s.actualReturn(), s.actualDirection(), s.hit(), s.resolvedAt(), s.createdAt(), s.timing(), s.signal(), reported);
+    }
+
     @Test @DisplayName("检查追加排序隔离且小时输入可离线复验，不改变预测状态")
     void roundTripsChecks() {
         var forecast = repository.saveIfAbsent(candidate("检查回执数学样例")).record();

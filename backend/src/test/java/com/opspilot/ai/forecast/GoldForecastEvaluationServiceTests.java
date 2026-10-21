@@ -25,6 +25,37 @@ class GoldForecastEvaluationServiceTests {
 
     private GoldForecastEvaluationService service;
 
+    @Test @DisplayName("同配置名的未知响应与已核对响应成绩分开，不共用命中率")
+    void separatesReportedModelEvidence() {
+        var old = resolved(ForecastDirection.BULLISH, ForecastDirection.BULLISH, true,
+                "glm-4.7", "prompt-v1", "rule-v1", 26);
+        var source = resolved(ForecastDirection.BULLISH, ForecastDirection.BEARISH, false,
+                "glm-4.7", "prompt-v1", "rule-v1", 26);
+        var timing = new GoldForecastTiming(LocalDate.parse("2026-08-27"),
+                java.time.Instant.parse("2026-08-26T21:00:00Z"), java.time.Instant.parse("2026-08-27T21:00:00Z"),
+                "sydney-0700-candidate-v1");
+        var known = copyReported(source, timing, "glm-4.7");
+        old = copyReported(old, timing, null);
+        when(forecastRepository.findAllForEvaluation()).thenReturn(List.of(old, known));
+        var result = service.evaluate();
+        assertThat(result.versions()).hasSize(2);
+        assertThat(result.versions().getFirst().reportedModel()).isNull();
+        assertThat(result.versions().getFirst().accuracy()).isEqualByComparingTo("1");
+        assertThat(result.versions().getLast().reportedModel()).isEqualTo("glm-4.7");
+        assertThat(result.versions().getLast().accuracy()).isEqualByComparingTo("0");
+        assertThat(result.independent().groups()).hasSize(2);
+        assertThat(result.independent().groups()).allSatisfy(group -> assertThat(group.selectedCount()).isEqualTo(1));
+        assertThat(result.timing().trustedCount()).isZero();
+    }
+
+    private StoredGoldDirectionForecast copyReported(StoredGoldDirectionForecast s, GoldForecastTiming timing, String name) {
+        return new StoredGoldDirectionForecast(s.id(), s.snapshotId(), s.baseDate(), s.basePrice(),
+                s.predictedDirection(), s.reasoning(), s.invalidationConditions(), s.modelName(), s.promptVersion(),
+                s.promptHash(), s.forecastRuleVersion(), s.rawResponse(), s.status(), s.targetDate(), s.targetPrice(),
+                s.actualReturn(), s.actualDirection(), s.hit(), OffsetDateTime.parse("2026-08-28T00:00:00Z"),
+                OffsetDateTime.parse("2026-08-26T22:00:00Z"), timing, s.signal(), name);
+    }
+
     @BeforeEach
     void setUp() {
         service = new GoldForecastEvaluationService(forecastRepository);

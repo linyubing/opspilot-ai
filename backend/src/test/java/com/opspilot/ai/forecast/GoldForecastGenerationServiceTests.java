@@ -56,18 +56,42 @@ class GoldForecastGenerationServiceTests {
     private GoldForecastGenerationService service;
 
     @Test
+    @org.junit.jupiter.api.DisplayName("网关报告其他模型时不能保存到当前模型的正式协议")
+    void rejectsWrongGeneratedModel() {
+        var snapshot = prepareNewForecast();
+        when(promptBuilder.build(org.mockito.ArgumentMatchers.eq(snapshot), any(GoldForecastTiming.class)))
+                .thenReturn(prompt());
+        when(gateway.generate(prompt())).thenReturn(new GeneratedGoldForecast("other-model", "{}", generated().content()));
+        assertThatThrownBy(() -> service.generate(snapshot.id()))
+                .isInstanceOf(InvalidGoldForecastAiResponseException.class);
+        verify(forecastRepository, never()).saveIfAbsent(any());
+    }
+
+    @Test
+    void rejectsMissingReportedModel() {
+        var snapshot = prepareNewForecast();
+        when(promptBuilder.build(org.mockito.ArgumentMatchers.eq(snapshot), any(GoldForecastTiming.class)))
+                .thenReturn(prompt());
+        when(gateway.generate(prompt())).thenReturn(new GeneratedGoldForecast(MODEL_NAME, "{}", generated().content()));
+        assertThatThrownBy(() -> service.generate(snapshot.id()))
+                .isInstanceOf(InvalidGoldForecastAiResponseException.class);
+        verify(forecastRepository, never()).saveIfAbsent(any());
+    }
+
+    @Test
     @org.junit.jupiter.api.DisplayName("正式弃权保留状态和空方向，不写成中性")
     void savesExplicitAbstention() {
         var snapshot = prepareNewForecast();
         when(promptBuilder.build(org.mockito.ArgumentMatchers.eq(snapshot), any(GoldForecastTiming.class)))
                 .thenReturn(prompt());
         var content = new GoldDirectionForecastContent(null, "证据不足", List.of("取得更多真实输入"), ForecastSignal.ABSTAINED);
-        when(gateway.generate(prompt())).thenReturn(new GeneratedGoldForecast(MODEL_NAME, "{}", content));
+        when(gateway.generate(prompt())).thenReturn(new GeneratedGoldForecast(MODEL_NAME, "{}", content, MODEL_NAME));
         when(forecastRepository.saveIfAbsent(any())).thenAnswer(call -> new SaveGoldForecastResult(call.getArgument(0), true));
         var result = service.generate(snapshot.id()).record();
         assertThat(result.signal()).isEqualTo(ForecastSignal.ABSTAINED);
         assertThat(result.predictedDirection()).isNull();
         assertThat(result.hit()).isNull();
+        assertThat(result.reportedModel()).isEqualTo(MODEL_NAME);
         verify(validator).validateFormal(content);
     }
 
@@ -455,7 +479,7 @@ class GoldForecastGenerationServiceTests {
                         ForecastDirection.BULLISH,
                         "双因子共同支持黄金。",
                         List.of("实际利率转为持续上行"), ForecastSignal.PREDICTED
-                )
+                ), MODEL_NAME
         );
     }
 

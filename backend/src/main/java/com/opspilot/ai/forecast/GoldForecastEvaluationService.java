@@ -73,7 +73,7 @@ public class GoldForecastEvaluationService {
         );
     }
     /**
-     * 严格按照模型、提示词和方向规则三个版本共同分组。
+     * 按模型、提示词、方向规则及响应标识分组；未知响应不借用已核对成绩。
      */
 
     private List<ForecastVersionEvaluation> evaluateVersions(List<StoredGoldDirectionForecast> allForecasts) {
@@ -83,7 +83,7 @@ public class GoldForecastEvaluationService {
                                 forecast -> new VersionKey(
                                         forecast.modelName(),
                                         forecast.promptVersion(),
-                                        forecast.forecastRuleVersion()
+                                        forecast.forecastRuleVersion(), forecast.reportedModel()
                                 )
                         ));
 
@@ -108,7 +108,7 @@ public class GoldForecastEvaluationService {
                             scored.size(),
                             countHits(scored),
                             calculateAccuracy(scored),
-                            GoldSignalEvaluation.from(forecasts)
+                            GoldSignalEvaluation.from(forecasts), version.reportedModel()
                     );
                 })
                 .toList();
@@ -210,12 +210,12 @@ public class GoldForecastEvaluationService {
     }
 
     /**
-     * 作为版本统计的组合键，三个字段有一个不同就属于不同版本。
+     * 组合键还区分响应标识未知；这不是模型权重工件的不可变身份。
      */
     private record VersionKey(
             String modelName,
             String promptVersion,
-            String forecastRuleVersion
+            String forecastRuleVersion, String reportedModel
     ) implements Comparable<VersionKey> {
 
         @Override
@@ -234,9 +234,9 @@ public class GoldForecastEvaluationService {
                 return promptComparison;
             }
 
-            return forecastRuleVersion.compareTo(
-                    other.forecastRuleVersion
-            );
+            int ruleComparison = forecastRuleVersion.compareTo(other.forecastRuleVersion);
+            return ruleComparison != 0 ? ruleComparison
+                    : Comparator.nullsFirst(String::compareTo).compare(reportedModel, other.reportedModel);
         }
     }
 }

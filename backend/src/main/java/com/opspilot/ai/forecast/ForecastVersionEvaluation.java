@@ -10,8 +10,13 @@ public record ForecastVersionEvaluation(
         int sampleCount,
         int hitCount,
         BigDecimal accuracy,
-        GoldSignalEvaluation signals
+        GoldSignalEvaluation signals,
+        String reportedModel
 ) {
+    public ForecastVersionEvaluation(String modelName, String promptVersion, String forecastRuleVersion,
+            int sampleCount, int hitCount, BigDecimal accuracy, GoldSignalEvaluation signals) {
+        this(modelName, promptVersion, forecastRuleVersion, sampleCount, hitCount, accuracy, signals, null);
+    }
     /** 兼容旧汇总调用；没有逐条信号证据时不补造覆盖率。 */
     public ForecastVersionEvaluation(String modelName, String promptVersion, String forecastRuleVersion,
             int sampleCount, int hitCount, BigDecimal accuracy) {

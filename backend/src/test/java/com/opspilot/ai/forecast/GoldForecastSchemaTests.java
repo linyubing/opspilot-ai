@@ -18,13 +18,14 @@ class GoldForecastSchemaTests {
     @Test
     @DisplayName("创建包含发布时间承诺字段的方向预测表")
     void createsForecastTable() {
-        Long count = jdbcTemplate.queryForObject("""
-                select count(*)
+        var columns = jdbcTemplate.queryForList("""
+                select column_name
                 from information_schema.columns
                 where table_schema = 'public'
                   and table_name = 'gold_direction_forecast'
-                """, Long.class);
-        assertThat(count).isEqualTo(26L);
+                """, String.class);
+        assertThat(columns).contains("base_date", "base_price", "predicted_direction", "signal_status",
+                "promised_target_date", "target_start", "target_end", "timing_rule", "reported_model");
     }
 
     @Test

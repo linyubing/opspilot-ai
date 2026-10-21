@@ -66,6 +66,20 @@ class GoldForecastControllerTests {
     @Mock private GoldForecastReviewService reviewService;
     private MockMvc mockMvc;
 
+    @Test
+    void returnsReportedModelWithoutInventingOldIdentity() throws Exception {
+        var s = record();
+        var known = new StoredGoldDirectionForecast(s.id(), s.snapshotId(), s.baseDate(), s.basePrice(),
+                s.predictedDirection(), s.reasoning(), s.invalidationConditions(), s.modelName(), s.promptVersion(),
+                s.promptHash(), s.forecastRuleVersion(), s.rawResponse(), s.status(), s.targetDate(), s.targetPrice(),
+                s.actualReturn(), s.actualDirection(), s.hit(), s.resolvedAt(), s.createdAt(), s.timing(), s.signal(), s.modelName());
+        when(historyService.retrieveRecent(20)).thenReturn(List.of(GoldForecastResponse.from(known), GoldForecastResponse.from(s)));
+        mockMvc.perform(get("/api/research/gold/forecasts"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$[0].reportedModel").value(s.modelName()))
+                .andExpect(jsonPath("$[1].reportedModel").value(org.hamcrest.Matchers.nullValue()))
+                .andExpect(jsonPath("$[0].rawResponse").doesNotExist());
+    }
+
     @Test @DisplayName("没有历史核验记录时返回空列表，不能事后编造证据")
     void returnsEmptyChecks() throws Exception {
         mockMvc.perform(get("/api/research/gold/forecasts/{id}/checks", UUID.randomUUID()))

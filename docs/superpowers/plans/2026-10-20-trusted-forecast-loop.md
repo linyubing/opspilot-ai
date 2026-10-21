@@ -90,3 +90,15 @@ Ruling: `CHECK_PASSED`是检查结果，不是结算成功。先保存检查、�
 真实运行：V29已应用，local-ai启动health=UP。新正式弃权记录`978b5294-fd31-4ff1-ad40-a7e422ee0ff6`原先无检查；实际resolve后新增`6176533b-b9dd-4be2-a719-f2d3ba05ca0e`，code=WAITING_BAR，两端输入null，仍PENDING、targetDate/hit=null。没有调用LLM、没有新增行情或篡改旧成绩。Chromium真实1440x1050和390x844检查页面标题/非空/无覆盖层/无JS异常/无横向溢出；打开JSON链接并刷新后内容一致。Browser插件未提供，使用已有Playwright；daily-report/latest的404是既有回退路径，非检查接口故障。截图在用户临时目录`oct21-forecast-checks-desktop.png`和`oct21-forecast-checks-mobile.png`。
 
 当前未完成：真实两端小时核验匹配与到期结算、来源合同、正式模型实际参数/工件身份、独立改进验收。准确率未证明提高，不将留痕与测试通过视作预测成功。
+
+2026-10-21响应模型核对：网关原先只取content，忽略响应metadata中的model，配置名可能被误当成真实返回模型。3项行为红测先证明“正式缺响应模型/响应错模型/生成服务接受其他模型”均未阻止，再修复。正式session-prompt缺标识或任意非空错标识均拒绝；生成服务再次验证配置名、网关名、响应名一致，避免其他实现绕过。旧研究无metadata可保持null，不改原提示词或研究输出；提供了冲突模型则不再允许错标。
+
+V30新增nullable reported_model和与model_name匹配的约束，旧记录不回填。新字段贯穿生成、保存、结算读取和API；幂等重放不能升级旧记录的身份资料。版本成绩与独立目标分组区分reportedModel已知/未知，策略改为first-publication-per-target-layer-v2-response-model；页面明确“响应标识”不是不可变模型工件，也不代表统计模型成绩。工件digest、完整运行参数、供应商不可变版本仍未完成。
+
+重要复核：审查指出SDK参数合并尚未验证。实际Ollama SDK请求体测试复现本轮初稿的model-only通用运行参数会丢掉think=false（1运行1失败，路径$.think不存在）。按影响升级为必须修复：删除该覆盖，保留完整既有客户端选项，依据响应标识做拒绝判断。修复后请求体实际保持model=qwen3.5:9b、think=false、num_ctx=8192、num_predict=2048、temperature=0。Ruling: 不为显式覆盖请求名而破坏厂商扩展选项；配置与响应错配时拒绝保存，不自动接受别名或悄悄切换模型。
+
+全量首次1090项仅旧schema测试硬编码26列失败；改为检查实际必需列（含reported_model），再次全量1090项0失败0错误3跳过，Node21项通过。独立审查原无Critical/Important；其SDK合并建议经上述红绿验证处理。Minor暂缓：无正文边界和旧研究metadata兼容的专项测试。既有研究网关测试仍通过，但不将其当成所有空分支均被覆盖。
+
+真实核验：新增只调用本机Ollama的CheckGoldResponseModel.java，无行情输入、无数据库连接，明确不是预测实验。14:27和服务恢复后19:19两次本地SDK短调用分别3439/3131毫秒，返回qwen3.5:9b、ABSTAINED，结构验证通过；不能由此证明长任务稳定、权重摘要或预测能力。原11435及8080监听在续轮复查时均已不存在（未观察到退出原因），确认缺失后用隐藏后台进程恢复，未因观察超时重复启动。local-ai health=UP，4条原预测reportedModel全部null、旧hit未变、新弃权仍PENDING；没有新增正式预测或模型成绩。
+
+Chromium 1440x1050/390x844验证旧身份未知提示、非工件说明、JSON链接与刷新，无JS异常或横向溢出；Browser插件未提供，沿用已有Playwright。daily-report/latest的404仍是既有回退，不是新字段故障。官方metadata接口依据：https://docs.spring.io/spring-ai/docs/current/api/org/springframework/ai/chat/model/ChatResponse.html；实际实现与合并验证以本项目Spring AI 1.1.8为准，不据新版文档推断依赖行为。

@@ -45,6 +45,17 @@ test('旧记录缺版本或时段时显示未知，不追认历史资格', () =>
     assert.equal(nodes.settlementDate.textContent,'尚未结算');
 });
 
+test('响应标识与不可变模型工件明确区分，切回旧记录不保留核对标记', () => {
+    const {nodes,context} = page();
+    context.renderIdentity({modelName:'qwen3.5:9b',reportedModel:'qwen3.5:9b'});
+    assert.match(nodes.forecastIdentity.textContent,/响应模型标识已核对：qwen3.5:9b/);
+    assert.match(nodes.forecastIdentity.textContent,/不是不可变工件版本/);
+    assert.match(nodes.forecastIdentity.textContent,/完整推理参数尚未留存/);
+    context.renderIdentity({modelName:'qwen3.5:9b'});
+    assert.match(nodes.forecastIdentity.textContent,/旧记录未保存响应模型标识/);
+    assert.doesNotMatch(nodes.forecastIdentity.textContent,/响应模型标识已核对/);
+});
+
 test('正式弃权与旧未知协议分开呈现', () => {
     const {nodes,context} = page();
     context.renderIdentity({signal:'ABSTAINED'});

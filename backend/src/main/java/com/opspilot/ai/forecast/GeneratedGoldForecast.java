@@ -4,6 +4,11 @@ package com.opspilot.ai.forecast;
 public record GeneratedGoldForecast(
         String modelName,
         String rawResponse,
-        GoldDirectionForecastContent content
+        GoldDirectionForecastContent content,
+        String reportedModel
 ) {
+    /** 旧研究调用没有响应身份资料，保持未知。 */
+    public GeneratedGoldForecast(String modelName, String rawResponse, GoldDirectionForecastContent content) {
+        this(modelName, rawResponse, content, null);
+    }
 }

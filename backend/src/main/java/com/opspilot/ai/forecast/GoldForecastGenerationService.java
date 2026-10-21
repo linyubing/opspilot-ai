@@ -85,6 +85,10 @@ public class GoldForecastGenerationService {
         GoldForecastPrompt prompt = promptBuilder.build(snapshot, timing);
         GeneratedGoldForecast generated = gateway.generate(prompt);
 
+        if (!modelName.equals(generated.modelName()) || !modelName.equals(generated.reportedModel())) {
+            throw new InvalidGoldForecastAiResponseException("正式预测响应模型身份未核对，未保存结果", null);
+        }
+
         // 模型返回内容必须先通过安全边界校验，才能写入数据库。
         validator.validateFormal(generated.content());
 
@@ -118,7 +122,8 @@ public class GoldForecastGenerationService {
 
                         publishedAt,
                         timing,
-                        content.signal()
+                        content.signal(),
+                        generated.reportedModel()
                 );
 
         /*
