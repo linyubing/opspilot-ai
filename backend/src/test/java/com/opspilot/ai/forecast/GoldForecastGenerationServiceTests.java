@@ -41,6 +41,61 @@ class GoldForecastGenerationServiceTests {
     private static final String MODEL_NAME = "glm-4.7";
 
     @Test
+    @org.junit.jupiter.api.DisplayName("因子状态、规则版本、解释或整体缺失时，均不得将矛盾摘要送给模型")
+    void rejectsWrongFactors() {
+        var source = confirmed();
+        var value = source.snapshot();
+        for (boolean rate : List.of(true, false)) {
+            var original = rate ? value.realRateAssessment() : value.dollarIndexAssessment();
+            var bad = java.util.Arrays.asList(
+                    new com.opspilot.ai.analysis.ResearchFactorAssessment(com.opspilot.ai.analysis.GoldFactorStatus.SUPPORTIVE,
+                            original.ruleVersion(), original.explanation()),
+                    new com.opspilot.ai.analysis.ResearchFactorAssessment(original.status(),
+                            "unknown-rule", original.explanation()),
+                    new com.opspilot.ai.analysis.ResearchFactorAssessment(original.status(),
+                            original.ruleVersion(), "该因子强烈支撑黄金。"), null);
+            for (var assessment : bad) {
+                var snapshot = withFactors(source, rate ? assessment : value.realRateAssessment(),
+                        rate ? value.dollarIndexAssessment() : assessment);
+                when(snapshotRepository.findById(snapshot.id())).thenReturn(Optional.of(snapshot));
+                lenient().when(promptBuilder.build(org.mockito.ArgumentMatchers.eq(snapshot), any(GoldForecastTiming.class)))
+                        .thenReturn(prompt());
+                lenient().when(gateway.generate(prompt())).thenReturn(generated());
+                lenient().when(forecastRepository.saveWithCheck(any(), any()))
+                        .thenAnswer(call -> new SaveGoldForecastResult(call.getArgument(0), true));
+                assertThatThrownBy(() -> service.generate(snapshot.id()))
+                        .isInstanceOf(InvalidGoldForecastSnapshotException.class).hasMessageContaining("因子");
+            }
+        }
+        verifyNoInteractions(bars, sessions, promptBuilder, gateway, validator);
+        verify(forecastRepository, never()).saveWithCheck(any(), any());
+    }
+
+    private StoredGoldResearchSnapshot withFactors(StoredGoldResearchSnapshot source,
+            com.opspilot.ai.analysis.ResearchFactorAssessment rate,
+            com.opspilot.ai.analysis.ResearchFactorAssessment dollar) {
+        var value = source.snapshot();
+        return new StoredGoldResearchSnapshot(source.id(), new GoldResearchSnapshot(value.analysisDate(),
+                value.latestGoldDate(), value.latestRealRateDate(), value.latestDollarIndexDate(), value.gold(),
+                value.realRate(), value.dollarIndex(), rate, dollar, value.researchVersion(), value.disclaimer(),
+                value.input()), source.createdAt());
+    }
+
+    @Test
+    @org.junit.jupiter.api.DisplayName("已有预测不因新因子核验被重算、改写或重复调用模型")
+    void keepsOldFactors() {
+        var snapshot = withFactors(confirmed(), null, null);
+        var existing = existingForecast(snapshot);
+        when(snapshotRepository.findById(snapshot.id())).thenReturn(Optional.of(snapshot));
+        when(forecastRepository.findByKey(snapshot.id(), MODEL_NAME,
+                GoldForecastPromptBuilder.FORMAL_VERSION, GoldForecastRule.RULE_VERSION))
+                .thenReturn(Optional.of(existing));
+        assertThat(service.generate(snapshot.id())).isEqualTo(new SaveGoldForecastResult(existing, false));
+        verifyNoInteractions(bars, sessions, promptBuilder, gateway, validator);
+        verify(forecastRepository, never()).saveWithCheck(any(), any());
+    }
+
+    @Test
     @org.junit.jupiter.api.DisplayName("新预测缺宏观原始输入时，在行情和模型请求前拒绝")
     void rejectsMissingMacro() {
         var snapshot = withoutMacro(confirmed());

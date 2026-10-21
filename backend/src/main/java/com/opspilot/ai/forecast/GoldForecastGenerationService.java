@@ -91,6 +91,16 @@ public class GoldForecastGenerationService {
             throw new InvalidGoldForecastSnapshotException(value.researchVersion(),
                     "缺少与冻结时刻及摘要匹配的宏观原始输入");
         }
+        // 两个评估器是无状态纯规则；重放当前规则，只核对，不改写冻结摘要。
+        // 解释也会进入模型提示词，不能仅比较状态而放过相反的文字。
+        var rateFactor = new com.opspilot.ai.analysis.RealRateFactorEvaluator().evaluate(
+                value.realRate().basisPointChange5(), value.realRate().basisPointChange20());
+        var dollarFactor = new com.opspilot.ai.analysis.DollarIndexFactorEvaluator().evaluate(
+                value.dollarIndex().return5(), value.dollarIndex().return20());
+        if (!rateFactor.equals(value.realRateAssessment()) || !dollarFactor.equals(value.dollarIndexAssessment())) {
+            throw new InvalidGoldForecastSnapshotException(value.researchVersion(),
+                    "因子状态、规则版本或解释与冻结宏观输入不一致");
+        }
         var timing = publication.plan(snapshot.snapshot().latestGoldDate());
         publication.check(snapshot.snapshot().latestGoldDate(), timing, clock);
 
