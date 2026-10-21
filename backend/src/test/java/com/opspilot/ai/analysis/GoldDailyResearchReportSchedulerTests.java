@@ -33,6 +33,18 @@ class GoldDailyResearchReportSchedulerTests {
     @Mock
     private GoldDailyResearchReportService dailyReportService;
 
+    @Test @DisplayName("日报调度失败日志不输出来源URL、凭据或嵌套异常正文")
+    void hidesSourceSecrets(CapturedOutput output) {
+        var secret = "test-only-secret-must-not-appear";
+        when(dailyReportService.generateDailyReport()).thenThrow(new IllegalStateException(
+                "Authorization: Bearer " + secret,
+                new IllegalArgumentException("https://example.invalid?api_key=" + secret)));
+        assertThatCode(() -> new GoldDailyResearchReportScheduler(dailyReportService).generateDailyReport())
+                .doesNotThrowAnyException();
+        assertThat(output.getAll()).contains("黄金每日研究报告生成失败")
+                .doesNotContain(secret, "Authorization: Bearer", "https://example.invalid");
+    }
+
     @Test
     @DisplayName("成功时记录快照、方向和幂等状态")
     void logsAuditMetadataOnSuccess(CapturedOutput output) {
@@ -68,7 +80,8 @@ class GoldDailyResearchReportSchedulerTests {
         assertThat(output.getOut())
                 .contains(
                         "黄金每日研究报告生成失败",
-                        "数据源暂时不可用"
+                        "异常类型=IllegalStateException",
+                        "流程未完整完成"
                 );
     }
 

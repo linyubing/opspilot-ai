@@ -39,14 +39,10 @@ public class GoldSettlementScheduler {
                     result.forecastResolution().pendingCount()
             );
         } catch (RuntimeException exception) {
-            /*
-             * 单次外部数据故障不能破坏调度线程；保留异常堆栈，
-             * 方便区分网络、额度、数据格式和数据库问题。
-             */
+            // 底层异常链可能带含key的URL；只记异常类型，不记Message或Throwable。
             log.error(
-                    "黄金定时结算失败，原因={}",
-                    exception.getMessage(),
-                    exception
+                    "黄金定时结算失败，异常类型={}，流程未完整完成；来源错误详情已隐藏",
+                    exception.getClass().getSimpleName()
             );
         }
     }

@@ -24,6 +24,18 @@ class GoldSettlementSchedulerTests {
     @Mock
     private GoldSettlementService settlementService;
 
+    @Test @DisplayName("结算调度失败日志不输出来源URL、凭据或嵌套异常正文")
+    void hidesSourceSecrets(CapturedOutput output) {
+        var secret = "test-only-secret-must-not-appear";
+        when(settlementService.settleDaily()).thenThrow(new MarketDataUnavailableException(
+                "请求地址含api_key=" + secret,
+                new IllegalStateException("https://example.invalid?api_key=" + secret)));
+        assertThatCode(() -> new GoldSettlementScheduler(settlementService).runSettlement())
+                .doesNotThrowAnyException();
+        assertThat(output.getAll()).contains("黄金定时结算失败")
+                .doesNotContain(secret, "api_key=", "https://example.invalid");
+    }
+
     @Test
     @DisplayName("定时结算成功时记录行情和预测处理数量")
     void logsSettlementCounts(CapturedOutput output) {
@@ -60,7 +72,8 @@ class GoldSettlementSchedulerTests {
 
         assertThat(output).contains(
                 "黄金定时结算失败",
-                "黄金行情暂时不可用"
+                "异常类型=MarketDataUnavailableException",
+                "流程未完整完成"
         );
     }
 }

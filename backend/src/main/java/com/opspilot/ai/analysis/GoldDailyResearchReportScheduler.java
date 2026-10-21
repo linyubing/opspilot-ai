@@ -44,10 +44,10 @@ public class GoldDailyResearchReportScheduler {
                     result.forecast().created()
             );
         } catch (RuntimeException exception) {
+            // 来源或模型异常可能包含凭据，不把原文和嵌套堆栈送入日志。
             log.error(
-                    "黄金每日研究报告生成失败，原因={}",
-                    exception.getMessage(),
-                    exception
+                    "黄金每日研究报告生成失败，异常类型={}，流程未完整完成；来源错误详情已隐藏",
+                    exception.getClass().getSimpleName()
             );
         }
     }
