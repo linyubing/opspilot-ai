@@ -1,7 +1,7 @@
 package com.opspilot.ai.forecast.api;
 
 import com.opspilot.ai.forecast.*;
-import com.opspilot.ai.marketdata.GoldPriceSyncResult;
+import com.opspilot.ai.marketdata.GoldDailyBarSyncResult;
 import com.opspilot.ai.forecast.review.GeneratedGoldForecastReview;
 import com.opspilot.ai.forecast.review.GoldForecastReviewContent;
 import com.opspilot.ai.forecast.review.GoldForecastReviewService;
@@ -180,13 +180,16 @@ class GoldForecastControllerTests {
     @DisplayName("每日结算接口返回行情同步和预测结算结果")
     void returnsDailySettlementResult() throws Exception {
         when(settlementService.settleDaily()).thenReturn(new GoldSettlementResult(
-                new GoldPriceSyncResult(3, 2, 1, LocalDate.parse("2026-08-27")),
+                new GoldDailyBarSyncResult(3, 2, 1, LocalDate.parse("2026-08-27")),
                 new ResolveGoldForecastsResult(2, 1, 1)
         ));
 
         mockMvc.perform(post("/api/research/gold/forecasts/daily-settlement"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.priceSync.savedCount").value(2))
+                .andExpect(jsonPath("$.priceSync.receivedCount").value(3))
+                .andExpect(jsonPath("$.priceSync.weekendSkippedCount").value(1))
+                .andExpect(jsonPath("$.priceSync.latestPriceDate").value("2026-08-27"))
                 .andExpect(jsonPath("$.forecastResolution.resolvedCount").value(1));
     }
 

@@ -1,6 +1,6 @@
 package com.opspilot.ai.forecast;
 
-import com.opspilot.ai.marketdata.GoldPriceSyncResult;
+import com.opspilot.ai.marketdata.GoldDailyBarSyncResult;
 import com.opspilot.ai.marketdata.MarketDataUnavailableException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,7 +28,7 @@ class GoldSettlementSchedulerTests {
     @DisplayName("定时结算成功时记录行情和预测处理数量")
     void logsSettlementCounts(CapturedOutput output) {
         when(settlementService.settleDaily()).thenReturn(new GoldSettlementResult(
-                new GoldPriceSyncResult(
+                new GoldDailyBarSyncResult(
                         3, 2, 1, LocalDate.parse("2026-08-27")
                 ),
                 new ResolveGoldForecastsResult(2, 1, 1)

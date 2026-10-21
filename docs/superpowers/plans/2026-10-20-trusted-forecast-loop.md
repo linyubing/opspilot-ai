@@ -150,3 +150,7 @@ Chromium真实1440x1050与390x844验证forecast.html：身份正确、非空、�
 行为红测3运行3失败（选错原基准、快照缺失仍结算、晚建快照仍结算）；修复后完整常规回归oct22-frozen-base-full.log为1130运行0失败0错误5跳过，进程无FRED_API_KEY，外部FRED可用性仍未验证。独立只读审查无actionable findings，未另跑测试。未修改生产预测、成绩、最终留出集或小时窗口，未调用当前未结束目标的来源。此修复绑定的是预测前冻结输入，不宣称来源历史PIT或未来预测更准，整体目标继续。
 
 2026-10-22等待状态顺序：评估代码核对显示trustedCount仍为0、independent.trusted=false，未知/候选不被升级为可信率，本轮不新增第二套“可信准确率”。结算入口原先先查target，无目标且窗口未结束时误报WAITING_BAR。红测明确expected WAITING_END actual WAITING_BAR；改为timing.end之前直接WAITING_END，恰好结束及之后才读日线。-1/0/+1秒参数测试覆盖边界，保持不请求小时来源、不评分；原未来目标夹具仍证明不读取。完整常规oct22-waiting-end-final.log为1133运行0失败0错误5跳过，独立只读审查无actionable findings。未更改目标窗口、模型、阈值、历史命中或最终留出集；外部FRED仍待恢复，整体准确率提升未证明。真实运行验证安排在加载已提交版本后，仅对当前pending触发一次检查，不触发daily-settlement同步或新模型调用。
+
+2026-10-22每日结算接线：发现GoldSettlementService仍调用GoldPriceSyncService，仅更新旧单参考价表，而resolver固定读GoldDailyBarRepository/Twelve Data OHLC。新增真实Spring编排装配测试，隔离来源和解析服务，红测2运行2失败，证实旧服务被调用且OHLC失败不阻断。改为GoldDailyBarSyncService.syncRecent，沿用最多5个近期缺日与全量核验后写入的合同，不扫描全历史。结果领域类型及公开DTO改用已有OHLC同步类型；priceSync四个JSON键及yyyy-MM-dd日期不变。测试证明先OHLC后resolve、失败不使用旧表回退、不继续结算；装配不是实际外部来源端到端证明。
+
+首次全量1135运行0失败12错误5跳过，SQL状态53300确认新测试上下文连接池使PostgreSQL连接耗尽；不是通过排除测试解决。仅新增测试设置maximum-pool-size=2/minimum-idle=0，并在class结束DirtiesContext释放上下文，不改生产或数据库设置。再次全量oct22-settlement-wiring-final.log：1135运行0失败0错误5跳过，含真实PostgreSQL测试，FRED两live仍跳过，不能声称来源已恢复。独立只读审查无actionable findings。local-ai配置仍显式关闭结算/日报调度，本轮不启用无限后台调用，不把工程接线修复说成自动运行已交付。没有新真实预测、结算或成绩，未调整留出集，准确率提升仍未证明。

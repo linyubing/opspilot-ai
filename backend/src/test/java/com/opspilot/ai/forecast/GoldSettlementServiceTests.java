@@ -1,7 +1,7 @@
 package com.opspilot.ai.forecast;
 
-import com.opspilot.ai.marketdata.GoldPriceSyncResult;
-import com.opspilot.ai.marketdata.GoldPriceSyncService;
+import com.opspilot.ai.marketdata.GoldDailyBarSyncResult;
+import com.opspilot.ai.marketdata.GoldDailyBarSyncService;
 import com.opspilot.ai.marketdata.MarketDataUnavailableException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
@@ -23,7 +23,7 @@ import static org.mockito.Mockito.when;
 class GoldSettlementServiceTests {
 
     @Mock
-    private GoldPriceSyncService priceSyncService;
+    private GoldDailyBarSyncService priceSyncService;
 
     @Mock
     private GoldForecastResolutionService resolutionService;
@@ -31,12 +31,12 @@ class GoldSettlementServiceTests {
     @Test
     @DisplayName("先同步真实行情，再结算待验证预测")
     void syncsPricesBeforeResolvingPendingForecasts() {
-        GoldPriceSyncResult priceSync = new GoldPriceSyncResult(
+        GoldDailyBarSyncResult priceSync = new GoldDailyBarSyncResult(
                 3, 2, 1, LocalDate.parse("2026-08-27")
         );
         ResolveGoldForecastsResult resolution =
                 new ResolveGoldForecastsResult(2, 1, 1);
-        when(priceSyncService.syncDailyPrices()).thenReturn(priceSync);
+        when(priceSyncService.syncRecent()).thenReturn(priceSync);
         when(resolutionService.resolvePending(100)).thenReturn(resolution);
         GoldSettlementService service = new GoldSettlementService(
                 priceSyncService,
@@ -48,7 +48,7 @@ class GoldSettlementServiceTests {
         assertThat(result.priceSync()).isSameAs(priceSync);
         assertThat(result.forecastResolution()).isSameAs(resolution);
         InOrder order = inOrder(priceSyncService, resolutionService);
-        order.verify(priceSyncService).syncDailyPrices();
+        order.verify(priceSyncService).syncRecent();
         order.verify(resolutionService).resolvePending(100);
     }
 
@@ -57,7 +57,7 @@ class GoldSettlementServiceTests {
     void doesNotResolveForecastsWhenPriceSyncFails() {
         MarketDataUnavailableException failure =
                 new MarketDataUnavailableException("黄金行情暂时不可用");
-        when(priceSyncService.syncDailyPrices()).thenThrow(failure);
+        when(priceSyncService.syncRecent()).thenThrow(failure);
         GoldSettlementService service = new GoldSettlementService(
                 priceSyncService,
                 resolutionService
