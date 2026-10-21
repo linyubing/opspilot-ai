@@ -84,6 +84,13 @@ public class GoldForecastGenerationService {
     private SaveGoldForecastResult generateAndSave(StoredGoldResearchSnapshot snapshot) {
         // 新鲜度只约束新预测，已经保存的历史预测仍可按幂等键读取。
         freshnessPolicy.validate(snapshot.snapshot());
+        // 仅约束新生成；旧预测仍由前面的幂等查询原样返回，不补造宏观依据。
+        var value = snapshot.snapshot();
+        var input = value.input();
+        if (input.macro() == null || !input.macro().matches(value, input.checkedAt())) {
+            throw new InvalidGoldForecastSnapshotException(value.researchVersion(),
+                    "缺少与冻结时刻及摘要匹配的宏观原始输入");
+        }
         var timing = publication.plan(snapshot.snapshot().latestGoldDate());
         publication.check(snapshot.snapshot().latestGoldDate(), timing, clock);
 

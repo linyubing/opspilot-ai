@@ -40,6 +40,70 @@ class GoldForecastGenerationServiceTests {
     private static final Instant NOW = Instant.parse("2026-08-27T12:00:00Z");
     private static final String MODEL_NAME = "glm-4.7";
 
+    @Test
+    @org.junit.jupiter.api.DisplayName("新预测缺宏观原始输入时，在行情和模型请求前拒绝")
+    void rejectsMissingMacro() {
+        var snapshot = withoutMacro(confirmed());
+        when(snapshotRepository.findById(snapshot.id())).thenReturn(Optional.of(snapshot));
+        lenient().when(promptBuilder.build(org.mockito.ArgumentMatchers.eq(snapshot), any(GoldForecastTiming.class)))
+                .thenReturn(prompt());
+        lenient().when(gateway.generate(prompt())).thenReturn(generated());
+        lenient().when(forecastRepository.saveWithCheck(any(), any()))
+                .thenAnswer(call -> new SaveGoldForecastResult(call.getArgument(0), true));
+        assertThatThrownBy(() -> service.generate(snapshot.id()))
+                .isInstanceOf(InvalidGoldForecastSnapshotException.class).hasMessageContaining("宏观");
+        verifyNoInteractions(bars, sessions, promptBuilder, gateway, validator);
+        verify(forecastRepository, never()).saveWithCheck(any(), any());
+    }
+
+    @Test
+    @org.junit.jupiter.api.DisplayName("旧预测缺宏观依据仍原样读取，不请求来源或回填")
+    void keepsLegacyMacro() {
+        var snapshot = withoutMacro(confirmed());
+        var existing = existingForecast(snapshot);
+        when(snapshotRepository.findById(snapshot.id())).thenReturn(Optional.of(snapshot));
+        when(forecastRepository.findByKey(snapshot.id(), MODEL_NAME,
+                GoldForecastPromptBuilder.FORMAL_VERSION, GoldForecastRule.RULE_VERSION))
+                .thenReturn(Optional.of(existing));
+        assertThat(service.generate(snapshot.id())).isEqualTo(new SaveGoldForecastResult(existing, false));
+        verifyNoInteractions(bars, sessions, promptBuilder, gateway, validator);
+        verify(forecastRepository, never()).saveWithCheck(any(), any());
+    }
+
+    @Test
+    @org.junit.jupiter.api.DisplayName("原始宏观值与摘要不符或采集晚于冻结时刻，均不请求行情和模型")
+    void rejectsInvalidMacro() {
+        var source = confirmed();
+        var value = source.snapshot();
+        for (boolean future : List.of(false, true)) {
+            var rates = new java.util.ArrayList<>(value.input().macro().rates());
+            var row = rates.getFirst();
+            rates.set(0, new com.opspilot.ai.macrodata.MacroObservation(row.id(), row.seriesId(),
+                    row.observationDate(), future ? row.value() : row.value().add(BigDecimal.ONE),
+                    row.unit(), row.provider(), future ? value.input().checkedAt().plusSeconds(1) : row.collectedAt(), null));
+            var snapshot = new StoredGoldResearchSnapshot(source.id(), new GoldResearchSnapshot(value.analysisDate(),
+                    value.latestGoldDate(), value.latestRealRateDate(), value.latestDollarIndexDate(), value.gold(),
+                    value.realRate(), value.dollarIndex(), value.realRateAssessment(), value.dollarIndexAssessment(),
+                    value.researchVersion(), value.disclaimer(), new com.opspilot.ai.analysis.GoldSnapshotInput(
+                            value.input().bars(), value.input().checkedAt(), new com.opspilot.ai.analysis.GoldMacroInput(
+                                    rates, value.input().macro().dollars()))), source.createdAt());
+            when(snapshotRepository.findById(snapshot.id())).thenReturn(Optional.of(snapshot));
+            assertThatThrownBy(() -> service.generate(snapshot.id()))
+                    .isInstanceOf(InvalidGoldForecastSnapshotException.class).hasMessageContaining("宏观");
+        }
+        verifyNoInteractions(bars, sessions, promptBuilder, gateway, validator);
+        verify(forecastRepository, never()).saveWithCheck(any(), any());
+    }
+
+    private StoredGoldResearchSnapshot withoutMacro(StoredGoldResearchSnapshot source) {
+        var value = source.snapshot();
+        return new StoredGoldResearchSnapshot(source.id(), new GoldResearchSnapshot(value.analysisDate(),
+                value.latestGoldDate(), value.latestRealRateDate(), value.latestDollarIndexDate(), value.gold(),
+                value.realRate(), value.dollarIndex(), value.realRateAssessment(), value.dollarIndexAssessment(),
+                value.researchVersion(), value.disclaimer(), new com.opspilot.ai.analysis.GoldSnapshotInput(
+                        value.input().bars(), value.input().checkedAt())), source.createdAt());
+    }
+
     @Mock
     private GoldResearchSnapshotRepository snapshotRepository;
     @Mock
@@ -599,9 +663,31 @@ class GoldForecastGenerationServiceTests {
 
     private StoredGoldResearchSnapshot confirmed() {
         StoredGoldResearchSnapshot source = GoldForecastTestFixtures.snapshot("2515.75");
-        return new StoredGoldResearchSnapshot(source.id(), GoldSnapshotFixtures.withInput(
-                source.snapshot(), source.snapshot().latestGoldDate(), "gold-multifactor-contiguous-v4", source.createdAt()),
-                source.createdAt());
+        var value = GoldSnapshotFixtures.withInput(source.snapshot(), source.snapshot().latestGoldDate(),
+                "gold-multifactor-contiguous-v4", source.createdAt());
+        // 明确的平坦数学夹具，不从摘要反推虚构历史，也不写入真实行情库。
+        var zero = BigDecimal.ZERO;
+        var rates = flatMacro("DFII10", "percent", value.latestRealRateDate(), "2.4", source.createdAt());
+        var dollars = flatMacro("DTWEXBGS", "index_2006_100", value.latestDollarIndexDate(), "118", source.createdAt());
+        var complete = new GoldResearchSnapshot(value.analysisDate(), value.latestGoldDate(),
+                value.latestRealRateDate(), value.latestDollarIndexDate(), value.gold(),
+                new com.opspilot.ai.analysis.RealRateChangeMetrics(new BigDecimal("2.4"), zero, zero, zero,
+                        zero, zero, zero, source.createdAt()),
+                new com.opspilot.ai.analysis.DollarIndexChangeMetrics(new BigDecimal("118"), zero, zero, zero,
+                        source.createdAt()),
+                new com.opspilot.ai.analysis.RealRateFactorEvaluator().evaluate(zero, zero),
+                new com.opspilot.ai.analysis.DollarIndexFactorEvaluator().evaluate(zero, zero),
+                value.researchVersion(), value.disclaimer(), new com.opspilot.ai.analysis.GoldSnapshotInput(
+                        value.input().bars(), value.input().checkedAt(),
+                        new com.opspilot.ai.analysis.GoldMacroInput(rates, dollars)));
+        return new StoredGoldResearchSnapshot(source.id(), complete, source.createdAt());
+    }
+
+    private List<com.opspilot.ai.macrodata.MacroObservation> flatMacro(String series, String unit,
+            LocalDate date, String value, OffsetDateTime collectedAt) {
+        return java.util.stream.IntStream.of(0, 1, 5, 20).mapToObj(offset ->
+                new com.opspilot.ai.macrodata.MacroObservation(UUID.randomUUID(), series, date.minusDays(offset),
+                        new BigDecimal(value), unit, "fred", collectedAt, null)).toList();
     }
 
     @Test
