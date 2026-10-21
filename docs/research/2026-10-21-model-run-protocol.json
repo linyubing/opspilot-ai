@@ -1,0 +1,13 @@
+{
+  "purpose": "仅核验本次本地SDK请求及模型摘要观察，不生成黄金预测或回填历史",
+  "codeBase": "ac8b00d6803202b1f85e74fc3a2ae2486f7e59e6",
+  "model": "qwen3.5:9b",
+  "digest": "6488c96fa5faab64bb65cbd30d4289e20e6130ef535a93ef9a49f42eda893ea7",
+  "configSha256": {
+    "application.yaml": "0fbdcf197ce660639b0cf6d5ea60d3f397acf5296ac38dceb5449e755a0b547d",
+    "application-local-ai.yaml": "3ef009bea3a31ee3c4572ad52fe953bfb27042f57655b8d57a64ad2a05852632"
+  },
+  "acceptance": "一次非流式SDK调用；实际请求think=false,num_ctx=8192,num_predict=2048,temperature=0；响应名相符且弃权；前后tags和后ps摘要均等于固定摘要；服务版本前后一致；观察时间有序",
+  "limits": "只调用本机11435，不连接数据库，不读取行情，不评分；任一条件不符如实拒绝，禁止换参数重试或把结果填回旧预测",
+  "scope": "前后服务端观察不认证执行中工件；明确选项不等于所有服务端默认值、硬件与采样状态均已固定"
+}
