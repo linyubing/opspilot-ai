@@ -193,6 +193,27 @@ class GoldSnapshotIdentityTests {
                 source.realRateAssessment(), source.dollarIndexAssessment(), source.researchVersion(), source.disclaimer(), input);
     }
 
+    @Test
+    @DisplayName("百分点正确但任一基点变化矛盾时拒绝保存，不能污染因子判断")
+    void rejectsWrongBasisPoints() {
+        var source = snapshot(date.minusDays(2), "2.00");
+        var rate = source.realRate();
+        for (int index = 0; index < 3; index++) {
+            var points = new BigDecimal[]{rate.basisPointChange1(), rate.basisPointChange5(),
+                    rate.basisPointChange20()};
+            points[index] = points[index].add(BigDecimal.ONE);
+            var changed = new GoldResearchSnapshot(source.analysisDate(), source.latestGoldDate(),
+                    source.latestRealRateDate(), source.latestDollarIndexDate(), source.gold(),
+                    new RealRateChangeMetrics(rate.currentRate(), rate.percentagePointChange1(),
+                            rate.percentagePointChange5(), rate.percentagePointChange20(),
+                            points[0], points[1], points[2], rate.collectedAt()),
+                    source.dollarIndex(), source.realRateAssessment(), source.dollarIndexAssessment(),
+                    source.researchVersion(), source.disclaimer(), source.input());
+            assertThatThrownBy(() -> save(changed)).isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("宏观原始输入");
+        }
+    }
+
     private SaveGoldResearchSnapshotResult save(GoldResearchSnapshot value) {
         var result = repository.saveIfAbsent(value, NOW);
         ids.add(result.record().id());

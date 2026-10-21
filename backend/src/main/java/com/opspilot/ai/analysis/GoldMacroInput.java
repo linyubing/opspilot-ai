@@ -30,6 +30,9 @@ public record GoldMacroInput(List<MacroObservation> rates, List<MacroObservation
                 && same(delta(1), rate.percentagePointChange1())
                 && same(delta(2), rate.percentagePointChange5())
                 && same(delta(3), rate.percentagePointChange20())
+                && same(basisPoints(1), rate.basisPointChange1())
+                && same(basisPoints(2), rate.basisPointChange5())
+                && same(basisPoints(3), rate.basisPointChange20())
                 && same(change(1), dollar.return1())
                 && same(change(2), dollar.return5())
                 && same(change(3), dollar.return20());
@@ -59,6 +62,11 @@ public record GoldMacroInput(List<MacroObservation> rates, List<MacroObservation
     private BigDecimal change(int index) {
         return dollars.getFirst().value().divide(dollars.get(index).value(), MathContext.DECIMAL128)
                 .subtract(BigDecimal.ONE).multiply(new BigDecimal("100")).setScale(4, RoundingMode.HALF_UP);
+    }
+
+    /** 1 个百分点等于 100 个基点；与快照生成时的两位小数口径一致。 */
+    private BigDecimal basisPoints(int index) {
+        return delta(index).multiply(new BigDecimal("100")).setScale(2, RoundingMode.HALF_UP);
     }
 
     private boolean same(BigDecimal expected, BigDecimal actual) {

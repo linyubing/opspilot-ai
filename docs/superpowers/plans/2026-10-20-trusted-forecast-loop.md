@@ -130,3 +130,5 @@ V31只扩展generation_base_checked类型。saveWithCheck事务仅包裹新预�
 最终验证日志oct21-model-run-full-verified.log：1113运行0失败0错误3跳过，Node22通过。local-ai已隐藏后台重启PID36428，health=UP、schema=32。首次状态比较脚本误把PowerShell Invoke-RestMethod数组整体送入管道，得到1条空投影，误报变化；已重现directPipelineObjects=1而展开后为4，修正为先接收再展开，缓存接口重放created=false，选定原字段前后一致。仍4条旧预测且modelRun全null，原弃权PENDING，WAITING_BAR仍1条，原3条已结算均未命中；不补填今天的运行资料。
 
 Chromium真实1440x1050与390x844验证forecast.html：身份正确、非空、无错误遮罩/JS异常/横向溢出，原记录details展开收起刷新正常；未注入虚构行情或新模型回执。Browser插件未提供，使用已有Playwright；daily-report/latest的404仍是既有回退。截图为用户临时目录oct21-model-run-desktop.png、oct21-model-run-mobile.png。新回执正向显示由Node夹具和HTTP/JDBC测试验证，生产尚无新真实记录可展示，不能据旧记录未知状态宣称逐次实证已完成。当前没有新增正式预测/模型成绩或重训；整体目标继续，准确率未证明提高。
+
+2026-10-21宏观摘要一致性修复：GoldMacroInput.matches原先只核对原始利率、百分点和美元收益率，不核对实际供因子判断使用的基点。新增真实PostgreSQL行为测试，保持原始输入和百分点正确、逐一篡改1/5/20期基点；修改前1项运行1项失败（未拒绝保存，oct21-macro-bps-red.log）。修复按原生成顺序，原始差值先保留6位，再乘100并HALF_UP保留2位，分别核对三期。完整回归oct21-macro-bps-full.log：1114运行，0失败0错误3跳过。独立只读审查无actionable findings；审查未另跑测试。仅合成数学数据验证存储边界，不写真实预测或成绩，不修改已有快照，不变更因子阈值或输入身份协议。8080仍运行上一提交，本轮尚未重启加载；没有将源码验证冒充运行部署。正式新预测缺少宏观原始输入的准入检查仍待后续处理，旧缓存读取不得回填依据。整体目标继续，未证明准确率提高。
