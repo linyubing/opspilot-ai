@@ -106,6 +106,10 @@ public class GoldForecastResolutionService {
      * 尝试解析一条预测；没有后续有效工作日价格时保持待验证。
      */
     private boolean resolveOne(StoredGoldDirectionForecast forecast) {
+        // 日线尚不应该完整时，等待结束而非误报缺行情，也不提前请求核验来源。
+        if (forecast.timing() != null && clock.instant().isBefore(forecast.timing().end())) {
+            return waitFor(forecast, WAITING_END, null, null);
+        }
         Optional<GoldDailyBar> target = goldRepository.findNext(
                 GOLD_SYMBOL,
                 GOLD_PROVIDER,

@@ -55,6 +55,24 @@ class GoldForecastResolutionServiceTests {
 
     private GoldForecastResolutionService service;
 
+    @ParameterizedTest @ValueSource(ints = {-1, 0, 1})
+    @DisplayName("目标窗口结束前等待，恰好结束及结束后才查询目标日线")
+    void waitsBeforeLookup(int seconds) {
+        var forecast = timedForecast("2026-08-31");
+        when(forecastRepository.findPending(10)).thenReturn(List.of(forecast));
+        service = new GoldForecastResolutionService(forecastRepository, goldRepository, new GoldForecastRule(),
+                Clock.fixed(forecast.timing().end().plusSeconds(seconds), ZoneOffset.UTC), sessionCheck);
+        assertThat(service.resolvePending(10)).isEqualTo(new ResolveGoldForecastsResult(1, 0, 1));
+        var receipt = ArgumentCaptor.forClass(GoldResolutionCheck.class);
+        verify(forecastRepository).recordCheck(receipt.capture());
+        assertThat(receipt.getValue().code()).isEqualTo(seconds < 0
+                ? GoldResolutionCheck.Code.WAITING_END : GoldResolutionCheck.Code.WAITING_BAR);
+        if (seconds < 0) verifyNoInteractions(goldRepository);
+        else verify(goldRepository).findNext("XAUUSD", "twelve_data", FRIDAY);
+        verifyNoInteractions(sessionCheck);
+        verify(forecastRepository, never()).resolve(any(), any());
+    }
+
     @ParameterizedTest @ValueSource(strings = {"original", "missing", "late"})
     @DisplayName("正式结算只核验预测前冻结的完整基准，不能用同收盘价的新版OHLC替代")
     void usesFrozenBase(String issue) {
@@ -341,12 +359,13 @@ class GoldForecastResolutionServiceTests {
                 Clock.fixed(Instant.parse("2026-08-31T15:00:00Z"), ZoneOffset.UTC), sessionCheck);
         var forecast = timedForecast("2026-08-31");
         when(forecastRepository.findPending(10)).thenReturn(List.of(forecast));
-        when(goldRepository.findNext("XAUUSD", "twelve_data", FRIDAY))
+        org.mockito.Mockito.lenient().when(goldRepository.findNext("XAUUSD", "twelve_data", FRIDAY))
                 .thenReturn(Optional.of(bar("2026-08-31", "2525", "2026-08-31T12:00:00Z")));
         org.mockito.Mockito.lenient().when(forecastRepository.resolve(any(), any()))
                 .thenAnswer(invocation -> resolvedForecast(forecast, invocation.getArgument(1)));
         assertThat(service.resolvePending(10)).isEqualTo(new ResolveGoldForecastsResult(1, 0, 1));
         verify(forecastRepository, never()).resolve(any(), any());
+        verifyNoInteractions(goldRepository, sessionCheck);
     }
 
     private StoredGoldDirectionForecast timedForecast(String promisedDate) {

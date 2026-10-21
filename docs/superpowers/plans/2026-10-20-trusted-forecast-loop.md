@@ -148,3 +148,5 @@ Chromium真实1440x1050与390x844验证forecast.html：身份正确、非空、�
 2026-10-22正式冻结基准闭环：进一步发现旧结算仅比较仓库基准close与预测basePrice，同收盘价但不同open/high/low的修订版可替换原基准。为正式session-prompt合同注入原快照仓储，按snapshotId读原不可变输入，要求快照ID、版本、基准日期、保存时刻<=预测创建时刻，以及完整21根窗口matches。小时重放使用原快照首根OHLC，而非当前仓库。原快照缺失、晚建或无有效窗口时等待，绝不回填。旧非正式合同保留原仓库口径；5参兼容构造器不能为正式合同降级，Spring正式注入6参构造器。没有给旧预测补“生成时已知”认证。
 
 行为红测3运行3失败（选错原基准、快照缺失仍结算、晚建快照仍结算）；修复后完整常规回归oct22-frozen-base-full.log为1130运行0失败0错误5跳过，进程无FRED_API_KEY，外部FRED可用性仍未验证。独立只读审查无actionable findings，未另跑测试。未修改生产预测、成绩、最终留出集或小时窗口，未调用当前未结束目标的来源。此修复绑定的是预测前冻结输入，不宣称来源历史PIT或未来预测更准，整体目标继续。
+
+2026-10-22等待状态顺序：评估代码核对显示trustedCount仍为0、independent.trusted=false，未知/候选不被升级为可信率，本轮不新增第二套“可信准确率”。结算入口原先先查target，无目标且窗口未结束时误报WAITING_BAR。红测明确expected WAITING_END actual WAITING_BAR；改为timing.end之前直接WAITING_END，恰好结束及之后才读日线。-1/0/+1秒参数测试覆盖边界，保持不请求小时来源、不评分；原未来目标夹具仍证明不读取。完整常规oct22-waiting-end-final.log为1133运行0失败0错误5跳过，独立只读审查无actionable findings。未更改目标窗口、模型、阈值、历史命中或最终留出集；外部FRED仍待恢复，整体准确率提升未证明。真实运行验证安排在加载已提交版本后，仅对当前pending触发一次检查，不触发daily-settlement同步或新模型调用。
