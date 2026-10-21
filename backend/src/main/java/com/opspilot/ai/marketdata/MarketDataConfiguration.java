@@ -33,6 +33,8 @@ public class MarketDataConfiguration {
 
     @Bean
     RestClient twelveDataRestClient(TwelveDataProperties properties) {
+        // 同一客户端的报价、日线与时段检查共享预算；不自动重试429。
+        TwelveDataPacer pacer = new TwelveDataPacer(java.time.Duration.ofSeconds(9));
         HttpClient httpClient = HttpClient.newBuilder()
                 .connectTimeout(properties.connectTimeout())
                 .build();
@@ -43,6 +45,13 @@ public class MarketDataConfiguration {
         return RestClient.builder()
                 .baseUrl(properties.baseUrl().toString())
                 .requestFactory(requestFactory)
+                .requestInterceptor((request, body, execution) -> {
+                    // 锁覆盖实际发送，防止取得时隙的线程暂停后与后续请求挤在一起。
+                    synchronized (pacer) {
+                        pacer.acquire();
+                        return execution.execute(request, body);
+                    }
+                })
                 .build();
     }
 
