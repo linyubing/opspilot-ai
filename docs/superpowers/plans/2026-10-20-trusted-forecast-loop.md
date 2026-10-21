@@ -144,3 +144,7 @@ Chromium真实1440x1050与390x844验证forecast.html：身份正确、非空、�
 2026-10-22结算依据重放：发现resolution.matches只相信MATCHED和session，缺失原始依据、错价、缺小时或未知时区仍可被放行。新增两端各4种负例，红测8运行8失败；部分基准错误被原代码推进到目标失败，其余场景可直接结算。修复要求完整input.day绑定仓库待验日线、已知UTC依据，并用GoldSessionCheck纯算法独立重放原小时数据。任一端不通过仍PENDING，不写实际方向或命中。未来核验时间负例补完整input，确保仍真正覆盖时间检查。数学正向夹具补24小时，不进入真实行情；真实HTTP离线合同测试仍覆盖完整服务链。
 
 首次全量1127运行1失败2错误3跳过：JdbcGoldForecastRepositoryTests.advancesPastMismatch原mock只有标志，补完整小时依据后保持原101条轮转断言不变；FredDollarIndexProviderLiveTests与FredRealRateProviderLiveTests真实接口均不可用，不能报告为通过。不改用户环境/测试注解，仅本次验证进程清空FRED_API_KEY重跑完整常规套件：oct22-resolution-proof-offline-full.log为1127运行0失败0错误5跳过，含真实PostgreSQL测试；两项额外跳过即FRED live，外部可用性仍未证明。独立只读生产差异审查无actionable findings。未请求当前未结束目标的行情、未结算真实预测、未重训或修改留出集；准确率未证明提高。
+
+2026-10-22正式冻结基准闭环：进一步发现旧结算仅比较仓库基准close与预测basePrice，同收盘价但不同open/high/low的修订版可替换原基准。为正式session-prompt合同注入原快照仓储，按snapshotId读原不可变输入，要求快照ID、版本、基准日期、保存时刻<=预测创建时刻，以及完整21根窗口matches。小时重放使用原快照首根OHLC，而非当前仓库。原快照缺失、晚建或无有效窗口时等待，绝不回填。旧非正式合同保留原仓库口径；5参兼容构造器不能为正式合同降级，Spring正式注入6参构造器。没有给旧预测补“生成时已知”认证。
+
+行为红测3运行3失败（选错原基准、快照缺失仍结算、晚建快照仍结算）；修复后完整常规回归oct22-frozen-base-full.log为1130运行0失败0错误5跳过，进程无FRED_API_KEY，外部FRED可用性仍未验证。独立只读审查无actionable findings，未另跑测试。未修改生产预测、成绩、最终留出集或小时窗口，未调用当前未结束目标的来源。此修复绑定的是预测前冻结输入，不宣称来源历史PIT或未来预测更准，整体目标继续。

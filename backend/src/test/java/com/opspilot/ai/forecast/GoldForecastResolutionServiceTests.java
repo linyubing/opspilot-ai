@@ -55,6 +55,45 @@ class GoldForecastResolutionServiceTests {
 
     private GoldForecastResolutionService service;
 
+    @ParameterizedTest @ValueSource(strings = {"original", "missing", "late"})
+    @DisplayName("正式结算只核验预测前冻结的完整基准，不能用同收盘价的新版OHLC替代")
+    void usesFrozenBase(String issue) {
+        var old = timedForecast("2026-08-31");
+        var forecast = new StoredGoldDirectionForecast(old.id(), old.snapshotId(), old.baseDate(), old.basePrice(),
+                old.predictedDirection(), old.reasoning(), old.invalidationConditions(), old.modelName(),
+                GoldForecastPromptBuilder.FORMAL_VERSION, old.promptHash(), old.forecastRuleVersion(),
+                old.rawResponse(), old.status(), null, null, null, null, null, null, old.createdAt(), old.timing());
+        when(forecastRepository.findPending(10)).thenReturn(List.of(forecast));
+        var target = bar("2026-08-31", "2525");
+        when(goldRepository.findNext("XAUUSD", "twelve_data", FRIDAY)).thenReturn(Optional.of(target));
+        var revised = bar("2026-08-28", "2500");
+        org.mockito.Mockito.lenient().when(goldRepository.findRecent("XAUUSD", "twelve_data", FRIDAY, 1))
+                .thenReturn(List.of(revised));
+        var snapshots = org.mockito.Mockito.mock(com.opspilot.ai.analysis.history.GoldResearchSnapshotRepository.class);
+        var savedAt = issue.equals("late") ? forecast.createdAt().plusSeconds(1) : forecast.createdAt().minusHours(1);
+        var value = com.opspilot.ai.analysis.GoldSnapshotFixtures.withInput(
+                GoldForecastTestFixtures.snapshot("2500").snapshot(), FRIDAY,
+                "gold-multifactor-contiguous-v4", savedAt);
+        var frozen = value.input().bars().getFirst();
+        org.mockito.Mockito.lenient().when(snapshots.findById(forecast.snapshotId())).thenReturn(issue.equals("missing")
+                ? Optional.empty() : Optional.of(new com.opspilot.ai.analysis.history.StoredGoldResearchSnapshot(
+                        forecast.snapshotId(), value, savedAt)));
+        org.mockito.Mockito.lenient().when(sessionCheck.check(any(GoldDailyBar.class)))
+                .thenAnswer(call -> proof(call.getArgument(0), "MATCHED"));
+        org.mockito.Mockito.lenient().when(forecastRepository.resolve(any(), any()))
+                .thenAnswer(call -> resolvedForecast(forecast, call.getArgument(1)));
+        service = new GoldForecastResolutionService(forecastRepository, goldRepository, new GoldForecastRule(),
+                Clock.fixed(NOW, ZoneOffset.UTC), sessionCheck, snapshots);
+        assertThat(service.resolvePending(10).resolvedCount()).isEqualTo(issue.equals("original") ? 1 : 0);
+        if (issue.equals("original")) {
+            verify(sessionCheck).check(frozen);
+            verify(sessionCheck, never()).check(revised);
+        } else {
+            verifyNoInteractions(sessionCheck);
+            verify(forecastRepository, never()).resolve(any(), any());
+        }
+    }
+
     @ParameterizedTest
     @CsvSource({"base,missing", "target,missing", "base,price", "target,price",
             "base,hours", "target,hours", "base,timezone", "target,timezone"})

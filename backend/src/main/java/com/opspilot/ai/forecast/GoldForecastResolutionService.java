@@ -33,6 +33,7 @@ public class GoldForecastResolutionService {
     private final GoldForecastRule forecastRule;
     private final Clock clock;
     private final GoldSessionCheckService sessionCheck;
+    private final com.opspilot.ai.analysis.history.GoldResearchSnapshotRepository snapshots;
 
     public GoldForecastResolutionService(
             GoldForecastRepository forecastRepository,
@@ -41,11 +42,20 @@ public class GoldForecastResolutionService {
             Clock clock,
             GoldSessionCheckService sessionCheck
     ) {
+        this(forecastRepository, goldRepository, forecastRule, clock, sessionCheck, null);
+    }
+
+    @org.springframework.beans.factory.annotation.Autowired
+    public GoldForecastResolutionService(GoldForecastRepository forecastRepository,
+            GoldDailyBarRepository goldRepository, GoldForecastRule forecastRule, Clock clock,
+            GoldSessionCheckService sessionCheck,
+            com.opspilot.ai.analysis.history.GoldResearchSnapshotRepository snapshots) {
         this.forecastRepository = forecastRepository;
         this.goldRepository = goldRepository;
         this.forecastRule = forecastRule;
         this.clock = clock;
         this.sessionCheck = sessionCheck;
+        this.snapshots = snapshots;
     }
 
     /**
@@ -121,9 +131,19 @@ public class GoldForecastResolutionService {
         }
         GoldSessionCheckResult baseProof = null, targetProof = null;
         if (forecast.timing() != null) {
-            var bases = goldRepository.findRecent(GOLD_SYMBOL, GOLD_PROVIDER, forecast.baseDate(), 1);
-            if (bases.size() != 1) return waitFor(forecast, BASE_UNAVAILABLE, null, null);
-            GoldDailyBar base = bases.getFirst();
+            GoldDailyBar base;
+            if (forecast.promptVersion() != null
+                    && forecast.promptVersion().startsWith("gold-direction-session-prompt-")) {
+                // 正式合同只能读取预测前冻结的完整OHLC；收盘相同也不能换成修订版。
+                var original = frozenBase(forecast);
+                if (original.isEmpty()) return waitFor(forecast, BASE_UNAVAILABLE, null, null);
+                base = original.get();
+            } else {
+                // 保留旧合同原口径，不给它补造正式快照依据。
+                var bases = goldRepository.findRecent(GOLD_SYMBOL, GOLD_PROVIDER, forecast.baseDate(), 1);
+                if (bases.size() != 1) return waitFor(forecast, BASE_UNAVAILABLE, null, null);
+                base = bases.getFirst();
+            }
             if (!forecast.baseDate().equals(base.priceDate()) || !base.isConfirmedAt(asOf)) {
                 return waitFor(forecast, BASE_UNAVAILABLE, null, null);
             }
@@ -131,7 +151,7 @@ public class GoldForecastResolutionService {
                 return waitFor(forecast, BASE_CHANGED, null, null);
             }
             try {
-                // 两端均绑定仓库原价格，不能用最新重下载版本替换冻结基准。
+                // 正式基准绑定原快照，目标绑定本次待结算日线，不能以重下载价替换。
                 baseProof = sessionCheck.check(base);
                 if (!matches(baseProof, base)) return waitFor(forecast, BASE_SESSION_FAILED, baseProof, null);
                 targetProof = sessionCheck.check(target.get());
@@ -186,6 +206,20 @@ public class GoldForecastResolutionService {
                 // 不仅相信MATCHED标签：用绑定原价的小时数据独立重放，拒绝缺行或错价。
                 && new com.opspilot.ai.marketdata.GoldSessionCheck().check(
                         day, proof.input().hours(), proof.checkedAt()).matched();
+    }
+
+    /** 只读旧快照；缺失或晚建时等待，不拿当前仓库重建历史依据。 */
+    private Optional<GoldDailyBar> frozenBase(StoredGoldDirectionForecast forecast) {
+        if (snapshots == null) return Optional.empty();
+        return snapshots.findById(forecast.snapshotId()).filter(stored -> {
+            var value = stored.snapshot();
+            return forecast.snapshotId().equals(stored.id()) && stored.createdAt() != null
+                    && forecast.createdAt() != null && !stored.createdAt().isAfter(forecast.createdAt())
+                    && value != null && value.input() != null
+                    && com.opspilot.ai.analysis.GoldResearchSnapshotService.RESEARCH_VERSION.equals(value.researchVersion())
+                    && forecast.baseDate().equals(value.latestGoldDate())
+                    && value.input().matches(value.latestGoldDate(), value.gold(), stored.createdAt());
+        }).map(stored -> stored.snapshot().input().bars().getFirst());
     }
 
     /** 时间一致性是必要条件，不等同于已经确认供应商日线收盘。 */
