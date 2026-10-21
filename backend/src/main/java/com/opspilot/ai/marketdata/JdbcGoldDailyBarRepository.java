@@ -164,13 +164,25 @@ public class JdbcGoldDailyBarRepository implements GoldDailyBarRepository {
                     close_price = excluded.close_price,
                     currency = excluded.currency,
                     unit = excluded.unit,
-                    collected_at = excluded.collected_at,
-                    closed_day = excluded.closed_day,
-                    confirmed_at = excluded.confirmed_at,
-                    confirmation_source = excluded.confirmation_source,
-                    confirmation_hash = excluded.confirmation_hash
+                    collected_at = case when gold_daily_bar.confirmation_hash is null
+                        then excluded.collected_at else gold_daily_bar.collected_at end,
+                    closed_day = case when gold_daily_bar.confirmation_hash is null
+                        then excluded.closed_day else gold_daily_bar.closed_day end,
+                    confirmed_at = case when gold_daily_bar.confirmation_hash is null
+                        then excluded.confirmed_at else gold_daily_bar.confirmed_at end,
+                    confirmation_source = case when gold_daily_bar.confirmation_hash is null
+                        then excluded.confirmation_source else gold_daily_bar.confirmation_source end,
+                    confirmation_hash = case when gold_daily_bar.confirmation_hash is null
+                        then excluded.confirmation_hash else gold_daily_bar.confirmation_hash end
+                where gold_daily_bar.confirmation_hash is null
+                   or (gold_daily_bar.open_price = excluded.open_price
+                       and gold_daily_bar.high_price = excluded.high_price
+                       and gold_daily_bar.low_price = excluded.low_price
+                       and gold_daily_bar.close_price = excluded.close_price
+                       and gold_daily_bar.currency = excluded.currency
+                       and gold_daily_bar.unit = excluded.unit)
                 """;
-        jdbc.batchUpdate(sql, bars, bars.size(), (statement, bar) -> {
+        int[][] changed = jdbc.batchUpdate(sql, bars, bars.size(), (statement, bar) -> {
             statement.setString(1, bar.symbol());
             statement.setObject(2, bar.priceDate());
             statement.setBigDecimal(3, bar.open());
@@ -182,12 +194,21 @@ public class JdbcGoldDailyBarRepository implements GoldDailyBarRepository {
             statement.setString(9, bar.provider());
             statement.setObject(10, bar.collectedAt());
             var proof = bar.confirmation();
-            // 未确认覆盖必须清空旧依据，不能把新价格挂到旧确认上。
+            // 仅未确认旧行可更新；已确认同价重放由SQL保留原采集时间和确认依据。
             statement.setObject(11, proof == null ? null : proof.closedDay());
             statement.setObject(12, proof == null ? null : proof.checkedAt());
             statement.setString(13, proof == null ? null : proof.source());
             statement.setString(14, proof == null ? null : proof.receiptHash());
         });
+        // where冲突分支返回0行，必须抛错使之前写入的新行也回滚。
+        // JDBC若只返回“成功但数量未知”，同样不能假定整批已按约定完成。
+        for (int[] batch : changed) {
+            for (int rows : batch) {
+                if (rows != 1) {
+                    throw new MarketDataUnavailableException("黄金全量同步存在已确认价格冲突或无法确认写入结果，整批拒绝保存");
+                }
+            }
+        }
     }
 
     @Override

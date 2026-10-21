@@ -7,6 +7,7 @@ import java.util.Optional;
 /** 保存和读取带明确开高低收口径的黄金日线。 */
 public interface GoldDailyBarRepository {
 
+    /** 批量保存；已确认价格及原凭证不可覆盖，任一修订冲突使整批回滚。 */
     void saveAll(List<GoldDailyBar> bars);
 
     /** 仅补入缺失的已确认日线，返回实际新增数；冲突不能覆盖旧记录。 */

@@ -147,13 +147,68 @@ class JdbcGoldDailyBarRepositoryTests {
     }
 
     @Test
-    void rawOverwriteClearsPreviousProof() {
-        repository.saveAll(List.of(confirmed("2026-08-28", "4456")));
-        assertThat(repository.findLatest("XAUUSD", PROVIDER).orElseThrow().confirmation()).isNotNull();
-        repository.saveAll(List.of(bar("2026-08-28", "4457")));
+    void rawWriteCannotReplaceConfirmedHistory() {
+        var original = confirmed("2026-08-28", "4456");
+        repository.saveAll(List.of(original));
+        assertThatThrownBy(() -> repository.saveAll(List.of(bar("2026-08-28", "4457"))))
+                .isInstanceOf(MarketDataUnavailableException.class);
         var latest = repository.findLatest("XAUUSD", PROVIDER).orElseThrow();
-        assertThat(latest.close()).isEqualByComparingTo("4457");
-        assertThat(latest.confirmation()).isNull();
+        assertThat(latest.close()).isEqualByComparingTo("4456");
+        assertThat(latest.confirmation()).isEqualTo(original.confirmation());
+    }
+
+    @Test
+    void saveAllSamePriceKeepsOriginalEvidence() {
+        var original = confirmed("2026-08-28", "4456");
+        repository.saveAll(List.of(original));
+        var refreshed = withProof(original, OffsetDateTime.parse("2026-09-01T00:00:00Z"),
+                LocalDate.parse("2026-08-31"), "cd".repeat(32));
+        repository.saveAll(List.of(refreshed));
+        repository.saveAll(List.of(bar("2026-08-28", "4456")));
+        var saved = repository.findLatest("XAUUSD", PROVIDER).orElseThrow();
+        assertThat(saved.collectedAt()).isEqualTo(original.collectedAt());
+        assertThat(saved.confirmation()).isEqualTo(original.confirmation());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"open", "high", "low", "close"})
+    void saveAllRejectsConfirmedPriceRevision(String field) {
+        var original = confirmed("2026-08-28", "4456");
+        repository.saveAll(List.of(original));
+        var revised = new GoldDailyBar(original.symbol(), original.priceDate(),
+                field.equals("open") ? new BigDecimal("4457") : original.open(),
+                field.equals("high") ? new BigDecimal("4467") : original.high(),
+                field.equals("low") ? new BigDecimal("4445") : original.low(),
+                field.equals("close") ? new BigDecimal("4457") : original.close(),
+                original.currency(), original.unit(), original.provider(), original.collectedAt(), original.confirmation());
+        assertThatThrownBy(() -> repository.saveAll(List.of(revised)))
+                .isInstanceOf(MarketDataUnavailableException.class);
+        var saved = repository.findLatest("XAUUSD", PROVIDER).orElseThrow();
+        assertThat(saved.open()).isEqualByComparingTo(original.open());
+        assertThat(saved.high()).isEqualByComparingTo(original.high());
+        assertThat(saved.low()).isEqualByComparingTo(original.low());
+        assertThat(saved.close()).isEqualByComparingTo(original.close());
+    }
+
+    @Test
+    void saveAllRevisionRollsBackEarlierInsert() {
+        repository.saveAll(List.of(confirmed("2026-08-28", "4456")));
+        assertThatThrownBy(() -> repository.saveAll(List.of(
+                confirmed("2026-08-27", "4400"), confirmed("2026-08-28", "4457"))))
+                .isInstanceOf(MarketDataUnavailableException.class);
+        assertThat(repository.findAll("XAUUSD", PROVIDER)).extracting(GoldDailyBar::priceDate)
+                .containsExactly(LocalDate.parse("2026-08-28"));
+    }
+
+    @Test
+    void saveAllConcurrentRevisionCannotReplaceCommittedEvidence() {
+        var original = confirmed("2026-08-28", "4456");
+        assertThatThrownBy(() -> saveAgainstConcurrentWriter(original,
+                List.of(confirmed("2026-08-27", "4400"), confirmed("2026-08-28", "4457")), false))
+                .hasCauseInstanceOf(MarketDataUnavailableException.class);
+        assertThat(repository.findAll("XAUUSD", PROVIDER)).extracting(GoldDailyBar::priceDate)
+                .containsExactly(LocalDate.parse("2026-08-28"));
+        assertThat(repository.findLatest("XAUUSD", PROVIDER).orElseThrow().close()).isEqualByComparingTo("4456");
     }
 
     @Test
@@ -380,6 +435,11 @@ class JdbcGoldDailyBarRepositoryTests {
 
     private int saveMissingAgainstConcurrentWriter(GoldDailyBar original, List<GoldDailyBar> incoming)
             throws Exception {
+        return saveAgainstConcurrentWriter(original, incoming, true);
+    }
+
+    private int saveAgainstConcurrentWriter(GoldDailyBar original, List<GoldDailyBar> incoming, boolean missing)
+            throws Exception {
         var inserted = new CountDownLatch(1);
         var releaseCommit = new CountDownLatch(1);
         var competingPid = new CompletableFuture<Integer>();
@@ -401,7 +461,9 @@ class JdbcGoldDailyBarRepositoryTests {
                 assertThat(inserted.await(5, TimeUnit.SECONDS)).isTrue();
                 var contender = executor.submit(() -> new TransactionTemplate(transactionManager).execute(status -> {
                     competingPid.complete(jdbc.queryForObject("select pg_backend_pid()", Integer.class));
-                    return repository.saveMissing(incoming);
+                    if (missing) return repository.saveMissing(incoming);
+                    repository.saveAll(incoming);
+                    return 0;
                 }));
                 try {
                     assertWaitingForConcurrentTransaction(competingPid.get(5, TimeUnit.SECONDS));
