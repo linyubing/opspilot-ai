@@ -179,7 +179,13 @@ public class GoldForecastResolutionService {
 
     private boolean matches(GoldSessionCheckResult proof, GoldDailyBar day) {
         return proof != null && proof.matched() && proof.checkedAt() != null
-                && GoldSession.forDate(day.priceDate()).equals(proof.session());
+                && GoldSession.forDate(day.priceDate()).equals(proof.session())
+                && proof.input() != null && day.equals(proof.input().day())
+                && ("REQUEST_ONLY_UTC".equals(proof.input().timezoneBasis())
+                    || "RESPONSE_UTC".equals(proof.input().timezoneBasis()))
+                // 不仅相信MATCHED标签：用绑定原价的小时数据独立重放，拒绝缺行或错价。
+                && new com.opspilot.ai.marketdata.GoldSessionCheck().check(
+                        day, proof.input().hours(), proof.checkedAt()).matched();
     }
 
     /** 时间一致性是必要条件，不等同于已经确认供应商日线收盘。 */

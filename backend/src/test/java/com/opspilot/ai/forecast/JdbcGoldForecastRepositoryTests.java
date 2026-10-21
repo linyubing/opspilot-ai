@@ -264,10 +264,18 @@ class JdbcGoldForecastRepositoryTests {
                 .thenReturn(java.util.List.of(base));
         var checker = org.mockito.Mockito.mock(com.opspilot.ai.marketdata.GoldSessionCheckService.class);
         org.mockito.Mockito.when(checker.check(org.mockito.ArgumentMatchers.any(com.opspilot.ai.marketdata.GoldDailyBar.class)))
-                .thenAnswer(inv -> new com.opspilot.ai.marketdata.GoldSessionCheckResult(
-                        com.opspilot.ai.marketdata.GoldSession.forDate(((com.opspilot.ai.marketdata.GoldDailyBar) inv.getArgument(0)).priceDate()),
-                        java.time.Instant.parse("2026-09-02T12:00:00Z"),
-                        com.opspilot.ai.marketdata.GoldSessionCheckResult.Status.MATCHED, 24, 24, java.util.List.of(), "数学样例"));
+                .thenAnswer(inv -> {
+                    com.opspilot.ai.marketdata.GoldDailyBar day = inv.getArgument(0);
+                    var session = com.opspilot.ai.marketdata.GoldSession.forDate(day.priceDate());
+                    var hours = java.util.stream.LongStream.range(0, 24).mapToObj(i ->
+                            new com.opspilot.ai.marketdata.GoldHourBar(session.start().plusSeconds(i * 3600),
+                                    day.open(), day.high(), day.low(), day.close())).toList();
+                    return new com.opspilot.ai.marketdata.GoldSessionCheckResult(session,
+                            java.time.Instant.parse("2026-09-02T12:00:00Z"),
+                            com.opspilot.ai.marketdata.GoldSessionCheckResult.Status.MATCHED, 24, 24,
+                            java.util.List.of(), "数学样例", new com.opspilot.ai.marketdata.GoldSessionCheckResult.Input(
+                                    day, hours, "REQUEST_ONLY_UTC"));
+                });
         var resolver = new GoldForecastResolutionService(repository, bars, new GoldForecastRule(),
                 java.time.Clock.fixed(java.time.Instant.parse("2026-09-02T12:00:00Z"), java.time.ZoneOffset.UTC), checker);
         assertThat(resolver.resolvePending(100).resolvedCount()).isZero();

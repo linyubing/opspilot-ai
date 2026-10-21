@@ -55,6 +55,36 @@ class GoldForecastResolutionServiceTests {
 
     private GoldForecastResolutionService service;
 
+    @ParameterizedTest
+    @CsvSource({"base,missing", "target,missing", "base,price", "target,price",
+            "base,hours", "target,hours", "base,timezone", "target,timezone"})
+    @DisplayName("结算不能仅相信MATCHED标志，必须重放绑定原价的完整小时依据")
+    void rejectsUnboundProof(String side, String issue) {
+        prepareSession();
+        var base = bar("2026-08-28", "2500");
+        var target = bar("2026-08-31", "2525");
+        var day = side.equals("base") ? base : target;
+        var correct = proof(day, "MATCHED");
+        var input = correct.input();
+        var badInput = switch (issue) {
+            case "missing" -> null;
+            case "price" -> new GoldSessionCheckResult.Input(bar(day.priceDate().toString(), "2499"),
+                    input.hours(), input.timezoneBasis());
+            case "hours" -> new GoldSessionCheckResult.Input(day, input.hours().subList(0, 23), input.timezoneBasis());
+            default -> new GoldSessionCheckResult.Input(day, input.hours(), "UNKNOWN");
+        };
+        var bad = new GoldSessionCheckResult(correct.session(), correct.checkedAt(),
+                GoldSessionCheckResult.Status.MATCHED, 24, 24, List.of(), "不可信标志", badInput);
+        when(sessionCheck.check(base)).thenReturn(side.equals("base") ? bad : proof(base, "MATCHED"));
+        if (side.equals("target")) when(sessionCheck.check(target)).thenReturn(bad);
+        assertThat(service.resolvePending(10)).isEqualTo(new ResolveGoldForecastsResult(1, 0, 1));
+        verify(forecastRepository, never()).resolve(any(), any());
+        var receipt = ArgumentCaptor.forClass(GoldResolutionCheck.class);
+        verify(forecastRepository).recordCheck(receipt.capture());
+        assertThat(receipt.getValue().code()).isEqualTo(side.equals("base")
+                ? GoldResolutionCheck.Code.BASE_SESSION_FAILED : GoldResolutionCheck.Code.TARGET_SESSION_FAILED);
+    }
+
     @Test @DisplayName("新时段合同不能仅凭同日期的闭市标志结算")
     void waitsForSessionProof() {
         var forecast = timedForecast("2026-08-31");
@@ -136,7 +166,8 @@ class GoldForecastResolutionServiceTests {
         when(sessionCheck.check(base)).thenReturn(proof(base, "MATCHED"));
         when(sessionCheck.check(target)).thenReturn(new GoldSessionCheckResult(
                 GoldSession.forDate(target.priceDate()), NOW.plusSeconds(1),
-                GoldSessionCheckResult.Status.MATCHED, 24, 24, List.of(), "数学样例"));
+                GoldSessionCheckResult.Status.MATCHED, 24, 24, List.of(), "数学样例",
+                proof(target, "MATCHED").input()));
         assertThat(service.resolvePending(10).resolvedCount()).isZero();
         verify(forecastRepository, never()).resolve(any(), any());
     }
@@ -243,8 +274,14 @@ class GoldForecastResolutionServiceTests {
     }
 
     private GoldSessionCheckResult proof(GoldDailyBar bar, String status) {
+        var session = GoldSession.forDate(bar.priceDate());
+        // 仅用于离线算法边界测试，不写入真实行情或成绩。
+        var hours = java.util.stream.LongStream.range(0, 24).mapToObj(i ->
+                new com.opspilot.ai.marketdata.GoldHourBar(session.start().plusSeconds(i * 3600),
+                        bar.open(), bar.high(), bar.low(), bar.close())).toList();
         return new GoldSessionCheckResult(GoldSession.forDate(bar.priceDate()), NOW,
-                GoldSessionCheckResult.Status.valueOf(status), 24, 24, List.of(), "数学样例");
+                GoldSessionCheckResult.Status.valueOf(status), 24, 24, List.of(), "数学样例",
+                new GoldSessionCheckResult.Input(bar, hours, "REQUEST_ONLY_UTC"));
     }
 
     @Test @DisplayName("真实下一根日线与承诺日不一致时保持等待，不能移动目标")

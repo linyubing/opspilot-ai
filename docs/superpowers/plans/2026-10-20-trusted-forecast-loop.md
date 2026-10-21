@@ -140,3 +140,7 @@ Chromium真实1440x1050与390x844验证forecast.html：身份正确、非空、�
 2026-10-22因子语义准入收尾：新生成在原始宏观数据通过后，以现有无状态评估器重放规则，完整比较status/ruleVersion/explanation。矛盾摘要、未知规则及null拒绝，不自动纠正冻结快照，不改变缓存旧记录。红测oct21-factor-gate-red.log复现矛盾摘要仍生成；最终oct21-factor-gate-final.log全量1119运行0失败0错误3跳过。负测分别覆盖两类因子的状态、版本、解释和缺失，缓存兼容测试证明不请求模型或来源、不回填。解释精确匹配属于明确准入合同：将来文案或规则变化需显式版本兼容，不让旧摘要静默套新规则。独立只读审查无actionable findings，未另跑测试。
 
 00:25上海实际核对后重启local-ai，PID35520、health=UP，真实缓存POST created=false，4条旧记录的选定字段含modelRun不变；没有新模型调用或评分。此时仍在原目标窗口内：承诺结束2026-10-21T20:00Z，即上海10月22日04:00，不能因为自然日期到了22日就提前结算。原978b5294预测仍ABSTAINED/PENDING、hit=null。服务加载本轮源码，但启动Git标识仍为提交前9893415，不认证未提交代码的工件身份。整体目标继续；下一步在窗口完整结束且真实来源可用后核验目标，不改时段追求匹配，不宣称准确率提高。
+
+2026-10-22结算依据重放：发现resolution.matches只相信MATCHED和session，缺失原始依据、错价、缺小时或未知时区仍可被放行。新增两端各4种负例，红测8运行8失败；部分基准错误被原代码推进到目标失败，其余场景可直接结算。修复要求完整input.day绑定仓库待验日线、已知UTC依据，并用GoldSessionCheck纯算法独立重放原小时数据。任一端不通过仍PENDING，不写实际方向或命中。未来核验时间负例补完整input，确保仍真正覆盖时间检查。数学正向夹具补24小时，不进入真实行情；真实HTTP离线合同测试仍覆盖完整服务链。
+
+首次全量1127运行1失败2错误3跳过：JdbcGoldForecastRepositoryTests.advancesPastMismatch原mock只有标志，补完整小时依据后保持原101条轮转断言不变；FredDollarIndexProviderLiveTests与FredRealRateProviderLiveTests真实接口均不可用，不能报告为通过。不改用户环境/测试注解，仅本次验证进程清空FRED_API_KEY重跑完整常规套件：oct22-resolution-proof-offline-full.log为1127运行0失败0错误5跳过，含真实PostgreSQL测试；两项额外跳过即FRED live，外部可用性仍未证明。独立只读生产差异审查无actionable findings。未请求当前未结束目标的行情、未结算真实预测、未重训或修改留出集；准确率未证明提高。
