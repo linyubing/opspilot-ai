@@ -1,0 +1,15 @@
+{
+  "purpose": "只核验现存正式预测的冻结基准时段，不进行模型评分或窗口搜索",
+  "forecastId": "978b5294-fd31-4ff1-ad40-a7e422ee0ff6",
+  "baseDate": "2026-10-20",
+  "baseClose": "4120.79556000",
+  "ruleVersion": "sydney-0700-candidate-v1",
+  "start": "2026-10-19T20:00:00Z",
+  "end": "2026-10-20T20:00:00Z",
+  "externalCalls": 1,
+  "interval": "1h",
+  "timezone": "UTC",
+  "outputsize": 64,
+  "acceptance": "完整唯一整点窗口，原仓库OHLC与小时聚合四价精确相等",
+  "stop": "任一不匹配、缺时或来源错误即拒绝，不下载日线替价、不改窗口、不调阈值、不重训、不评分、不写库"
+}

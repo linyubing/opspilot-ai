@@ -102,3 +102,5 @@ V30新增nullable reported_model和与model_name匹配的约束，旧记录不�
 真实核验：新增只调用本机Ollama的CheckGoldResponseModel.java，无行情输入、无数据库连接，明确不是预测实验。14:27和服务恢复后19:19两次本地SDK短调用分别3439/3131毫秒，返回qwen3.5:9b、ABSTAINED，结构验证通过；不能由此证明长任务稳定、权重摘要或预测能力。原11435及8080监听在续轮复查时均已不存在（未观察到退出原因），确认缺失后用隐藏后台进程恢复，未因观察超时重复启动。local-ai health=UP，4条原预测reportedModel全部null、旧hit未变、新弃权仍PENDING；没有新增正式预测或模型成绩。
 
 Chromium 1440x1050/390x844验证旧身份未知提示、非工件说明、JSON链接与刷新，无JS异常或横向溢出；Browser插件未提供，沿用已有Playwright。daily-report/latest的404仍是既有回退，不是新字段故障。官方metadata接口依据：https://docs.spring.io/spring-ai/docs/current/api/org/springframework/ai/chat/model/ChatResponse.html；实际实现与合并验证以本项目Spring AI 1.1.8为准，不据新版文档推断依赖行为。
+
+2026-10-21当前基准实证：预先固定已有正式预测及10/20原仓库基准、原20:00UTC窗口，唯一1h请求获得24/24且四价精确MATCHED。原归档SHA b846bca9122fd983b2e77f5cf5f339945b1d59847f311b1c4081f652b04c79bf；空凭据离线复算与错误摘要/同路径重取拒绝共3项通过。此证据否定“此前两日失败意味着所有日期都不能匹配”的泛化，下一步仍按原规则检查当前预测的真实目标，不换窗口或重训。仅REQUEST_ONLY_UTC，且复核晚于生成，不升级为PIT/官方时段/可信样本。无数据库或成绩写入，旧冻结配对仍不评分。只读审查无阻断；操作及暂缓Minor见`docs/research/2026-10-21-current-base-session-check.md`。目标尚未完成。
