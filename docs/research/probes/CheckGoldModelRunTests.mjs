@@ -22,6 +22,7 @@ for (const [name, change] of [
     ['失败尝试', r => {r.status='FAILED'}],
     ['协议替换', r => {r.protocolSha256='d'.repeat(64)}],
     ['实际请求开启思考', r => {r.request.think=true}],
+    ['双处思考开关冲突', r => {r.request.options.think=true}],
     ['输出参数被丢弃', r => {delete r.request.options.num_predict}],
     ['响应模型错配', r => {r.reportedModel='another-model'}],
     ['加载工件不同', r => {r.loadedModel={...r.loadedModel,digest:'e'.repeat(64)}}],

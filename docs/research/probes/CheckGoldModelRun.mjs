@@ -13,6 +13,7 @@ export function checkRun(run, protocol, protocolHash) {
     assert.equal(run.request.model, protocol.model, '请求模型不符');
     assert.equal(run.reportedModel, protocol.model, '响应模型不符');
     assert.equal(run.request.think, false, '未关闭额外思考');
+    if ('think' in run.request.options) assert.equal(run.request.options.think, false, '思考开关存在冲突');
     assert.equal(run.request.stream, false, '探针必须为单次非流式请求');
     assert.equal(run.request.options.num_ctx, 8192, '上下文限制变化');
     assert.equal(run.request.options.num_predict, 2048, '输出限制变化');

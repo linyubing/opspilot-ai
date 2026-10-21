@@ -79,6 +79,9 @@ public class CheckGoldModelRun {
             var http = RestClient.builder().requestFactory(factory).requestInterceptor((req, body, execution) -> {
                 require(req.getURI().toString().equals(uri + "/api/chat"), "SDK请求地址不符");
                 require(request.compareAndSet(null, JSON.readTree(body)), "不允许重复模型请求");
+                // 即使超时或正文无效，也保留已经实际发送的参数，不能在失败后丢失证据。
+                archive.set("request", request.get());
+                archive.put("requestCapturedAt", Instant.now().toString());
                 return execution.execute(req, body);
             });
             var api = OllamaApi.builder().baseUrl(uri.toString()).restClientBuilder(http).build();
@@ -107,6 +110,7 @@ public class CheckGoldModelRun {
             archive.put("failureType", error.getClass().getSimpleName());
             throw error;
         } finally {
+            archive.put("attemptEndedAt", Instant.now().toString());
             byte[] bytes = JSON.writeValueAsBytes(archive);
             Files.write(output, bytes, StandardOpenOption.CREATE_NEW);
             System.out.println(JSON.writeValueAsString(Map.of("archiveSha256", sha(bytes),

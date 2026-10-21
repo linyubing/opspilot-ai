@@ -22,3 +22,6 @@
 2026-10-03-vix-protocol.md text eol=lf
 2026-10-03-vix-vectors-metrics.json text eol=lf
 2026-10-03-vix-model-metrics.json text eol=lf
+# 以下是按原字节验收的固定协议与真实归档，不做换行转换。
+2026-10-21-model-run-protocol.json -text
+evidence/2026-10-21-model-run.json -text
