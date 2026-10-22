@@ -90,6 +90,37 @@ function runLabel(key) {
     return key ? `逐次运行配置键 ${String(key).slice(0, 12)}` : "逐次运行依据未知";
 }
 
+// 结算只读原记录；切换记录时先清空，不能借用最新日线或推算缺失成绩。
+function renderSettlement(forecast) {
+    text("actualDate", "尚无有效结算");
+    for (const id of ["actualPrice", "actualReturn", "actualDirection"]) text(id, "暂无");
+    text("hitResult", "不判定");
+    text("settlementNote", "尚无有效结算，不使用最新行情补值；等待原因见下方已保存检查。");
+    if (forecast.status !== "RESOLVED") return;
+
+    if (!forecast.targetDate || !Number.isFinite(forecast.targetPrice) || forecast.targetPrice <= 0
+        || !Number.isFinite(forecast.actualReturn)
+        || !["BULLISH", "NEUTRAL", "BEARISH"].includes(forecast.actualDirection)) {
+        text("settlementNote", "记录已结算，但结果字段不完整，不能展示涨跌或判定命中；不补零、不借用其他行情。");
+        return;
+    }
+
+    // actualReturn 已是百分数（0.6 表示 0.6%），不能复用把比例乘 100 的 percent()。
+    const change = forecast.actualReturn;
+    text("actualDate", forecast.targetDate);
+    text("actualPrice", money(forecast.targetPrice));
+    text("actualReturn", `${change > 0 ? "+" : ""}${change.toFixed(4)}%`);
+    text("actualDirection", directions[forecast.actualDirection]);
+    const hit = forecast.hit === true ? "命中" : forecast.hit === false ? "未命中" : "命中结果未留存";
+    text("hitResult", forecast.signal === "ABSTAINED" ? "弃权，不计命中"
+        : forecast.signal === "PREDICTED" ? hit : `旧协议：${hit}，资格未知`);
+    const move = change > 0 ? "上涨" : change < 0 ? "下跌" : "持平";
+    const rule = forecast.forecastRuleVersion === "gold-next-session-direction-v1"
+        ? "本条规则将 [-0.5%, 0.5%]（含边界）归为中性，中性不等于价格持平。"
+        : "本条规则阈值未在此确认，不套用当前阈值重写历史分类。";
+    text("settlementNote", `实际价格${move}；方向分类来自原结算记录。${rule}结算通过不等于模型准确率提高。`);
+}
+
 function renderForecast(forecast) {
     latestForecast = forecast;
     const direction = forecast.signal === "ABSTAINED" ? "ABSTAINED" : forecast.predictedDirection;
@@ -101,6 +132,7 @@ function renderForecast(forecast) {
     text("direction", directions[direction] || direction);
     text("baseDate", forecast.baseDate);
     renderIdentity(forecast);
+    renderSettlement(forecast);
     text("basePrice", money(forecast.basePrice));
     text("forecastStatus", statuses[forecast.status] || forecast.status);
     text("createdAt", forecast.createdAt ? new Date(forecast.createdAt).toLocaleString("zh-CN") : "-");

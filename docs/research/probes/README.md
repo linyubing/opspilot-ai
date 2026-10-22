@@ -259,3 +259,17 @@ node ../docs/research/probes/TreeVerifierChecks.cjs target/tree-local.json
 输出必须是不存在的新文件。查询只读本地PostgreSQL，需要已有`OPSPILOT_DB_PASSWORD`，不要把密码写入归档。缺少真实日线或指纹变化时停止；新检出也须使用有权使用的本地数据库，不能补假值。核验器独立遍历保存的600棵原生树、映射特征/类别ID、复核原生概率与所有指标；不依赖数据库，不调用Java预测。`TreeMathChecks`的人工树、四象限数学夹具与故意损坏副本都不是市场行情。
 
 已有完整本地归档时，可从项目根运行`node docs/research/probes/verify-tree.cjs docs/research/2026-10-03-tree-check.json`；比较重复运行可另加`backend/target/tree-local.json`作为第三个参数。完整JSON被忽略，不公开再分发行情。
+
+## 2026-10-23 已存正式结算的独立离线复算
+
+`VerifyStoredGoldResolution.java` 只核验本轮固定记录 `978b5294-fd31-4ff1-ad40-a7e422ee0ff6`，不查询数据库、行情或模型。它要求调用方提供首次捕获的外部 SHA-256 锚点，再精确重算两端各 24 小时 OHLC、原基准与目标价、六位百分比收益和方向，核对原时段不漂移及弃权 `hit=null`。输入是本地 API 的数据库回读 JSON，不是供应商原生 HTTP，也不认证官方时段或历史可得性。
+
+在项目根目录运行（Java 21；`$probeCp` 使用已有依赖类路径，环境变量不输出）：
+
+```powershell
+$probeCp = (Get-Content -Raw backend/target/oct21-runtime-cp.txt).Trim()
+javac -encoding UTF-8 -cp $probeCp -d backend/target/oct23-resolution-verifier docs/research/probes/VerifyStoredGoldResolution.java
+java '-Dstdout.encoding=UTF-8' '-Dstderr.encoding=UTF-8' -cp "backend/target/oct23-resolution-verifier;$probeCp" VerifyStoredGoldResolution --input backend/target/oct23-stored-resolution.json --expected-sha256 7bc1bb5299725655cd6e143550f08f59a5744012f13a5b968fa7185feb7328c0 --self-test
+```
+
+缺类路径文件时，可在 `backend` 用现有 Maven 执行 `dependency:build-classpath '-Dmdep.outputFile=target/oct21-runtime-cp.txt'` 生成，之后回项目根目录。完整行情回读文件仅保留在 Git 忽略的 `backend/target`；缺失时不能新下载再冒称原文件。工具不会生成、覆盖文件；9 个内存篡改检查仅验证拒绝规则，4 个数学方向边界不计为行情或预测样本。真实结果为 `0.333590% / NEUTRAL / ABSTAINED / hit=null`，不是准确率改善证据。

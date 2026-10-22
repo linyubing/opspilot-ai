@@ -44,6 +44,18 @@
             </dl>
         </article>
 
+        <section class="panel" id="settlementPanel">
+            <div class="heading"><h2>真实结算结果</h2></div>
+            <div class="source-grid">
+                <article><span>实际结算日</span><strong id="actualDate">尚无有效结算</strong></article>
+                <article><span>已存结算价（美元/金衡盎司）</span><strong id="actualPrice">暂无</strong></article>
+                <article><span>相对原预测基准价的涨跌幅</span><strong id="actualReturn">暂无</strong></article>
+                <article><span>实际方向（规则分类）</span><strong id="actualDirection">暂无</strong></article>
+                <article><span>原预测命中结果</span><strong id="hitResult">不判定</strong></article>
+            </div>
+            <p id="settlementNote" class="note">只显示这条预测保存的结算，不使用最新行情补值。</p>
+        </section>
+
         <section class="panel">
             <div class="heading"><h2>预测发布时间与目标承诺</h2></div>
             <p id="targetInterval" class="reasoning">旧记录未保存候选时段。</p>
@@ -168,6 +180,6 @@
         <div id="independentStats" aria-live="polite">正在读取独立目标统计…</div>
     </section>
 </main>
-<script src="/forecast.js?v=14" defer></script>
+<script src="/forecast.js?v=15" defer></script>
 </body>
 </html>
